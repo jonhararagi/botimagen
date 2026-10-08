@@ -88,6 +88,7 @@ class CharacterGenerator:
         chosen: dict[str, str],
         rng: random.Random,
         coherence: float,
+        surprise: bool = False,
     ) -> tuple[str, str]:
         requested = chosen.get(category, "auto")
         values = self.categories.get(category, [])
@@ -108,15 +109,32 @@ class CharacterGenerator:
         )
         top_score = ranked[0][0]
 
-        # High coherence narrows the candidate pool. Lower coherence keeps
-        # the best candidates but permits more visual experimentation.
-        spread = 0.35 + (1.0 - coherence) * 2.4
-        threshold = top_score - spread
-        pool = [item for score, item in ranked if score >= threshold]
+        if surprise and category == "quirk":
+            preferred = [
+                (
+                    item,
+                    3.0 if item.get("rarity") == "rare"
+                    else 2.0 if item.get("rarity") == "uncommon"
+                    else 0.8,
+                )
+                for _, item in ranked
+            ]
+            pool = [item for item, _ in preferred]
+            weights = [
+                max(0.2, self._score(category, item, chosen)) * rarity_weight
+                for (item, rarity_weight) in preferred
+            ]
+        else:
+            # High coherence narrows the candidate pool. Lower coherence keeps
+            # the best candidates but permits more visual experimentation.
+            spread = 0.35 + (1.0 - coherence) * 2.4
+            threshold = top_score - spread
+            pool = [item for score, item in ranked if score >= threshold]
+            weights = [
+                max(0.1, self._score(category, item, chosen) - threshold + 0.5)
+                for item in pool
+            ]
 
-        # Weighted random selection prevents the first equally-scored item
-        # from winning every time, while strongly preferring compatible traits.
-        weights = [max(0.1, self._score(category, item, chosen) - threshold + 0.5) for item in pool]
         selected = rng.choices(pool, weights=weights, k=1)[0]
         return selected["id"], selected["label"]
 
@@ -125,6 +143,7 @@ class CharacterGenerator:
         selections: dict[str, str] | None = None,
         seed: int | None = None,
         coherence: float = 0.82,
+        surprise: bool = False,
     ) -> dict[str, Any]:
         chosen = dict(selections or {})
         rng = random.Random(seed)
@@ -135,7 +154,7 @@ class CharacterGenerator:
 
         for category in CATEGORY_ORDER:
             context = {**chosen, **profile}
-            value, label = self._choose_category(category, context, rng, coherence)
+            value, label = self._choose_category(category, context, rng, coherence, surprise)
             profile[category] = value
             labels[category] = label
 
@@ -152,7 +171,7 @@ class CharacterGenerator:
             if chosen.get(category, "auto") != "auto":
                 continue
             value, label = self._choose_category(
-                category, {**chosen, **profile}, rng, coherence
+                category, {**chosen, **profile}, rng, coherence, surprise
             )
             profile[category] = value
             labels[category] = label
@@ -170,6 +189,7 @@ class CharacterGenerator:
             "negative_prompt": DEFAULT_NEGATIVE,
             "seed": seed,
             "coherence": coherence,
+            "surprise": surprise,
         }
 
     @staticmethod
@@ -282,6 +302,16 @@ class CharacterGenerator:
             "AUTO usa etiquetas compartidas, pesos de compatibilidad y semilla; "
             "la coherencia se controla con un nivel ajustable para evitar clones."
         )
+        if profile.get("quirk"):
+            reasons.append(
+                "El quirk añade una pequeña contradicción, hábito o detalle memorable "
+                "para dar personalidad sin convertir el diseño en un solo chiste."
+            )
+        if profile.get("quirk") and chosen.get("quirk", "auto") == "auto":
+            reasons.append(
+                "El detalle sorpresa fue elegido por compatibilidad y rareza; los resultados "
+                "raros siguen siendo posibles, pero no se fuerzan."
+            )
         return reasons
 
 
@@ -290,5 +320,11 @@ def generate_character(
     selections: dict[str, str] | None = None,
     seed: int | None = None,
     coherence: float = 0.82,
+    surprise: bool = False,
 ) -> dict[str, Any]:
-    return CharacterGenerator(rules_path).generate(selections, seed, coherence)
+    return CharacterGenerator(rules_path).generate(
+        selections,
+        seed,
+        coherence,
+        surprise,
+    )
