@@ -144,6 +144,8 @@ class AssetIntake(tk.Tk):
                    command=self.open_repo).pack(side="left")
         ttk.Button(actions_tools, text="HISTORIAL",
                    command=self.show_history).pack(side="left", padx=8)
+        ttk.Button(actions_tools, text="DIAGNÓSTICO PC",
+                   command=self.run_diagnostics).pack(side="left", padx=8)
         ttk.Button(actions_tools, text="GIT STATUS",
                    command=self.git_status).pack(side="left")
         ttk.Button(actions_tools, text="GIT PUSH",
@@ -439,6 +441,79 @@ class AssetIntake(tk.Tk):
         )
         self.status_var.set(f"✅ Asset preparado: {destination}")
         return True
+
+    def prepare_and_next(self):
+        if not self.prepare_asset():
+            return
+
+        visible = self._visible_assets()
+        current_id = self.selected_asset.get("id", "") if self.selected_asset else ""
+        current_index = next(
+            (index for index, asset in enumerate(visible)
+             if asset.get("id", "") == current_id),
+            -1,
+        )
+        if current_index < 0 or current_index + 1 >= len(visible):
+            self.status_var.set("✅ Asset preparado. No quedan más assets en el filtro.")
+            return
+
+        next_asset = visible[current_index + 1]
+        self._select_asset_by_id(next_asset.get("id", ""))
+        self.status_var.set(
+            f"➡ Siguiente asset: {next_asset.get('id', '')} · "
+            f"{next_asset.get('title', '')}"
+        )
+
+    def run_diagnostics(self):
+        doctor = app_dir() / "doctor.py"
+        if not doctor.exists():
+            messagebox.showwarning(
+                "Diagnóstico",
+                "No se encontró doctor.py en la carpeta de BotImagen.",
+            )
+            return
+
+        try:
+            result = subprocess.run(
+                [self._python_executable(), str(doctor)],
+                cwd=app_dir(),
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+            )
+        except OSError as exc:
+            messagebox.showerror("Diagnóstico", str(exc))
+            return
+
+        output = (result.stdout + "\n" + result.stderr).strip()
+        window = tk.Toplevel(self)
+        window.title("BotImagen · Diagnóstico PC")
+        window.geometry("760x520")
+        window.minsize(620, 420)
+
+        ttk.Label(
+            window,
+            text="DIAGNÓSTICO DEL PC",
+            font=("Segoe UI", 12, "bold"),
+        ).pack(anchor="w", padx=12, pady=(12, 6))
+
+        box = tk.Text(window, wrap="word")
+        box.pack(fill="both", expand=True, padx=12, pady=(0, 10))
+        box.insert("1.0", output or "Sin salida.")
+        box.configure(state="disabled")
+
+        status = "PASS" if result.returncode == 0 else "REVISAR"
+        ttk.Label(window, text=f"Resultado: {status}").pack(
+            anchor="w", padx=12, pady=(0, 10)
+        )
+        ttk.Button(window, text="CERRAR", command=window.destroy).pack(
+            side="right", padx=12, pady=(0, 12)
+        )
+
+    @staticmethod
+    def _python_executable():
+        return os.environ.get("PYTHON_EXECUTABLE") or shutil.which("python") or "python"
 
     def _refresh_asset_labels(self):
         current_file = self.selected_file
