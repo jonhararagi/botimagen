@@ -9,10 +9,13 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
+from character_generator import CharacterGenerator, TRAIT_KEYS
+
 APP_TITLE = "BaseWarriors · Asset Intake"
 MANIFEST_NAME = "assets_manifest.json"
 CONFIG_NAME = "botimagen_config.json"
 HISTORY_NAME = "botimagen_history.json"
+CHARACTER_RULES_NAME = "character_rules.json"
 MAX_HISTORY_ITEMS = 100
 
 
@@ -48,6 +51,7 @@ class AssetIntake(tk.Tk):
             self.history = []
 
         self.assets = self.manifest.get("assets", [])
+        self.character_generator = CharacterGenerator(app_dir() / CHARACTER_RULES_NAME)
         self.selected_asset = None
         self.selected_file = None
         self.preview_image = None
@@ -157,6 +161,8 @@ class AssetIntake(tk.Tk):
                    command=self.show_history).pack(side="left", padx=8)
         ttk.Button(actions_tools, text="DIAGNÓSTICO PC",
                    command=self.run_diagnostics).pack(side="left", padx=8)
+        ttk.Button(actions_tools, text="GENERADOR PERSONAJE",
+                   command=self.open_character_generator).pack(side="left", padx=8)
         ttk.Button(actions_tools, text="GIT STATUS",
                    command=self.git_status).pack(side="left")
         ttk.Button(actions_tools, text="GIT PUSH",
@@ -282,6 +288,192 @@ class AssetIntake(tk.Tk):
         if value >= 1024 * 1024:
             return f"{value / (1024 * 1024):.1f} MB"
         return f"{value / 1024:.0f} KB"
+
+    def open_character_generator(self):
+        try:
+            generator = CharacterGenerator(app_dir() / CHARACTER_RULES_NAME)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            messagebox.showerror("Generador", f"No se pudo cargar el generador:\n{exc}")
+            return
+
+        window = tk.Toplevel(self)
+        window.title("BotImagen · Generador de personajes")
+        window.geometry("1180x780")
+        window.minsize(980, 680)
+        window.columnconfigure(1, weight=1)
+        window.rowconfigure(1, weight=1)
+
+        ttk.Label(
+            window,
+            text="GENERADOR DE PERSONAJE",
+            font=("Segoe UI", 17, "bold"),
+        ).grid(row=0, column=0, columnspan=2, sticky="w", padx=14, pady=(14, 4))
+        ttk.Label(
+            window,
+            text="Elige unos pocos rasgos. Todo lo que quede en AUTO será completado por reglas de afinidad + variación.",
+        ).grid(row=0, column=1, sticky="e", padx=14, pady=(14, 4))
+
+        left = ttk.LabelFrame(window, text="RASGOS", padding=10)
+        left.grid(row=1, column=0, sticky="nsw", padx=(14, 8), pady=10)
+
+        right = ttk.Frame(window, padding=(8, 10, 14, 10))
+        right.grid(row=1, column=1, sticky="nsew")
+        right.columnconfigure(0, weight=1)
+        right.rowconfigure(1, weight=1)
+        right.rowconfigure(3, weight=1)
+
+        variables = {}
+        lookups = {}
+
+        category_order = (
+            "personality",
+            "stature",
+            "silhouette",
+            "expression",
+            "hair",
+            "eyes",
+            "voice",
+            "combat_role",
+        )
+
+        for row, category in enumerate(category_order):
+            ttk.Label(
+                left,
+                text=TRAIT_KEYS.get(category, category.title()),
+                font=("Segoe UI", 9, "bold"),
+            ).grid(row=row, column=0, sticky="w", pady=(0, 3))
+            options = generator.options(category)
+            labels = [option["label"] for option in options]
+            lookups[category] = {option["label"]: option["id"] for option in options}
+            var = tk.StringVar(value=labels[0])
+            variables[category] = var
+            ttk.Combobox(
+                left,
+                textvariable=var,
+                values=labels,
+                state="readonly",
+                width=31,
+            ).grid(row=row, column=1, sticky="ew", padx=(10, 0), pady=(0, 9))
+
+        ttk.Label(
+            left,
+            text="AUTO = el sistema decide\nPuedes fijar 1–3 rasgos y dejar el resto libre.",
+            justify="left",
+        ).grid(row=len(category_order), column=0, columnspan=2, sticky="w", pady=(8, 10))
+
+        profile_box = ttk.LabelFrame(right, text="PERFIL GENERADO", padding=8)
+        profile_box.grid(row=0, column=0, sticky="ew")
+        profile_box.columnconfigure(0, weight=1)
+
+        profile_text = tk.Text(profile_box, height=7, wrap="word")
+        profile_text.grid(row=0, column=0, sticky="ew")
+        profile_text.configure(state="disabled")
+
+        prompt_box = ttk.LabelFrame(right, text="PROMPT DE PRODUCCIÓN", padding=8)
+        prompt_box.grid(row=1, column=0, sticky="nsew", pady=(10, 0))
+        prompt_box.columnconfigure(0, weight=1)
+        prompt_box.rowconfigure(0, weight=1)
+        prompt_text = tk.Text(prompt_box, wrap="word")
+        prompt_text.grid(row=0, column=0, sticky="nsew")
+        prompt_text.configure(state="disabled")
+
+        negative_box = ttk.LabelFrame(right, text="NEGATIVE PROMPT", padding=8)
+        negative_box.grid(row=2, column=0, sticky="nsew", pady=(10, 0))
+        negative_box.columnconfigure(0, weight=1)
+        negative_box.rowconfigure(0, weight=1)
+        negative_text = tk.Text(negative_box, height=5, wrap="word")
+        negative_text.grid(row=0, column=0, sticky="nsew")
+        negative_text.configure(state="disabled")
+
+        rationale_box = ttk.LabelFrame(right, text="POR QUÉ EL SISTEMA ELIGIÓ ESTO", padding=8)
+        rationale_box.grid(row=3, column=0, sticky="nsew", pady=(10, 0))
+        rationale_box.columnconfigure(0, weight=1)
+        rationale_box.rowconfigure(0, weight=1)
+        rationale_text = tk.Text(rationale_box, wrap="word")
+        rationale_text.grid(row=0, column=0, sticky="nsew")
+        rationale_text.configure(state="disabled")
+
+        actions = ttk.Frame(window, padding=(14, 0, 14, 14))
+        actions.grid(row=2, column=0, columnspan=2, sticky="ew")
+
+        result_holder = {"value": None}
+
+        def write_box(widget, text):
+            widget.configure(state="normal")
+            widget.delete("1.0", tk.END)
+            widget.insert("1.0", text)
+            widget.configure(state="disabled")
+
+        def generate_variant():
+            selections = {
+                category: lookups[category].get(variables[category].get(), "auto")
+                for category in category_order
+            }
+            seed = datetime.now().microsecond
+            try:
+                result = generator.generate(selections, seed=seed)
+            except (ValueError, KeyError, IndexError) as exc:
+                messagebox.showerror("Generador", str(exc), parent=window)
+                return
+
+            result_holder["value"] = result
+            profile = result["profile"]
+            labels = result["labels"]
+            profile_lines = [
+                f"{TRAIT_KEYS.get(category, category.title())}: {labels[category]}"
+                for category in category_order
+            ]
+            profile_lines.append(f"Dirección visual: {profile['style_direction']}")
+            profile_lines.append(f"Seed: {result['seed']}")
+            write_box(profile_text, "\n".join(profile_lines))
+            write_box(prompt_text, result["prompt"])
+            write_box(negative_text, result["negative_prompt"])
+            write_box(rationale_text, "\n".join(f"• {line}" for line in result["rationale"]))
+
+        def copy_box(widget, empty_message, status):
+            text = widget.get("1.0", tk.END).strip()
+            if not text:
+                messagebox.showinfo("Generador", empty_message, parent=window)
+                return
+            window.clipboard_clear()
+            window.clipboard_append(text)
+            window.update()
+            self.status_var.set(status)
+
+        def save_profile():
+            result = result_holder["value"]
+            if not result:
+                messagebox.showwarning("Generador", "Genera un personaje primero.", parent=window)
+                return
+            folder = app_dir() / "generated_characters"
+            try:
+                folder.mkdir(parents=True, exist_ok=True)
+                filename = folder / f"character_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                save_json(filename, result)
+            except OSError as exc:
+                messagebox.showerror("Generador", str(exc), parent=window)
+                return
+            self.status_var.set(f"Perfil guardado: {filename.name}")
+            messagebox.showinfo("Generador", f"Perfil guardado en:\n{filename}", parent=window)
+
+        ttk.Button(actions, text="✨ GENERAR / VARIAR",
+                   command=generate_variant).pack(side="left")
+        ttk.Button(actions, text="COPIAR PROMPT",
+                   command=lambda: copy_box(prompt_text, "Genera un personaje primero.", "Prompt de personaje copiado.")).pack(side="left", padx=8)
+        ttk.Button(actions, text="COPIAR NEGATIVE",
+                   command=lambda: copy_box(negative_text, "Genera un personaje primero.", "Negative prompt copiado.")).pack(side="left")
+        ttk.Button(actions, text="COPIAR TODO",
+                   command=lambda: copy_box(
+                       prompt_text,
+                       "Genera un personaje primero.",
+                       "Prompt de personaje copiado.",
+                   )).pack(side="left", padx=8)
+        ttk.Button(actions, text="GUARDAR PERFIL",
+                   command=save_profile).pack(side="left")
+        ttk.Button(actions, text="CERRAR",
+                   command=window.destroy).pack(side="right")
+
+        generate_variant()
 
     def copy_prompt(self):
         if not self.selected_asset:
