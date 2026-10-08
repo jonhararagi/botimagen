@@ -16,20 +16,4 @@ jobs:
         run: python -m py_compile app.py
 
       - name: Validate asset manifest
-        run: python - <<'PY'
-import json
-from pathlib import Path
-
-manifest = json.loads(Path("assets_manifest.json").read_text(encoding="utf-8"))
-assert isinstance(manifest.get("assets"), list)
-assert manifest["assets"], "assets_manifest.json must contain at least one asset"
-
-required = {"id", "title", "destination", "expected"}
-for asset in manifest["assets"]:
-    missing = required - asset.keys()
-    assert not missing, f"{asset.get('id', '?')}: missing {sorted(missing)}"
-    assert asset["destination"].endswith(".png"), asset["id"]
-    assert asset["expected"].get("format", "PNG").upper() == "PNG", asset["id"]
-
-print(f"PASS: {len(manifest['assets'])} asset contracts validated")
-PY
+        run: python tests/validate_manifest.py
