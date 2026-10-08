@@ -44,6 +44,8 @@ class AssetIntake(tk.Tk):
         self.assets = self.manifest.get("assets", [])
         self.selected_asset = None
         self.selected_file = None
+        self.preview_image = None
+        self.prepared_ids = set()
 
         self.status_var = tk.StringVar(value="Selecciona un asset.")
         self.path_var = tk.StringVar(value=self.config_data.get("repo_path", ""))
@@ -101,6 +103,10 @@ class AssetIntake(tk.Tk):
         actions.grid(row=5, column=0, sticky="ew")
         ttk.Button(actions, text="PREPARAR ASSET",
                    command=self.prepare_asset).pack(side="left")
+        ttk.Button(actions, text="PREPARAR + SIGUIENTE",
+                   command=self.prepare_and_next).pack(side="left", padx=8)
+        ttk.Button(actions, text="LIMPIAR",
+                   command=self.clear_selection).pack(side="left")
         ttk.Button(actions, text="ABRIR CARPETA",
                    command=self.open_destination).pack(side="left", padx=8)
         ttk.Button(actions, text="ABRIR REPOSITORIO",
@@ -153,7 +159,9 @@ class AssetIntake(tk.Tk):
         self.selected_file = None
         self.file_var.set("Ninguna imagen seleccionada")
         self.validation_var.set("Esperando imagen...")
+        self.preview_image = None
         self.preview.configure(text="Vista previa\n\nSin imagen", image="")
+        self.status_var.set("Asset seleccionado. Listo para recibir imagen.")
 
     @staticmethod
     def _format_bytes(value):
@@ -163,11 +171,18 @@ class AssetIntake(tk.Tk):
             return f"{value / (1024 * 1024):.1f} MB"
         return f"{value / 1024:.0f} KB"
 
+    def clear_selection(self):
+        self.selected_file = None
+        self.file_var.set("Ninguna imagen seleccionada")
+        self.validation_var.set("Esperando imagen...")
+        self.preview_image = None
+        self.preview.configure(text="Vista previa\n\nSin imagen", image="")
+        self.status_var.set("Selección limpiada.")
+
     def choose_image(self):
         path = filedialog.askopenfilename(
             title="Seleccionar imagen",
             filetypes=[
-                ("Imágenes PNG/JPG", "*.png *.jpg *.jpeg"),
                 ("PNG", "*.png"),
                 ("Todos los archivos", "*.*"),
             ],
@@ -192,7 +207,7 @@ class AssetIntake(tk.Tk):
                 image = image.subsample(scale, scale)
             self.preview_image = image
             self.preview.configure(text="", image=self.preview_image)
-        except tk.TclError as exc:
+        except (tk.TclError, OSError) as exc:
             self.preview_image = None
             self.preview.configure(text=f"No se puede previsualizar esta imagen.\\n{exc}", image="")
 
@@ -223,11 +238,14 @@ class AssetIntake(tk.Tk):
         if max_bytes and self.selected_file.stat().st_size > max_bytes:
             errors.append("El archivo supera el peso máximo permitido.")
 
+        try:
+            size = self.selected_file.stat().st_size
+        except OSError as exc:
+            errors.append(f"No se pudo leer el archivo: {exc}")
+
         if errors:
             self.validation_var.set("❌ " + " ".join(errors))
             return False
-
-        size = self.selected_file.stat().st_size
         dimensions = f"{width}×{height}" if width and height else "dimensiones no verificadas"
         self.validation_var.set(f"✅ PASS · {dimensions} · {self._format_bytes(size)}")
         return True
@@ -259,10 +277,42 @@ class AssetIntake(tk.Tk):
 
         try:
             shutil.copy2(self.selected_file, destination)
+            self.prepared_ids.add(self.selected_asset.get("id", ""))
+            self._refresh_asset_labels()
             self.status_var.set(f"✅ Asset preparado: {destination}")
             messagebox.showinfo("Listo", f"Asset colocado en:\n{destination}")
         except OSError as exc:
             messagebox.showerror("Error", str(exc))
+
+
+    def _refresh_asset_labels(self):
+        current = self.asset_list.curselection()
+        current_index = current[0] if current else None
+        for index, asset in enumerate(self.assets):
+            marker = "✓ " if asset.get("id", "") in self.prepared_ids else ""
+            self.asset_list.delete(index)
+            self.asset_list.insert(index, marker + f"{asset.get('id', '?')} · {asset.get('title', '')}")
+        if current_index is not None:
+            self.asset_list.selection_set(current_index)
+
+    def prepare_and_next(self):
+        before = self.selected_asset.get("id", "") if self.selected_asset else ""
+        if not self.prepare_asset():
+            return
+
+        for index, asset in enumerate(self.assets):
+            if asset.get("id", "") == before:
+                continue
+            if asset.get("id", "") not in self.prepared_ids:
+                self.asset_list.selection_clear(0, tk.END)
+                self.asset_list.selection_set(index)
+                self.asset_list.see(index)
+                self._on_asset_selected()
+                self.status_var.set(f"✅ Listo. Siguiente asset: {asset.get('id', '')}")
+                return
+
+        self.status_var.set("🎉 Todos los assets del catálogo fueron preparados en esta sesión.")
+        messagebox.showinfo("Cola terminada", "No quedan assets sin preparar en esta sesión.")
 
     def choose_repo(self):
         path = filedialog.askdirectory(title="Seleccionar repositorio local")
