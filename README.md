@@ -168,6 +168,33 @@ La arquitectura incorpora patrones que aparecen repetidamente en herramientas de
 
 Por ejemplo, NAIWeaver combina biblioteca de tags con ejemplos visuales, wildcards, presets y referencias de personaje/estilo; Character Select Stand Alone usa taggers locales, listas JSON/CSV, wildcards y referencias para ComfyUI/WebUI; y RandomPromptBuilder separa atributos de personaje, acción, ropa, ubicación y fondo y utiliza seed/batch para variaciones reproducibles.
 
+## Descubrimiento de personajes: ⭐ Favoritos y 🎲 Sorpresa
+
+El generador tiene dos herramientas para explorar diseños:
+
+**⭐ FAVORITO** guarda el perfil completo, prompt, negative prompt, seed y nivel de coherencia en un archivo local. **⭐ VER FAVORITOS** permite revisar los diseños guardados y abrir su prompt.
+
+**🎲 SORPRÉNDEME** mantiene los rasgos que hayas fijado, pero reduce temporalmente la coherencia y aumenta la exploración del sistema. Además, da más peso a quirks `uncommon` y `rare`.
+
+### Quirks creíbles pero divertidos
+
+El catálogo incluye pequeños detalles como:
+
+- ponerle nombre al bate;
+- coleccionar stickers diminutos;
+- llevar snacks de emergencia;
+- perderse incluso con un mapa;
+- realizar un ritual antes de usar el equipo;
+- ponerse nerviosa frente a una mascota gigante;
+- practicar poses de victoria cuando nadie mira;
+- cantar maravillosamente cuando cree estar sola;
+- tomar rivalidades absurdamente serias;
+- tener una debilidad por merchandising adorable.
+
+La regla de diseño es **“detalle memorable, no caricatura”**. El quirk debe poder aparecer naturalmente en una línea de diálogo, una animación idle, una pose de victoria, un prop o una escena corta.
+
+Esto toma como referencia un patrón muy útil de *Uma Musume*: personajes fuertes por tener una identidad central clara más uno o varios comportamientos pequeños y memorables. La investigación usada para diseñar el sistema encontró ejemplos como El Condor Pasa, cuyo personaje combina una presentación muy definida con detalles cotidianos y contradicciones, y Twin Turbo, asociada a una personalidad muy energética. El objetivo aquí es aplicar la técnica de construcción de personaje, no copiar personajes concretos.
+
 ## Diagnóstico del PC
 
 `doctor.py` comprueba automáticamente:
@@ -212,7 +239,7 @@ Tkinter puro no incorpora drag & drop de archivos de Windows de forma nativa. Po
 
 Bloque ejecutado: ~1–2 h de implementación.
 Prueba real pendiente: ~30–60 min en Windows.
-Siguiente mejora útil: ~3–5 h para incorporar miniaturas locales por rasgo, favoritos/presets de personaje y plantillas de prompt por familia de modelo; después ~30–60 min de prueba real.
+Siguiente mejora útil: ~3–5 h para miniaturas locales por rasgo, presets de personaje y perfiles visuales guardados; después ~30–60 min de prueba real.
 
 ## Estado
 
