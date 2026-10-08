@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "project": "BaseWarriors: Meta-Strike",
+  "assets": [
+    {
+      "id": "stage.background.far",
+      "title": "Combat Stage · Far Background",
+      "description": "Capa lejana del escenario de combate 2.5D.",
+      "prompt": "Anime 2.5D kawaii baseball combat arena background, wide cinematic composition, clean layered depth, no characters, no logos.",
+      "destination": "assets/stages/combat-stage--background--far--wide.png",
+      "expected": {
+        "format": "PNG",
+        "width": 2048,
+        "height": 1152,
+        "max_bytes": 12582912
+      }
+    },
+    {
+      "id": "stage.background.mid",
+      "title": "Combat Stage · Mid Background",
+      "description": "Capa media del escenario de combate 2.5D.",
+      "prompt": "Anime 2.5D kawaii baseball combat arena midground, layered depth, clean stylized environment, no characters, no logos.",
+      "destination": "assets/stages/combat-stage--background--mid--wide.png",
+      "expected": {
+        "format": "PNG",
+        "width": 2048,
+        "height": 1152,
+        "max_bytes": 12582912
+      }
+    },
+    {
+      "id": "stage.ground",
+      "title": "Combat Stage · Ground",
+      "description": "Plano de suelo del escenario.",
+      "prompt": "Anime 2.5D kawaii baseball combat ground plane, clean stylized arena floor, perspective depth, no characters, no logos.",
+      "destination": "assets/stages/combat-stage--ground--wide.png",
+      "expected": {
+        "format": "PNG",
+        "width": 2048,
+        "height": 1152,
+        "max_bytes": 12582912
+      }
+    },
+    {
+      "id": "stage.foreground",
+      "title": "Combat Stage · Foreground",
+      "description": "Elementos visuales cercanos para reforzar el efecto 2.5D.",
+      "prompt": "Anime 2.5D kawaii baseball combat foreground elements, framing props, transparent-friendly composition, no characters, no logos.",
+      "destination": "assets/stages/combat-stage--foreground--wide.png",
+      "expected": {
+        "format": "PNG",
+        "width": 2048,
+        "height": 1152,
+        "max_bytes": 12582912
+      }
+    },
+    {
+      "id": "character.bw001",
+      "title": "bw001 · Aiko Hanamori",
+      "description": "Asset aprobado de personaje principal.",
+      "prompt": "BaseWarriors canonical character asset for bw001 Aiko Hanamori. 2.5D kawaii anime game art, clean silhouette, transparent background, no logo.",
+      "destination": "assets/characters/approved/bw001.png",
+      "expected": {
+        "format": "PNG",
+        "max_bytes": 12582912
+      }
+    },
+    {
+      "id": "prop.baseball.bat",
+      "title": "Baseball Bat · Common Prop",
+      "description": "Prop común reutilizable.",
+      "prompt": "Kawaii anime baseball combat bat prop, sturdy stylized game asset, isolated, no character, no brand logo.",
+      "destination": "assets/props/baseball-bat.png",
+      "expected": {
+        "format": "PNG",
+        "max_bytes": 6291456
+      }
+    }
+  ]
+}
