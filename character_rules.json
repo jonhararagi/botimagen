@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "profile": "BaseWarriors Character Generator",
   "categories": {
     "personality": [
@@ -291,7 +291,8 @@
           "personality:kuudere": 5,
           "personality:seria": 4,
           "personality:disciplinada": 3,
-          "expression:serena": 3
+          "expression:serena": 3,
+          "expression:mirada_enojada": 2
         }
       },
       {
@@ -335,7 +336,8 @@
         "bias": {
           "personality:rebelde": 5,
           "personality:seria": 2,
-          "expression:mirada_desafiante": 4
+          "expression:mirada_desafiante": 4,
+          "expression:mirada_enojada": 4
         }
       },
       {
@@ -345,7 +347,8 @@
         "bias": {
           "personality:kuudere": 6,
           "personality:seria": 4,
-          "expression:mirada_fria": 4
+          "expression:mirada_fria": 4,
+          "expression:mirada_enojada": 4
         }
       },
       {
@@ -375,7 +378,8 @@
         "bias": {
           "personality:seria": 4,
           "personality:kuudere": 5,
-          "expression:mirada_fria": 3
+          "expression:mirada_fria": 3,
+          "expression:mirada_enojada": 3
         }
       }
     ],
@@ -511,7 +515,619 @@
           "expression:mirada_enfocada": 4
         }
       }
+    ],
+    "body_build": [
+      {
+        "id": "compacta_atletica",
+        "label": "Compacta atlética",
+        "tags": [
+          "compact",
+          "athletic",
+          "agile"
+        ]
+      },
+      {
+        "id": "delgada_atletica",
+        "label": "Delgada atlética",
+        "tags": [
+          "lean",
+          "athletic",
+          "agile"
+        ]
+      },
+      {
+        "id": "equilibrada",
+        "label": "Atlética equilibrada",
+        "tags": [
+          "balanced",
+          "athletic"
+        ]
+      },
+      {
+        "id": "fuerte_guardiana",
+        "label": "Fuerte / guardiana",
+        "tags": [
+          "strong",
+          "guardian",
+          "powerful"
+        ]
+      },
+      {
+        "id": "elegante_larga",
+        "label": "Esbelta / elegante",
+        "tags": [
+          "elegant",
+          "long",
+          "refined"
+        ]
+      }
+    ],
+    "face_shape": [
+      {
+        "id": "suave",
+        "label": "Suave y redondeada",
+        "tags": [
+          "soft",
+          "cute",
+          "friendly"
+        ]
+      },
+      {
+        "id": "equilibrada",
+        "label": "Equilibrada",
+        "tags": [
+          "balanced",
+          "versatile"
+        ]
+      },
+      {
+        "id": "afilada",
+        "label": "Afinada / definida",
+        "tags": [
+          "sharp",
+          "elegant",
+          "cool"
+        ]
+      }
+    ],
+    "hair_length": [
+      {
+        "id": "corto",
+        "label": "Corto",
+        "tags": [
+          "compact",
+          "agile",
+          "energetic"
+        ]
+      },
+      {
+        "id": "medio",
+        "label": "Medio",
+        "tags": [
+          "balanced",
+          "versatile"
+        ]
+      },
+      {
+        "id": "largo",
+        "label": "Largo",
+        "tags": [
+          "elegant",
+          "flowing"
+        ]
+      }
+    ],
+    "hairstyle": [
+      {
+        "id": "bob",
+        "label": "Bob / corte recto",
+        "tags": [
+          "compact",
+          "cute",
+          "clean"
+        ]
+      },
+      {
+        "id": "short_wavy",
+        "label": "Corto ondulado",
+        "tags": [
+          "energetic",
+          "soft"
+        ]
+      },
+      {
+        "id": "long_flowing",
+        "label": "Largo fluido",
+        "tags": [
+          "elegant",
+          "flowing",
+          "dramatic"
+        ]
+      },
+      {
+        "id": "ponytail",
+        "label": "Cola alta",
+        "tags": [
+          "athletic",
+          "energetic",
+          "focused"
+        ]
+      },
+      {
+        "id": "side_ponytail",
+        "label": "Cola lateral",
+        "tags": [
+          "playful",
+          "social",
+          "agile"
+        ]
+      },
+      {
+        "id": "twin_tails",
+        "label": "Coletas gemelas",
+        "tags": [
+          "cute",
+          "bright",
+          "playful"
+        ]
+      },
+      {
+        "id": "braided",
+        "label": "Trenzado",
+        "tags": [
+          "disciplined",
+          "refined"
+        ]
+      },
+      {
+        "id": "hime_cut",
+        "label": "Hime cut",
+        "tags": [
+          "elegant",
+          "controlled"
+        ]
+      },
+      {
+        "id": "layered_shag",
+        "label": "Capas dinámicas",
+        "tags": [
+          "rebellious",
+          "energetic",
+          "bold"
+        ]
+      },
+      {
+        "id": "asymmetrical",
+        "label": "Asimétrico",
+        "tags": [
+          "edgy",
+          "bold",
+          "defiant"
+        ]
+      }
+    ],
+    "eye_shape": [
+      {
+        "id": "suave",
+        "label": "Suave / amistosa",
+        "tags": [
+          "soft",
+          "friendly"
+        ]
+      },
+      {
+        "id": "grande_expresiva",
+        "label": "Grande / expresiva",
+        "tags": [
+          "bright",
+          "social",
+          "cute"
+        ]
+      },
+      {
+        "id": "afilada",
+        "label": "Afilada / intensa",
+        "tags": [
+          "cool",
+          "focused",
+          "strong"
+        ]
+      },
+      {
+        "id": "entornada",
+        "label": "Entornada / serena",
+        "tags": [
+          "cool",
+          "reserved",
+          "calm"
+        ]
+      }
+    ],
+    "outfit": [
+      {
+        "id": "tactical_baseball",
+        "label": "Tactical baseball combat suit",
+        "tags": [
+          "athletic",
+          "technical",
+          "combat"
+        ]
+      },
+      {
+        "id": "combat_jacket",
+        "label": "Chaqueta de combate ligera",
+        "tags": [
+          "street",
+          "bold",
+          "mobile"
+        ]
+      },
+      {
+        "id": "techwear_sport",
+        "label": "Techwear deportivo",
+        "tags": [
+          "technical",
+          "modern",
+          "agile"
+        ]
+      },
+      {
+        "id": "light_armor",
+        "label": "Armadura ligera modular",
+        "tags": [
+          "strong",
+          "guardian",
+          "powerful"
+        ]
+      },
+      {
+        "id": "idol_combat",
+        "label": "Idol combat estilizado",
+        "tags": [
+          "bright",
+          "social",
+          "dramatic"
+        ]
+      },
+      {
+        "id": "elegant_command",
+        "label": "Uniforme de mando elegante",
+        "tags": [
+          "elegant",
+          "controlled",
+          "commanding"
+        ]
+      },
+      {
+        "id": "support_coat",
+        "label": "Abrigo de soporte",
+        "tags": [
+          "warm",
+          "support",
+          "practical"
+        ]
+      },
+      {
+        "id": "street_bomber",
+        "label": "Bomber urbano",
+        "tags": [
+          "rebelde",
+          "bold",
+          "playful"
+        ]
+      }
+    ],
+    "outer_layer": [
+      {
+        "id": "none",
+        "label": "Sin capa exterior",
+        "tags": [
+          "clean",
+          "agile"
+        ]
+      },
+      {
+        "id": "short_bomber",
+        "label": "Bomber corto",
+        "tags": [
+          "street",
+          "bold",
+          "agile"
+        ]
+      },
+      {
+        "id": "hooded_jacket",
+        "label": "Chaqueta con capucha",
+        "tags": [
+          "casual",
+          "playful"
+        ]
+      },
+      {
+        "id": "long_coat",
+        "label": "Abrigo largo",
+        "tags": [
+          "elegant",
+          "dramatic",
+          "cool"
+        ]
+      },
+      {
+        "id": "utility_cape",
+        "label": "Capa utilitaria corta",
+        "tags": [
+          "guardian",
+          "technical"
+        ]
+      }
+    ],
+    "footwear": [
+      {
+        "id": "combat_sneakers",
+        "label": "Zapatillas de combate",
+        "tags": [
+          "athletic",
+          "agile"
+        ]
+      },
+      {
+        "id": "armored_boots",
+        "label": "Botas blindadas ligeras",
+        "tags": [
+          "strong",
+          "guardian"
+        ]
+      },
+      {
+        "id": "high_top",
+        "label": "High-top deportivo",
+        "tags": [
+          "street",
+          "playful",
+          "energetic"
+        ]
+      },
+      {
+        "id": "sleek_boots",
+        "label": "Botas estilizadas",
+        "tags": [
+          "elegant",
+          "cool"
+        ]
+      }
+    ],
+    "accessory": [
+      {
+        "id": "minimal",
+        "label": "Minimalista",
+        "tags": [
+          "clean",
+          "controlled"
+        ]
+      },
+      {
+        "id": "hair_ribbon",
+        "label": "Lazo de cabello",
+        "tags": [
+          "cute",
+          "bright",
+          "social"
+        ]
+      },
+      {
+        "id": "headband",
+        "label": "Vincha deportiva",
+        "tags": [
+          "athletic",
+          "focused"
+        ]
+      },
+      {
+        "id": "earpiece",
+        "label": "Earpiece táctico",
+        "tags": [
+          "technical",
+          "controlled"
+        ]
+      },
+      {
+        "id": "batting_glove",
+        "label": "Guante de bateo",
+        "tags": [
+          "baseball",
+          "athletic"
+        ]
+      },
+      {
+        "id": "utility_pouch",
+        "label": "Pouch utilitario",
+        "tags": [
+          "technical",
+          "practical"
+        ]
+      },
+      {
+        "id": "signature_charm",
+        "label": "Amuleto distintivo",
+        "tags": [
+          "personal",
+          "soft"
+        ]
+      }
+    ],
+    "palette_accent": [
+      {
+        "id": "sunset",
+        "label": "Atardecer cálido",
+        "tags": [
+          "warm",
+          "bright"
+        ]
+      },
+      {
+        "id": "crimson",
+        "label": "Carmesí",
+        "tags": [
+          "bold",
+          "strong"
+        ]
+      },
+      {
+        "id": "violet",
+        "label": "Violeta",
+        "tags": [
+          "cool",
+          "elegant"
+        ]
+      },
+      {
+        "id": "midnight",
+        "label": "Azul medianoche",
+        "tags": [
+          "cool",
+          "controlled"
+        ]
+      },
+      {
+        "id": "mint",
+        "label": "Menta",
+        "tags": [
+          "soft",
+          "bright"
+        ]
+      },
+      {
+        "id": "gold",
+        "label": "Dorado",
+        "tags": [
+          "warm",
+          "commanding"
+        ]
+      },
+      {
+        "id": "cyan_white",
+        "label": "Cian / blanco",
+        "tags": [
+          "clean",
+          "technical"
+        ]
+      },
+      {
+        "id": "black_red",
+        "label": "Negro / rojo",
+        "tags": [
+          "bold",
+          "defiant"
+        ]
+      }
+    ],
+    "baseball_prop": [
+      {
+        "id": "bat",
+        "label": "Bate",
+        "tags": [
+          "baseball",
+          "striker"
+        ]
+      },
+      {
+        "id": "pitching_glove",
+        "label": "Guante de pitcher",
+        "tags": [
+          "baseball",
+          "technical"
+        ]
+      },
+      {
+        "id": "energy_ball",
+        "label": "Pelota de energía",
+        "tags": [
+          "baseball",
+          "powerful"
+        ]
+      },
+      {
+        "id": "tactical_shield",
+        "label": "Escudo táctico",
+        "tags": [
+          "guardian",
+          "tank"
+        ]
+      },
+      {
+        "id": "support_device",
+        "label": "Dispositivo de soporte",
+        "tags": [
+          "support",
+          "technical"
+        ]
+      }
+    ],
+    "pose": [
+      {
+        "id": "relaxed_ready",
+        "label": "Reposo listo",
+        "tags": [
+          "balanced",
+          "controlled"
+        ]
+      },
+      {
+        "id": "energetic",
+        "label": "Energética",
+        "tags": [
+          "bright",
+          "energetic"
+        ]
+      },
+      {
+        "id": "defiant",
+        "label": "Desafiante",
+        "tags": [
+          "bold",
+          "defiant"
+        ]
+      },
+      {
+        "id": "stoic",
+        "label": "Estoica",
+        "tags": [
+          "cool",
+          "controlled"
+        ]
+      },
+      {
+        "id": "protective",
+        "label": "Protectora",
+        "tags": [
+          "guardian",
+          "strong"
+        ]
+      },
+      {
+        "id": "technical",
+        "label": "Técnica / concentrada",
+        "tags": [
+          "focused",
+          "technical"
+        ]
+      },
+      {
+        "id": "sleepy_ready",
+        "label": "Somnolienta pero lista",
+        "tags": [
+          "sleepy",
+          "soft"
+        ]
+      }
     ]
   },
-  "style_core": "original premium Japanese anime hero-collector game character, BaseWarriors: Meta-Strike, polished cel shading, crisp linework, expressive anime eyes, refined costume design, strong gameplay silhouette, cinematic 2.5D cutout readiness, subtle material separation, controlled highlights, clean production art, original design"
+  "style_core": "original premium Japanese anime hero-collector game character, BaseWarriors: Meta-Strike, polished cel shading, crisp linework, expressive anime eyes, refined costume design, strong gameplay silhouette, cinematic 2.5D cutout readiness, subtle material separation, controlled highlights, clean production art, original design",
+  "design_principles": [
+    "User choices are hard locks.",
+    "AUTO choices use weighted compatibility instead of arbitrary randomness.",
+    "Seeds reproduce a generated profile.",
+    "Visual references are inspiration only and never become copy instructions.",
+    "Character design stays original and suitable for a premium anime game."
+  ]
 }
