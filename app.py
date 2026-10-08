@@ -52,6 +52,8 @@ class AssetIntake(tk.Tk):
         self.file_var = tk.StringVar(value="Ninguna imagen seleccionada")
         self.validation_var = tk.StringVar(value="Esperando imagen...")
         self.asset_title_var = tk.StringVar(value="Selecciona un asset")
+        self.asset_filter_var = tk.StringVar()
+        self.catalog_status_var = tk.StringVar(value="")
 
         self._build_ui()
         self._populate_assets()
@@ -70,6 +72,11 @@ class AssetIntake(tk.Tk):
         left = ttk.Frame(self, padding=(14, 0, 8, 14))
         left.grid(row=1, column=0, sticky="nsw")
         ttk.Label(left, text="ASSETS", font=("Segoe UI", 10, "bold")).pack(anchor="w")
+        filter_row = ttk.Frame(left)
+        filter_row.pack(fill="x", pady=(4, 4))
+        ttk.Entry(filter_row, textvariable=self.asset_filter_var).pack(side="left", fill="x", expand=True)
+        self.asset_filter_var.trace_add("write", lambda *_: self._refresh_asset_list())
+        ttk.Label(left, textvariable=self.catalog_status_var).pack(anchor="w")
 
         self.asset_list = tk.Listbox(left, width=34, height=25, exportselection=False)
         self.asset_list.pack(fill="y", expand=True, pady=(8, 0))
@@ -89,6 +96,8 @@ class AssetIntake(tk.Tk):
         upload_row.grid(row=2, column=0, sticky="ew")
         ttk.Button(upload_row, text="+ SUBIR IMAGEN",
                    command=self.choose_image).pack(side="left")
+        ttk.Button(upload_row, text="COPIAR PROMPT",
+                   command=self.copy_prompt).pack(side="left", padx=8)
         ttk.Label(upload_row, textvariable=self.file_var).pack(side="left", padx=12)
 
         self.preview = ttk.Label(right, text="Vista previa\n\nSin imagen",
@@ -125,14 +134,33 @@ class AssetIntake(tk.Tk):
         ttk.Label(bottom, textvariable=self.status_var).grid(
             row=1, column=0, columnspan=3, sticky="w", pady=(8, 0))
 
-    def _populate_assets(self):
+    def _refresh_asset_list(self):
+        if not hasattr(self, "asset_list"):
+            return
+        query = self.asset_filter_var.get().strip().lower()
+        current_id = self.selected_asset.get("id", "") if self.selected_asset else ""
         self.asset_list.delete(0, tk.END)
+        visible = []
         for asset in self.assets:
-            self.asset_list.insert(tk.END, f"{asset.get('id', '?')} · {asset.get('title', '')}")
-
-        if self.assets:
-            self.asset_list.selection_set(0)
+            label = f"{asset.get('id', '?')} · {asset.get('title', '')}"
+            if query and query not in label.lower():
+                continue
+            marker = "✓ " if asset.get("id", "") in self.prepared_ids else ""
+            visible.append(asset)
+            self.asset_list.insert(tk.END, marker + label)
+        self.catalog_status_var.set(f"{len(visible)}/{len(self.assets)} assets")
+        if visible:
+            index = next((i for i, a in enumerate(visible) if a.get("id") == current_id), 0)
+            self.asset_list.selection_set(index)
             self._on_asset_selected()
+        else:
+            self.selected_asset = None
+            self.selected_file = None
+            self.asset_title_var.set("Sin resultados")
+            self.status_var.set("El filtro no encontró assets.")
+
+    def _populate_assets(self):
+        self._refresh_asset_list()
 
     def _on_asset_selected(self, _event=None):
         selection = self.asset_list.curselection()
@@ -161,7 +189,12 @@ class AssetIntake(tk.Tk):
         self.validation_var.set("Esperando imagen...")
         self.preview_image = None
         self.preview.configure(text="Vista previa\n\nSin imagen", image="")
-        self.status_var.set("Asset seleccionado. Listo para recibir imagen.")
+        repo = Path(self.path_var.get()).expanduser()
+        destination = repo / self.selected_asset.get("destination", "")
+        if destination.is_file():
+            self.status_var.set(f"✓ Ya existe en destino: {destination}")
+        else:
+            self.status_var.set("Asset seleccionado. Listo para recibir imagen.")
 
     @staticmethod
     def _format_bytes(value):
@@ -170,6 +203,18 @@ class AssetIntake(tk.Tk):
         if value >= 1024 * 1024:
             return f"{value / (1024 * 1024):.1f} MB"
         return f"{value / 1024:.0f} KB"
+
+    def copy_prompt(self):
+        if not self.selected_asset:
+            return
+        prompt = self.selected_asset.get("prompt", "").strip()
+        if not prompt:
+            messagebox.showinfo("Prompt", "Este asset no tiene prompt.")
+            return
+        self.clipboard_clear()
+        self.clipboard_append(prompt)
+        self.update()
+        self.status_var.set("Prompt copiado al portapapeles.")
 
     def clear_selection(self):
         self.selected_file = None
@@ -287,14 +332,7 @@ class AssetIntake(tk.Tk):
 
 
     def _refresh_asset_labels(self):
-        current = self.asset_list.curselection()
-        current_index = current[0] if current else None
-        for index, asset in enumerate(self.assets):
-            marker = "✓ " if asset.get("id", "") in self.prepared_ids else ""
-            self.asset_list.delete(index)
-            self.asset_list.insert(index, marker + f"{asset.get('id', '?')} · {asset.get('title', '')}")
-        if current_index is not None:
-            self.asset_list.selection_set(current_index)
+        self._refresh_asset_list()
 
     def prepare_and_next(self):
         before = self.selected_asset.get("id", "") if self.selected_asset else ""
