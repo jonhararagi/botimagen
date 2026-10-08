@@ -17,6 +17,7 @@ CONFIG_NAME = "botimagen_config.json"
 HISTORY_NAME = "botimagen_history.json"
 CHARACTER_RULES_NAME = "character_rules.json"
 MAX_HISTORY_ITEMS = 100
+CHARACTER_FAVORITES_NAME = "character_favorites.json"
 
 
 def app_dir() -> Path:
@@ -49,6 +50,11 @@ class AssetIntake(tk.Tk):
         self.history = load_json(app_dir() / HISTORY_NAME, [])
         if not isinstance(self.history, list):
             self.history = []
+        self.character_favorites = load_json(
+            app_dir() / CHARACTER_FAVORITES_NAME, []
+        )
+        if not isinstance(self.character_favorites, list):
+            self.character_favorites = []
 
         self.assets = self.manifest.get("assets", [])
         self.character_generator = CharacterGenerator(app_dir() / CHARACTER_RULES_NAME)
@@ -336,6 +342,9 @@ class AssetIntake(tk.Tk):
             "COMBATE": (
                 "voice", "combat_role", "baseball_prop",
             ),
+            "DETALLE": (
+                "quirk",
+            ),
         }
 
         for group_name, categories in category_groups.items():
@@ -478,15 +487,17 @@ class AssetIntake(tk.Tk):
                 for category in variables
             }
 
-        def generate_variant():
+        def generate_variant(surprise=False):
             selections = build_selections()
             seed = datetime.now().microsecond
             coherence = coherence_var.get() / 100.0
+            effective_coherence = min(coherence, 0.45) if surprise else coherence
             try:
                 result = generator.generate(
                     selections,
                     seed=seed,
-                    coherence=coherence,
+                    coherence=effective_coherence,
+                    surprise=surprise,
                 )
             except (ValueError, KeyError, IndexError) as exc:
                 messagebox.showerror("Generador", str(exc), parent=window)
@@ -503,7 +514,9 @@ class AssetIntake(tk.Tk):
             profile_lines.extend([
                 f"Dirección visual: {result['style_direction']}",
                 f"Coherencia: {result['coherence'] * 100:.0f}%",
+                f"Modo: {'SORPRESA' if result.get('surprise') else 'NORMAL'}",
                 f"Seed: {result['seed']}",
+                f"⭐ Favoritos guardados: {len(self.character_favorites)}",
             ])
             write_box(profile_text, "\n".join(profile_lines))
             write_box(prompt_text, result["prompt"])
@@ -593,6 +606,140 @@ class AssetIntake(tk.Tk):
             except OSError as exc:
                 messagebox.showerror("Referencias", str(exc), parent=window)
 
+        def save_favorite():
+            result = result_holder["value"]
+            if not result:
+                messagebox.showwarning(
+                    "Favorito",
+                    "Genera un personaje primero.",
+                    parent=window,
+                )
+                return
+
+            favorite = {
+                "saved_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+                "profile": result["profile"],
+                "labels": result["labels"],
+                "style_direction": result["style_direction"],
+                "prompt": result["prompt"],
+                "negative_prompt": result["negative_prompt"],
+                "seed": result["seed"],
+                "coherence": result["coherence"],
+                "surprise": result.get("surprise", False),
+            }
+
+            key = json.dumps(favorite["profile"], sort_keys=True, ensure_ascii=False)
+            existing = {
+                json.dumps(item.get("profile", {}), sort_keys=True, ensure_ascii=False)
+                for item in self.character_favorites
+            }
+            if key in existing:
+                self.status_var.set("⭐ Ese diseño ya está en favoritos.")
+                return
+
+            self.character_favorites.insert(0, favorite)
+            self.character_favorites = self.character_favorites[:100]
+            try:
+                save_json(
+                    app_dir() / CHARACTER_FAVORITES_NAME,
+                    self.character_favorites,
+                )
+            except OSError as exc:
+                self.character_favorites.pop(0)
+                messagebox.showerror("Favorito", str(exc), parent=window)
+                return
+
+            self.status_var.set(
+                f"⭐ Favorito guardado · {len(self.character_favorites)} diseños"
+            )
+            write_box(
+                profile_text,
+                profile_text.get("1.0", tk.END).strip() + "\n⭐ MARCADO COMO FAVORITO",
+            )
+
+        def show_favorites():
+            fav_window = tk.Toplevel(window)
+            fav_window.title("BotImagen · Personajes favoritos")
+            fav_window.geometry("980x560")
+            fav_window.minsize(760, 420)
+            fav_window.columnconfigure(0, weight=1)
+            fav_window.rowconfigure(1, weight=1)
+
+            ttk.Label(
+                fav_window,
+                text=f"⭐ PERSONAJES FAVORITOS · {len(self.character_favorites)}",
+                font=("Segoe UI", 12, "bold"),
+            ).grid(row=0, column=0, sticky="w", padx=12, pady=(12, 8))
+
+            fav_list = tk.Listbox(fav_window, font=("Consolas", 9))
+            fav_list.grid(row=1, column=0, sticky="nsew", padx=12, pady=(0, 8))
+
+            for item in self.character_favorites:
+                labels = item.get("labels", {})
+                fav_list.insert(
+                    tk.END,
+                    f"{item.get('saved_at', '')} | "
+                    f"{labels.get('personality', '?')} | "
+                    f"{labels.get('stature', '?')} | "
+                    f"{labels.get('hair', '?')} | "
+                    f"{labels.get('outfit', '?')} | "
+                    f"{labels.get('quirk', '?')}",
+                )
+
+            def inspect(_event=None):
+                selection = fav_list.curselection()
+                if not selection:
+                    return
+                item = self.character_favorites[selection[0]]
+                inspect_window = tk.Toplevel(fav_window)
+                inspect_window.title("BotImagen · Favorito")
+                inspect_window.geometry("900x620")
+                inspect_window.columnconfigure(0, weight=1)
+                inspect_window.rowconfigure(1, weight=1)
+
+                labels = item.get("labels", {})
+                profile_lines = [
+                    f"{TRAIT_KEYS.get(category, category.title())}: {labels.get(category, '?')}"
+                    for category in variables
+                    if category in labels
+                ]
+                profile_lines += [
+                    f"Dirección visual: {item.get('style_direction', '')}",
+                    f"Seed: {item.get('seed', '')}",
+                    f"Coherencia: {float(item.get('coherence', 0)) * 100:.0f}%",
+                ]
+
+                frame = ttk.Frame(inspect_window, padding=12)
+                frame.grid(row=0, column=0, sticky="ew")
+                ttk.Label(frame, text="PERFIL", font=("Segoe UI", 11, "bold")).pack(anchor="w")
+                box = tk.Text(frame, height=12, wrap="word")
+                box.pack(fill="x", pady=(6, 0))
+                box.insert("1.0", "\n".join(profile_lines))
+                box.configure(state="disabled")
+
+                prompt_frame = ttk.LabelFrame(
+                    inspect_window,
+                    text="PROMPT DE PRODUCCIÓN",
+                    padding=8,
+                )
+                prompt_frame.grid(row=1, column=0, sticky="nsew", padx=12, pady=(8, 12))
+                prompt_frame.columnconfigure(0, weight=1)
+                prompt_frame.rowconfigure(0, weight=1)
+                prompt_box = tk.Text(prompt_frame, wrap="word")
+                prompt_box.grid(row=0, column=0, sticky="nsew")
+                prompt_box.insert("1.0", item.get("prompt", ""))
+                prompt_box.configure(state="disabled")
+
+            fav_list.bind("<Double-Button-1>", inspect)
+            ttk.Button(
+                fav_window,
+                text="CERRAR",
+                command=fav_window.destroy,
+            ).grid(row=2, column=0, sticky="e", padx=12, pady=(0, 12))
+
+        def surprise_variant():
+            generate_variant(surprise=True)
+
         def save_profile():
             result = result_holder["value"]
             if not result:
@@ -616,6 +763,11 @@ class AssetIntake(tk.Tk):
         ).pack(side="left")
         ttk.Button(
             actions,
+            text="🎲 SORPRÉNDEME",
+            command=surprise_variant,
+        ).pack(side="left", padx=8)
+        ttk.Button(
+            actions,
             text="COPIAR PROMPT",
             command=lambda: copy_box(
                 prompt_text,
@@ -633,6 +785,8 @@ class AssetIntake(tk.Tk):
             ),
         ).pack(side="left")
         ttk.Button(actions, text="COPIAR TODO", command=copy_all).pack(side="left", padx=8)
+        ttk.Button(actions, text="⭐ FAVORITO", command=save_favorite).pack(side="left")
+        ttk.Button(actions, text="⭐ VER FAVORITOS", command=show_favorites).pack(side="left", padx=8)
         ttk.Button(actions, text="GUARDAR PERFIL", command=save_profile).pack(side="left")
         ttk.Button(actions, text="CERRAR", command=window.destroy).pack(side="right")
 
