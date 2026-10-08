@@ -101,6 +101,40 @@ Antes del commit, **GIT PUSH** comprueba que solamente el asset seleccionado est
 
 La aplicación nunca renombra el archivo fuente original. Copia el archivo al destino canónico del manifiesto.
 
+## Generador de personajes
+
+BotImagen incluye un generador local de diseño de personajes. No necesita una API externa.
+
+En **GENERADOR PERSONAJE** puedes elegir con listas:
+
+- Personalidad: alegre, rebelde, seria, kuudere, protectora, tímida, traviesa, disciplinada, hiperactiva.
+- Estatura: bajita, media, alta.
+- Silueta: compacta/ágil, atlética, elegante, guardiana.
+- Expresión: sonrisa, mirada enfocada, desafiante, fría, enojada, somnolienta, etc.
+- Cabello, ojos y voz: pueden quedar en **AUTO**.
+- Rol de combate: striker, support, tank, control/debuffer o pitcher/especialista.
+
+El motor usa reglas de afinidad y una semilla de variación. Los rasgos que fijes quedan bloqueados; los demás se completan automáticamente.
+
+Ejemplo de intención de diseño:
+
+`Alegre + Bajita` → aumenta la afinidad por una silueta compacta, energía visual y cabello rojo coral/naranja.
+
+`Seria + Mirada enojada` → aumenta la afinidad por cabello violeta/obsidiana y una identidad vocal de timbre violeta/oscuro.
+
+Esto no es una regla biológica ni una asociación obligatoria: es una **heurística artística editable** para producir personajes con coherencia interna y variedad.
+
+El resultado incluye:
+
+- perfil completo;
+- explicación de por qué se eligieron los rasgos AUTO;
+- prompt de producción;
+- negative prompt;
+- seed para reproducir o comparar una variación;
+- opción **GUARDAR PERFIL** como JSON local.
+
+Los perfiles guardados en `generated_characters/` se excluyen de Git por defecto. Primero se generan y revisan; después pueden convertirse en contratos reales de BaseWarriors.
+
 ## Diagnóstico del PC
 
 `doctor.py` comprueba automáticamente:
@@ -145,7 +179,7 @@ Tkinter puro no incorpora drag & drop de archivos de Windows de forma nativa. Po
 
 Bloque ejecutado: ~1–2 h de implementación.
 Prueba real pendiente: ~30–60 min en Windows.
-Siguiente mejora útil: ~2–3 h para modo de lote con multi-selección/cola y detección automática de imágenes compatibles, más ~30–60 min de prueba real.
+Siguiente mejora útil: ~3–5 h para ampliar el generador con peinados, paleta secundaria, accesorios, arma/prop característico y plantillas por IA; después ~30–60 min de prueba real.
 
 ## Estado
 
