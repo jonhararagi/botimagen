@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Python syntax
-        run: python -m py_compile app.py
+        run: python -m py_compile app.py doctor.py
 
       - name: Validate asset manifest
         run: python tests/validate_manifest.py
