@@ -37,10 +37,12 @@ py app.py
 2. Pulsar **+ SUBIR IMAGEN**.
 3. La app muestra una vista previa.
 4. Se validan extensión, dimensiones y tamaño.
-5. Pulsar **PREPARAR ASSET**.
-6. La imagen se copia a la ruta indicada por el manifiesto.
-7. El archivo queda listo para Git.
-8. Opcionalmente se puede usar **ABRIR CARPETA** para revisar el resultado.
+5. Pulsar **PREPARAR ASSET** o **PREPARAR + SIGUIENTE** para trabajar en cadena.
+6. Los assets preparados quedan marcados con ✓ durante la sesión.
+7. La imagen se copia a la ruta indicada por el manifiesto.
+8. El archivo queda listo para Git.
+9. Opcionalmente se puede usar **ABRIR CARPETA** para revisar el resultado.
+10. **GIT STATUS** y **GIT PUSH** permiten revisar y enviar solamente el asset seleccionado.
 
 ## Configuración
 
@@ -69,3 +71,21 @@ La sincronización Git usa el Git instalado en el PC y las credenciales/configur
 
 MVP implementado: ~3–5 h de trabajo estimado.
 Mejoras posteriores: ~3–6 h adicionales.
+
+## Validación automática
+
+GitHub Actions ejecuta en cada cambio de `main`:
+
+- compilación sintáctica de `app.py` con `python -m py_compile`;
+- validación estructural de `assets_manifest.json`;
+- comprobación de que los contratos apunten a PNG.
+
+Esto no sustituye la prueba real de la interfaz Tkinter en Windows, que sigue siendo una validación local.
+
+## Inicio rápido en Windows
+
+También puedes usar `Iniciar_BotImagen.bat` con doble clic. El lanzador usa el Python Launcher (`py`) cuando está disponible.
+
+## Estado
+
+MVP funcional en evolución. La prueba de interfaz gráfica real todavía debe ejecutarse en un PC Windows con Python/Tkinter.
