@@ -1,0 +1,501 @@
+{
+  "version": 1,
+  "profile": "BaseWarriors Character Generator",
+  "categories": {
+    "personality": [
+      {
+        "id": "alegre",
+        "label": "Alegre",
+        "tags": [
+          "bright",
+          "warm",
+          "social"
+        ]
+      },
+      {
+        "id": "rebelde",
+        "label": "Rebelde",
+        "tags": [
+          "bold",
+          "defiant",
+          "edgy"
+        ]
+      },
+      {
+        "id": "seria",
+        "label": "Seria",
+        "tags": [
+          "cool",
+          "controlled",
+          "focused"
+        ]
+      },
+      {
+        "id": "kuudere",
+        "label": "Kuudere",
+        "tags": [
+          "cool",
+          "reserved",
+          "quiet"
+        ]
+      },
+      {
+        "id": "protectora",
+        "label": "Protectora",
+        "tags": [
+          "warm",
+          "strong",
+          "guardian"
+        ]
+      },
+      {
+        "id": "timida",
+        "label": "Tímida",
+        "tags": [
+          "soft",
+          "reserved",
+          "gentle"
+        ]
+      },
+      {
+        "id": "traviesa",
+        "label": "Traviesa",
+        "tags": [
+          "playful",
+          "bold",
+          "social"
+        ]
+      },
+      {
+        "id": "disciplinada",
+        "label": "Disciplinada",
+        "tags": [
+          "focused",
+          "controlled",
+          "strong"
+        ]
+      },
+      {
+        "id": "hiperactiva",
+        "label": "Hiperactiva",
+        "tags": [
+          "bright",
+          "energetic",
+          "bold"
+        ]
+      }
+    ],
+    "stature": [
+      {
+        "id": "bajita",
+        "label": "Bajita",
+        "tags": [
+          "compact",
+          "cute",
+          "agile"
+        ]
+      },
+      {
+        "id": "media",
+        "label": "Estatura media",
+        "tags": [
+          "balanced",
+          "versatile"
+        ]
+      },
+      {
+        "id": "alta",
+        "label": "Alta",
+        "tags": [
+          "elegant",
+          "commanding",
+          "long"
+        ]
+      }
+    ],
+    "silhouette": [
+      {
+        "id": "compacta_agil",
+        "label": "Compacta / ágil",
+        "tags": [
+          "compact",
+          "agile",
+          "cute"
+        ]
+      },
+      {
+        "id": "atletica",
+        "label": "Atlética equilibrada",
+        "tags": [
+          "athletic",
+          "balanced"
+        ]
+      },
+      {
+        "id": "elegante",
+        "label": "Alta y elegante",
+        "tags": [
+          "elegant",
+          "long"
+        ]
+      },
+      {
+        "id": "guardiana",
+        "label": "Robusta / guardiana",
+        "tags": [
+          "strong",
+          "guardian",
+          "powerful"
+        ]
+      }
+    ],
+    "expression": [
+      {
+        "id": "sonrisa_abierta",
+        "label": "Sonrisa abierta",
+        "tags": [
+          "bright",
+          "warm",
+          "social"
+        ]
+      },
+      {
+        "id": "sonrisa_picara",
+        "label": "Sonrisa pícara",
+        "tags": [
+          "playful",
+          "bold"
+        ]
+      },
+      {
+        "id": "serena",
+        "label": "Serena",
+        "tags": [
+          "cool",
+          "soft",
+          "controlled"
+        ]
+      },
+      {
+        "id": "mirada_enfocada",
+        "label": "Mirada enfocada",
+        "tags": [
+          "focused",
+          "strong"
+        ]
+      },
+      {
+        "id": "mirada_desafiante",
+        "label": "Mirada desafiante",
+        "tags": [
+          "defiant",
+          "bold",
+          "strong"
+        ]
+      },
+      {
+        "id": "mirada_fria",
+        "label": "Mirada fría",
+        "tags": [
+          "cool",
+          "reserved",
+          "quiet"
+        ]
+      },
+      {
+        "id": "somnolienta",
+        "label": "Somnolienta",
+        "tags": [
+          "soft",
+          "quiet",
+          "sleepy"
+        ]
+      }
+    ],
+    "hair": [
+      {
+        "id": "rojo_coral",
+        "label": "Rojo coral",
+        "base": 2,
+        "bias": {
+          "personality:alegre": 5,
+          "personality:rebelde": 6,
+          "personality:hiperactiva": 3,
+          "stature:bajita": 2,
+          "expression:sonrisa_abierta": 3
+        }
+      },
+      {
+        "id": "naranja_tangerina",
+        "label": "Naranja mandarina",
+        "base": 2,
+        "bias": {
+          "personality:alegre": 6,
+          "personality:hiperactiva": 5,
+          "stature:bajita": 3,
+          "expression:sonrisa_abierta": 4
+        }
+      },
+      {
+        "id": "rosa_chicle",
+        "label": "Rosa chicle",
+        "base": 1,
+        "bias": {
+          "personality:alegre": 4,
+          "personality:traviesa": 4,
+          "personality:timida": 2
+        }
+      },
+      {
+        "id": "violeta_profundo",
+        "label": "Violeta profundo",
+        "base": 2,
+        "bias": {
+          "personality:seria": 5,
+          "personality:kuudere": 7,
+          "personality:rebelde": 2,
+          "expression:mirada_fria": 5,
+          "expression:mirada_enfocada": 3
+        }
+      },
+      {
+        "id": "negro_obsidiana",
+        "label": "Negro obsidiana",
+        "base": 2,
+        "bias": {
+          "personality:seria": 5,
+          "personality:kuudere": 6,
+          "personality:rebelde": 5,
+          "expression:mirada_desafiante": 4,
+          "expression:mirada_fria": 4
+        }
+      },
+      {
+        "id": "azul_nocturno",
+        "label": "Azul nocturno",
+        "base": 2,
+        "bias": {
+          "personality:kuudere": 5,
+          "personality:seria": 4,
+          "personality:disciplinada": 3,
+          "expression:serena": 3
+        }
+      },
+      {
+        "id": "plateado_perla",
+        "label": "Plateado perla",
+        "base": 1,
+        "bias": {
+          "personality:kuudere": 4,
+          "personality:seria": 3,
+          "personality:timida": 2,
+          "expression:mirada_fria": 3
+        }
+      },
+      {
+        "id": "castano_miel",
+        "label": "Castaño miel",
+        "base": 2,
+        "bias": {
+          "personality:protectora": 4,
+          "personality:timida": 3,
+          "personality:alegre": 2,
+          "expression:serena": 2
+        }
+      }
+    ],
+    "eyes": [
+      {
+        "id": "ambar",
+        "label": "Ámbar dorado",
+        "base": 2,
+        "bias": {
+          "personality:alegre": 4,
+          "personality:protectora": 4,
+          "personality:hiperactiva": 3
+        }
+      },
+      {
+        "id": "rojo_rubi",
+        "label": "Rojo rubí",
+        "base": 2,
+        "bias": {
+          "personality:rebelde": 5,
+          "personality:seria": 2,
+          "expression:mirada_desafiante": 4
+        }
+      },
+      {
+        "id": "violeta",
+        "label": "Violeta",
+        "base": 2,
+        "bias": {
+          "personality:kuudere": 6,
+          "personality:seria": 4,
+          "expression:mirada_fria": 4
+        }
+      },
+      {
+        "id": "azul_hielo",
+        "label": "Azul hielo",
+        "base": 2,
+        "bias": {
+          "personality:kuudere": 5,
+          "personality:timida": 2,
+          "personality:seria": 3,
+          "expression:serena": 3
+        }
+      },
+      {
+        "id": "verde_esmeralda",
+        "label": "Verde esmeralda",
+        "base": 1,
+        "bias": {
+          "personality:protectora": 4,
+          "personality:disciplinada": 3
+        }
+      },
+      {
+        "id": "gris_grafito",
+        "label": "Gris grafito",
+        "base": 1,
+        "bias": {
+          "personality:seria": 4,
+          "personality:kuudere": 5,
+          "expression:mirada_fria": 3
+        }
+      }
+    ],
+    "voice": [
+      {
+        "id": "coral_brillante",
+        "label": "Coral brillante",
+        "base": 2,
+        "bias": {
+          "personality:alegre": 6,
+          "personality:hiperactiva": 5,
+          "expression:sonrisa_abierta": 3
+        }
+      },
+      {
+        "id": "rojo_ardiente",
+        "label": "Rojo ardiente",
+        "base": 2,
+        "bias": {
+          "personality:rebelde": 6,
+          "personality:traviesa": 3,
+          "expression:mirada_desafiante": 3
+        }
+      },
+      {
+        "id": "violeta_sereno",
+        "label": "Violeta sereno",
+        "base": 2,
+        "bias": {
+          "personality:seria": 5,
+          "personality:kuudere": 7,
+          "expression:mirada_fria": 5,
+          "expression:serena": 2
+        }
+      },
+      {
+        "id": "obsidiana_profunda",
+        "label": "Obsidiana profunda",
+        "base": 2,
+        "bias": {
+          "personality:kuudere": 6,
+          "personality:seria": 5,
+          "expression:mirada_desafiante": 4,
+          "expression:mirada_fria": 5
+        }
+      },
+      {
+        "id": "azul_cristalino",
+        "label": "Azul cristalino",
+        "base": 1,
+        "bias": {
+          "personality:timida": 3,
+          "personality:kuudere": 3,
+          "expression:serena": 4
+        }
+      },
+      {
+        "id": "miel_calida",
+        "label": "Miel cálida",
+        "base": 2,
+        "bias": {
+          "personality:protectora": 5,
+          "personality:alegre": 3
+        }
+      }
+    ],
+    "combat_role": [
+      {
+        "id": "striker",
+        "label": "Striker / atacante",
+        "tags": [
+          "aggressive",
+          "dynamic"
+        ],
+        "bias": {
+          "personality:rebelde": 4,
+          "personality:hiperactiva": 5,
+          "expression:mirada_desafiante": 4
+        }
+      },
+      {
+        "id": "support",
+        "label": "Support / soporte",
+        "tags": [
+          "warm",
+          "team"
+        ],
+        "bias": {
+          "personality:protectora": 6,
+          "personality:timida": 2,
+          "personality:alegre": 3
+        }
+      },
+      {
+        "id": "tank",
+        "label": "Tank / guardiana",
+        "tags": [
+          "strong",
+          "guardian"
+        ],
+        "bias": {
+          "personality:protectora": 6,
+          "stature:alta": 2,
+          "silhouette:guardiana": 6
+        }
+      },
+      {
+        "id": "control",
+        "label": "Control / debuffer",
+        "tags": [
+          "cool",
+          "controlled"
+        ],
+        "bias": {
+          "personality:seria": 4,
+          "personality:kuudere": 5,
+          "expression:mirada_fria": 4
+        }
+      },
+      {
+        "id": "pitcher",
+        "label": "Pitcher / especialista",
+        "tags": [
+          "focused",
+          "technical"
+        ],
+        "bias": {
+          "personality:disciplinada": 5,
+          "personality:seria": 3,
+          "expression:mirada_enfocada": 4
+        }
+      }
+    ]
+  },
+  "style_core": "original premium Japanese anime hero-collector game character, BaseWarriors: Meta-Strike, polished cel shading, crisp linework, expressive anime eyes, refined costume design, strong gameplay silhouette, cinematic 2.5D cutout readiness, subtle material separation, controlled highlights, clean production art, original design"
+}
