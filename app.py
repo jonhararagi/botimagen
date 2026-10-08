@@ -56,6 +56,8 @@ class AssetIntake(tk.Tk):
         self.catalog_status_var = tk.StringVar(value="")
 
         self._build_ui()
+        self.bind("<Control-o>", lambda _event: self.choose_image())
+        self.bind("<Escape>", lambda _event: self.clear_selection())
         self._populate_assets()
 
     def _build_ui(self):
@@ -89,27 +91,34 @@ class AssetIntake(tk.Tk):
         ttk.Label(right, textvariable=self.asset_title_var,
                   font=("Segoe UI", 16, "bold")).grid(row=0, column=0, sticky="w")
 
-        self.info = tk.Text(right, height=8, wrap="word", state="disabled")
-        self.info.grid(row=1, column=0, sticky="ew", pady=(8, 12))
+        self.info = tk.Text(right, height=6, wrap="word", state="disabled")
+        self.info.grid(row=1, column=0, sticky="ew", pady=(8, 8))
+
+        prompt_frame = ttk.LabelFrame(right, text="PROMPT DEL ASSET", padding=8)
+        prompt_frame.grid(row=2, column=0, sticky="ew", pady=(0, 10))
+        prompt_frame.columnconfigure(0, weight=1)
+        self.prompt_text = tk.Text(prompt_frame, height=4, wrap="word")
+        self.prompt_text.grid(row=0, column=0, sticky="ew")
+        self.prompt_text.configure(state="disabled")
+        ttk.Button(prompt_frame, text="COPIAR PROMPT",
+                   command=self.copy_prompt).grid(row=0, column=1, sticky="ns", padx=(8, 0))
 
         upload_row = ttk.Frame(right)
-        upload_row.grid(row=2, column=0, sticky="ew")
+        upload_row.grid(row=3, column=0, sticky="ew")
         ttk.Button(upload_row, text="+ SUBIR IMAGEN",
                    command=self.choose_image).pack(side="left")
-        ttk.Button(upload_row, text="COPIAR PROMPT",
-                   command=self.copy_prompt).pack(side="left", padx=8)
         ttk.Label(upload_row, textvariable=self.file_var).pack(side="left", padx=12)
 
         self.preview = ttk.Label(right, text="Vista previa\n\nSin imagen",
                                  anchor="center", relief="solid")
-        self.preview.grid(row=3, column=0, sticky="nsew", pady=12)
-        right.rowconfigure(3, weight=1)
+        self.preview.grid(row=4, column=0, sticky="nsew", pady=12)
+        right.rowconfigure(4, weight=1)
 
         ttk.Label(right, textvariable=self.validation_var).grid(
-            row=4, column=0, sticky="w", pady=(0, 10))
+            row=5, column=0, sticky="w", pady=(0, 10))
 
         actions = ttk.Frame(right)
-        actions.grid(row=5, column=0, sticky="ew")
+        actions.grid(row=6, column=0, sticky="ew")
         ttk.Button(actions, text="PREPARAR ASSET",
                    command=self.prepare_asset).pack(side="left")
         ttk.Button(actions, text="PREPARAR + SIGUIENTE",
@@ -183,6 +192,12 @@ class AssetIntake(tk.Tk):
         self.info.delete("1.0", tk.END)
         self.info.insert("1.0", text)
         self.info.configure(state="disabled")
+
+        prompt = self.selected_asset.get("prompt", "").strip()
+        self.prompt_text.configure(state="normal")
+        self.prompt_text.delete("1.0", tk.END)
+        self.prompt_text.insert("1.0", prompt)
+        self.prompt_text.configure(state="disabled")
 
         self.selected_file = None
         self.file_var.set("Ninguna imagen seleccionada")
@@ -339,19 +354,37 @@ class AssetIntake(tk.Tk):
         if not self.prepare_asset():
             return
 
-        for index, asset in enumerate(self.assets):
-            if asset.get("id", "") == before:
-                continue
-            if asset.get("id", "") not in self.prepared_ids:
+        query = self.asset_filter_var.get().strip().lower()
+        visible = [
+            asset for asset in self.assets
+            if not query
+            or query in f"{asset.get('id', '?')} · {asset.get('title', '')}".lower()
+        ]
+        pending = [asset for asset in visible if asset.get("id", "") not in self.prepared_ids]
+        if not pending:
+            self.status_var.set("🎉 Todos los assets visibles fueron preparados en esta sesión.")
+            messagebox.showinfo("Cola terminada", "No quedan assets sin preparar en el filtro actual.")
+            return
+
+        next_asset = pending[0]
+        self._select_asset_by_id(next_asset.get("id", ""))
+        self.status_var.set(f"✅ Listo. Siguiente asset: {next_asset.get('id', '')}")
+
+    def _select_asset_by_id(self, asset_id):
+        query = self.asset_filter_var.get().strip().lower()
+        visible = [
+            asset for asset in self.assets
+            if not query
+            or query in f"{asset.get('id', '?')} · {asset.get('title', '')}".lower()
+        ]
+        for index, asset in enumerate(visible):
+            if asset.get("id", "") == asset_id:
                 self.asset_list.selection_clear(0, tk.END)
                 self.asset_list.selection_set(index)
                 self.asset_list.see(index)
                 self._on_asset_selected()
-                self.status_var.set(f"✅ Listo. Siguiente asset: {asset.get('id', '')}")
-                return
-
-        self.status_var.set("🎉 Todos los assets del catálogo fueron preparados en esta sesión.")
-        messagebox.showinfo("Cola terminada", "No quedan assets sin preparar en esta sesión.")
+                return True
+        return False
 
     def choose_repo(self):
         path = filedialog.askdirectory(title="Seleccionar repositorio local")
@@ -429,6 +462,19 @@ class AssetIntake(tk.Tk):
 
         if self.run_git(["add", "--", relative]) is None:
             return
+
+        staged = self.run_git(["diff", "--cached", "--name-only"])
+        if staged is None:
+            return
+        staged_files = [line.strip() for line in staged.splitlines() if line.strip()]
+        if staged_files != [relative]:
+            messagebox.showerror(
+                "Git",
+                "La operación se detuvo porque el índice contiene archivos distintos al asset seleccionado."
+            )
+            self.run_git(["reset", "--", relative])
+            return
+
         if self.run_git(["commit", "-m", f"asset: intake {self.selected_asset.get('id', 'update')}"]) is None:
             return
         if self.run_git(["push"]) is None:
