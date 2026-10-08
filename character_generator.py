@@ -36,6 +36,7 @@ TRAIT_KEYS = {
     "combat_role": "Rol de combate",
     "baseball_prop": "Prop característico",
     "pose": "Pose",
+    "quirk": "Detalle / quirk",
 }
 
 CATEGORY_ORDER = tuple(TRAIT_KEYS)
@@ -145,7 +146,7 @@ class CharacterGenerator:
             "hair_length", "hairstyle", "hair",
             "eyes", "eye_shape", "outfit", "outer_layer",
             "footwear", "accessory", "palette_accent",
-            "voice", "combat_role", "baseball_prop", "pose",
+            "voice", "combat_role", "baseball_prop", "pose", "quirk",
         )
         for category in refine:
             if chosen.get(category, "auto") != "auto":
@@ -212,6 +213,7 @@ class CharacterGenerator:
             f"Combat role: {labels['combat_role']}. "
             f"Signature baseball prop: {labels['baseball_prop']}. "
             f"Pose: {labels['pose']}. "
+            f"Signature character quirk: {labels['quirk']}. "
             f"Overall visual direction: {style_direction}. "
             "Use all selected traits as a coherent design system, not as disconnected keywords. "
             "Personality must be visible in posture, facial tension, hair movement, costume geometry, "
@@ -223,7 +225,10 @@ class CharacterGenerator:
             "uniform. Full body adult heroine, head to shoes, three-quarter dynamic idle combat pose, clean "
             "hands, clear feet, transparent background, generous padding, no crop, production-ready PNG cutout, "
             "subtle rim light, controlled highlights, clean shadow grouping, premium mobile-game key art, "
-            "2.5D parallax-friendly contours and silhouette."
+            "2.5D parallax-friendly contours and silhouette. The quirk should be a small, believable "
+            "behavioral signature that can appear naturally in idle animations, dialogue, victory poses, "
+            "voice lines, props or slice-of-life scenes. It should add charm or comedy without turning the "
+            "character into a one-joke caricature."
         )
 
     @staticmethod
@@ -266,6 +271,11 @@ class CharacterGenerator:
             reasons.append(
                 "Protectora aumenta la afinidad por siluetas fuertes, equipamiento "
                 "defensivo y roles de soporte/tanque."
+            )
+        if profile.get("quirk"):
+            reasons.append(
+                f"Detalle sorpresa: {labels.get('quirk', profile['quirk'])}. Los quirks se mantienen pequeños "
+                "y funcionales para que sumen personalidad sin dominar el concepto."
             )
 
         reasons.append(
