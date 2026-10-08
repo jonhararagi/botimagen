@@ -78,6 +78,8 @@ El historial de imports se guarda en `botimagen_history.json`, también ignorado
 
 El catálogo vive en `assets_manifest.json`.
 
+Cada contrato usa ahora `prompt_version: production-v2`, un **prompt de producción** detallado y un **negative prompt**. La intención es que el texto pueda copiarse directamente a una herramienta de generación de imágenes y mantener mejor composición, materiales, iluminación, silueta, uso del PNG y coherencia con BaseWarriors.
+
 ## Catálogo actual
 
 El manifiesto incluye contratos de:
@@ -147,4 +149,4 @@ Siguiente mejora útil: ~2–3 h para modo de lote con multi-selección/cola y d
 
 ## Estado
 
-Estado: **MVP funcional en evolución**. El proyecto tiene ahora preflight local para Windows y validación estática automatizada; la interfaz real todavía debe probarse físicamente en tu PC.
+Estado: **MVP funcional en evolución**. El proyecto tiene preflight local para Windows, prompts de producción por contrato y validación estática automatizada; la interfaz real todavía debe probarse físicamente en tu PC.
