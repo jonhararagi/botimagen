@@ -68,12 +68,12 @@ def test_joyful_short_character_prefers_warm_hair():
     assert result["profile"]["hair"] in {"rojo_coral", "naranja_tangerina"}
 
 
-def test_serious_cold_character_prefers_dark_voice_palette():
+def test_serious_angry_character_prefers_dark_voice_palette():
     generator = CharacterGenerator(RULES)
     result = generator.generate(
         {
             "personality": "seria",
-            "expression": "mirada_fria",
+            "expression": "mirada_enojada",
         },
         seed=20,
     )
