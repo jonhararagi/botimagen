@@ -102,31 +102,42 @@ class AssetIntake(tk.Tk):
         self.info = tk.Text(right, height=6, wrap="word", state="disabled")
         self.info.grid(row=1, column=0, sticky="ew", pady=(8, 8))
 
-        prompt_frame = ttk.LabelFrame(right, text="PROMPT DEL ASSET", padding=8)
-        prompt_frame.grid(row=2, column=0, sticky="ew", pady=(0, 10))
+        prompt_frame = ttk.LabelFrame(right, text="PROMPT DE PRODUCCIÓN", padding=8)
+        prompt_frame.grid(row=2, column=0, sticky="ew", pady=(0, 8))
         prompt_frame.columnconfigure(0, weight=1)
-        self.prompt_text = tk.Text(prompt_frame, height=4, wrap="word")
+        self.prompt_text = tk.Text(prompt_frame, height=6, wrap="word")
         self.prompt_text.grid(row=0, column=0, sticky="ew")
         self.prompt_text.configure(state="disabled")
         ttk.Button(prompt_frame, text="COPIAR PROMPT",
                    command=self.copy_prompt).grid(row=0, column=1, sticky="ns", padx=(8, 0))
 
+        negative_frame = ttk.LabelFrame(right, text="NEGATIVE PROMPT", padding=8)
+        negative_frame.grid(row=3, column=0, sticky="ew", pady=(0, 10))
+        negative_frame.columnconfigure(0, weight=1)
+        self.negative_text = tk.Text(negative_frame, height=3, wrap="word")
+        self.negative_text.grid(row=0, column=0, sticky="ew")
+        self.negative_text.configure(state="disabled")
+        ttk.Button(negative_frame, text="COPIAR NEGATIVE",
+                   command=self.copy_negative_prompt).grid(row=0, column=1, sticky="ns", padx=(8, 0))
+        ttk.Button(negative_frame, text="COPIAR TODO",
+                   command=self.copy_full_prompt).grid(row=0, column=2, sticky="ns", padx=(8, 0))
+
         upload_row = ttk.Frame(right)
-        upload_row.grid(row=3, column=0, sticky="ew")
+        upload_row.grid(row=4, column=0, sticky="ew")
         ttk.Button(upload_row, text="+ SUBIR IMAGEN",
                    command=self.choose_image).pack(side="left")
         ttk.Label(upload_row, textvariable=self.file_var).pack(side="left", padx=12)
 
         self.preview = ttk.Label(right, text="Vista previa\n\nSin imagen",
                                  anchor="center", relief="solid")
-        self.preview.grid(row=4, column=0, sticky="nsew", pady=12)
-        right.rowconfigure(4, weight=1)
+        self.preview.grid(row=5, column=0, sticky="nsew", pady=12)
+        right.rowconfigure(5, weight=1)
 
         ttk.Label(right, textvariable=self.validation_var).grid(
-            row=5, column=0, sticky="w", pady=(0, 10))
+            row=6, column=0, sticky="w", pady=(0, 10))
 
         actions_primary = ttk.Frame(right)
-        actions_primary.grid(row=6, column=0, sticky="ew")
+        actions_primary.grid(row=7, column=0, sticky="ew")
         ttk.Button(actions_primary, text="PREPARAR ASSET",
                    command=self.prepare_asset).pack(side="left")
         ttk.Button(actions_primary, text="PREPARAR + SIGUIENTE",
@@ -135,7 +146,7 @@ class AssetIntake(tk.Tk):
                    command=self.clear_selection).pack(side="left")
 
         actions_tools = ttk.Frame(right)
-        actions_tools.grid(row=7, column=0, sticky="ew", pady=(8, 0))
+        actions_tools.grid(row=8, column=0, sticky="ew", pady=(8, 0))
         ttk.Button(actions_tools, text="COPIAR DESTINO",
                    command=self.copy_destination).pack(side="left")
         ttk.Button(actions_tools, text="ABRIR CARPETA",
@@ -245,6 +256,12 @@ class AssetIntake(tk.Tk):
         self.prompt_text.insert("1.0", prompt)
         self.prompt_text.configure(state="disabled")
 
+        negative = self.selected_asset.get("negative_prompt", "").strip()
+        self.negative_text.configure(state="normal")
+        self.negative_text.delete("1.0", tk.END)
+        self.negative_text.insert("1.0", negative)
+        self.negative_text.configure(state="disabled")
+
         self.selected_file = None
         self.file_var.set("Ninguna imagen seleccionada")
         self.validation_var.set("Esperando imagen...")
@@ -276,7 +293,35 @@ class AssetIntake(tk.Tk):
         self.clipboard_clear()
         self.clipboard_append(prompt)
         self.update()
-        self.status_var.set("Prompt copiado al portapapeles.")
+        self.status_var.set("Prompt de producción copiado.")
+
+    def copy_negative_prompt(self):
+        if not self.selected_asset:
+            return
+        negative = self.selected_asset.get("negative_prompt", "").strip()
+        if not negative:
+            messagebox.showinfo("Negative Prompt", "Este asset no tiene negative prompt.")
+            return
+        self.clipboard_clear()
+        self.clipboard_append(negative)
+        self.update()
+        self.status_var.set("Negative prompt copiado.")
+
+    def copy_full_prompt(self):
+        if not self.selected_asset:
+            return
+        positive = self.selected_asset.get("prompt", "").strip()
+        negative = self.selected_asset.get("negative_prompt", "").strip()
+        if not positive:
+            messagebox.showinfo("Prompt", "Este asset no tiene prompt.")
+            return
+        combined = positive
+        if negative:
+            combined += "\n\nNEGATIVE PROMPT:\n" + negative
+        self.clipboard_clear()
+        self.clipboard_append(combined)
+        self.update()
+        self.status_var.set("Prompt + negative prompt copiados.")
 
     def copy_destination(self):
         if not self.selected_asset:
