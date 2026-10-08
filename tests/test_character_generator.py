@@ -53,6 +53,9 @@ def test_generator_locks_user_choices_and_fills_auto():
         assert result["profile"][category] != "auto"
     assert result["prompt"]
     assert result["negative_prompt"]
+    assert result["coherence"] == 0.82
+    assert "outfit" in result["profile"]
+    assert "hairstyle" in result["profile"]
 
 
 def test_joyful_short_character_prefers_warm_hair():
@@ -66,6 +69,19 @@ def test_joyful_short_character_prefers_warm_hair():
         seed=10,
     )
     assert result["profile"]["hair"] in {"rojo_coral", "naranja_tangerina"}
+
+
+def test_coherence_changes_variation_pool_but_keeps_locks():
+    generator = CharacterGenerator(RULES)
+    locked = {"personality": "rebelde", "stature": "bajita", "hair": "auto"}
+    strict = generator.generate(locked, seed=99, coherence=1.0)
+    varied = generator.generate(locked, seed=99, coherence=0.25)
+    assert strict["profile"]["personality"] == "rebelde"
+    assert varied["profile"]["personality"] == "rebelde"
+    assert strict["profile"]["stature"] == "bajita"
+    assert varied["profile"]["stature"] == "bajita"
+    assert strict["coherence"] == 1.0
+    assert varied["coherence"] == 0.25
 
 
 def test_serious_angry_character_prefers_dark_voice_palette():
