@@ -105,6 +105,10 @@ class AssetIntake(tk.Tk):
                    command=self.open_destination).pack(side="left", padx=8)
         ttk.Button(actions, text="ABRIR REPOSITORIO",
                    command=self.choose_repo).pack(side="left")
+        ttk.Button(actions, text="GIT STATUS",
+                   command=self.git_status).pack(side="left", padx=(8, 0))
+        ttk.Button(actions, text="GIT PUSH",
+                   command=self.git_push).pack(side="left", padx=(8, 0))
 
         bottom = ttk.Frame(self, padding=(14, 0, 14, 12))
         bottom.grid(row=2, column=0, columnspan=2, sticky="ew")
