@@ -12,12 +12,34 @@ La aplicación funciona como una pequeña estación de trabajo: muestra el contr
 
 - Windows 10/11
 - Python 3.10+
-- Tkinter (normalmente incluido en Python para Windows)
-- Git, si se quiere usar el botón de sincronización
+- Tkinter/Tk, disponible con la instalación normal de Python para Windows
+- Git for Windows, si se quiere usar `GIT STATUS`/`GIT PUSH`
 
-No necesita instalar paquetes de PyPI.
+No necesita instalar paquetes de PyPI ni Node.js.
+
+La documentación oficial de Python confirma que Tkinter está disponible en Windows y forma parte de la biblioteca estándar. La instalación oficial de Git for Windows proporciona Git para la consola y GUI.
+
+Fuentes consultadas:
+- Python Tkinter: https://docs.python.org/3/library/tkinter.html
+- Python Windows: https://www.python.org/downloads/windows/
+- Git for Windows: https://gitforwindows.org/
+- Instalación oficial de Git: https://git-scm.com/install/windows
 
 ## Ejecutar
+
+La aplicación está pensada para Windows 10/11. No necesita un servidor, una cuenta ni conexión a Internet para abrirse. Solo usa Python/Tkinter y, para las funciones Git, Git for Windows.
+
+### Forma recomendada en Windows
+
+Haz doble clic en `Iniciar_BotImagen.bat`. El launcher ejecuta primero un diagnóstico del PC y solo abre la aplicación si Python, Tkinter, Git y los archivos locales básicos están disponibles.
+
+También puedes abrir el diagnóstico manualmente:
+
+```bat
+py doctor.py
+```
+
+Si el diagnóstico devuelve `PASS`, el entorno local está listo para ejecutar BotImagen.
 
 Desde la carpeta del repositorio:
 
@@ -77,6 +99,20 @@ Antes del commit, **GIT PUSH** comprueba que solamente el asset seleccionado est
 
 La aplicación nunca renombra el archivo fuente original. Copia el archivo al destino canónico del manifiesto.
 
+## Diagnóstico del PC
+
+`doctor.py` comprueba automáticamente:
+
+- versión de Python;
+- Tkinter/Tk y que pueda crear una ventana;
+- Git disponible en `PATH`;
+- archivos básicos de BotImagen;
+- lectura de la configuración local.
+
+La aplicación también incluye el botón **DIAGNÓSTICO PC** para ejecutar estas comprobaciones sin salir de la interfaz.
+
+El launcher `.bat` ejecuta este preflight antes de abrir la app. Esto evita que una instalación incompleta llegue directamente a una pantalla que luego falla.
+
 ## Mejoras de la iteración
 
 - Corregida la selección cuando el catálogo está filtrado: ahora el índice visible se resuelve contra la lista filtrada real.
@@ -107,8 +143,8 @@ Tkinter puro no incorpora drag & drop de archivos de Windows de forma nativa. Po
 
 Bloque ejecutado: ~1–2 h de implementación.
 Prueba real pendiente: ~30–60 min en Windows.
-Siguiente mejora útil: ~2–3 h para un modo de lote con multi-selección/cola y detección de archivos compatibles, más ~30–60 min de prueba real.
+Siguiente mejora útil: ~2–3 h para modo de lote con multi-selección/cola y detección automática de imágenes compatibles, más ~30–60 min de prueba real.
 
 ## Estado
 
-Estado: **MVP funcional en evolución**. La validación estática queda automatizada; la interfaz real de Windows todavía debe probarse físicamente.
+Estado: **MVP funcional en evolución**. El proyecto tiene ahora preflight local para Windows y validación estática automatizada; la interfaz real todavía debe probarse físicamente en tu PC.
