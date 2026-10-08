@@ -56,6 +56,8 @@ def test_generator_locks_user_choices_and_fills_auto():
     assert result["coherence"] == 0.82
     assert "outfit" in result["profile"]
     assert "hairstyle" in result["profile"]
+    assert "quirk" in result["profile"]
+    assert result["surprise"] is False
 
 
 def test_joyful_short_character_prefers_warm_hair():
@@ -84,6 +86,22 @@ def test_coherence_changes_variation_pool_but_keeps_locks():
     assert varied["coherence"] == 0.25
 
 
+def test_surprise_mode_prefers_character_quirks():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {
+            "personality": "seria",
+            "stature": "bajita",
+            "quirk": "auto",
+        },
+        seed=7,
+        surprise=True,
+    )
+    assert result["surprise"] is True
+    assert result["profile"]["quirk"]
+    assert result["coherence"] == 0.82
+
+
 def test_serious_angry_character_prefers_dark_voice_palette():
     generator = CharacterGenerator(RULES)
     result = generator.generate(
@@ -103,5 +121,5 @@ if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
     test_joyful_short_character_prefers_warm_hair()
-    test_serious_cold_character_prefers_dark_voice_palette()
+    test_serious_angry_character_prefers_dark_voice_palette()
     print("PASS: character generator tests")
