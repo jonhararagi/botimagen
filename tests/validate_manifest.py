@@ -21,6 +21,8 @@ def main() -> None:
         title = asset.get("title")
         description = asset.get("description")
         prompt = asset.get("prompt", "").strip()
+        negative_prompt = asset.get("negative_prompt", "").strip()
+        prompt_version = asset.get("prompt_version")
         destination = asset.get("destination")
         expected = asset.get("expected", {})
 
@@ -28,6 +30,8 @@ def main() -> None:
         assert title, f"missing title: {asset_id}"
         assert description, f"missing description: {asset_id}"
         assert prompt, f"missing prompt: {asset_id}"
+        assert negative_prompt, f"missing negative prompt: {asset_id}"
+        assert prompt_version == "production-v2", f"unsupported prompt version: {asset_id}"
         assert destination and destination.endswith(".png"), f"invalid destination: {asset_id}"
         assert destination not in destinations, f"duplicate destination: {destination}"
         assert expected.get("format", "PNG").upper() == "PNG", f"non-PNG contract: {asset_id}"
