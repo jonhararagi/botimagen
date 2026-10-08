@@ -181,7 +181,7 @@ class AssetIntake(tk.Tk):
 
     def validate_image(self):
         if not self.selected_file or not self.selected_asset:
-            return
+            return False
 
         errors = []
         expected = self.selected_asset.get("expected", {})
@@ -190,22 +190,12 @@ class AssetIntake(tk.Tk):
         if expected.get("format", "PNG").upper() == "PNG" and suffix != ".png":
             errors.append("Se requiere PNG.")
 
-        try:
-            from PIL import Image
-        except ImportError:
-            Image = None
-
         width = height = None
-        if Image:
-            try:
-                with Image.open(self.selected_file) as image:
-                    width, height = image.size
-            except Exception as exc:
-                errors.append(f"No se pudo leer la imagen: {exc}")
-        else:
-            # El MVP no obliga Pillow. La validación de dimensiones se omite si no está instalada.
-            if expected.get("width") or expected.get("height"):
-                errors.append("Instala Pillow para validar dimensiones: pip install pillow")
+        try:
+            probe = tk.PhotoImage(file=str(self.selected_file))
+            width, height = probe.width(), probe.height()
+        except tk.TclError as exc:
+            errors.append(f"No se pudo leer la imagen: {exc}")
 
         if width and expected.get("width") and width != expected["width"]:
             errors.append(f"Ancho incorrecto: {width}px; esperado {expected['width']}px.")
@@ -307,18 +297,40 @@ class AssetIntake(tk.Tk):
             messagebox.showinfo("Git status", output or "Working tree limpio.")
 
     def git_push(self):
-        if not self.run_git(["status", "--short"]) is None:
-            if messagebox.askyesno(
-                "Sincronizar",
-                "Esto hará git add, commit y push de los cambios del repositorio. ¿Continuar?"
-            ):
-                if self.run_git(["add", "."]) is None:
-                    return
-                if self.run_git(["commit", "-m", "asset: intake update"]) is None:
-                    return
-                self.run_git(["push"])
+        repo = Path(self.path_var.get()).expanduser()
+        if not (repo / ".git").exists():
+            messagebox.showerror("Git", "La carpeta seleccionada no parece ser un repositorio Git.")
+            return
 
-        self.status_var.set("Git sincronizado.")
+        destination = repo / self.selected_asset["destination"] if self.selected_asset else None
+        if not destination:
+            messagebox.showwarning("Git", "Selecciona un asset primero.")
+            return
+
+        relative = destination.relative_to(repo).as_posix()
+        status = self.run_git(["status", "--short", "--", relative])
+        if status is None:
+            return
+        if not status:
+            messagebox.showinfo("Git", "No hay cambios pendientes para este asset.")
+            return
+
+        if not messagebox.askyesno(
+            "Sincronizar asset",
+            f"Se hará git add del asset, commit y push:\n\n{relative}\n\n¿Continuar?"
+        ):
+            return
+
+        if self.run_git(["add", "--", relative]) is None:
+            return
+        if self.run_git(["commit", "-m", f"asset: intake {self.selected_asset.get('id', 'update')}"]) is None:
+            return
+        if self.run_git(["push"]) is None:
+            return
+
+        self.status_var.set("✅ Asset enviado a GitHub.")
+        messagebox.showinfo("Git", "Asset enviado correctamente a GitHub.")
+
 
 if __name__ == "__main__":
     app = AssetIntake()
