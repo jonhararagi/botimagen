@@ -298,8 +298,9 @@ class AssetIntake(tk.Tk):
 
         window = tk.Toplevel(self)
         window.title("BotImagen · Generador de personajes")
-        window.geometry("1180x780")
-        window.minsize(980, 680)
+        window.geometry("1260x820")
+        window.minsize(1040, 700)
+        window.columnconfigure(0, weight=0)
         window.columnconfigure(1, weight=1)
         window.rowconfigure(1, weight=1)
 
@@ -307,65 +308,132 @@ class AssetIntake(tk.Tk):
             window,
             text="GENERADOR DE PERSONAJE",
             font=("Segoe UI", 17, "bold"),
-        ).grid(row=0, column=0, columnspan=2, sticky="w", padx=14, pady=(14, 4))
+        ).grid(row=0, column=0, columnspan=2, sticky="w", padx=14, pady=(14, 2))
         ttk.Label(
             window,
-            text="Elige unos pocos rasgos. Todo lo que quede en AUTO será completado por reglas de afinidad + variación.",
-        ).grid(row=0, column=1, sticky="e", padx=14, pady=(14, 4))
+            text="Fija lo importante. AUTO resuelve lo demás por afinidad, semilla y coherencia visual.",
+        ).grid(row=0, column=1, sticky="e", padx=14, pady=(14, 2))
 
-        left = ttk.LabelFrame(window, text="RASGOS", padding=10)
-        left.grid(row=1, column=0, sticky="nsw", padx=(14, 8), pady=10)
+        left = ttk.Frame(window, padding=(14, 8, 8, 10))
+        left.grid(row=1, column=0, sticky="nsw")
+        left.rowconfigure(0, weight=1)
 
-        right = ttk.Frame(window, padding=(8, 10, 14, 10))
+        notebook = ttk.Notebook(left)
+        notebook.grid(row=0, column=0, sticky="nsw")
+
+        variables = {}
+        lookups = {}
+        category_groups = {
+            "IDENTIDAD": (
+                "personality", "stature", "body_build",
+                "silhouette", "expression", "face_shape", "pose",
+            ),
+            "VISUAL": (
+                "hair_length", "hairstyle", "hair",
+                "eyes", "eye_shape", "outfit", "outer_layer",
+                "footwear", "accessory", "palette_accent",
+            ),
+            "COMBATE": (
+                "voice", "combat_role", "baseball_prop",
+            ),
+        }
+
+        for group_name, categories in category_groups.items():
+            tab = ttk.Frame(notebook, padding=10)
+            tab.columnconfigure(1, weight=1)
+            notebook.add(tab, text=group_name)
+            for row, category in enumerate(categories):
+                ttk.Label(
+                    tab,
+                    text=TRAIT_KEYS.get(category, category.title()),
+                    font=("Segoe UI", 9, "bold"),
+                ).grid(row=row, column=0, sticky="w", pady=(0, 5))
+                options = generator.options(category)
+                labels = [option["label"] for option in options]
+                lookups[category] = {option["label"]: option["id"] for option in options}
+                var = tk.StringVar(value=labels[0])
+                variables[category] = var
+                ttk.Combobox(
+                    tab,
+                    textvariable=var,
+                    values=labels,
+                    state="readonly",
+                    width=31,
+                ).grid(row=row, column=1, sticky="ew", padx=(10, 0), pady=(0, 7))
+
+        settings = ttk.LabelFrame(left, text="CONTROL DE GENERACIÓN", padding=10)
+        settings.grid(row=1, column=0, sticky="ew", pady=(10, 0))
+        settings.columnconfigure(0, weight=1)
+
+        ttk.Label(settings, text="Coherencia / variedad").grid(row=0, column=0, sticky="w")
+        coherence_var = tk.DoubleVar(value=82.0)
+        ttk.Scale(
+            settings,
+            from_=25,
+            to=100,
+            variable=coherence_var,
+            orient="horizontal",
+        ).grid(row=1, column=0, sticky="ew", pady=(3, 5))
+        coherence_value = ttk.Label(settings, text="82%")
+        coherence_value.grid(row=2, column=0, sticky="w")
+        coherence_var.trace_add(
+            "write",
+            lambda *_: coherence_value.configure(text=f"{coherence_var.get():.0f}%"),
+        )
+
+        ttk.Label(
+            settings,
+            text="100% = muy coherente con tus elecciones.\nMás bajo = más experimentación compatible.",
+            justify="left",
+        ).grid(row=3, column=0, sticky="w", pady=(6, 0))
+
+        reference = ttk.LabelFrame(left, text="REFERENCIA VISUAL", padding=10)
+        reference.grid(row=2, column=0, sticky="ew", pady=(10, 0))
+        reference.columnconfigure(0, weight=1)
+
+        reference_options = {
+            "Personaje completo": "full_character",
+            "Cabello": "hair",
+            "Peinado": "hairstyle",
+            "Ropa / vestimenta": "outfit",
+            "Paleta de color": "palette_accent",
+            "Expresión": "expression",
+            "Pose": "pose",
+            "Rol / equipamiento": "combat_role",
+        }
+        ref_labels = list(reference_options)
+        ref_var = tk.StringVar(value=ref_labels[0])
+        ref_combo = ttk.Combobox(
+            reference,
+            textvariable=ref_var,
+            values=ref_labels,
+            state="readonly",
+        )
+        ref_combo.grid(row=0, column=0, sticky="ew")
+
+        actions_ref = ttk.Frame(reference)
+        actions_ref.grid(row=1, column=0, sticky="ew", pady=(8, 0))
+        ttk.Button(
+            actions_ref,
+            text="🔎 VER IMÁGENES WEB",
+            command=lambda: open_reference(),
+        ).pack(side="left")
+        ttk.Button(
+            actions_ref,
+            text="📁 CARPETA",
+            command=lambda: open_reference_folder(),
+        ).pack(side="left", padx=8)
+
+        right = ttk.Frame(window, padding=(8, 8, 14, 10))
         right.grid(row=1, column=1, sticky="nsew")
         right.columnconfigure(0, weight=1)
         right.rowconfigure(1, weight=1)
         right.rowconfigure(3, weight=1)
 
-        variables = {}
-        lookups = {}
-
-        category_order = (
-            "personality",
-            "stature",
-            "silhouette",
-            "expression",
-            "hair",
-            "eyes",
-            "voice",
-            "combat_role",
-        )
-
-        for row, category in enumerate(category_order):
-            ttk.Label(
-                left,
-                text=TRAIT_KEYS.get(category, category.title()),
-                font=("Segoe UI", 9, "bold"),
-            ).grid(row=row, column=0, sticky="w", pady=(0, 3))
-            options = generator.options(category)
-            labels = [option["label"] for option in options]
-            lookups[category] = {option["label"]: option["id"] for option in options}
-            var = tk.StringVar(value=labels[0])
-            variables[category] = var
-            ttk.Combobox(
-                left,
-                textvariable=var,
-                values=labels,
-                state="readonly",
-                width=31,
-            ).grid(row=row, column=1, sticky="ew", padx=(10, 0), pady=(0, 9))
-
-        ttk.Label(
-            left,
-            text="AUTO = el sistema decide\nPuedes fijar 1–3 rasgos y dejar el resto libre.",
-            justify="left",
-        ).grid(row=len(category_order), column=0, columnspan=2, sticky="w", pady=(8, 10))
-
         profile_box = ttk.LabelFrame(right, text="PERFIL GENERADO", padding=8)
         profile_box.grid(row=0, column=0, sticky="ew")
         profile_box.columnconfigure(0, weight=1)
-
-        profile_text = tk.Text(profile_box, height=7, wrap="word")
+        profile_text = tk.Text(profile_box, height=9, wrap="word")
         profile_text.grid(row=0, column=0, sticky="ew")
         profile_text.configure(state="disabled")
 
@@ -381,7 +449,7 @@ class AssetIntake(tk.Tk):
         negative_box.grid(row=2, column=0, sticky="nsew", pady=(10, 0))
         negative_box.columnconfigure(0, weight=1)
         negative_box.rowconfigure(0, weight=1)
-        negative_text = tk.Text(negative_box, height=5, wrap="word")
+        negative_text = tk.Text(negative_box, height=6, wrap="word")
         negative_text.grid(row=0, column=0, sticky="nsew")
         negative_text.configure(state="disabled")
 
@@ -398,20 +466,28 @@ class AssetIntake(tk.Tk):
 
         result_holder = {"value": None}
 
-        def write_box(widget, text):
+        def write_box(widget, value):
             widget.configure(state="normal")
             widget.delete("1.0", tk.END)
-            widget.insert("1.0", text)
+            widget.insert("1.0", value)
             widget.configure(state="disabled")
 
-        def generate_variant():
-            selections = {
+        def build_selections():
+            return {
                 category: lookups[category].get(variables[category].get(), "auto")
-                for category in category_order
+                for category in variables
             }
+
+        def generate_variant():
+            selections = build_selections()
             seed = datetime.now().microsecond
+            coherence = coherence_var.get() / 100.0
             try:
-                result = generator.generate(selections, seed=seed)
+                result = generator.generate(
+                    selections,
+                    seed=seed,
+                    coherence=coherence,
+                )
             except (ValueError, KeyError, IndexError) as exc:
                 messagebox.showerror("Generador", str(exc), parent=window)
                 return
@@ -419,24 +495,31 @@ class AssetIntake(tk.Tk):
             result_holder["value"] = result
             profile = result["profile"]
             labels = result["labels"]
+
             profile_lines = [
                 f"{TRAIT_KEYS.get(category, category.title())}: {labels[category]}"
-                for category in category_order
+                for category in variables
             ]
-            profile_lines.append(f"Dirección visual: {profile['style_direction']}")
-            profile_lines.append(f"Seed: {result['seed']}")
+            profile_lines.extend([
+                f"Dirección visual: {result['style_direction']}",
+                f"Coherencia: {result['coherence'] * 100:.0f}%",
+                f"Seed: {result['seed']}",
+            ])
             write_box(profile_text, "\n".join(profile_lines))
             write_box(prompt_text, result["prompt"])
             write_box(negative_text, result["negative_prompt"])
-            write_box(rationale_text, "\n".join(f"• {line}" for line in result["rationale"]))
+            write_box(
+                rationale_text,
+                "\n".join(f"• {line}" for line in result["rationale"]),
+            )
 
         def copy_box(widget, empty_message, status):
-            text = widget.get("1.0", tk.END).strip()
-            if not text:
+            value = widget.get("1.0", tk.END).strip()
+            if not value:
                 messagebox.showinfo("Generador", empty_message, parent=window)
                 return
             window.clipboard_clear()
-            window.clipboard_append(text)
+            window.clipboard_append(value)
             window.update()
             self.status_var.set(status)
 
@@ -454,6 +537,62 @@ class AssetIntake(tk.Tk):
             window.update()
             self.status_var.set("Prompt + negative prompt del personaje copiados.")
 
+        def open_reference():
+            import webbrowser
+            from urllib.parse import quote_plus
+
+            result = result_holder["value"]
+            selected_key = reference_options.get(ref_var.get(), "full_character")
+            if result:
+                labels = result["labels"]
+                if selected_key == "full_character":
+                    query_parts = [
+                        "original adult anime game character design",
+                        labels["personality"],
+                        labels["stature"],
+                        labels["hairstyle"],
+                        labels["hair"],
+                        labels["outfit"],
+                        labels["palette_accent"],
+                        "clean game character reference",
+                    ]
+                else:
+                    query_parts = [
+                        "anime character design reference",
+                        labels.get(selected_key, selected_key),
+                    ]
+                query = " ".join(query_parts)
+            else:
+                selections = build_selections()
+                readable = []
+                for category, value in selections.items():
+                    if value != "auto":
+                        option = next(
+                            (item for item in generator.options(category)
+                             if item["id"] == value),
+                            None,
+                        )
+                        if option:
+                            readable.append(option["label"])
+                if not readable:
+                    readable = ["anime character hair clothing pose reference"]
+                query = " ".join(readable + ["character design reference"])
+
+            url = "https://www.google.com/search?" + quote_plus("tbm=isch&q=" + query)
+            webbrowser.open(url)
+            self.status_var.set("Referencia visual abierta en el navegador.")
+
+        def open_reference_folder():
+            folder = app_dir() / "references"
+            try:
+                folder.mkdir(parents=True, exist_ok=True)
+                try:
+                    os.startfile(folder)
+                except AttributeError:
+                    subprocess.Popen(["xdg-open", str(folder)])
+            except OSError as exc:
+                messagebox.showerror("Referencias", str(exc), parent=window)
+
         def save_profile():
             result = result_holder["value"]
             if not result:
@@ -470,18 +609,32 @@ class AssetIntake(tk.Tk):
             self.status_var.set(f"Perfil guardado: {filename.name}")
             messagebox.showinfo("Generador", f"Perfil guardado en:\n{filename}", parent=window)
 
-        ttk.Button(actions, text="✨ GENERAR / VARIAR",
-                   command=generate_variant).pack(side="left")
-        ttk.Button(actions, text="COPIAR PROMPT",
-                   command=lambda: copy_box(prompt_text, "Genera un personaje primero.", "Prompt de personaje copiado.")).pack(side="left", padx=8)
-        ttk.Button(actions, text="COPIAR NEGATIVE",
-                   command=lambda: copy_box(negative_text, "Genera un personaje primero.", "Negative prompt copiado.")).pack(side="left")
-        ttk.Button(actions, text="COPIAR TODO",
-                   command=copy_all).pack(side="left", padx=8)
-        ttk.Button(actions, text="GUARDAR PERFIL",
-                   command=save_profile).pack(side="left")
-        ttk.Button(actions, text="CERRAR",
-                   command=window.destroy).pack(side="right")
+        ttk.Button(
+            actions,
+            text="✨ GENERAR / VARIAR",
+            command=generate_variant,
+        ).pack(side="left")
+        ttk.Button(
+            actions,
+            text="COPIAR PROMPT",
+            command=lambda: copy_box(
+                prompt_text,
+                "Genera un personaje primero.",
+                "Prompt de personaje copiado.",
+            ),
+        ).pack(side="left", padx=8)
+        ttk.Button(
+            actions,
+            text="COPIAR NEGATIVE",
+            command=lambda: copy_box(
+                negative_text,
+                "Genera un personaje primero.",
+                "Negative prompt copiado.",
+            ),
+        ).pack(side="left")
+        ttk.Button(actions, text="COPIAR TODO", command=copy_all).pack(side="left", padx=8)
+        ttk.Button(actions, text="GUARDAR PERFIL", command=save_profile).pack(side="left")
+        ttk.Button(actions, text="CERRAR", command=window.destroy).pack(side="right")
 
         generate_variant()
 
