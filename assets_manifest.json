@@ -6,119 +6,139 @@
       "id": "stage.background.far",
       "title": "Combat Stage · Far Background",
       "description": "Capa lejana del escenario de combate 2.5D.",
-      "prompt": "Anime 2.5D kawaii baseball combat arena background, wide cinematic composition, clean layered depth, no characters, no logos.",
+      "prompt": "Production-ready environment concept for BaseWarriors: Meta-Strike, cinematic 2.5D anime mobile-game combat stage, FAR BACKGROUND layer only. Wide 16:9 composition, designed specifically as a rear parallax plate behind four playable anime heroines and a single enemy. Establish a believable futuristic baseball-combat arena with a large stadium bowl, distant stands, soft structural silhouettes, subtle scoreboards without readable text, atmospheric architecture, layered depth cues, faint crowd suggestion, distant lights, and a clean horizon. Visual language: polished Japanese anime gacha game environment, crisp cel-shaded shapes, soft painted gradients, controlled linework, premium game-key-art finish, cute energetic baseball identity rather than sports realism. Camera at slightly elevated third-person combat angle, moderate perspective, generous negative space through the center for characters and combat readability. Keep the far layer visually quieter than midground and foreground: low contrast, simplified micro-detail, atmospheric perspective, depth separation by value and edge softness. Palette should support colorful character PNGs without competing with them. No characters, no weapons, no foreground props. Landscape 2048x1152, safe margins, seamless-looking composition for parallax movement, production asset rather than illustration poster.",
       "destination": "assets/stages/combat-stage--background--far--wide.png",
       "expected": {
         "format": "PNG",
         "width": 2048,
         "height": 1152,
         "max_bytes": 12582912
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "stage.background.mid",
       "title": "Combat Stage · Mid Background",
       "description": "Capa media del escenario de combate 2.5D.",
-      "prompt": "Anime 2.5D kawaii baseball combat arena midground, layered depth, clean stylized environment, no characters, no logos.",
+      "prompt": "Production-ready environment concept for BaseWarriors: Meta-Strike, cinematic 2.5D anime mobile-game combat stage, MIDGROUND layer only. Wide 16:9 composition built for parallax behind the combatants. Create a stylish futuristic baseball arena interior with mid-distance bleachers, railings, tunnel entrances, banners with abstract shapes but absolutely no readable text, industrial support beams, luminous stadium fixtures, decorative baseball motifs, layered platforms, and subtle depth landmarks that help anchor four anime heroines around one enemy. Premium Japanese anime game rendering: polished cel shading, clean graphic planes, crisp edges, selective soft gradients, appealing kawaii proportions in environmental shapes, high production value, controlled visual noise. Camera matches a gameplay combat view, slightly elevated and centered, enough perspective to communicate depth but not so much that floor geometry becomes a sports-simulator field. Mid layer should be more detailed than the far layer but still subordinate to characters: moderate contrast, medium-scale forms, restrained lighting, clear silhouette boundaries, no clutter at center stage. Leave playable space readable in the lower-middle region and avoid giant objects crossing the character silhouettes. Include subtle warm/cool stadium lighting variation and believable material separation between painted steel, fabric, glass, and concrete. No characters, no enemy, no weapons, no UI.",
       "destination": "assets/stages/combat-stage--background--mid--wide.png",
       "expected": {
         "format": "PNG",
         "width": 2048,
         "height": 1152,
         "max_bytes": 12582912
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "stage.ground",
       "title": "Combat Stage · Ground",
       "description": "Plano de suelo del escenario.",
-      "prompt": "Anime 2.5D kawaii baseball combat ground plane, clean stylized arena floor, perspective depth, no characters, no logos.",
+      "prompt": "Production-ready 2.5D gameplay ground plane for BaseWarriors: Meta-Strike, designed as a modular combat-stage floor rather than a baseball simulation field. Wide 2048x1152 landscape image, camera perspective matched to a slightly elevated third-person anime combat view. Create a stylized futuristic baseball-combat arena floor with broad readable surface planes, subtle panel seams, painted geometric markings, faint baseball-inspired arcs and lane cues, controlled perspective lines, small material variations, polished stadium flooring, and enough visual richness to feel premium without becoming busy. Japanese anime gacha-game environment finish, cel-shaded graphic surfaces, clean shape language, crisp edges, soft controlled gradients, kawaii sci-fi sports aesthetic, polished mobile-game presentation. Prioritize gameplay readability: a clear central fighting area for four characters and one enemy, no dense texture directly beneath the fighters, no realistic dirt, no photoreal turf, no stadium field simulation markings that imply nine-position baseball. Create depth through perspective, light falloff, and layered surface shapes. Slightly stronger contrast toward the foreground edges and calmer center. No characters, no enemy, no UI, no text, no giant logos. The asset must read immediately as the floor of a cinematic 2.5D hero-collector combat screen.",
       "destination": "assets/stages/combat-stage--ground--wide.png",
       "expected": {
         "format": "PNG",
         "width": 2048,
         "height": 1152,
         "max_bytes": 12582912
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "stage.foreground",
       "title": "Combat Stage · Foreground",
       "description": "Elementos visuales cercanos para reforzar el efecto 2.5D.",
-      "prompt": "Anime 2.5D kawaii baseball combat foreground elements, framing props, transparent-friendly composition, no characters, no logos.",
+      "prompt": "Production-ready foreground overlay elements for BaseWarriors: Meta-Strike, cinematic 2.5D anime game stage. Create a restrained set of near-camera framing elements intended to sit in front of the four playable heroines during combat and reinforce depth through parallax. Wide 16:9 composition with transparent-friendly isolated foreground shapes: softly blurred stadium rail segments, near-camera structural silhouettes, small baseball-combat props, cables, banners, light frames, edge foliage or decorative arena pieces only where visually appropriate. Premium Japanese anime gacha game rendering, clean cel-shaded surfaces, crisp shape language with selective depth-of-field softness, strong silhouette control, polished mobile-game key-art finish. Foreground elements should frame the scene from the corners and edges, never block the central combat area, never cover faces or attack paths, and never become the visual focal point. Use scale exaggeration and mild perspective distortion to create a convincing fake-3D layer while retaining a 2D asset workflow. Moderate translucency or soft shadowing is acceptable, but avoid heavy bloom. No characters, no enemy, no readable text, no logos, no UI panels. Design for compositing over far, mid, and ground layers and for camera movement in a 2.5D scene.",
       "destination": "assets/stages/combat-stage--foreground--wide.png",
       "expected": {
         "format": "PNG",
         "width": 2048,
         "height": 1152,
         "max_bytes": 12582912
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "character.bw001",
       "title": "bw001 · Aiko Hanamori",
       "description": "Asset aprobado de personaje principal.",
-      "prompt": "BaseWarriors canonical character asset for bw001 Aiko Hanamori. 2.5D kawaii anime game art, clean silhouette, transparent background, no logo.",
+      "prompt": "Production-ready original anime game character asset for BaseWarriors: Meta-Strike, canonical character bw001, Aiko Hanamori. Full-body heroine designed for a premium mobile hero-collector combat game, using a polished Japanese anime gacha-game visual language with clean cel shading, appealing facial design, controlled linework, expressive eyes, elegant but practical combat costume design, and a readable silhouette at gameplay scale. She must feel like an original BaseWarriors character, not a copy of any existing franchise character. Give her a confident, athletic baseball-combat presence: balanced stance, clear shoulder and hip shapes, believable hand placement, compact readable accessories, game-ready costume layers, subtle fabric and hard-surface material separation, and visual cues that connect her to baseball as a combat language rather than a school-sports simulator. Use refined anime proportions, carefully designed hair masses, controlled highlights, soft rim light, clean shadow grouping, premium key-art polish, and a slightly cinematic pose suitable for a 2.5D cutout with parallax. Transparent background. Full body fully visible from head to shoes, no cropping, no floor shadow that merges into the silhouette, no text or logo, no extra characters, no duplicate limbs, no alternate costume, no weapon unless canonically specified by the asset contract. Preserve a strong contour so the PNG remains readable over bright or dark stages.",
       "destination": "assets/characters/approved/bw001.png",
       "expected": {
         "format": "PNG",
         "max_bytes": 12582912
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects, copied character design, recognizable Blue Archive character, recognizable Tsubaki outfit, franchise-specific school uniform"
     },
     {
       "id": "prop.baseball.bat",
       "title": "Baseball Bat · Common Prop",
       "description": "Prop común reutilizable.",
-      "prompt": "Kawaii anime baseball combat bat prop, sturdy stylized game asset, isolated, no character, no brand logo.",
+      "prompt": "Production-ready common combat prop for BaseWarriors: Meta-Strike, premium anime baseball bat designed for a 2.5D hero-collector action game. Isolated single object, three-quarter view with slight diagonal dynamic angle, clean readable silhouette, compact proportions suitable for character hands, stylized but believable construction, reinforced combat-ready materials, subtle surface wear kept tasteful, polished painted wood/composite body, small metallic details where appropriate, crisp cel-shaded rendering, controlled specular highlights, soft contact shadow only if useful for compositing. Visual language should feel kawaii, energetic, sturdy and game-ready rather than realistic sporting equipment. Add distinctive BaseWarriors visual detailing without any logo, text, trademark, or existing franchise motif. Make the object immediately legible at thumbnail size and still attractive at high resolution. Transparent background, centered object, generous padding, no crop, no extra baseballs, no hands, no character. Avoid excessive ornamentation that would reduce usability as a reusable prop. The bat should support attack animations, inventory icons, reward screens, and stage props, so its silhouette must remain clean and mechanically understandable from multiple scales. Premium Japanese anime game asset finish, polished mobile production quality.",
       "destination": "assets/props/baseball-bat.png",
       "expected": {
         "format": "PNG",
         "max_bytes": 6291456
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "prop.baseball.ball",
       "title": "Baseball · Common Prop",
       "description": "Pelota reutilizable para ataques, VFX y UI de combate.",
-      "prompt": "Kawaii anime baseball combat ball prop, clean game asset, isolated on transparent background, crisp silhouette, no character, no brand logo.",
+      "prompt": "Production-ready common baseball combat prop for BaseWarriors: Meta-Strike. Single isolated baseball rendered as a premium anime game asset, viewed in a dynamic three-quarter angle rather than a flat catalog side view. Clean spherical silhouette, crisp seam geometry, subtle stylized texture, polished material response, slightly exaggerated graphic readability, controlled cel-shaded highlight, soft rim light, and a tiny sense of kinetic energy suitable for attack trajectories and VFX compositing. Keep the core baseball identity immediately recognizable while allowing a cute futuristic combat-game treatment: refined seam pattern, pristine surface, no dirt or realistic scuffing, optional tiny energy accent that remains subordinate to the ball form. Transparent background with generous padding. No character, no bat, no hand, no stadium, no UI. The asset must work in combat VFX, cards, drops, menus, projectiles, and animation trails, so the silhouette should remain legible at small scale. Premium Japanese anime gacha-game rendering, crisp anti-aliased edges, clean color separation, subtle shadow grouping, no photorealism.",
       "destination": "assets/props/baseball-ball.png",
       "expected": {
         "format": "PNG",
         "max_bytes": 4194304
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "prop.baseball.helmet",
       "title": "Baseball Helmet · Common Prop",
       "description": "Casco reutilizable para props, escenas y drops.",
-      "prompt": "Kawaii anime baseball helmet prop, sturdy stylized game asset, isolated, transparent-friendly background, no character, no brand logo.",
+      "prompt": "Production-ready common baseball helmet prop for BaseWarriors: Meta-Strike, designed as a premium reusable anime game asset. Isolated single helmet, three-quarter front view, slightly tilted for a dynamic game-key-art presentation while keeping the silhouette immediately readable. Futuristic but believable baseball helmet construction, cute stylized proportions, reinforced protective shell, clean ear protection geometry, compact visor/opening, tasteful small mechanical details, smooth painted material, controlled cel-shaded highlights, soft ambient occlusion, crisp linework, polished Japanese anime gacha-game finish. The design should feel sturdy enough for a combat heroine while retaining a kawaii accessible visual identity. Add original visual motifs that fit a baseball-combat universe but do not copy any existing team, school, franchise, or branded helmet. No readable text, no logos, no decals that imply real-world trademarks. Transparent-friendly background, fully visible, centered with safe padding, no character, no hands, no bat. Prioritize clean production usability for props, inventory icons, rewards, stage dressing, and card illustrations. No photoreal sports photography treatment, no gritty scratches, no excessive metallic shine.",
       "destination": "assets/props/baseball-helmet.png",
       "expected": {
         "format": "PNG",
         "max_bytes": 4194304
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "enemy.kytos.common",
       "title": "Kytos · Common Enemy",
       "description": "Enemigo común reutilizable para pruebas de combate.",
-      "prompt": "BaseWarriors Kytos common enemy, cute but sturdy anime combat creature, 2.5D game asset, readable silhouette, isolated transparent background, no logo.",
+      "prompt": "Production-ready common enemy character for BaseWarriors: Meta-Strike, canonical Kytos family silhouette language. Design an original cute-but-threatening combat creature for a premium anime hero-collector game: compact sturdy body, strong readable massing, expressive hostile face, exaggerated limbs or armor plates, clear front-facing combat readability, and a silhouette that remains recognizable at gameplay distance. Blend kawaii appeal with lethality: rounded forms combined with hard angular elements, purposeful asymmetry, mechanical or bio-organic details, subtle damage-resistant surfaces, and a visual personality that feels like a recurring enemy species rather than a generic monster. Japanese anime gacha-game rendering, crisp cel shading, refined linework, polished highlights, clean color blocking, controlled texture density, premium mobile-game key-art finish. Three-quarter stance with feet grounded, neutral attack-ready posture, full body visible, no clipping, no extra enemies. Transparent background. Give it enough distinctive detail to read as BaseWarriors worldbuilding while avoiding direct imitation of any existing game creature. No logo, no readable text, no gore, no realistic blood. The character should be suitable for combat sprites, idle poses, defeat animations, encounters, cards, and enemy variants.",
       "destination": "assets/enemies/kytos-common.png",
       "expected": {
         "format": "PNG",
         "max_bytes": 8388608
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     },
     {
       "id": "prop.robot.common",
       "title": "Combat Robot · Common Enemy Prop",
       "description": "Robot/enemigo común para encuentros y pruebas.",
-      "prompt": "Kawaii anime baseball combat robot enemy, sturdy lethal-but-cute design, 2.5D game asset, isolated transparent background, no character branding, no logo.",
+      "prompt": "Production-ready common combat robot enemy for BaseWarriors: Meta-Strike. Create a sturdy lethal-but-cute autonomous enemy unit built for a premium Japanese anime hero-collector combat game. Compact armored silhouette, exaggerated readable proportions, stable center of mass, chunky mechanical limbs, simple expressive optical sensor or face plate, reinforced plating, exposed small pistons/joints where useful, and one or two baseball-combat-inspired design cues such as projectile storage, batting-defense geometry, or arena maintenance equipment repurposed into a weaponized form. The result must be original and generic enough to support many variants. Visual language: polished anime gacha-game cel shading, clean linework, selective hard-surface detailing, controlled specular highlights, soft rim lighting, attractive color blocking, high readability at thumbnail scale. Three-quarter combat stance, full unit visible, no character, no duplicate units, transparent background, no floor, no UI. Cute facial language should not make it harmless: keep proportions sturdy, armored and mechanically credible. Avoid military realism, photoreal industrial rendering, gore, or gritty post-apocalyptic styling. No logo, no text, no trademarked markings. Designed for repeated use as a common enemy in combat encounters and for later recolors and upgrade tiers.",
       "destination": "assets/enemies/combat-robot-common.png",
       "expected": {
         "format": "PNG",
         "max_bytes": 8388608
-      }
+      },
+      "prompt_version": "production-v2",
+      "negative_prompt": "photorealistic, realistic human anatomy when not applicable, 3d CGI render, low-poly, gritty western comic style, horror gore, dirty textures, excessive bloom, chromatic aberration, heavy film grain, oversharpening, muddy details, unreadable silhouette, text, subtitles, watermark, signature, logo, brand markings, UI elements, cropped subject, duplicate objects"
     }
   ]
 }
