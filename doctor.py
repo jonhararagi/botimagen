@@ -49,10 +49,16 @@ def check_git():
 
 
 def check_repo():
-    manifest = APP_DIR / "assets_manifest.json"
-    app = APP_DIR / "app.py"
-    ok = manifest.is_file() and app.is_file()
-    return ok, f"BotImagen files {'OK' if ok else 'FAIL'}"
+    required = (
+        APP_DIR / "assets_manifest.json",
+        APP_DIR / "app.py",
+        APP_DIR / "character_generator.py",
+        APP_DIR / "character_rules.json",
+    )
+    missing = [path.name for path in required if not path.is_file()]
+    ok = not missing
+    detail = "OK" if ok else "FALTAN: " + ", ".join(missing)
+    return ok, f"BotImagen files {detail}"
 
 
 def check_config():
