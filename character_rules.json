@@ -1120,6 +1120,245 @@
           "soft"
         ]
       }
+    ],
+    "quirk": [
+      {
+        "id": "bat_named",
+        "label": "Le pone nombre a su bate",
+        "rarity": "common",
+        "tags": [
+          "baseball",
+          "personal",
+          "playful"
+        ],
+        "bias": {
+          "personality:alegre": 3,
+          "personality:traviesa": 5,
+          "personality:rebelde": 2
+        }
+      },
+      {
+        "id": "tiny_sticker_collection",
+        "label": "Colecciona stickers diminutos",
+        "rarity": "common",
+        "tags": [
+          "cute",
+          "personal",
+          "social"
+        ],
+        "bias": {
+          "personality:alegre": 4,
+          "personality:timida": 3,
+          "personality:kuudere": 1
+        }
+      },
+      {
+        "id": "emergency_snacks",
+        "label": "Siempre lleva snacks de emergencia",
+        "rarity": "common",
+        "tags": [
+          "warm",
+          "practical",
+          "cute"
+        ],
+        "bias": {
+          "personality:protectora": 4,
+          "personality:alegre": 3,
+          "personality:hiperactiva": 3
+        }
+      },
+      {
+        "id": "gets_lost",
+        "label": "Se pierde incluso con un mapa",
+        "rarity": "uncommon",
+        "tags": [
+          "funny",
+          "contradiction",
+          "cute"
+        ],
+        "bias": {
+          "personality:seria": 2,
+          "personality:disciplinada": 2,
+          "personality:kuudere": 2
+        }
+      },
+      {
+        "id": "equipment_ritual",
+        "label": "Hace un ritual antes de usar su equipo",
+        "rarity": "common",
+        "tags": [
+          "focused",
+          "personal",
+          "superstitious"
+        ],
+        "bias": {
+          "personality:disciplinada": 5,
+          "personality:seria": 3,
+          "personality:rebelde": 1
+        }
+      },
+      {
+        "id": "pet_mascot_fear",
+        "label": "Una mascota gigante la pone nerviosa",
+        "rarity": "uncommon",
+        "tags": [
+          "contradiction",
+          "cute",
+          "funny"
+        ],
+        "bias": {
+          "personality:seria": 3,
+          "personality:rebelde": 2,
+          "personality:protectora": 2
+        }
+      },
+      {
+        "id": "dramatic_victory_pose",
+        "label": "Practica poses de victoria cuando nadie mira",
+        "rarity": "uncommon",
+        "tags": [
+          "dramatic",
+          "playful",
+          "social"
+        ],
+        "bias": {
+          "personality:alegre": 3,
+          "personality:traviesa": 5,
+          "personality:rebelde": 3
+        }
+      },
+      {
+        "id": "sings_alone",
+        "label": "Canta maravillosamente cuando cree estar sola",
+        "rarity": "uncommon",
+        "tags": [
+          "soft",
+          "contradiction",
+          "personal"
+        ],
+        "bias": {
+          "personality:kuudere": 4,
+          "personality:timida": 5,
+          "personality:seria": 2
+        }
+      },
+      {
+        "id": "trivial_rivalry",
+        "label": "Tiene rivalidades absurdamente serias",
+        "rarity": "uncommon",
+        "tags": [
+          "competitive",
+          "funny",
+          "bold"
+        ],
+        "bias": {
+          "personality:rebelde": 4,
+          "personality:hiperactiva": 5,
+          "personality:seria": 2
+        }
+      },
+      {
+        "id": "cute_merch_weakness",
+        "label": "Pierde toda la dignidad ante merchandising adorable",
+        "rarity": "rare",
+        "tags": [
+          "cute",
+          "contradiction",
+          "social"
+        ],
+        "bias": {
+          "personality:seria": 5,
+          "personality:kuudere": 5,
+          "personality:rebelde": 3
+        }
+      },
+      {
+        "id": "sleep_anywhere",
+        "label": "Puede dormirse en lugares imposibles",
+        "rarity": "uncommon",
+        "tags": [
+          "sleepy",
+          "soft",
+          "funny"
+        ],
+        "bias": {
+          "personality:kuudere": 3,
+          "personality:timida": 2
+        }
+      },
+      {
+        "id": "overprotective_equipment",
+        "label": "Trata su equipo como si fuera parte de la familia",
+        "rarity": "common",
+        "tags": [
+          "guardian",
+          "personal",
+          "warm"
+        ],
+        "bias": {
+          "personality:protectora": 6,
+          "personality:seria": 2
+        }
+      },
+      {
+        "id": "wrong_name_moment",
+        "label": "A veces llama a alguien por un apodo inesperado",
+        "rarity": "uncommon",
+        "tags": [
+          "social",
+          "playful",
+          "funny"
+        ],
+        "bias": {
+          "personality:traviesa": 5,
+          "personality:alegre": 3
+        }
+      },
+      {
+        "id": "perfect_timing_bad_luck",
+        "label": "Tiene un talento increíble para el momento dramático y una suerte terrible en cosas pequeñas",
+        "rarity": "rare",
+        "tags": [
+          "contradiction",
+          "dramatic",
+          "funny"
+        ],
+        "bias": {
+          "personality:rebelde": 3,
+          "personality:seria": 3,
+          "personality:alegre": 2
+        }
+      },
+      {
+        "id": "secret_soft_spot",
+        "label": "Tiene una debilidad secreta por algo extremadamente tierno",
+        "rarity": "rare",
+        "tags": [
+          "soft",
+          "contradiction",
+          "personal"
+        ],
+        "bias": {
+          "personality:seria": 4,
+          "personality:kuudere": 5,
+          "personality:rebelde": 4
+        }
+      },
+      {
+        "id": "lucky_charm",
+        "label": "Nunca entra en combate sin su pequeño amuleto",
+        "rarity": "common",
+        "tags": [
+          "personal",
+          "focused",
+          "superstitious"
+        ],
+        "bias": {
+          "personality:protectora": 3,
+          "personality:disciplinada": 4,
+          "personality:timida": 2
+        }
+      }
     ]
   },
   "style_core": "original premium Japanese anime hero-collector game character, BaseWarriors: Meta-Strike, polished cel shading, crisp linework, expressive anime eyes, refined costume design, strong gameplay silhouette, cinematic 2.5D cutout readiness, subtle material separation, controlled highlights, clean production art, original design",
