@@ -578,7 +578,7 @@ class AssetIntake(tk.Tk):
                     readable = ["anime character hair clothing pose reference"]
                 query = " ".join(readable + ["character design reference"])
 
-            url = "https://www.google.com/search?" + quote_plus("tbm=isch&q=" + query)
+            url = "https://www.google.com/search?tbm=isch&q=" + quote_plus(query)
             webbrowser.open(url)
             self.status_var.set("Referencia visual abierta en el navegador.")
 
