@@ -7,12 +7,14 @@ from typing import Any
 
 
 DEFAULT_NEGATIVE = (
-    "photorealistic, live-action, 3d CGI render, low-poly, generic stock anime, "
+    "photorealistic, live-action, 3d CGI render, low-poly, chibi proportions, generic stock anime, "
     "copied franchise character, recognizable existing character outfit, school-uniform clone, "
     "sexualized presentation, childlike body proportions, gore, blood, text, subtitles, watermark, "
     "signature, logo, brand markings, extra characters, duplicate limbs, malformed hands, "
     "cropped head, cropped feet, unreadable silhouette, excessive bloom, heavy film grain, "
-    "muddy details, over-rendered microtexture"
+    "muddy details, over-rendered microtexture, mixed art styles, inconsistent line weight, "
+    "inconsistent shading, painterly brushwork mixed with cel shading, conflicting bangs, "
+    "duplicate pupils, random facial markings, cluttered accessories"
 )
 
 TRAIT_KEYS = {
@@ -22,11 +24,19 @@ TRAIT_KEYS = {
     "silhouette": "Silueta",
     "expression": "Expresión",
     "face_shape": "Forma del rostro",
-    "hair_length": "Largo del cabello",
-    "hairstyle": "Peinado",
-    "hair": "Color de cabello",
-    "eyes": "Color de ojos",
+    "nose_style": "Nariz",
     "eye_shape": "Forma de ojos",
+    "eyes": "Color de ojos",
+    "pupil_shape": "Forma de pupila",
+    "eyebrow_style": "Cejas",
+    "mouth_style": "Boca",
+    "facial_detail": "Detalle facial",
+    "hair_length": "Largo del cabello",
+    "hair_bangs": "Flequillo",
+    "hairstyle": "Peinado principal",
+    "side_hair": "Cabello lateral",
+    "back_hair": "Cabello trasero / recogido",
+    "hair": "Color de cabello",
     "outfit": "Vestimenta",
     "outer_layer": "Capa exterior",
     "footwear": "Calzado",
@@ -47,6 +57,7 @@ class CharacterGenerator:
         self.rules_path = Path(rules_path)
         self.rules = self._load()
         self.categories = self.rules.get("categories", {})
+        self.style_catalog, self.visual_standard = self._load_visual_standard()
 
     def _load(self) -> dict[str, Any]:
         with self.rules_path.open("r", encoding="utf-8") as handle:
@@ -54,6 +65,21 @@ class CharacterGenerator:
         if not isinstance(data, dict) or not isinstance(data.get("categories"), dict):
             raise ValueError("Invalid character generator rules")
         return data
+
+    def _load_visual_standard(self) -> tuple[dict[str, Any], dict[str, Any]]:
+        catalog_path = self.rules_path.with_name("visual_style_catalog.json")
+        with catalog_path.open("r", encoding="utf-8") as handle:
+            catalog = json.load(handle)
+        active_id = catalog.get("active_style_id")
+        style = next(
+            (item for item in catalog.get("styles", []) if item.get("id") == active_id),
+            None,
+        )
+        if not isinstance(style, dict):
+            raise ValueError("Visual style catalog has no valid active style")
+        if not style.get("prompt_core") or not style.get("prompt_suffix"):
+            raise ValueError("Active visual style is missing prompt instructions")
+        return catalog, style
 
     def options(self, category: str) -> list[dict[str, Any]]:
         return [{"id": "auto", "label": "AUTO · el sistema decide"}] + self.categories.get(category, [])
@@ -161,11 +187,12 @@ class CharacterGenerator:
         # Final coherence pass over visual/combat traits. Explicit choices
         # remain hard-locked, AUTO traits are refined with the whole profile.
         refine = (
-            "body_build", "silhouette", "face_shape",
-            "hair_length", "hairstyle", "hair",
-            "eyes", "eye_shape", "outfit", "outer_layer",
-            "footwear", "accessory", "palette_accent",
-            "voice", "combat_role", "baseball_prop", "pose", "quirk",
+            "body_build", "silhouette", "face_shape", "nose_style",
+            "eye_shape", "eyes", "pupil_shape", "eyebrow_style", "mouth_style",
+            "facial_detail", "hair_length", "hair_bangs", "hairstyle",
+            "side_hair", "back_hair", "hair", "outfit", "outer_layer",
+            "footwear", "accessory", "palette_accent", "voice",
+            "combat_role", "baseball_prop", "pose", "quirk",
         )
         for category in refine:
             if chosen.get(category, "auto") != "auto":
@@ -181,6 +208,9 @@ class CharacterGenerator:
 
         return {
             "version": self.rules.get("version", 1),
+            "style_id": self.visual_standard["id"],
+            "style_name": self.visual_standard["name"],
+            "style_version": self.visual_standard.get("version", 1),
             "profile": profile,
             "labels": labels,
             "rationale": rationale,
@@ -220,12 +250,17 @@ class CharacterGenerator:
         style_direction: str,
     ) -> str:
         return (
-            f"{self.rules.get('style_core', '')}. "
+            f"{self.visual_standard['prompt_core']} "
             f"Character identity: {labels['personality']} personality. "
             f"Physical direction: {labels['stature']}, {labels['body_build']}, {labels['silhouette']}. "
-            f"Face: {labels['face_shape']}, {labels['expression']}, {labels['eye_shape']} eyes, "
-            f"{labels['eyes']} eye color. "
-            f"Hair: {labels['hair_length']}, {labels['hairstyle']}, {labels['hair']}. "
+            f"Face construction: {labels['face_shape']}, {labels['nose_style']} nose, "
+            f"{labels['expression']} expression. "
+            f"Eyes: {labels['eye_shape']} shape, {labels['eyes']} iris color, "
+            f"{labels['pupil_shape']} pupils, {labels['eyebrow_style']} eyebrows, "
+            f"{labels['mouth_style']} mouth, {labels['facial_detail']} facial detail. "
+            f"Hair construction: {labels['hair_length']}, {labels['hair_bangs']} bangs, "
+            f"{labels['hairstyle']} main style, {labels['side_hair']} side hair, "
+            f"{labels['back_hair']} back hair, {labels['hair']} hair color. "
             f"Clothing: {labels['outfit']}, {labels['outer_layer']}, {labels['footwear']}, "
             f"accessory {labels['accessory']}. "
             f"Color direction: {labels['palette_accent']}. "
@@ -234,21 +269,16 @@ class CharacterGenerator:
             f"Signature baseball prop: {labels['baseball_prop']}. "
             f"Pose: {labels['pose']}. "
             f"Signature character quirk: {labels['quirk']}. "
-            f"Overall visual direction: {style_direction}. "
-            "Use all selected traits as a coherent design system, not as disconnected keywords. "
-            "Personality must be visible in posture, facial tension, hair movement, costume geometry, "
-            "accessories and color accents. Stature and body build must support the silhouette without "
-            "exaggerated or sexualized anatomy. Clothing must communicate the combat role and baseball "
-            "identity while remaining original and functional. Hair, eyes and accent colors should form "
-            "a deliberate palette with a clear focal color. Keep one memorable signature detail that can "
-            "survive at thumbnail size. Baseball is the language of the combat system, not a school-sports "
-            "uniform. Full body adult heroine, head to shoes, three-quarter dynamic idle combat pose, clean "
-            "hands, clear feet, transparent background, generous padding, no crop, production-ready PNG cutout, "
-            "subtle rim light, controlled highlights, clean shadow grouping, premium mobile-game key art, "
-            "2.5D parallax-friendly contours and silhouette. The quirk should be a small, believable "
-            "behavioral signature that can appear naturally in idle animations, dialogue, victory poses, "
-            "voice lines, props or slice-of-life scenes. It should add charm or comedy without turning the "
-            "character into a one-joke caricature."
+            f"Character-specific mood direction: {style_direction}. "
+            "Use selected traits as one coherent design system, not disconnected keywords. "
+            "Personality should read through posture, eye tension, hair motion, costume geometry "
+            "and one controlled accent palette. The main hairstyle, bangs, side hair and back hair "
+            "must form one plausible hairstyle rather than several competing styles. Keep iris and "
+            "pupil design intentional and readable at thumbnail size; treat facial markings as optional "
+            "single accents, not random decoration. Clothing must communicate the baseball-combat role "
+            "while remaining original, functional and non-sexualized. Baseball is the language of combat, "
+            "not a school-sports uniform. "
+            f"{self.visual_standard['prompt_suffix']}"
         )
 
     @staticmethod

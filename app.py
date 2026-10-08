@@ -317,7 +317,7 @@ class AssetIntake(tk.Tk):
         ).grid(row=0, column=0, columnspan=2, sticky="w", padx=14, pady=(14, 2))
         ttk.Label(
             window,
-            text="Fija lo importante. AUTO resuelve lo demás por afinidad, semilla y coherencia visual.",
+            text="Estilo fijo: Anime moderno de gacha · Beta universal. AUTO completa rasgos compatibles.",
         ).grid(row=0, column=1, sticky="e", padx=14, pady=(14, 2))
 
         left = ttk.Frame(window, padding=(14, 8, 8, 10))
@@ -334,10 +334,17 @@ class AssetIntake(tk.Tk):
                 "personality", "stature", "body_build",
                 "silhouette", "expression", "face_shape", "pose",
             ),
-            "VISUAL": (
-                "hair_length", "hairstyle", "hair",
-                "eyes", "eye_shape", "outfit", "outer_layer",
-                "footwear", "accessory", "palette_accent",
+            "CARA": (
+                "eye_shape", "eyes", "pupil_shape", "eyebrow_style",
+                "nose_style", "mouth_style", "facial_detail",
+            ),
+            "CABELLO": (
+                "hair_length", "hair_bangs", "hairstyle",
+                "side_hair", "back_hair", "hair",
+            ),
+            "VESTUARIO": (
+                "outfit", "outer_layer", "footwear",
+                "accessory", "palette_accent",
             ),
             "COMBATE": (
                 "voice", "combat_role", "baseball_prop",

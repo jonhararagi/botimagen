@@ -244,3 +244,30 @@ Siguiente mejora útil: ~3–5 h para miniaturas locales por rasgo, presets de p
 ## Estado
 
 Estado: **MVP funcional en evolución**. El proyecto tiene preflight local para Windows, prompts de producción por contrato y validación estática automatizada; la interfaz real todavía debe probarse físicamente en tu PC.
+
+
+## Beta visual universal · Anime moderno de gacha
+
+La dirección artística universal del generador queda fijada en `visual_style_catalog.json` bajo el ID `bw-modern-gacha-v1`. La personalidad y el vestuario pueden variar, pero no pueden cambiar la familia de render: ilustración 2D anime moderna, lineart limpio y controlado, cel shading pulido, reflejos definidos y una silueta legible para presentación 2.5D.
+
+### Catálogo normalizado de rasgos
+
+El perfil ahora separa las partes que muchos editores visuales permiten combinar:
+
+- **Cara:** forma del rostro, forma y color de ojos, pupila, cejas, nariz, boca y detalle facial.
+- **Cabello:** longitud, flequillo, peinado principal, piezas laterales, parte trasera/recogido y color.
+- **Diseño de juego:** complexión, silueta, vestuario, capa exterior, calzado, accesorios, paleta, pose y prop de béisbol.
+
+Las categorías visuales principales contienen diez opciones normalizadas cada una. Los IDs son estables, las etiquetas son legibles para la interfaz y las etiquetas de afinidad ayudan a elegir opciones compatibles. Las selecciones del usuario se conservan como bloqueos; la generación automática rellena los demás campos.
+
+La interfaz organiza los controles en pestañas `IDENTIDAD`, `CARA`, `CABELLO`, `VESTUARIO`, `COMBATE` y `DETALLE`, y muestra el estilo universal activo.
+
+### Contrato de metadatos de referencias
+
+El mismo archivo define el esquema futuro de la biblioteca de referencias: origen, autor, licencia, categorías, IDs de rasgos, etiquetas originales y detectadas, prompt original, modelo, sampler, pasos, CFG, seed, dimensiones, hash y confianza del dato.
+
+**Regla de procedencia:** las etiquetas detectadas por un modelo se guardan separadas de los metadatos originales. Una licencia desconocida se trata como `reference_only` hasta comprobar sus términos. La beta todavía no descarga masivamente imágenes externas: esta iteración fija el vocabulario y el contrato de estilo sobre los que se construirá la ingesta e indexación local.
+
+### Validación
+
+GitHub Actions valida que cada categoría visual configurada tenga diez opciones únicas, que exista un único estilo activo, que esté definido el esquema de metadatos, y que el prompt utilice las piezas separadas de cara y cabello sin perder las elecciones bloqueadas. También prueba que la semilla reproduzca el mismo perfil y prompt.

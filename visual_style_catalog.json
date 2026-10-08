@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "active_style_id": "bw-modern-gacha-v1",
+  "style_mode": "BETA_UNIVERSAL",
+  "styles": [
+    {
+      "id": "bw-modern-gacha-v1",
+      "version": 1,
+      "name": "Anime moderno de gacha",
+      "status": "ACTIVE_BETA_UNIVERSAL",
+      "prompt_core": "Original premium modern Japanese anime gacha-game character illustration, consistent 2D anime key-visual art direction, clean controlled line art, crisp readable contours, polished cel shading with restrained soft secondary gradients, expressive detailed anime eyes, deliberate hair strand grouping and clean highlights, coherent color design, original tactical baseball hero-collector character, 2.5D-ready silhouette.",
+      "prompt_suffix": "Maintain the same unified rendering language across every character: consistent contour weight, cel-shading structure, eye rendering, hair highlights, skin treatment, material response and detail density. Keep personality, outfit and color variations within this fixed art direction. Create one original adult heroine with a readable full-body silhouette, visible head and shoes, three-quarter idle combat pose, clean hands, clear feet, transparent background, generous padding, no crop, production-ready PNG cutout, subtle rim light, controlled highlights, clear shadow grouping, mobile-game key art and 2.5D parallax-friendly contours. Use the chosen face and hair components as compatible design pieces, not as conflicting hairstyles layered on top of each other. The signature quirk should be a small believable behavior that can appear in idle animation, dialogue, victory poses, props or slice-of-life scenes without turning the character into a one-joke caricature.",
+      "negative_prompt_additions": "mixed art styles, inconsistent line weight, inconsistent shading, photorealistic skin, live-action, realistic portrait photography, 3D CGI render, low-poly, chibi proportions, watercolor bleed, painterly brushwork, retro film grain, overexposed bloom, over-rendered microtexture, duplicate hair masses, conflicting bangs, duplicate pupils, random facial markings, cluttered accessories",
+      "consistency_rules": [
+        "Art style is fixed to modern polished 2D anime gacha key art.",
+        "Variations may alter character traits but cannot switch the rendering style.",
+        "Line art, cel shading, eyes, hair highlights and detail density remain consistent.",
+        "Manual selections are hard locks; AUTO fields are chosen by compatibility scores.",
+        "The negative prompt rejects competing rendering styles and common composition defects."
+      ]
+    }
+  ],
+  "reference_metadata_schema": {
+    "version": 1,
+    "purpose": "Index visual inspiration and generation metadata without confusing detected traits with original metadata.",
+    "fields": [
+      {
+        "name": "reference_id",
+        "type": "string",
+        "required": true,
+        "description": "Stable local identifier."
+      },
+      {
+        "name": "source_url",
+        "type": "string|null",
+        "required": false,
+        "description": "Original source URL when known."
+      },
+      {
+        "name": "source_type",
+        "type": "enum",
+        "required": true,
+        "values": [
+          "local_file",
+          "permitted_api",
+          "public_dataset",
+          "manual_import"
+        ]
+      },
+      {
+        "name": "creator",
+        "type": "string|null",
+        "required": false,
+        "description": "Artist or publisher attribution when known."
+      },
+      {
+        "name": "license",
+        "type": "string|null",
+        "required": false,
+        "description": "Exact license/usage terms if published."
+      },
+      {
+        "name": "license_status",
+        "type": "enum",
+        "required": true,
+        "values": [
+          "verified",
+          "reference_only",
+          "unknown",
+          "permission_granted"
+        ]
+      },
+      {
+        "name": "local_path",
+        "type": "string|null",
+        "required": false,
+        "description": "Path managed by the local reference library."
+      },
+      {
+        "name": "sha256",
+        "type": "string|null",
+        "required": false,
+        "description": "File hash for deduplication."
+      },
+      {
+        "name": "width",
+        "type": "integer|null",
+        "required": false,
+        "description": "Pixel width."
+      },
+      {
+        "name": "height",
+        "type": "integer|null",
+        "required": false,
+        "description": "Pixel height."
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "required": true,
+        "description": "Visual category such as eye_shape or hair_bangs."
+      },
+      {
+        "name": "trait_id",
+        "type": "string|null",
+        "required": false,
+        "description": "Normalized visual option ID."
+      },
+      {
+        "name": "tags_original",
+        "type": "array",
+        "required": false,
+        "description": "Tags found in the source; preserve source wording."
+      },
+      {
+        "name": "tags_detected",
+        "type": "array",
+        "required": false,
+        "description": "Machine-inferred tags; never treat as ground truth."
+      },
+      {
+        "name": "prompt",
+        "type": "string|null",
+        "required": false,
+        "description": "Original positive prompt when present."
+      },
+      {
+        "name": "negative_prompt",
+        "type": "string|null",
+        "required": false,
+        "description": "Original negative prompt when present."
+      },
+      {
+        "name": "model",
+        "type": "string|null",
+        "required": false,
+        "description": "Generator/model metadata when present."
+      },
+      {
+        "name": "sampler",
+        "type": "string|null",
+        "required": false,
+        "description": "Sampler metadata when present."
+      },
+      {
+        "name": "steps",
+        "type": "integer|null",
+        "required": false,
+        "description": "Generation steps when present."
+      },
+      {
+        "name": "cfg_scale",
+        "type": "number|null",
+        "required": false,
+        "description": "CFG/guidance value when present."
+      },
+      {
+        "name": "seed",
+        "type": "integer|null",
+        "required": false,
+        "description": "Seed when present."
+      },
+      {
+        "name": "metadata_confidence",
+        "type": "enum",
+        "required": true,
+        "values": [
+          "original_embedded",
+          "source_supplied",
+          "machine_detected",
+          "manual_unverified"
+        ]
+      }
+    ],
+    "policy": [
+      "Keep source metadata distinct from machine-inferred tags.",
+      "Unknown or unverified licences remain reference-only until checked.",
+      "Never mark scraped or imported content as reusable merely because it is publicly visible.",
+      "Use normalized tags to search and compare; do not reproduce an existing character as an output target."
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "profile": "BaseWarriors Character Generator",
+  "version": 3,
+  "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
       {
@@ -147,6 +147,66 @@
           "guardian",
           "powerful"
         ]
+      },
+      {
+        "id": "explosiva_compacta",
+        "label": "Compacta y explosiva",
+        "tags": [
+          "compact",
+          "agile",
+          "energetic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "potencia_atletica",
+        "label": "Potencia atlética",
+        "tags": [
+          "athletic",
+          "strong",
+          "powerful"
+        ],
+        "base": 1
+      },
+      {
+        "id": "tecnica_aerodinamica",
+        "label": "Técnica y aerodinámica",
+        "tags": [
+          "technical",
+          "lean",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "heroica_equilibrada",
+        "label": "Heroica equilibrada",
+        "tags": [
+          "balanced",
+          "heroic",
+          "versatile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "movilidad_ligera",
+        "label": "Ligera y móvil",
+        "tags": [
+          "agile",
+          "lean",
+          "mobile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "asimetrica_dinamica",
+        "label": "Asimétrica y dinámica",
+        "tags": [
+          "edgy",
+          "dynamic",
+          "bold"
+        ],
+        "base": 1
       }
     ],
     "expression": [
@@ -220,6 +280,26 @@
           "quiet",
           "sleepy"
         ]
+      },
+      {
+        "id": "curiosa",
+        "label": "Curiosa",
+        "tags": [
+          "curious",
+          "bright",
+          "social"
+        ],
+        "base": 1
+      },
+      {
+        "id": "confiada",
+        "label": "Confiada",
+        "tags": [
+          "confident",
+          "strong",
+          "calm"
+        ],
+        "base": 1
       }
     ],
     "hair": [
@@ -234,7 +314,12 @@
           "stature:bajita": 2,
           "expression:sonrisa_abierta": 3,
           "expression:mirada_enojada": 2
-        }
+        },
+        "tags": [
+          "warm",
+          "bright",
+          "bold"
+        ]
       },
       {
         "id": "naranja_tangerina",
@@ -245,7 +330,12 @@
           "personality:hiperactiva": 5,
           "stature:bajita": 3,
           "expression:sonrisa_abierta": 4
-        }
+        },
+        "tags": [
+          "warm",
+          "bright",
+          "energetic"
+        ]
       },
       {
         "id": "rosa_chicle",
@@ -255,7 +345,12 @@
           "personality:alegre": 4,
           "personality:traviesa": 4,
           "personality:timida": 2
-        }
+        },
+        "tags": [
+          "cute",
+          "bright",
+          "playful"
+        ]
       },
       {
         "id": "violeta_profundo",
@@ -268,7 +363,12 @@
           "expression:mirada_fria": 5,
           "expression:mirada_enfocada": 3,
           "expression:mirada_enojada": 4
-        }
+        },
+        "tags": [
+          "cool",
+          "elegant",
+          "mysterious"
+        ]
       },
       {
         "id": "negro_obsidiana",
@@ -281,7 +381,12 @@
           "expression:mirada_desafiante": 4,
           "expression:mirada_fria": 4,
           "expression:mirada_enojada": 5
-        }
+        },
+        "tags": [
+          "cool",
+          "bold",
+          "focused"
+        ]
       },
       {
         "id": "azul_nocturno",
@@ -293,7 +398,12 @@
           "personality:disciplinada": 3,
           "expression:serena": 3,
           "expression:mirada_enojada": 2
-        }
+        },
+        "tags": [
+          "cool",
+          "technical",
+          "focused"
+        ]
       },
       {
         "id": "plateado_perla",
@@ -304,7 +414,12 @@
           "personality:seria": 3,
           "personality:timida": 2,
           "expression:mirada_fria": 3
-        }
+        },
+        "tags": [
+          "cool",
+          "elegant",
+          "soft"
+        ]
       },
       {
         "id": "castano_miel",
@@ -315,7 +430,32 @@
           "personality:timida": 3,
           "personality:alegre": 2,
           "expression:serena": 2
-        }
+        },
+        "tags": [
+          "warm",
+          "soft",
+          "friendly"
+        ]
+      },
+      {
+        "id": "rubio_platino",
+        "label": "Rubio platino",
+        "tags": [
+          "light",
+          "cool",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "turquesa",
+        "label": "Turquesa",
+        "tags": [
+          "cool",
+          "bright",
+          "technical"
+        ],
+        "base": 1
       }
     ],
     "eyes": [
@@ -327,7 +467,12 @@
           "personality:alegre": 4,
           "personality:protectora": 4,
           "personality:hiperactiva": 3
-        }
+        },
+        "tags": [
+          "warm",
+          "bright",
+          "confident"
+        ]
       },
       {
         "id": "rojo_rubi",
@@ -338,7 +483,12 @@
           "personality:seria": 2,
           "expression:mirada_desafiante": 4,
           "expression:mirada_enojada": 4
-        }
+        },
+        "tags": [
+          "bold",
+          "intense",
+          "defiant"
+        ]
       },
       {
         "id": "violeta",
@@ -349,7 +499,12 @@
           "personality:seria": 4,
           "expression:mirada_fria": 4,
           "expression:mirada_enojada": 4
-        }
+        },
+        "tags": [
+          "cool",
+          "mysterious",
+          "elegant"
+        ]
       },
       {
         "id": "azul_hielo",
@@ -360,7 +515,12 @@
           "personality:timida": 2,
           "personality:seria": 3,
           "expression:serena": 3
-        }
+        },
+        "tags": [
+          "cool",
+          "calm",
+          "focused"
+        ]
       },
       {
         "id": "verde_esmeralda",
@@ -369,7 +529,12 @@
         "bias": {
           "personality:protectora": 4,
           "personality:disciplinada": 3
-        }
+        },
+        "tags": [
+          "fresh",
+          "balanced",
+          "natural"
+        ]
       },
       {
         "id": "gris_grafito",
@@ -380,7 +545,52 @@
           "personality:kuudere": 5,
           "expression:mirada_fria": 3,
           "expression:mirada_enojada": 3
-        }
+        },
+        "tags": [
+          "cool",
+          "reserved",
+          "controlled"
+        ]
+      },
+      {
+        "id": "azul_profundo",
+        "label": "Azul profundo",
+        "tags": [
+          "cool",
+          "focused",
+          "calm"
+        ],
+        "base": 1
+      },
+      {
+        "id": "celeste",
+        "label": "Celeste",
+        "tags": [
+          "bright",
+          "soft",
+          "fresh"
+        ],
+        "base": 1
+      },
+      {
+        "id": "verde_lima",
+        "label": "Verde lima",
+        "tags": [
+          "bright",
+          "energetic",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "rosa_opalina",
+        "label": "Rosa opalina",
+        "tags": [
+          "soft",
+          "cute",
+          "bright"
+        ],
+        "base": 1
       }
     ],
     "voice": [
@@ -560,6 +770,56 @@
           "long",
           "refined"
         ]
+      },
+      {
+        "id": "ligera_compacta",
+        "label": "Ligera y compacta",
+        "tags": [
+          "compact",
+          "agile",
+          "light"
+        ],
+        "base": 1
+      },
+      {
+        "id": "atletica_potente",
+        "label": "Atlética potente",
+        "tags": [
+          "athletic",
+          "strong",
+          "powerful"
+        ],
+        "base": 1
+      },
+      {
+        "id": "flexible_esbelta",
+        "label": "Flexible y esbelta",
+        "tags": [
+          "lean",
+          "agile",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "robusta_deportiva",
+        "label": "Robusta deportiva",
+        "tags": [
+          "strong",
+          "athletic",
+          "durable"
+        ],
+        "base": 1
+      },
+      {
+        "id": "equilibrada_flexible",
+        "label": "Equilibrada y flexible",
+        "tags": [
+          "balanced",
+          "athletic",
+          "versatile"
+        ],
+        "base": 1
       }
     ],
     "face_shape": [
@@ -588,6 +848,76 @@
           "elegant",
           "cool"
         ]
+      },
+      {
+        "id": "corazon",
+        "label": "En forma de corazón",
+        "tags": [
+          "heart",
+          "delicate",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "diamante",
+        "label": "Diamante / pómulos definidos",
+        "tags": [
+          "diamond",
+          "defined",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "mandibula_suave",
+        "label": "Mandíbula suave",
+        "tags": [
+          "soft",
+          "balanced",
+          "mature"
+        ],
+        "base": 1
+      },
+      {
+        "id": "menton_corto",
+        "label": "Mentón corto",
+        "tags": [
+          "compact",
+          "cute",
+          "friendly"
+        ],
+        "base": 1
+      },
+      {
+        "id": "menton_fino",
+        "label": "Mentón fino",
+        "tags": [
+          "delicate",
+          "elegant",
+          "sharp"
+        ],
+        "base": 1
+      },
+      {
+        "id": "rostro_alargado",
+        "label": "Rostro alargado",
+        "tags": [
+          "long",
+          "elegant",
+          "refined"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pomulos_definidos",
+        "label": "Pómulos definidos",
+        "tags": [
+          "defined",
+          "strong",
+          "elegant"
+        ],
+        "base": 1
       }
     ],
     "hair_length": [
@@ -615,6 +945,76 @@
           "elegant",
           "flowing"
         ]
+      },
+      {
+        "id": "pixie",
+        "label": "Pixie",
+        "tags": [
+          "short",
+          "compact",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "muy_corto",
+        "label": "Muy corto",
+        "tags": [
+          "short",
+          "agile",
+          "sporty"
+        ],
+        "base": 1
+      },
+      {
+        "id": "a_la_mandibula",
+        "label": "A la mandíbula",
+        "tags": [
+          "short",
+          "clean",
+          "versatile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "a_los_hombros",
+        "label": "Hasta los hombros",
+        "tags": [
+          "medium",
+          "balanced",
+          "versatile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "medio_largo",
+        "label": "Medio-largo",
+        "tags": [
+          "flowing",
+          "versatile",
+          "soft"
+        ],
+        "base": 1
+      },
+      {
+        "id": "muy_largo",
+        "label": "Muy largo",
+        "tags": [
+          "long",
+          "flowing",
+          "dramatic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "extra_largo",
+        "label": "Extra largo",
+        "tags": [
+          "long",
+          "dramatic",
+          "elegant"
+        ],
+        "base": 1
       }
     ],
     "hairstyle": [
@@ -741,6 +1141,66 @@
           "reserved",
           "calm"
         ]
+      },
+      {
+        "id": "redondos",
+        "label": "Redondos",
+        "tags": [
+          "round",
+          "bright",
+          "cute"
+        ],
+        "base": 1
+      },
+      {
+        "id": "felinos",
+        "label": "Felinos / levantados",
+        "tags": [
+          "sharp",
+          "confident",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "caidos",
+        "label": "Caídos / dulces",
+        "tags": [
+          "soft",
+          "gentle",
+          "shy"
+        ],
+        "base": 1
+      },
+      {
+        "id": "abiertos",
+        "label": "Grandes y abiertos",
+        "tags": [
+          "bright",
+          "energetic",
+          "cute"
+        ],
+        "base": 1
+      },
+      {
+        "id": "angulares",
+        "label": "Angulares",
+        "tags": [
+          "sharp",
+          "focused",
+          "strong"
+        ],
+        "base": 1
+      },
+      {
+        "id": "asimétricos",
+        "label": "Asimétricos",
+        "tags": [
+          "edgy",
+          "bold",
+          "distinctive"
+        ],
+        "base": 1
       }
     ],
     "outfit": [
@@ -815,6 +1275,26 @@
           "bold",
           "playful"
         ]
+      },
+      {
+        "id": "baseball_tech_suit",
+        "label": "Traje táctico baseball-tech",
+        "tags": [
+          "athletic",
+          "technical",
+          "combat"
+        ],
+        "base": 1
+      },
+      {
+        "id": "armadura_asimetrica",
+        "label": "Armadura ligera asimétrica",
+        "tags": [
+          "strong",
+          "edgy",
+          "combat"
+        ],
+        "base": 1
       }
     ],
     "outer_layer": [
@@ -859,6 +1339,56 @@
           "guardian",
           "technical"
         ]
+      },
+      {
+        "id": "chaleco_tactico",
+        "label": "Chaleco táctico ligero",
+        "tags": [
+          "technical",
+          "practical",
+          "combat"
+        ],
+        "base": 1
+      },
+      {
+        "id": "chaqueta_corta_asimetrica",
+        "label": "Chaqueta corta asimétrica",
+        "tags": [
+          "edgy",
+          "bold",
+          "mobile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "capa_corta_energetica",
+        "label": "Capa corta de energía",
+        "tags": [
+          "dramatic",
+          "powerful",
+          "flowing"
+        ],
+        "base": 1
+      },
+      {
+        "id": "hombrera_modular",
+        "label": "Hombrera modular",
+        "tags": [
+          "guardian",
+          "technical",
+          "strong"
+        ],
+        "base": 1
+      },
+      {
+        "id": "mangas_desmontables",
+        "label": "Mangas deportivas desmontables",
+        "tags": [
+          "athletic",
+          "modern",
+          "agile"
+        ],
+        "base": 1
       }
     ],
     "footwear": [
@@ -894,6 +1424,66 @@
           "elegant",
           "cool"
         ]
+      },
+      {
+        "id": "botas_cortas",
+        "label": "Botas cortas de combate",
+        "tags": [
+          "agile",
+          "combat",
+          "practical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "zapatillas_plataforma",
+        "label": "Zapatillas de plataforma deportiva",
+        "tags": [
+          "street",
+          "bold",
+          "stylish"
+        ],
+        "base": 1
+      },
+      {
+        "id": "botas_asimetricas",
+        "label": "Botas asimétricas",
+        "tags": [
+          "edgy",
+          "distinctive",
+          "combat"
+        ],
+        "base": 1
+      },
+      {
+        "id": "calzado_ligero_pitcher",
+        "label": "Calzado ligero de pitcher",
+        "tags": [
+          "technical",
+          "athletic",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "botines_elegantes",
+        "label": "Botines elegantes",
+        "tags": [
+          "elegant",
+          "refined",
+          "clean"
+        ],
+        "base": 1
+      },
+      {
+        "id": "botas_reforzadas",
+        "label": "Botas reforzadas de guardiana",
+        "tags": [
+          "guardian",
+          "strong",
+          "durable"
+        ],
+        "base": 1
       }
     ],
     "accessory": [
@@ -953,6 +1543,36 @@
           "personal",
           "soft"
         ]
+      },
+      {
+        "id": "hairclip",
+        "label": "Horquilla distintiva",
+        "tags": [
+          "personal",
+          "cute",
+          "hair"
+        ],
+        "base": 1
+      },
+      {
+        "id": "earrings",
+        "label": "Pendientes geométricos",
+        "tags": [
+          "elegant",
+          "distinctive",
+          "refined"
+        ],
+        "base": 1
+      },
+      {
+        "id": "visor_goggles",
+        "label": "Visor deportivo compacto",
+        "tags": [
+          "technical",
+          "sporty",
+          "focused"
+        ],
+        "base": 1
       }
     ],
     "palette_accent": [
@@ -1019,6 +1639,26 @@
           "bold",
           "defiant"
         ]
+      },
+      {
+        "id": "teal_black",
+        "label": "Turquesa / negro",
+        "tags": [
+          "cool",
+          "technical",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pearl_coral",
+        "label": "Perla / coral",
+        "tags": [
+          "warm",
+          "soft",
+          "bright"
+        ],
+        "base": 1
       }
     ],
     "baseball_prop": [
@@ -1061,6 +1701,56 @@
           "support",
           "technical"
         ]
+      },
+      {
+        "id": "baton_energetico",
+        "label": "Bate con núcleo energético",
+        "tags": [
+          "baseball",
+          "powerful",
+          "technical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "guante_mecanico",
+        "label": "Guante mecánico de recepción",
+        "tags": [
+          "baseball",
+          "technical",
+          "support"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pelota_dron",
+        "label": "Pelota-dron táctica",
+        "tags": [
+          "baseball",
+          "technical",
+          "agile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "bate_transformable",
+        "label": "Bate modular transformable",
+        "tags": [
+          "baseball",
+          "bold",
+          "powerful"
+        ],
+        "base": 1
+      },
+      {
+        "id": "receptor_energia",
+        "label": "Dispositivo receptor de energía",
+        "tags": [
+          "technical",
+          "support",
+          "control"
+        ],
+        "base": 1
       }
     ],
     "pose": [
@@ -1119,6 +1809,36 @@
           "sleepy",
           "soft"
         ]
+      },
+      {
+        "id": "batting_ready",
+        "label": "Preparada para batear",
+        "tags": [
+          "baseball",
+          "focused",
+          "athletic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pitch_windup",
+        "label": "Inicio de lanzamiento",
+        "tags": [
+          "pitcher",
+          "technical",
+          "dynamic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "victory_pose",
+        "label": "Pose de victoria",
+        "tags": [
+          "confident",
+          "dramatic",
+          "social"
+        ],
+        "base": 1
       }
     ],
     "quirk": [
@@ -1359,14 +2079,837 @@
           "personality:timida": 2
         }
       }
+    ],
+    "hair_bangs": [
+      {
+        "id": "recto",
+        "label": "Flequillo recto",
+        "tags": [
+          "clean",
+          "classic",
+          "balanced"
+        ],
+        "base": 1
+      },
+      {
+        "id": "lateral",
+        "label": "Flequillo lateral",
+        "tags": [
+          "soft",
+          "versatile",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "cortina",
+        "label": "Flequillo cortina",
+        "tags": [
+          "modern",
+          "soft",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "abierto_centro",
+        "label": "Abierto al centro",
+        "tags": [
+          "clean",
+          "confident",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "irregular",
+        "label": "Flequillo irregular",
+        "tags": [
+          "energetic",
+          "edgy",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "asimetrico",
+        "label": "Flequillo asimétrico",
+        "tags": [
+          "edgy",
+          "bold",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "mechones_separados",
+        "label": "Mechones separados",
+        "tags": [
+          "dynamic",
+          "modern",
+          "agile"
+        ],
+        "base": 1
+      },
+      {
+        "id": "cubriendo_un_ojo",
+        "label": "Flequillo sobre un ojo",
+        "tags": [
+          "mysterious",
+          "cool",
+          "dramatic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "corto",
+        "label": "Flequillo corto",
+        "tags": [
+          "cute",
+          "bright",
+          "compact"
+        ],
+        "base": 1
+      },
+      {
+        "id": "sin_flequillo",
+        "label": "Sin flequillo",
+        "tags": [
+          "clean",
+          "elegant",
+          "open"
+        ],
+        "base": 1
+      }
+    ],
+    "side_hair": [
+      {
+        "id": "mechones_largos",
+        "label": "Mechones laterales largos",
+        "tags": [
+          "flowing",
+          "elegant",
+          "soft"
+        ],
+        "base": 1
+      },
+      {
+        "id": "mechones_cortos",
+        "label": "Mechones laterales cortos",
+        "tags": [
+          "compact",
+          "agile",
+          "clean"
+        ],
+        "base": 1
+      },
+      {
+        "id": "laterales_ondulados",
+        "label": "Laterales ondulados",
+        "tags": [
+          "soft",
+          "flowing",
+          "warm"
+        ],
+        "base": 1
+      },
+      {
+        "id": "detras_orejas",
+        "label": "Cabello detrás de las orejas",
+        "tags": [
+          "clean",
+          "focused",
+          "practical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "trenza_lateral",
+        "label": "Trenza lateral decorativa",
+        "tags": [
+          "refined",
+          "distinctive",
+          "personal"
+        ],
+        "base": 1
+      },
+      {
+        "id": "patillas_hime",
+        "label": "Laterales tipo hime",
+        "tags": [
+          "elegant",
+          "controlled",
+          "classic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "laterales_asimetricos",
+        "label": "Laterales asimétricos",
+        "tags": [
+          "edgy",
+          "bold",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "rizos_marco",
+        "label": "Rizos que enmarcan el rostro",
+        "tags": [
+          "soft",
+          "cute",
+          "flowing"
+        ],
+        "base": 1
+      },
+      {
+        "id": "mechones_finos",
+        "label": "Mechones finos junto a las mejillas",
+        "tags": [
+          "delicate",
+          "soft",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "volumen_lateral",
+        "label": "Volumen lateral marcado",
+        "tags": [
+          "bold",
+          "dramatic",
+          "distinctive"
+        ],
+        "base": 1
+      }
+    ],
+    "back_hair": [
+      {
+        "id": "recto_liso",
+        "label": "Parte trasera lisa",
+        "tags": [
+          "clean",
+          "elegant",
+          "controlled"
+        ],
+        "base": 1
+      },
+      {
+        "id": "capas_largas",
+        "label": "Capas largas",
+        "tags": [
+          "flowing",
+          "dynamic",
+          "elegant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "nuca_corta",
+        "label": "Nuca corta",
+        "tags": [
+          "compact",
+          "agile",
+          "sporty"
+        ],
+        "base": 1
+      },
+      {
+        "id": "coleta_alta",
+        "label": "Parte trasera en coleta alta",
+        "tags": [
+          "athletic",
+          "energetic",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "coleta_baja",
+        "label": "Parte trasera en coleta baja",
+        "tags": [
+          "calm",
+          "elegant",
+          "practical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "doble_coleta",
+        "label": "Parte trasera en coletas dobles",
+        "tags": [
+          "cute",
+          "bright",
+          "playful"
+        ],
+        "base": 1
+      },
+      {
+        "id": "trenza_trasera",
+        "label": "Trenza trasera",
+        "tags": [
+          "disciplined",
+          "refined",
+          "practical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "recogido",
+        "label": "Recogido completo",
+        "tags": [
+          "elegant",
+          "controlled",
+          "clean"
+        ],
+        "base": 1
+      },
+      {
+        "id": "media_coleta",
+        "label": "Media coleta",
+        "tags": [
+          "versatile",
+          "playful",
+          "balanced"
+        ],
+        "base": 1
+      },
+      {
+        "id": "ondas_sueltas",
+        "label": "Ondas sueltas traseras",
+        "tags": [
+          "soft",
+          "flowing",
+          "warm"
+        ],
+        "base": 1
+      }
+    ],
+    "pupil_shape": [
+      {
+        "id": "circular",
+        "label": "Circular clásica",
+        "tags": [
+          "classic",
+          "balanced",
+          "expressive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "ovalada",
+        "label": "Ovalada",
+        "tags": [
+          "soft",
+          "elegant",
+          "calm"
+        ],
+        "base": 1
+      },
+      {
+        "id": "vertical_fina",
+        "label": "Vertical fina",
+        "tags": [
+          "sharp",
+          "focused",
+          "mysterious"
+        ],
+        "base": 1
+      },
+      {
+        "id": "estrella",
+        "label": "Estrella",
+        "tags": [
+          "bright",
+          "playful",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "corazon",
+        "label": "Corazón",
+        "tags": [
+          "cute",
+          "warm",
+          "playful"
+        ],
+        "base": 1
+      },
+      {
+        "id": "diamante",
+        "label": "Diamante",
+        "tags": [
+          "sharp",
+          "technical",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "anillo_concentrico",
+        "label": "Anillos concéntricos",
+        "tags": [
+          "technical",
+          "mysterious",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "doble_anillo",
+        "label": "Doble anillo",
+        "tags": [
+          "detailed",
+          "distinctive",
+          "technical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "brillo_geometrico",
+        "label": "Brillo geométrico integrado",
+        "tags": [
+          "bright",
+          "modern",
+          "technical"
+        ],
+        "base": 1
+      },
+      {
+        "id": "ranura_vertical",
+        "label": "Ranura vertical estilizada",
+        "tags": [
+          "intense",
+          "sharp",
+          "focused"
+        ],
+        "base": 1
+      }
+    ],
+    "eyebrow_style": [
+      {
+        "id": "finas_arqueadas",
+        "label": "Finas arqueadas",
+        "tags": [
+          "elegant",
+          "delicate",
+          "confident"
+        ],
+        "base": 1
+      },
+      {
+        "id": "rectas",
+        "label": "Rectas",
+        "tags": [
+          "calm",
+          "controlled",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "gruesas_deportivas",
+        "label": "Gruesas deportivas",
+        "tags": [
+          "athletic",
+          "strong",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "anguladas",
+        "label": "Anguladas",
+        "tags": [
+          "sharp",
+          "defiant",
+          "strong"
+        ],
+        "base": 1
+      },
+      {
+        "id": "inclinadas_centro",
+        "label": "Inclinadas hacia el centro",
+        "tags": [
+          "intense",
+          "defiant",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "elevadas",
+        "label": "Elevadas",
+        "tags": [
+          "curious",
+          "bright",
+          "surprised"
+        ],
+        "base": 1
+      },
+      {
+        "id": "suaves",
+        "label": "Suaves y redondeadas",
+        "tags": [
+          "soft",
+          "gentle",
+          "friendly"
+        ],
+        "base": 1
+      },
+      {
+        "id": "cortas",
+        "label": "Cortas",
+        "tags": [
+          "compact",
+          "cute",
+          "clean"
+        ],
+        "base": 1
+      },
+      {
+        "id": "largas",
+        "label": "Largas y definidas",
+        "tags": [
+          "elegant",
+          "refined",
+          "focused"
+        ],
+        "base": 1
+      },
+      {
+        "id": "asimetrica",
+        "label": "Ligeramente asimétricas",
+        "tags": [
+          "playful",
+          "distinctive",
+          "expressive"
+        ],
+        "base": 1
+      }
+    ],
+    "mouth_style": [
+      {
+        "id": "sonrisa_pequena",
+        "label": "Sonrisa pequeña",
+        "tags": [
+          "soft",
+          "gentle",
+          "friendly"
+        ],
+        "base": 1
+      },
+      {
+        "id": "sonrisa_amplia",
+        "label": "Sonrisa amplia",
+        "tags": [
+          "bright",
+          "social",
+          "warm"
+        ],
+        "base": 1
+      },
+      {
+        "id": "puchero",
+        "label": "Puchero",
+        "tags": [
+          "cute",
+          "playful",
+          "sulky"
+        ],
+        "base": 1
+      },
+      {
+        "id": "sonrisa_ladeada",
+        "label": "Sonrisa ladeada",
+        "tags": [
+          "confident",
+          "playful",
+          "bold"
+        ],
+        "base": 1
+      },
+      {
+        "id": "colmillo_visible",
+        "label": "Sonrisa con colmillo visible",
+        "tags": [
+          "playful",
+          "bold",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "boca_neutra",
+        "label": "Boca neutra",
+        "tags": [
+          "calm",
+          "controlled",
+          "reserved"
+        ],
+        "base": 1
+      },
+      {
+        "id": "labio_inferior_tenso",
+        "label": "Labio inferior tenso",
+        "tags": [
+          "focused",
+          "intense",
+          "defiant"
+        ],
+        "base": 1
+      },
+      {
+        "id": "boca_abierta_energia",
+        "label": "Boca abierta de esfuerzo",
+        "tags": [
+          "energetic",
+          "athletic",
+          "dynamic"
+        ],
+        "base": 1
+      },
+      {
+        "id": "mueca_concentrada",
+        "label": "Mueca concentrada",
+        "tags": [
+          "focused",
+          "technical",
+          "strong"
+        ],
+        "base": 1
+      },
+      {
+        "id": "sonrisa_serena",
+        "label": "Sonrisa serena",
+        "tags": [
+          "calm",
+          "elegant",
+          "warm"
+        ],
+        "base": 1
+      }
+    ],
+    "nose_style": [
+      {
+        "id": "minima",
+        "label": "Nariz mínima estilizada",
+        "tags": [
+          "clean",
+          "classic",
+          "anime"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pequena_redondeada",
+        "label": "Nariz pequeña redondeada",
+        "tags": [
+          "soft",
+          "cute",
+          "friendly"
+        ],
+        "base": 1
+      },
+      {
+        "id": "puente_sutil",
+        "label": "Puente sutil",
+        "tags": [
+          "elegant",
+          "refined",
+          "balanced"
+        ],
+        "base": 1
+      },
+      {
+        "id": "punta_definida",
+        "label": "Punta ligeramente definida",
+        "tags": [
+          "defined",
+          "mature",
+          "balanced"
+        ],
+        "base": 1
+      },
+      {
+        "id": "triangular_suave",
+        "label": "Triangular suave",
+        "tags": [
+          "sharp",
+          "clean",
+          "modern"
+        ],
+        "base": 1
+      },
+      {
+        "id": "sombra_minima",
+        "label": "Sugerida con una sombra mínima",
+        "tags": [
+          "clean",
+          "minimal",
+          "anime"
+        ],
+        "base": 1
+      },
+      {
+        "id": "linea_corta",
+        "label": "Línea corta de perfil",
+        "tags": [
+          "minimal",
+          "classic",
+          "clean"
+        ],
+        "base": 1
+      },
+      {
+        "id": "puente_recto",
+        "label": "Puente recto estilizado",
+        "tags": [
+          "refined",
+          "focused",
+          "clean"
+        ],
+        "base": 1
+      },
+      {
+        "id": "nariz_curva_sutil",
+        "label": "Curva sutil",
+        "tags": [
+          "soft",
+          "distinctive",
+          "balanced"
+        ],
+        "base": 1
+      },
+      {
+        "id": "perfil_anguloso",
+        "label": "Perfil anguloso estilizado",
+        "tags": [
+          "sharp",
+          "strong",
+          "defined"
+        ],
+        "base": 1
+      }
+    ],
+    "facial_detail": [
+      {
+        "id": "sin_marca",
+        "label": "Sin marca facial adicional",
+        "tags": [
+          "clean",
+          "classic",
+          "balanced"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pecas_sutiles",
+        "label": "Pecas sutiles",
+        "tags": [
+          "warm",
+          "soft",
+          "friendly"
+        ],
+        "base": 1
+      },
+      {
+        "id": "lunar_belleza",
+        "label": "Pequeño lunar de belleza",
+        "tags": [
+          "distinctive",
+          "elegant",
+          "personal"
+        ],
+        "base": 1
+      },
+      {
+        "id": "rubor_sutil",
+        "label": "Rubor sutil",
+        "tags": [
+          "warm",
+          "cute",
+          "soft"
+        ],
+        "base": 1
+      },
+      {
+        "id": "cicatriz_fina",
+        "label": "Cicatriz fina no gráfica",
+        "tags": [
+          "bold",
+          "combat",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "marca_geometrica",
+        "label": "Marca geométrica decorativa",
+        "tags": [
+          "technical",
+          "modern",
+          "distinctive"
+        ],
+        "base": 1
+      },
+      {
+        "id": "linea_deportiva",
+        "label": "Marca deportiva bajo el ojo",
+        "tags": [
+          "athletic",
+          "focused",
+          "sporty"
+        ],
+        "base": 1
+      },
+      {
+        "id": "sombra_de_ojera_suave",
+        "label": "Sombra suave bajo los ojos",
+        "tags": [
+          "sleepy",
+          "cool",
+          "reserved"
+        ],
+        "base": 1
+      },
+      {
+        "id": "pequenas_marcas_luz",
+        "label": "Pequeñas marcas luminosas",
+        "tags": [
+          "technical",
+          "bright",
+          "modern"
+        ],
+        "base": 1
+      },
+      {
+        "id": "marca_equipo",
+        "label": "Marca personal del equipo",
+        "tags": [
+          "team",
+          "personal",
+          "distinctive"
+        ],
+        "base": 1
+      }
     ]
   },
-  "style_core": "original premium Japanese anime hero-collector game character, BaseWarriors: Meta-Strike, polished cel shading, crisp linework, expressive anime eyes, refined costume design, strong gameplay silhouette, cinematic 2.5D cutout readiness, subtle material separation, controlled highlights, clean production art, original design",
+  "style_core": "original premium modern Japanese anime gacha-game character illustration, consistent 2D anime key visual, clean controlled line art, crisp readable contours, polished cel shading with restrained soft secondary gradients, expressive detailed anime eyes, deliberate hair strand grouping and clean highlights, coherent color design, original tactical baseball hero-collector character, 2.5D-ready silhouette",
   "design_principles": [
     "User choices are hard locks.",
     "AUTO choices use weighted compatibility instead of arbitrary randomness.",
     "Seeds reproduce a generated profile.",
     "Visual references are inspiration only and never become copy instructions.",
     "Character design stays original and suitable for a premium anime game."
-  ]
+  ],
+  "visual_style_contract": {
+    "id": "bw-modern-gacha-v1",
+    "name": "Anime moderno de gacha",
+    "mode": "BETA_UNIVERSAL",
+    "catalog_file": "visual_style_catalog.json",
+    "rule": "Character traits may vary; rendering style remains fixed."
+  }
 }

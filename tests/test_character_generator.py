@@ -57,6 +57,9 @@ def test_generator_locks_user_choices_and_fills_auto():
     ):
         assert result["profile"][category] != "auto"
     assert result["prompt"]
+    assert "modern Japanese anime gacha-game character illustration" in result["prompt"]
+    assert result["style_id"] == "bw-modern-gacha-v1"
+    assert result["style_name"] == "Anime moderno de gacha"
     assert result["negative_prompt"]
     assert result["coherence"] == 0.82
     assert "outfit" in result["profile"]
