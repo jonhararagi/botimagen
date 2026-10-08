@@ -440,6 +440,20 @@ class AssetIntake(tk.Tk):
             window.update()
             self.status_var.set(status)
 
+        def copy_all():
+            positive = prompt_text.get("1.0", tk.END).strip()
+            negative = negative_text.get("1.0", tk.END).strip()
+            if not positive:
+                messagebox.showinfo("Generador", "Genera un personaje primero.", parent=window)
+                return
+            combined = positive
+            if negative:
+                combined += "\n\nNEGATIVE PROMPT:\n" + negative
+            window.clipboard_clear()
+            window.clipboard_append(combined)
+            window.update()
+            self.status_var.set("Prompt + negative prompt del personaje copiados.")
+
         def save_profile():
             result = result_holder["value"]
             if not result:
@@ -463,11 +477,7 @@ class AssetIntake(tk.Tk):
         ttk.Button(actions, text="COPIAR NEGATIVE",
                    command=lambda: copy_box(negative_text, "Genera un personaje primero.", "Negative prompt copiado.")).pack(side="left")
         ttk.Button(actions, text="COPIAR TODO",
-                   command=lambda: copy_box(
-                       prompt_text,
-                       "Genera un personaje primero.",
-                       "Prompt de personaje copiado.",
-                   )).pack(side="left", padx=8)
+                   command=copy_all).pack(side="left", padx=8)
         ttk.Button(actions, text="GUARDAR PERFIL",
                    command=save_profile).pack(side="left")
         ttk.Button(actions, text="CERRAR",
