@@ -135,6 +135,39 @@ El resultado incluye:
 
 Los perfiles guardados en `generated_characters/` se excluyen de Git por defecto. Primero se generan y revisan; después pueden convertirse en contratos reales de BaseWarriors.
 
+## Diseño de personajes avanzado
+
+El generador ahora funciona como un sistema de diseño por capas:
+
+**Identidad → físico → rostro → cabello → vestimenta → paleta → rol → prop → pose.**
+
+Puedes fijar solo dos o tres cosas y dejar el resto en **AUTO**. Cada elección automática usa pesos de compatibilidad y etiquetas compartidas, y una semilla para conservar reproducibilidad.
+
+También existe un control **Coherencia / variedad**:
+- alto: mantiene las decisiones muy cerca de la combinación que elegiste;
+- bajo: permite alternativas compatibles para descubrir diseños inesperados.
+
+### Referencias visuales
+
+El botón **VER IMÁGENES WEB** abre una búsqueda visual basada en el rasgo seleccionado o en el personaje completo. Esto sirve para comparar rápidamente peinados, ropa, expresiones, paletas o poses antes de generar.
+
+La carpeta **references/** puede usarse como espacio local para imágenes de inspiración descargadas manualmente. Se mantiene fuera de Git para no mezclar material de referencia con los assets oficiales.
+
+Las referencias son inspiración visual. El prompt del personaje siempre pide un diseño original y no convierte una referencia externa en una instrucción de copia.
+
+### Ideas tomadas de herramientas externas
+
+La arquitectura incorpora patrones que aparecen repetidamente en herramientas de generación anime y prompt engineering:
+
+- bibliotecas de tags y autocompletado por categoría;
+- wildcards con semilla y variación reproducible;
+- presets separados de personaje, estilo y referencias;
+- galerías y comparación/organización de resultados;
+- formatos de prompt dependientes del modelo;
+- separación entre prompt positivo, negativo y controles del modelo.
+
+Por ejemplo, NAIWeaver combina biblioteca de tags con ejemplos visuales, wildcards, presets y referencias de personaje/estilo; Character Select Stand Alone usa taggers locales, listas JSON/CSV, wildcards y referencias para ComfyUI/WebUI; y RandomPromptBuilder separa atributos de personaje, acción, ropa, ubicación y fondo y utiliza seed/batch para variaciones reproducibles.
+
 ## Diagnóstico del PC
 
 `doctor.py` comprueba automáticamente:
@@ -179,7 +212,7 @@ Tkinter puro no incorpora drag & drop de archivos de Windows de forma nativa. Po
 
 Bloque ejecutado: ~1–2 h de implementación.
 Prueba real pendiente: ~30–60 min en Windows.
-Siguiente mejora útil: ~3–5 h para ampliar el generador con peinados, paleta secundaria, accesorios, arma/prop característico y plantillas por IA; después ~30–60 min de prueba real.
+Siguiente mejora útil: ~3–5 h para incorporar miniaturas locales por rasgo, favoritos/presets de personaje y plantillas de prompt por familia de modelo; después ~30–60 min de prueba real.
 
 ## Estado
 
