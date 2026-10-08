@@ -75,6 +75,50 @@
         "format": "PNG",
         "max_bytes": 6291456
       }
+    },
+    {
+      "id": "prop.baseball.ball",
+      "title": "Baseball · Common Prop",
+      "description": "Pelota reutilizable para ataques, VFX y UI de combate.",
+      "prompt": "Kawaii anime baseball combat ball prop, clean game asset, isolated on transparent background, crisp silhouette, no character, no brand logo.",
+      "destination": "assets/props/baseball-ball.png",
+      "expected": {
+        "format": "PNG",
+        "max_bytes": 4194304
+      }
+    },
+    {
+      "id": "prop.baseball.helmet",
+      "title": "Baseball Helmet · Common Prop",
+      "description": "Casco reutilizable para props, escenas y drops.",
+      "prompt": "Kawaii anime baseball helmet prop, sturdy stylized game asset, isolated, transparent-friendly background, no character, no brand logo.",
+      "destination": "assets/props/baseball-helmet.png",
+      "expected": {
+        "format": "PNG",
+        "max_bytes": 4194304
+      }
+    },
+    {
+      "id": "enemy.kytos.common",
+      "title": "Kytos · Common Enemy",
+      "description": "Enemigo común reutilizable para pruebas de combate.",
+      "prompt": "BaseWarriors Kytos common enemy, cute but sturdy anime combat creature, 2.5D game asset, readable silhouette, isolated transparent background, no logo.",
+      "destination": "assets/enemies/kytos-common.png",
+      "expected": {
+        "format": "PNG",
+        "max_bytes": 8388608
+      }
+    },
+    {
+      "id": "prop.robot.common",
+      "title": "Combat Robot · Common Enemy Prop",
+      "description": "Robot/enemigo común para encuentros y pruebas.",
+      "prompt": "Kawaii anime baseball combat robot enemy, sturdy lethal-but-cute design, 2.5D game asset, isolated transparent background, no character branding, no logo.",
+      "destination": "assets/enemies/combat-robot-common.png",
+      "expected": {
+        "format": "PNG",
+        "max_bytes": 8388608
+      }
     }
   ]
 }
