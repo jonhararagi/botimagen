@@ -194,6 +194,16 @@
         ]
       },
       {
+        "id": "mirada_enojada",
+        "label": "Mirada enojada",
+        "tags": [
+          "defiant",
+          "strong",
+          "intense",
+          "cool"
+        ]
+      },
+      {
         "id": "mirada_fria",
         "label": "Mirada fría",
         "tags": [
@@ -222,7 +232,8 @@
           "personality:rebelde": 6,
           "personality:hiperactiva": 3,
           "stature:bajita": 2,
-          "expression:sonrisa_abierta": 3
+          "expression:sonrisa_abierta": 3,
+          "expression:mirada_enojada": 2
         }
       },
       {
@@ -255,7 +266,8 @@
           "personality:kuudere": 7,
           "personality:rebelde": 2,
           "expression:mirada_fria": 5,
-          "expression:mirada_enfocada": 3
+          "expression:mirada_enfocada": 3,
+          "expression:mirada_enojada": 4
         }
       },
       {
@@ -267,7 +279,8 @@
           "personality:kuudere": 6,
           "personality:rebelde": 5,
           "expression:mirada_desafiante": 4,
-          "expression:mirada_fria": 4
+          "expression:mirada_fria": 4,
+          "expression:mirada_enojada": 5
         }
       },
       {
@@ -384,7 +397,8 @@
         "bias": {
           "personality:rebelde": 6,
           "personality:traviesa": 3,
-          "expression:mirada_desafiante": 3
+          "expression:mirada_desafiante": 3,
+          "expression:mirada_enojada": 4
         }
       },
       {
@@ -395,7 +409,8 @@
           "personality:seria": 5,
           "personality:kuudere": 7,
           "expression:mirada_fria": 5,
-          "expression:serena": 2
+          "expression:serena": 2,
+          "expression:mirada_enojada": 5
         }
       },
       {
@@ -406,7 +421,8 @@
           "personality:kuudere": 6,
           "personality:seria": 5,
           "expression:mirada_desafiante": 4,
-          "expression:mirada_fria": 5
+          "expression:mirada_fria": 5,
+          "expression:mirada_enojada": 6
         }
       },
       {
