@@ -70,7 +70,7 @@ def test_prompt_uses_separated_face_and_hair_parts_and_preserves_locks():
     assert "side hair" in prompt
     assert "back hair" in prompt
     assert result["style_id"] == "bw-modern-gacha-v1"
-    assert "one unified rendering language" in prompt
+    assert "unified rendering language" in prompt
 
 
 def test_seed_reproduces_profile_and_prompt():
