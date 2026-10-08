@@ -177,7 +177,24 @@ class AssetIntake(tk.Tk):
 
         self.selected_file = Path(path)
         self.file_var.set(self.selected_file.name)
+        self.show_preview()
         self.validate_image()
+
+    def show_preview(self):
+        if not self.selected_file:
+            return
+        try:
+            image = tk.PhotoImage(file=str(self.selected_file))
+            width, height = image.width(), image.height()
+            max_w, max_h = 620, 300
+            scale = max(1, (width + max_w - 1) // max_w, (height + max_h - 1) // max_h)
+            if scale > 1:
+                image = image.subsample(scale, scale)
+            self.preview_image = image
+            self.preview.configure(text="", image=self.preview_image)
+        except tk.TclError as exc:
+            self.preview_image = None
+            self.preview.configure(text=f"No se puede previsualizar esta imagen.\\n{exc}", image="")
 
     def validate_image(self):
         if not self.selected_file or not self.selected_asset:
