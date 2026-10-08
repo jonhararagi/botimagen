@@ -1,0 +1,321 @@
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+
+APP_TITLE = "BaseWarriors · Asset Intake"
+MANIFEST_NAME = "assets_manifest.json"
+CONFIG_NAME = "botimagen_config.json"
+
+
+def app_dir() -> Path:
+    return Path(__file__).resolve().parent
+
+
+def load_json(path: Path, fallback):
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return fallback
+
+
+def save_json(path: Path, data) -> None:
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(data, handle, indent=2, ensure_ascii=False)
+        handle.write("\n")
+
+
+class AssetIntake(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title(APP_TITLE)
+        self.geometry("1080x720")
+        self.minsize(900, 620)
+
+        self.manifest = load_json(app_dir() / MANIFEST_NAME, {"assets": []})
+        self.config_data = load_json(app_dir() / CONFIG_NAME, {"repo_path": ""})
+        self.assets = self.manifest.get("assets", [])
+        self.selected_asset = None
+        self.selected_file = None
+
+        self.status_var = tk.StringVar(value="Selecciona un asset.")
+        self.path_var = tk.StringVar(value=self.config_data.get("repo_path", ""))
+        self.file_var = tk.StringVar(value="Ninguna imagen seleccionada")
+        self.validation_var = tk.StringVar(value="Esperando imagen...")
+        self.asset_title_var = tk.StringVar(value="Selecciona un asset")
+
+        self._build_ui()
+        self._populate_assets()
+
+    def _build_ui(self):
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(1, weight=1)
+
+        header = ttk.Frame(self, padding=14)
+        header.grid(row=0, column=0, columnspan=2, sticky="ew")
+        ttk.Label(header, text="BASEWARRIORS ASSET INTAKE",
+                  font=("Segoe UI", 18, "bold")).pack(anchor="w")
+        ttk.Label(header, text="Genera → selecciona → valida → coloca en el destino correcto.",
+                  font=("Segoe UI", 10)).pack(anchor="w", pady=(3, 0))
+
+        left = ttk.Frame(self, padding=(14, 0, 8, 14))
+        left.grid(row=1, column=0, sticky="nsw")
+        ttk.Label(left, text="ASSETS", font=("Segoe UI", 10, "bold")).pack(anchor="w")
+
+        self.asset_list = tk.Listbox(left, width=34, height=25, exportselection=False)
+        self.asset_list.pack(fill="y", expand=True, pady=(8, 0))
+        self.asset_list.bind("<<ListboxSelect>>", self._on_asset_selected)
+
+        right = ttk.Frame(self, padding=(8, 0, 14, 14))
+        right.grid(row=1, column=1, sticky="nsew")
+        right.columnconfigure(0, weight=1)
+
+        ttk.Label(right, textvariable=self.asset_title_var,
+                  font=("Segoe UI", 16, "bold")).grid(row=0, column=0, sticky="w")
+
+        self.info = tk.Text(right, height=8, wrap="word", state="disabled")
+        self.info.grid(row=1, column=0, sticky="ew", pady=(8, 12))
+
+        upload_row = ttk.Frame(right)
+        upload_row.grid(row=2, column=0, sticky="ew")
+        ttk.Button(upload_row, text="+ SUBIR IMAGEN",
+                   command=self.choose_image).pack(side="left")
+        ttk.Label(upload_row, textvariable=self.file_var).pack(side="left", padx=12)
+
+        self.preview = ttk.Label(right, text="Vista previa\n\nSin imagen",
+                                 anchor="center", relief="solid")
+        self.preview.grid(row=3, column=0, sticky="nsew", pady=12)
+        right.rowconfigure(3, weight=1)
+
+        ttk.Label(right, textvariable=self.validation_var).grid(
+            row=4, column=0, sticky="w", pady=(0, 10))
+
+        actions = ttk.Frame(right)
+        actions.grid(row=5, column=0, sticky="ew")
+        ttk.Button(actions, text="PREPARAR ASSET",
+                   command=self.prepare_asset).pack(side="left")
+        ttk.Button(actions, text="ABRIR CARPETA",
+                   command=self.open_destination).pack(side="left", padx=8)
+        ttk.Button(actions, text="ABRIR REPOSITORIO",
+                   command=self.choose_repo).pack(side="left")
+
+        bottom = ttk.Frame(self, padding=(14, 0, 14, 12))
+        bottom.grid(row=2, column=0, columnspan=2, sticky="ew")
+        bottom.columnconfigure(1, weight=1)
+        ttk.Label(bottom, text="Repositorio local:").grid(row=0, column=0, sticky="w")
+        ttk.Entry(bottom, textvariable=self.path_var).grid(row=0, column=1, sticky="ew", padx=8)
+        ttk.Button(bottom, text="Elegir...", command=self.choose_repo).grid(row=0, column=2)
+        ttk.Label(bottom, textvariable=self.status_var).grid(
+            row=1, column=0, columnspan=3, sticky="w", pady=(8, 0))
+
+    def _populate_assets(self):
+        self.asset_list.delete(0, tk.END)
+        for asset in self.assets:
+            self.asset_list.insert(tk.END, f"{asset.get('id', '?')} · {asset.get('title', '')}")
+
+        if self.assets:
+            self.asset_list.selection_set(0)
+            self._on_asset_selected()
+
+    def _on_asset_selected(self, _event=None):
+        selection = self.asset_list.curselection()
+        if not selection:
+            return
+        self.selected_asset = self.assets[selection[0]]
+        self.asset_title_var.set(self.selected_asset.get("title", "Asset"))
+
+        expected = self.selected_asset.get("expected", {})
+        text = (
+            f"ID: {self.selected_asset.get('id', '')}\n"
+            f"Destino: {self.selected_asset.get('destination', '')}\n"
+            f"Formato: {expected.get('format', 'PNG')}\n"
+            f"Dimensiones: {expected.get('width', 'cualquiera')} × "
+            f"{expected.get('height', 'cualquiera')}\n"
+            f"Máximo: {self._format_bytes(expected.get('max_bytes'))}\n\n"
+            f"PROMPT / DESCRIPCIÓN:\n{self.selected_asset.get('prompt', '')}"
+        )
+        self.info.configure(state="normal")
+        self.info.delete("1.0", tk.END)
+        self.info.insert("1.0", text)
+        self.info.configure(state="disabled")
+
+        self.selected_file = None
+        self.file_var.set("Ninguna imagen seleccionada")
+        self.validation_var.set("Esperando imagen...")
+        self.preview.configure(text="Vista previa\n\nSin imagen", image="")
+
+    @staticmethod
+    def _format_bytes(value):
+        if not value:
+            return "sin límite"
+        if value >= 1024 * 1024:
+            return f"{value / (1024 * 1024):.1f} MB"
+        return f"{value / 1024:.0f} KB"
+
+    def choose_image(self):
+        path = filedialog.askopenfilename(
+            title="Seleccionar imagen",
+            filetypes=[
+                ("Imágenes PNG/JPG", "*.png *.jpg *.jpeg"),
+                ("PNG", "*.png"),
+                ("Todos los archivos", "*.*"),
+            ],
+        )
+        if not path:
+            return
+
+        self.selected_file = Path(path)
+        self.file_var.set(self.selected_file.name)
+        self.validate_image()
+
+    def validate_image(self):
+        if not self.selected_file or not self.selected_asset:
+            return
+
+        errors = []
+        expected = self.selected_asset.get("expected", {})
+        suffix = self.selected_file.suffix.lower()
+
+        if expected.get("format", "PNG").upper() == "PNG" and suffix != ".png":
+            errors.append("Se requiere PNG.")
+
+        try:
+            from PIL import Image
+        except ImportError:
+            Image = None
+
+        width = height = None
+        if Image:
+            try:
+                with Image.open(self.selected_file) as image:
+                    width, height = image.size
+            except Exception as exc:
+                errors.append(f"No se pudo leer la imagen: {exc}")
+        else:
+            # El MVP no obliga Pillow. La validación de dimensiones se omite si no está instalada.
+            if expected.get("width") or expected.get("height"):
+                errors.append("Instala Pillow para validar dimensiones: pip install pillow")
+
+        if width and expected.get("width") and width != expected["width"]:
+            errors.append(f"Ancho incorrecto: {width}px; esperado {expected['width']}px.")
+        if height and expected.get("height") and height != expected["height"]:
+            errors.append(f"Alto incorrecto: {height}px; esperado {expected['height']}px.")
+
+        max_bytes = expected.get("max_bytes")
+        if max_bytes and self.selected_file.stat().st_size > max_bytes:
+            errors.append("El archivo supera el peso máximo permitido.")
+
+        if errors:
+            self.validation_var.set("❌ " + " ".join(errors))
+            return False
+
+        size = self.selected_file.stat().st_size
+        dimensions = f"{width}×{height}" if width and height else "dimensiones no verificadas"
+        self.validation_var.set(f"✅ PASS · {dimensions} · {self._format_bytes(size)}")
+        return True
+
+    def prepare_asset(self):
+        if not self.selected_asset or not self.selected_file:
+            messagebox.showwarning("Falta imagen", "Selecciona primero un asset y una imagen.")
+            return
+
+        if not self.validate_image():
+            messagebox.showerror("Validación fallida", "Corrige la imagen antes de prepararla.")
+            return
+
+        repo = Path(self.path_var.get()).expanduser()
+        if not repo.is_dir():
+            messagebox.showerror("Repositorio", "Selecciona una carpeta de repositorio válida.")
+            return
+
+        destination = repo / self.selected_asset["destination"]
+        destination.parent.mkdir(parents=True, exist_ok=True)
+
+        if destination.exists():
+            replace = messagebox.askyesno(
+                "Reemplazar asset",
+                f"Ya existe:\n{destination}\n\n¿Quieres reemplazarlo?"
+            )
+            if not replace:
+                return
+
+        try:
+            shutil.copy2(self.selected_file, destination)
+            self.status_var.set(f"✅ Asset preparado: {destination}")
+            messagebox.showinfo("Listo", f"Asset colocado en:\n{destination}")
+        except OSError as exc:
+            messagebox.showerror("Error", str(exc))
+
+    def choose_repo(self):
+        path = filedialog.askdirectory(title="Seleccionar repositorio local")
+        if not path:
+            return
+        self.path_var.set(path)
+        self.config_data["repo_path"] = path
+        save_json(app_dir() / CONFIG_NAME, self.config_data)
+        self.status_var.set(f"Repositorio configurado: {path}")
+
+    def open_destination(self):
+        if not self.selected_asset:
+            return
+        repo = Path(self.path_var.get()).expanduser()
+        destination = repo / self.selected_asset["destination"]
+        folder = destination.parent
+        if not folder.exists():
+            folder.mkdir(parents=True, exist_ok=True)
+        try:
+            os.startfile(folder)
+        except AttributeError:
+            subprocess.Popen(["xdg-open", str(folder)])
+
+    def run_git(self, args):
+        repo = Path(self.path_var.get()).expanduser()
+        if not (repo / ".git").exists():
+            messagebox.showerror("Git", "La carpeta seleccionada no parece ser un repositorio Git.")
+            return None
+        try:
+            result = subprocess.run(
+                ["git", *args],
+                cwd=repo,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+            )
+            if result.returncode != 0:
+                messagebox.showerror("Git", result.stderr.strip() or "Git devolvió un error.")
+                return None
+            return result.stdout.strip()
+        except FileNotFoundError:
+            messagebox.showerror("Git", "No se encontró Git en PATH.")
+            return None
+
+    def git_status(self):
+        output = self.run_git(["status", "--short"])
+        if output is not None:
+            messagebox.showinfo("Git status", output or "Working tree limpio.")
+
+    def git_push(self):
+        if not self.run_git(["status", "--short"]) is None:
+            if messagebox.askyesno(
+                "Sincronizar",
+                "Esto hará git add, commit y push de los cambios del repositorio. ¿Continuar?"
+            ):
+                if self.run_git(["add", "."]) is None:
+                    return
+                if self.run_git(["commit", "-m", "asset: intake update"]) is None:
+                    return
+                self.run_git(["push"])
+
+        self.status_var.set("Git sincronizado.")
+
+if __name__ == "__main__":
+    app = AssetIntake()
+    app.mainloop()
