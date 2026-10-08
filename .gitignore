@@ -88,3 +88,5 @@ dmypy.json
 # Local BotImagen configuration and history
 botimagen_config.json
 botimagen_history.json
+
+generated_characters/
