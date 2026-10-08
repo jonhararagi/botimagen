@@ -280,8 +280,10 @@ class AssetIntake(tk.Tk):
             self._refresh_asset_labels()
             self.status_var.set(f"✅ Asset preparado: {destination}")
             messagebox.showinfo("Listo", f"Asset colocado en:\n{destination}")
+            return True
         except OSError as exc:
             messagebox.showerror("Error", str(exc))
+            return False
 
 
     def _refresh_asset_labels(self):
