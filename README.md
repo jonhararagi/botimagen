@@ -37,10 +37,10 @@ py app.py
 2. Seleccionar el contrato que quieres completar.
 3. Usar **COPIAR PROMPT** para llevar el prompt directamente a tu herramienta de generación.
 4. Pulsar **+ SUBIR IMAGEN**.
-3. La app muestra una vista previa.
+3. La app muestra una vista previa y el prompt completo del contrato.
 4. Se validan extensión, dimensiones y tamaño.
 5. Pulsar **PREPARAR ASSET** o **PREPARAR + SIGUIENTE** para trabajar en cadena.
-6. Los assets preparados quedan marcados con ✓ durante la sesión.
+6. Los assets preparados quedan marcados con ✓ durante la sesión y la cola respeta el filtro de búsqueda.
 7. Si el archivo ya existe en el destino configurado, la aplicación lo indica al seleccionar el asset.
 8. La imagen se copia a la ruta indicada por el manifiesto.
 9. El archivo queda listo para Git.
@@ -70,11 +70,20 @@ La aplicación no sube imágenes a un servidor propio. Trabaja localmente.
 
 La sincronización Git usa el Git instalado en el PC y las credenciales/configuración Git del usuario.
 
+## Mejoras de la iteración actual
+
+- Prompt visible en un panel propio, con copia directa al portapapeles.
+- Atajos **Ctrl+O** para seleccionar imagen y **Esc** para limpiar.
+- Cola **PREPARAR + SIGUIENTE** corregida para funcionar también con filtros.
+- Protección de **GIT PUSH**: antes del commit comprueba que solamente el asset seleccionado esté staged.
+- Catálogo ampliado con pelota, casco, Kytos común y robot de combate común.
+- Validador reutilizable en `tests/validate_manifest.py`.
+
 ## TIMER
 
-MVP implementado: ~3–5 h de trabajo estimado.
-Mejoras posteriores: ~3–6 h adicionales.
-Iteración actual: búsqueda de catálogo + copiar prompt + detección de destino existente.
+Iteración actual: ~1–2 h de implementación + ~30–60 min de prueba real en Windows.
+Siguiente bloque recomendado: ~1–2 h para drag & drop, historial de importaciones y un modo "lote" con selección múltiple.
+
 
 ## Validación automática
 
@@ -92,4 +101,4 @@ También puedes usar `Iniciar_BotImagen.bat` con doble clic. El lanzador usa el 
 
 ## Estado
 
-MVP funcional en evolución. La prueba de interfaz gráfica real todavía debe ejecutarse en un PC Windows con Python/Tkinter.
+Estado: MVP funcional en evolución. La validación estática queda automatizada en GitHub Actions; la prueba real de interfaz Tkinter todavía debe ejecutarse en un PC Windows.
