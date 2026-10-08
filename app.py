@@ -235,11 +235,10 @@ class AssetIntake(tk.Tk):
             errors.append(f"Alto incorrecto: {height}px; esperado {expected['height']}px.")
 
         max_bytes = expected.get("max_bytes")
-        if max_bytes and self.selected_file.stat().st_size > max_bytes:
-            errors.append("El archivo supera el peso máximo permitido.")
-
         try:
             size = self.selected_file.stat().st_size
+            if max_bytes and size > max_bytes:
+                errors.append("El archivo supera el peso máximo permitido.")
         except OSError as exc:
             errors.append(f"No se pudo leer el archivo: {exc}")
 
@@ -253,16 +252,16 @@ class AssetIntake(tk.Tk):
     def prepare_asset(self):
         if not self.selected_asset or not self.selected_file:
             messagebox.showwarning("Falta imagen", "Selecciona primero un asset y una imagen.")
-            return
+            return False
 
         if not self.validate_image():
             messagebox.showerror("Validación fallida", "Corrige la imagen antes de prepararla.")
-            return
+            return False
 
         repo = Path(self.path_var.get()).expanduser()
         if not repo.is_dir():
             messagebox.showerror("Repositorio", "Selecciona una carpeta de repositorio válida.")
-            return
+            return False
 
         destination = repo / self.selected_asset["destination"]
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -273,7 +272,7 @@ class AssetIntake(tk.Tk):
                 f"Ya existe:\n{destination}\n\n¿Quieres reemplazarlo?"
             )
             if not replace:
-                return
+                return False
 
         try:
             shutil.copy2(self.selected_file, destination)
