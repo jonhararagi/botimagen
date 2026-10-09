@@ -36,7 +36,6 @@ def test_rules_have_expected_categories():
     }
     assert expected.issubset(data.get("categories", {}))
     assert data["version"] == 7
-    assert data["version"] == 6
     expected_scale_patterns = {
         "dorsal_hand_scales",
         "outer_thigh_scales",
