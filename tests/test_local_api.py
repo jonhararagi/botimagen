@@ -130,6 +130,34 @@ class LocalApiTests(unittest.TestCase):
                 self.assertEqual(response.status, 200)
                 self.assertEqual(loaded["profile"]["values"]["species"], "draconica")
 
+                duplicate_payload = json.dumps({
+                    "name": "Dragonkin rojo · Copia",
+                    "profile": loaded["profile"],
+                }).encode("utf-8")
+                connection.request("POST", "/api/profiles", body=duplicate_payload, headers={"Content-Type": "application/json"})
+                response = connection.getresponse()
+                duplicate = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 201)
+                self.assertEqual(duplicate["name"], "Dragonkin rojo · Copia")
+                self.assertNotEqual(duplicate["id"], saved["id"])
+
+                connection.request("GET", "/api/profiles/" + saved["id"])
+                response = connection.getresponse()
+                original_after_copy = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(original_after_copy["name"], "Dragonkin rojo")
+                self.assertEqual(original_after_copy["profile"], loaded["profile"])
+
+                connection.request("GET", "/api/profiles")
+                response = connection.getresponse()
+                duplicated_listing = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(len(duplicated_listing["profiles"]), 2)
+                self.assertEqual(
+                    {item["id"] for item in duplicated_listing["profiles"]},
+                    {saved["id"], duplicate["id"]},
+                )
+
                 connection.request("GET", "/api/profiles/../../README.md")
                 response = connection.getresponse()
                 response.read()
