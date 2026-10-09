@@ -1,8 +1,5 @@
 name: Validate BotImagen
 
-permissions:
-  contents: write
-
 on:
   push:
     branches: [main]
@@ -37,21 +34,8 @@ jobs:
 
       - name: Install web dependencies
         working-directory: web
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build web interface
         working-directory: web
         run: npm run build
-
-      - name: Bootstrap npm lockfile once
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          if git ls-files --error-unmatch web/package-lock.json >/dev/null 2>&1; then
-            echo "package-lock.json is already tracked; no bootstrap needed."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web/package-lock.json
-          git commit -m "chore: add npm lockfile"
-          git push
