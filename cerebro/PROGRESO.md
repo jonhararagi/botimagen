@@ -35,7 +35,9 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - CI #86: PASS_REAL; test de compatibilidad AUTO de escamas entre humana/dracónica con 12 semillas y coherencia reducida: https://github.com/jonhararagi/botimagen/actions/runs/37921964365
 - CI #93: PASS_REAL; duplicación de perfil conserva el original, genera UUID distinto y crea segunda entrada en biblioteca. Pruebas del motor/API, cobertura de 46 campos, `npm ci` y build pasan: https://github.com/jonhararagi/botimagen/actions/runs/37922321639
 - Smoke test de navegador real y prueba física en Windows: **NOT_RUN**.
-- Mejora de calidad del motor: el prompt ya no menciona color de escamas cuando el patrón está fijado en `no_visible_scales`; se agregó una prueba de regresión. Es una corrección de coherencia dentro de BIMG-006, sin cambio de ponderación: total **49,2 / 100 → 49%** hasta cerrar un incremento funcional de fase.
+- Mejora del motor, **CI #99 PASS_REAL**: el prompt ya no menciona color de escamas cuando el patrón está fijado en `no_visible_scales`; prueba de regresión verde. https://github.com/jonhararagi/botimagen/actions/runs/37924780083.
+- Mejora de sincronización UI, **CI #100 PASS_REAL**: guardar/copiar/exportar se bloquea con cambios pendientes hasta regenerar; se comparan perfiles antiguos al cargarlos y los controles se bloquean durante generación. `tests/test_web_field_coverage.py` cubre el contrato estático. https://github.com/jonhararagi/botimagen/actions/runs/37925030261.
+- Ambas son correcciones de calidad, no cierre de fases ni evidencia de navegador. Progreso sin cambio: **49,2 / 100 → 49%**.
 
 ## Nota de continuidad · 2026-10-09
 
