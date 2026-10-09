@@ -1,12 +1,12 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: prueba multi-semilla de compatibilidad por especie, CI verde y continuidad, 2026-10-09.
+Última actualización de esta ficha: duplicación de perfiles locales, API testada y CI verde, 2026-10-09.
 
 ## Repositorio
 
 - HEAD BEFORE de la tarea de perfiles locales: `1a66b8eda4d6d43046973750418b4a3719f6fc09`.
 - Último commit funcional de interfaz anterior: `509eb98e2c3fb13134aa23573749f18a1c7d8270`.
-- HEAD de implementación/pruebas verificado: `6e2a0c64b239cb12ba07a0a42b534d898afeb327` (se añadió prueba AUTO de compatibilidad de escamas en 12 semillas). Este checkpoint documental añade commits posteriores; consultar `main` antes de retomar.
+- HEAD de implementación/pruebas verificado: `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d` (botón de duplicación de perfiles y estado de UI corregido). Este checkpoint documental añade commits posteriores; consultar `main` antes de retomar.
 - Para continuar, verifica siempre el HEAD real de `main`, ya que el commit documental posterior puede avanzar la referencia.
 
 - Repositorio: jonhararagi/botimagen
@@ -43,7 +43,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Los selectores cargan opciones mediante `GET /api/catalog`; las listas provienen de `character_rules.json`, no de una copia de opciones en TypeScript.
 - El botón de generar llama a `POST /api/generate` y reutiliza `CharacterGenerator`; respeta IDs manuales, AUTO, semilla y coherencia, y devuelve prompt/negative prompt oficiales.
 - `botimagen_server.py` utiliza `http.server` de la biblioteca estándar, escucha solo en `127.0.0.1:8765`, limita el cuerpo JSON, valida campos contra el catálogo y no expone rutas de archivos arbitrarias.
-- Endpoints de perfiles: `POST /api/profiles` guarda atómicamente bajo `generated_characters/web_profiles/`; `GET /api/profiles` lista; `GET /api/profiles/{uuid}` recupera. La UI permite guardar, listar y cargar perfiles. La cobertura CI existe; el smoke test real del navegador y la prueba física Windows siguen `NOT_RUN`.
+- Endpoints de perfiles: `POST /api/profiles` guarda atómicamente bajo `generated_characters/web_profiles/`; `GET /api/profiles` lista; `GET /api/profiles/{uuid}` recupera. La UI permite guardar, listar, cargar y duplicar perfiles. La duplicación recupera el perfil completo y crea un nuevo registro por `POST /api/profiles`, con UUID nuevo y sin mutar el original. CI prueba esa propiedad; el smoke test real del navegador y la prueba física Windows siguen `NOT_RUN`.
 - La silueta SVG central es un marcador temporal de interfaz, no una ilustración generada.
 - Vite redirige `/api` al motor local en desarrollo. La interfaz de producción servida desde un único launcher aún está pendiente.
 
@@ -62,15 +62,16 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-001: DONE. Dirección inicial persistida en GitHub.
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~90%). UI React/TypeScript y proxy local; `web/package-lock.json` versionado. CI #65 valida `npm ci` y el build. La prueba real de navegador/Windows no se ha ejecutado.
-- BIMG-005: PARTIAL (~60%). Editor expandido a 46 categorías y 8 pestañas; CI #82 comprueba cobertura exacta, grupos sin duplicados, instalación reproducible y build. Duplicación de perfiles y QA real aún pendientes.
+- BIMG-005: PARTIAL (~70%). Editor expandido a 46 categorías y 8 pestañas; guarda, lista, carga y duplica perfiles de forma independiente. CI #93 prueba API, motor, cobertura del editor, `npm ci` y build. QA real e interacciones visuales completas pendientes.
 - BIMG-006: PARTIAL (~20%). Catálogo v5 añade `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color` y `hair_inner_color`; motor y prompt conservan elecciones fijadas, los campos se exponen en la UI, y AUTO escala se verifica con 12 semillas para humana/dracónica.
 - BIMG-004: PARTIAL (~90%). API de catálogo/generación/perfiles y controles UI para listar/cargar integrados; smoke test físico pendiente.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
 - Evidencia CI #82: PASS_REAL para la primera integración de rasgos y cobertura de 46 categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921734995.
-- Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica, además de pruebas del motor, cobertura de 46 categorías, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
+- Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
+- Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime en navegador/Windows: NOT_RUN.
-- Progreso total ponderado hacia la beta local: 47%, calculado en `cerebro/PROGRESO.md` (47,4/100 sin redondear).
+- Progreso total ponderado hacia la beta local: 49%, calculado en `cerebro/PROGRESO.md` (49,2/100 sin redondear).
 
 ## Investigación comparativa: regla permanente
 
@@ -83,7 +84,7 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 
 1. Consultar el HEAD actual y la CI.
 2. Preparar el smoke test real de Chrome/Edge y realizar la prueba física en Windows con el entorno disponible. Mientras no se ejecute, mantener runtime como `NOT_RUN`.
-3. Continuar con BIMG-006: ampliar/pruebar compatibilidad por especie para escamas y probar múltiples semillas en modo AUTO.
-4. En BIMG-005, añadir duplicación de perfiles y completar smoke test real de navegador/Windows. Cerrar BIMG-003/BIMG-004 solo tras sus criterios funcionales y QA pertinentes.
+3. Continuar con BIMG-006: ampliar compatibilidad por especie para más patrones de escamas y cabello, con pruebas AUTO/múltiples semillas.
+4. En BIMG-005, profundizar en tests de interacción y realizar smoke test real de navegador/Windows. Cerrar BIMG-003/BIMG-004 solo tras sus criterios funcionales y QA pertinentes.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
