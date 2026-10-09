@@ -290,8 +290,26 @@ try {
     `AUTO footwear must match the manually locked tank role; got ${await footwearSelect.inputValue()}`);
   assert.ok(allowedAccessories.includes(await accessorySelect.inputValue()),
     `AUTO accessory must match the manually locked tank role; got ${await accessorySelect.inputValue()}`);
+
+  // Explicit "none" is a real design choice, not a missing value or blank prompt.
+  const outerLayerLabel = page.locator('label[for="trait-outer_layer"]');
+  const outerLayerField = outerLayerLabel.locator("xpath=../..");
+  const outerLayerLock = outerLayerField.locator("button.lock");
+  if ((await outerLayerLock.innerText()).includes("AUTO")) await outerLayerLock.click();
+  await outerLayerSelect.selectOption("none");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+  prompt = await page.locator(".prompt-panel pre").innerText();
+  assert.ok(prompt.includes("no outer layer"),
+    "Explicit no-outer-layer selection must have clear prompt semantics");
+  assert.ok(prompt.includes("Clothing:"),
+    "Selecting no outer layer must not remove unrelated clothing prompt sections");
+  assert.equal(await outerLayerSelect.inputValue(), "none",
+    "The explicit none selection must survive regeneration");
   assert.equal(await saveButton.isDisabled(), false,
-    "Saving should unlock after role-compatible outfit regeneration");
+    "A valid none selection must remain saveable");
+
+
 
   // Species-specific anatomy follows catalog constraints; manual locks remain possible.
   await page.getByRole("tab", { name: /Identidad/i }).click();
@@ -406,7 +424,7 @@ try {
     "Loading a saved profile must retain deliberately incompatible manual anatomy");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified recoverable API generation failure, strict seeds, catalog compatibility, manual overrides across save/load, stale-snapshot guards, and no page errors.");
+  console.log("PASS_REAL: Chromium verified recoverable API generation failure, strict seeds, catalog compatibility, explicit none prompt semantics, manual overrides across save/load, stale-snapshot guards, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
