@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: compatibilidad entre cortes, arreglos y longitudes de cabello, catálogo v10, 2026-10-09.
+Última actualización de esta ficha: catálogo v11, compatibilidad de vestuario por rol y E2E bidireccional, 2026-10-09.
 
 ## Repositorio
 
@@ -62,8 +62,8 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-001: DONE. Dirección inicial persistida en GitHub.
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
-- BIMG-005: PARTIAL (~75%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #127 PASS_REAL además verifica en Chromium un largo capilar fijado, selección AUTO compatible de corte/arreglo, protección por cambios pendientes y persistencia del perfil. Faltan recorridos E2E en otras pestañas, casos de error y revisión visual amplia.
-- BIMG-006: PARTIAL (~50%). Catálogo v10 mantiene 47 categorías y declara `compatible_with.hair_length` en diez cortes y diez arreglos. AUTO adapta largo/corte/arreglo desde cualquiera de las otras elecciones manuales; las selecciones manuales incompatibles se conservan. CI #124 y CI #127 PASS_REAL verifican la lógica y el recorrido UI/API real en Chromium. El API local ahora propaga `color_family` y `compatible_with` sin cambiar IDs. La prueba manual en Windows sigue pendiente.
+- BIMG-005: PARTIAL (~80%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #134 PASS_REAL comprueba en Chromium largo fijo→corte/arreglo AUTO, arreglo fijo→largo AUTO, rol tank fijo→outfit AUTO en otra pestaña, protección por cambios pendientes y restauración compatible tras guardar/duplicar/cargar. Faltan más grupos UI, errores y revisión visual amplia.
+- BIMG-006: PARTIAL (~55%). Catálogo v11 mantiene 47 categorías; `compatible_with` declara compatibilidad entre largo, corte, arreglo y outfit/rol de combate. AUTO respeta las restricciones desde cualquier elección manual relacionada, mientras que dos elecciones manuales incompatibles no se modifican. El API conserva `color_family` y `compatible_with` en todos los items que los declaran. CI #132 y CI #134 PASS_REAL; QA física en Windows sigue pendiente.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -71,7 +71,16 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **55%**, calculado en `cerebro/PROGRESO.md` (**57,0/100** sin redondear).
+- Progreso total ponderado hacia la beta local: **59%**, calculado en `cerebro/PROGRESO.md` (**58,65/100** sin redondear).
+
+## Compatibilidad de vestuario y rol de combate · catálogo v11
+
+- Se actualizó `character_rules.json` de v10 a v11, conservando 47 categorías e IDs existentes. Diez opciones de `outfit` declaran `compatible_with.combat_role`.
+- La misma lógica genérica de compatibilidad filtra vestuario AUTO cuando el rol está fijado y filtra rol AUTO cuando el vestuario está fijado. No aplica correcciones forzadas cuando ambos campos son manuales.
+- Se añadieron pruebas con 60 escenarios de rol fijado → outfit AUTO (cinco roles × doce semillas), 84 escenarios de outfit fijado → rol AUTO (siete opciones × doce semillas), validación de referencias y una combinación manual no convencional preservada.
+- `tests/test_local_api.py` recorre todas las categorías/opciones y verifica la conservación exacta de IDs, etiquetas, tags, `color_family` y `compatible_with`. **CI #131 y CI #132 PASS_REAL** para ese contrato y motor/API.
+- CI #133 detectó que el test consultaba el selector de rol mientras la pestaña Combate no estaba montada. Se corrigió el orden de navegación. **CI #134 PASS_REAL** confirma la ida y vuelta por pestañas, compatibilidad rol/vestuario, guardar/duplicar/cargar perfil y ausencia de errores JavaScript: https://github.com/jonhararagi/botimagen/actions/runs/37936099162.
+- TIMER estimado: 1–2 horas para diseño, implementación y correcciones de pruebas. BIMG-006 sube de 50% a 55%; BIMG-005 de 75% a 80%. Total ponderado **58,65 / 100 → 59%**. QA físico en Windows y mediciones de rendimiento continúan `NOT_RUN`.
 
 ## E2E ampliado: compatibilidad capilar a través de UI/API · CI #127
 
