@@ -8,6 +8,7 @@ Este directorio es la memoria operativa y la fuente de dirección técnica de la
 - **ARQUITECTURA.md**: tecnologías y límites de la arquitectura acordada.
 - **PLAN_MAESTRO.md**: fases, tareas, dependencias y TIMER estimado de cada trabajo.
 - **ESTADO_ACTUAL.md**: punto de partida verificado y funciones que todavía no deben darse por terminadas.
+- **PROGRESO.md**: porcentaje global ponderado hacia la beta local, reglas de cálculo y contribuciones de cada fase.
 
 ## Misión
 
@@ -15,9 +16,9 @@ Convertir BotImagen en un editor modular de personajes con una interfaz web inte
 
 ## Estado actual
 
-La dirección técnica y la continuidad están guardadas en GitHub. La auditoría BIMG-002 está cerrada y el primer prototipo React/TypeScript/Vite de BIMG-003 ya está implementado en `web/`. El build pasa en GitHub Actions run #56: https://github.com/jonhararagi/botimagen/actions/runs/37882017431.
+La auditoría BIMG-002 está cerrada. La UI React/TypeScript/Vite consume el catálogo y `CharacterGenerator` mediante el servicio local `botimagen_server.py`; la API valida las opciones, genera prompts y permite guardar, listar y leer perfiles locales. CI #58 pasó: https://github.com/jonhararagi/botimagen/actions/runs/37887532209.
 
-**No declarar beta ni migración completa:** la interfaz aún usa un subconjunto local temporal del catálogo, no está conectada a `character_generator.py`, no incluye la biblioteca de imágenes y no se ha probado en un navegador real/Windows. BIMG-003 permanece PARTIAL hasta que se añada `package-lock.json` y se complete ese smoke test. Después debe comenzar BIMG-004, el servicio local seguro.
+**No declarar la beta completa:** falta `package-lock.json`, la UI aún no lista/carga perfiles guardados, la biblioteca visual y el intake web no están implementados, y el smoke test en navegador/Windows sigue NOT_RUN. El progreso ponderado hacia la beta local figura en [PROGRESO.md](PROGRESO.md).
 
 ## Regla de continuidad
 

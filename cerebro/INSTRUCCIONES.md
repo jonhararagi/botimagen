@@ -21,6 +21,8 @@ Para cada tarea seguir este orden:
 
 Toda tarea de implementación debe incluir un **TIMER** en horas o días de trabajo estimado. Es una estimación de esfuerzo, no una promesa de calendario. Si una tarea se interrumpe, actualizar ESTADO_ACTUAL.md con lo completado, lo pendiente y los comandos/pruebas relevantes; al reanudar, inspeccionar de nuevo antes de continuar.
 
+**Contador obligatorio al cerrar cada tarea:** actualizar `cerebro/PROGRESO.md` con el porcentaje global ponderado de avance hacia la beta web local. Usa los pesos y la fórmula de ese documento; no inventes una subida porcentual por la cantidad de archivos escritos. Actualiza estados por fase y describe qué falta. Informa ese porcentaje en el reporte final, aunque la tarea termine bloqueada o parcial.
+
 ## Estados de evidencia
 
 - PASS_REAL: ejecución real comprobada.

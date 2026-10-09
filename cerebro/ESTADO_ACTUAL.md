@@ -1,11 +1,12 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: cierre BIMG-002 y spike web inicial, 2026-10-09.
+Última actualización de esta ficha: conexión UI/API local y pruebas CI, 2026-10-09.
 
 ## Repositorio
 
-- HEAD BEFORE de la entrega de código: 65d883824c90c3bc4637a0584ef3796c599f1aef
-- La sesión actual añade el spike web y registra la auditoría. Commit funcional: `787be57d0b224f4d9c0d6a07a0c09b17750a87f8`. Para la continuidad, consulta siempre el HEAD real de `main`, que puede incluir commits posteriores de documentación.
+- HEAD BEFORE de la entrega actual: `15e4ce38efcb630b02961203ed5257db21feda9b`.
+- Commit de código actual: `b9612adf25ef25dd6f3fdcaf5cfefdba126b6e59`.
+- Para continuar, verifica siempre el HEAD real de `main`, ya que el commit documental posterior puede avanzar la referencia.
 
 - Repositorio: jonhararagi/botimagen
 - Rama principal: main
@@ -35,39 +36,44 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Auditoría BIMG-002: `CharacterGenerator.generate()` acepta elecciones, `seed` y `coherence`; devuelve `profile`, `prompt`, `negative_prompt`, `seed`, `coherence`, estilo y justificación. Carga reglas JSON y `visual_style_catalog.json`. `app.py` concentra el shell Tkinter y el flujo de intake; el motor es reutilizable, pero la UI aún no usa un servicio HTTP.
 - GitHub Actions run #55 del HEAD anterior terminó SUCCESS: https://github.com/jonhararagi/botimagen/actions/runs/37880345143. Pasaron sintaxis Python, manifiesto, tests del generador y contrato de estilo. No es una prueba de Windows.
 
-## Implementación web inicial
+## Implementación web y API local
 
-- `web/` contiene React + TypeScript + Vite y una interfaz adaptable para escritorio/ventanas estrechas.
-- Incluye controles de ejemplo basados en IDs y etiquetas que existen en `character_rules.json`: especie, altura, constitución, proporciones, color base/patrón/color secundario del cabello, color de ojos, pupila y pose.
-- Incluye FIJO/AUTO, selección demostrativa a partir de semilla, vista de prompt de muestra, copia, exportación JSON y guardado temporal en `localStorage`.
+- `web/` contiene React + TypeScript + Vite con editor adaptable de 5 grupos: identidad, cuerpo, cabello, rostro y pose.
+- Los selectores cargan opciones mediante `GET /api/catalog`; las listas provienen de `character_rules.json`, no de una copia de opciones en TypeScript.
+- El botón de generar llama a `POST /api/generate` y reutiliza `CharacterGenerator`; respeta IDs manuales, AUTO, semilla y coherencia, y devuelve prompt/negative prompt oficiales.
+- `botimagen_server.py` utiliza `http.server` de la biblioteca estándar, escucha solo en `127.0.0.1:8765`, limita el cuerpo JSON, valida campos contra el catálogo y no expone rutas de archivos arbitrarias.
+- Endpoints de perfiles: `POST /api/profiles` guarda atomicamente bajo `generated_characters/web_profiles/`; `GET /api/profiles` lista; `GET /api/profiles/{uuid}` recupera. El frontend guarda; la lista/carga desde la UI aún está pendiente.
 - La silueta SVG central es un marcador temporal de interfaz, no una ilustración generada.
-- `web/README.md` describe comandos y límites. La CI se amplía para compilar el frontend.
+- Vite redirige `/api` al motor local en desarrollo. La interfaz de producción servida desde un único launcher aún está pendiente.
 
 ## Todavía NO implementado
 
-- Catálogo web cargado en tiempo de ejecución desde el motor: el subconjunto de `web/src/App.tsx` está copiado temporalmente.
-- Servicio HTTP local y contrato estable entre interfaz y motor.
+- `web/package-lock.json` para instalaciones reproducibles.
+- UI para listar y cargar perfiles guardados (los endpoints GET existen).
+- Prueba real en Chrome/Edge y Windows.
 - Biblioteca de referencias avanzada con SQLite, miniaturas, filtros y metadatos.
 - Comparación lado a lado de variantes.
+- Intake de assets migrado a la web.
 - Integración de generación de imágenes local.
 - Interfaz remota con acceso desde otras máquinas.
 - Empaquetado de escritorio con Tauri/Electron.
-- Prueba completa de la nueva aplicación en Chrome/Edge y Windows físico.
 
 ## Estado de la entrega actual
 
-- BIMG-001: DONE. Continuidad inicial guardada en commit 33de0c8fd08448e2767a6fa9fb0efe52895a7d6e.
-- BIMG-002: DONE. Auditoría por fuente y CI; runtime físico Windows: NOT_RUN.
-- BIMG-003: PARTIAL. Shell web creada y build de CI PASS en el run #56. Faltan `package-lock.json` y smoke test real de navegador/Windows.
-- BIMG-004: NEXT después de cerrar los pendientes de BIMG-003: API local segura que entregue al frontend el catálogo auténtico y reutilice `CharacterGenerator`.
-- Evidencia del build web: PASS_REAL en GitHub Actions run #56, commit de código `787be57d0b224f4d9c0d6a07a0c09b17750a87f8`: https://github.com/jonhararagi/botimagen/actions/runs/37882017431. Pasaron las pruebas Python, instalación de dependencias y `npm run build`.
-- Evidencia de runtime del prototipo web en navegador/Windows: NOT_RUN.
+- BIMG-001: DONE. Dirección inicial persistida en GitHub.
+- BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
+- BIMG-003: PARTIAL (~75%). UI React/TypeScript, proxy local y build CI disponibles; faltan lockfile y smoke test de navegador/Windows.
+- BIMG-004: PARTIAL (~80%). API de catálogo/generación/perfiles implementada y conectada para generación/guardado; falta UI para listar/cargar y smoke test físico.
+- Evidencia CI #58: PASS_REAL para tests Python, API local e instalación/build web en commit `b9612adf25ef25dd6f3fdcaf5cfefdba126b6e59`: https://github.com/jonhararagi/botimagen/actions/runs/37887532209.
+- Runtime en navegador/Windows: NOT_RUN.
+- Progreso total ponderado hacia la beta local: 31%, calculado en `cerebro/PROGRESO.md`.
 
 ## Próxima acción exacta
 
-1. Consultar el HEAD y la CI reales de `main`.
+1. Consultar el HEAD actual y la CI.
 2. Generar y guardar `web/package-lock.json` para instalaciones reproducibles.
-3. Hacer un smoke test real en Chrome/Edge; probar Windows cuando el entorno esté disponible. Hasta entonces, mantenerlo como NOT_RUN.
-4. Al cumplir esos pasos, marcar BIMG-003 DONE y comenzar BIMG-004: servicio local con catálogo servido desde Python, validación estricta, tests de contrato y reutilización del motor actual.
+3. Añadir a la UI un panel sencillo para listar y cargar perfiles mediante `/api/profiles`.
+4. Ejecutar un smoke test en navegador real y hacer la prueba física en Windows cuando el entorno esté disponible. Hasta entonces mantenerla NOT_RUN.
+5. Cerrar BIMG-003/BIMG-004 solo cuando se cumplan sus criterios y, después, trabajar en los campos que faltan: tamaño del busto, escamas y zonas de color de cabello.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.

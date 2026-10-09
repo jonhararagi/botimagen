@@ -20,10 +20,10 @@ Esta arquitectura no significa que la aplicación ya esté migrada. Es la direcc
 
 ### 2. Servicio local
 
-- Python reutiliza el generador y la lógica de importación existentes.
-- FastAPI + Uvicorn es la opción inicial para ofrecer endpoints locales tipados; debe confirmarse mediante un spike pequeño antes de convertirla en dependencia firme.
-- El servicio escucha en 127.0.0.1 por defecto y sirve el frontend compilado cuando corresponda.
-- Endpoints estrechos y explícitos: salud/estado, leer catálogo, generar perfil, obtener/guardar perfiles, consultar biblioteca, importar imagen y crear/recuperar miniatura.
+- Python reutiliza el generador y lógica de dominio existentes.
+- El primer puente, `botimagen_server.py`, usa `http.server` de la biblioteca estándar de Python. Se eligió después de la auditoría para evitar nuevas dependencias Python en un servicio pequeño y local; ofrece JSON/HTTP con validación explícita. FastAPI puede reconsiderarse si el contrato crece y lo justifica.
+- El servicio escucha exclusivamente en `127.0.0.1:8765`; Vite redirige `/api` en desarrollo. El servidor actual atiende la API, no sirve aún el frontend compilado para distribución.
+- Endpoints actuales: `GET /api/health`, `GET /api/catalog`, `POST /api/generate`, `GET /api/profiles`, `GET /api/profiles/{uuid}` y `POST /api/profiles`. Biblioteca de imágenes e importación de assets son endpoints futuros.
 - Validación estricta de argumentos, rutas dentro de las carpetas configuradas, límites de tamaño, errores legibles y ningún endpoint para ejecutar comandos arbitrarios.
 - La UI muestra errores y no informa éxito antes de que el servicio confirme la operación.
 

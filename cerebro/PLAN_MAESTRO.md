@@ -6,6 +6,10 @@ Una aplicación local para Windows que se abre en el navegador y permite diseña
 
 La beta inicial no requiere que BotImagen genere píxeles por sí mismo ni que la web sea accesible públicamente.
 
+## Progreso global
+
+El porcentaje ponderado de la beta local se mantiene en [`PROGRESO.md`](PROGRESO.md). El cálculo cuenta únicamente alcance de beta web local, no funciones futuras opcionales como generación neuronal.
+
 ## TIMER y alcance
 
 Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y pueden ajustarse tras inspeccionar el código y probar en Windows. Los tiempos de fase pueden solaparse parcialmente, pero no deben sumarse como garantía de calendario.
@@ -32,27 +36,25 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-003 · Spike de frontend web
 
-**Estado:** PARTIAL. Shell React/TypeScript creada; el build se añade a CI. Pendientes: `package-lock.json`, prueba real en navegador/Windows y conexión al motor por BIMG-004.  
-**TIMER:** 3–5 horas estimadas para el spike; implementación inicial realizada.  
+**Estado:** PARTIAL (~75%). Shell React/TypeScript creada, proxy `/api` configurado y UI consumiendo el catálogo y la API. Pendientes: `package-lock.json` y smoke test real en navegador/Windows.  
+**TIMER:** 3–5 horas estimadas para el spike inicial; el tiempo de integración está registrado también en BIMG-004.  
 **Trabajo:**
 - Crear un frontend TypeScript + React + Vite en una carpeta propia, sin tocar ni retirar aún la app Tkinter.
 - Añadir lint/build o comprobaciones equivalentes y una interfaz de shell adaptable.
 - Diseñar una dirección visual de estudio de personajes: panel de categorías, área central del diseño, panel de resumen y vista de prompts.
 - Configurar CI para instalar dependencias directas con versiones exactas y compilar. Pendiente antes de beta: generar y verificar `package-lock.json` reproducible.
 
-**Evidencia:** build PASS_REAL en GitHub Actions run #56 para commit `787be57d0b224f4d9c0d6a07a0c09b17750a87f8`. El smoke test real en Chrome/Edge y Windows y `package-lock.json` quedan pendientes; no existe integración con el motor todavía.
+**Evidencia:** build PASS_REAL en CI #58 para `b9612adf25ef25dd6f3fdcaf5cfefdba126b6e59`: https://github.com/jonhararagi/botimagen/actions/runs/37887532209. El smoke test real en Chrome/Edge y Windows y `package-lock.json` quedan pendientes.
 
 ### BIMG-004 · Puente web hacia el motor Python
 
-**Estado:** NOT_STARTED.  
-**TIMER:** 4–8 horas.  
-**Trabajo:**
-- Probar FastAPI + Uvicorn frente a una opción mínima.
-- Crear endpoints tipados y documentados para salud, catálogo, generación y perfiles.
-- Escuchar en 127.0.0.1 por defecto, validar datos y restringir operaciones de archivos.
-- Reutilizar CharacterGenerator en lugar de duplicar reglas en TypeScript.
+**Estado:** PARTIAL (~80%).  
+**TIMER:** 4–8 horas estimadas para el puente inicial; implementación principal ya realizada.
+**Implementado:** servicio Python de biblioteca estándar en `botimagen_server.py`; endpoints `/api/health`, `/api/catalog`, `/api/generate`, `/api/profiles` y lectura de perfil individual; validación de categorías y opciones contra el catálogo oficial; límites de tamaño y payload, semilla/coherencia validadas, guardado atómico con ID generado por el servidor y rutas restringidas a identificadores UUID; Vite proxy local y UI consumiendo catálogo, generación y guardado.
+**Evidencia:** CI #58 PASS, incluidas pruebas HTTP de catálogo, generación, reproducibilidad, rechazo de rasgos desconocidos y persistencia local: https://github.com/jonhararagi/botimagen/actions/runs/37887532209.
+**Pendiente:** UI para listar/cargar perfiles guardados, prueba real de navegador/Windows y revisión final del flujo local antes de cerrar la tarea.
 
-**Aceptación:** tests del servicio, errores controlados, perfil producido por el motor existente y prueba de contrato UI/API.
+**Criterio de aceptación final:** tests del servicio, errores controlados, perfil generado por el motor existente, integración UI/API y persistencia local; documentar el runtime físico por separado.
 
 ### BIMG-005 · Migrar el editor de rasgos
 
