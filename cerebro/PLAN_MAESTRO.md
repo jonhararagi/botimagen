@@ -40,7 +40,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - Diseñar una dirección visual de estudio de personajes: panel de categorías, área central del diseño, panel de resumen y vista de prompts.
 - Configurar CI para instalar dependencias directas con versiones exactas y compilar. Pendiente antes de beta: generar y verificar `package-lock.json` reproducible.
 
-**Aceptación:** el build del frontend debe pasar en CI. El smoke test real en Chrome/Edge y Windows queda pendiente; no se afirma todavía que exista integración con el motor.
+**Evidencia:** build PASS_REAL en GitHub Actions run #56 para commit `787be57d0b224f4d9c0d6a07a0c09b17750a87f8`. El smoke test real en Chrome/Edge y Windows y `package-lock.json` quedan pendientes; no existe integración con el motor todavía.
 
 ### BIMG-004 · Puente web hacia el motor Python
 

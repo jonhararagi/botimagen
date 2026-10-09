@@ -5,7 +5,7 @@
 ## Repositorio
 
 - HEAD BEFORE de la entrega de código: 65d883824c90c3bc4637a0584ef3796c599f1aef
-- La sesión actual añade el spike web y registra la auditoría. Para la continuidad, consulta siempre el HEAD real de `main`; el estado de esta ficha se refiere al commit funcional señalado en el reporte de entrega.
+- La sesión actual añade el spike web y registra la auditoría. Commit funcional: `787be57d0b224f4d9c0d6a07a0c09b17750a87f8`. Para la continuidad, consulta siempre el HEAD real de `main`, que puede incluir commits posteriores de documentación.
 
 - Repositorio: jonhararagi/botimagen
 - Rama principal: main
@@ -58,16 +58,16 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 
 - BIMG-001: DONE. Continuidad inicial guardada en commit 33de0c8fd08448e2767a6fa9fb0efe52895a7d6e.
 - BIMG-002: DONE. Auditoría por fuente y CI; runtime físico Windows: NOT_RUN.
-- BIMG-003: PARTIAL. Shell web creada; depende del resultado del build en GitHub Actions. Faltan `package-lock.json` y smoke test real de navegador/Windows.
+- BIMG-003: PARTIAL. Shell web creada y build de CI PASS en el run #56. Faltan `package-lock.json` y smoke test real de navegador/Windows.
 - BIMG-004: NEXT después de cerrar los pendientes de BIMG-003: API local segura que entregue al frontend el catálogo auténtico y reutilice `CharacterGenerator`.
+- Evidencia del build web: PASS_REAL en GitHub Actions run #56, commit de código `787be57d0b224f4d9c0d6a07a0c09b17750a87f8`: https://github.com/jonhararagi/botimagen/actions/runs/37882017431. Pasaron las pruebas Python, instalación de dependencias y `npm run build`.
 - Evidencia de runtime del prototipo web en navegador/Windows: NOT_RUN.
 
 ## Próxima acción exacta
 
 1. Consultar el HEAD y la CI reales de `main`.
-2. Si el build web falla, corregir TypeScript/Vite y repetir la CI.
-3. Generar y guardar `web/package-lock.json` para instalaciones reproducibles.
-4. Hacer un smoke test real en Chrome/Edge; probar Windows cuando el entorno esté disponible. Hasta entonces, mantenerlo como NOT_RUN.
-5. Al cumplir esos pasos, marcar BIMG-003 DONE y comenzar BIMG-004: servicio local con catálogo servido desde Python, validación estricta, tests de contrato y reutilización del motor actual.
+2. Generar y guardar `web/package-lock.json` para instalaciones reproducibles.
+3. Hacer un smoke test real en Chrome/Edge; probar Windows cuando el entorno esté disponible. Hasta entonces, mantenerlo como NOT_RUN.
+4. Al cumplir esos pasos, marcar BIMG-003 DONE y comenzar BIMG-004: servicio local con catálogo servido desde Python, validación estricta, tests de contrato y reutilización del motor actual.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.

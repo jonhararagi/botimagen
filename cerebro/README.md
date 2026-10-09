@@ -13,11 +13,11 @@ Este directorio es la memoria operativa y la fuente de dirección técnica de la
 
 Convertir BotImagen en un editor modular de personajes con una interfaz web interactiva que funcione localmente en Windows, reutilizando lo que ya sirve del motor Python. Debe permitir combinaciones visuales muy amplias, gestionar referencias e imágenes y mantener abierta una ruta futura hacia una aplicación de escritorio y, por separado, una experiencia web remota.
 
-## Estado de este commit
+## Estado actual
 
-Esta entrega crea la hoja de dirección técnica y la memoria de continuidad. **No implementa todavía la nueva interfaz web ni afirma que el producto beta esté terminado.**
+La dirección técnica y la continuidad están guardadas en GitHub. La auditoría BIMG-002 está cerrada y el primer prototipo React/TypeScript/Vite de BIMG-003 ya está implementado en `web/`. El build pasa en GitHub Actions run #56: https://github.com/jonhararagi/botimagen/actions/runs/37882017431.
 
-Punto de partida registrado: main en 0a23a7136632d4e66ecee5f871ea40a47ea324e4 antes de esta documentación. El siguiente trabajo es verificar el entorno, las pruebas existentes y el comportamiento actual; después se inicia el esqueleto web sin eliminar la aplicación que ya funciona.
+**No declarar beta ni migración completa:** la interfaz aún usa un subconjunto local temporal del catálogo, no está conectada a `character_generator.py`, no incluye la biblioteca de imágenes y no se ha probado en un navegador real/Windows. BIMG-003 permanece PARTIAL hasta que se añada `package-lock.json` y se complete ese smoke test. Después debe comenzar BIMG-004, el servicio local seguro.
 
 ## Regla de continuidad
 
