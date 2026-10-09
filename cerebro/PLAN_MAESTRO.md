@@ -67,7 +67,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - Añadir semilla editable, coherencia/variedad, generar, guardar, duplicar, cargar y regenerar desde un favorito.
 - Incluir el perfil inicial bw-modern-gacha-v1.
 
-**Evidencia parcial:** CI #82 valida que cada una de las 46 categorías del catálogo tenga exactamente un control de edición, que no existan campos duplicados y que los 8 grupos y pestañas coincidan; `npm ci`, generación de perfiles y build pasan.
+**Evidencia parcial:** CI #86 valida que cada una de las 46 categorías del catálogo tenga exactamente un control de edición, que no existan campos duplicados y que los 8 grupos y pestañas coincidan; `npm ci`, generación de perfiles, compatibilidad de escamas para 12 semillas por especie y build pasan.
 
 **Pendiente para cerrar:** duplicar perfiles desde la UI, reforzar pruebas de combinaciones/locks y realizar smoke test real del navegador/Windows.
 
@@ -85,7 +85,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - Primera cobertura implementada para distribución/color de escamas y zonas separadas de cabello; faltan nuevas regiones de escamas/cabello, mejoras de compatibilidad por especie y validaciones semánticas adicionales.
 - Añadir compatibilidad, exclusiones, selección AUTO y pruebas por combinación.
 
-**Evidencia parcial:** CI #82 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`: comprueba que las elecciones manuales permanecen fijadas y que busto, patrón/color de escamas, raíces, coronilla e inner hair aparecen como conceptos separados en el prompt. La prueba de cobertura exige un control UI por cada categoría del catálogo.
+**Evidencia parcial:** CI #86 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`, que comprueba elecciones fijadas y la presencia independiente de busto, patrón/color de escamas y raíces/coronilla/interior de cabello en el prompt. `test_auto_scale_pattern_respects_species_compatibility` verifica 12 semillas a coherencia 0,4: las especies humanas no reciben escamas visibles por AUTO y la especie dracónica sí recibe un patrón visible. La prueba de cobertura exige un control UI por cada categoría.
 
 **Pendiente para cerrar:** probar múltiples familias de especie y los modos AUTO con varias semillas, sumar opciones de zonas/patrones que falten y revisar compatibilidad/exclusiones. La generación de imagen no está incluida en este criterio.
 
