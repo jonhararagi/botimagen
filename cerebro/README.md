@@ -16,9 +16,9 @@ Convertir BotImagen en un editor modular de personajes con una interfaz web inte
 
 ## Estado actual
 
-La auditoría BIMG-002 está cerrada. La UI React/TypeScript/Vite consume el catálogo y `CharacterGenerator` mediante el servicio local `botimagen_server.py`; la API valida las opciones, genera prompts y permite guardar, listar y leer perfiles locales. CI #58 pasó: https://github.com/jonhararagi/botimagen/actions/runs/37887532209.
+La auditoría BIMG-002 está cerrada. La UI React/TypeScript/Vite consume el catálogo y `CharacterGenerator` mediante el servicio local `botimagen_server.py`; la API valida las opciones, genera prompts y permite guardar, listar y leer perfiles locales. CI #60 pasó, incluyendo UI de perfiles: https://github.com/jonhararagi/botimagen/actions/runs/37887835609.
 
-**No declarar la beta completa:** falta `package-lock.json`, la UI aún no lista/carga perfiles guardados, la biblioteca visual y el intake web no están implementados, y el smoke test en navegador/Windows sigue NOT_RUN. El progreso ponderado hacia la beta local figura en [PROGRESO.md](PROGRESO.md).
+**No declarar la beta completa:** faltan `package-lock.json`, la biblioteca visual, el intake web y el smoke test en navegador/Windows, que sigue NOT_RUN. El progreso ponderado hacia la beta local figura en [PROGRESO.md](PROGRESO.md).
 
 ## Regla de continuidad
 

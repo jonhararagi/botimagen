@@ -44,15 +44,15 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - Diseñar una dirección visual de estudio de personajes: panel de categorías, área central del diseño, panel de resumen y vista de prompts.
 - Configurar CI para instalar dependencias directas con versiones exactas y compilar. Pendiente antes de beta: generar y verificar `package-lock.json` reproducible.
 
-**Evidencia:** build PASS_REAL en CI #58 para `b9612adf25ef25dd6f3fdcaf5cfefdba126b6e59`: https://github.com/jonhararagi/botimagen/actions/runs/37887532209. El smoke test real en Chrome/Edge y Windows y `package-lock.json` quedan pendientes.
+**Evidencia:** build PASS_REAL en CI #60 para `509eb98e2c3fb13134aa23573749f18a1c7d8270`: https://github.com/jonhararagi/botimagen/actions/runs/37887835609. El smoke test real en Chrome/Edge y Windows y `package-lock.json` quedan pendientes.
 
 ### BIMG-004 · Puente web hacia el motor Python
 
-**Estado:** PARTIAL (~80%).  
-**TIMER:** 4–8 horas estimadas para el puente inicial; implementación principal ya realizada.
-**Implementado:** servicio Python de biblioteca estándar en `botimagen_server.py`; endpoints `/api/health`, `/api/catalog`, `/api/generate`, `/api/profiles` y lectura de perfil individual; validación de categorías y opciones contra el catálogo oficial; límites de tamaño y payload, semilla/coherencia validadas, guardado atómico con ID generado por el servidor y rutas restringidas a identificadores UUID; Vite proxy local y UI consumiendo catálogo, generación y guardado.
-**Evidencia:** CI #58 PASS, incluidas pruebas HTTP de catálogo, generación, reproducibilidad, rechazo de rasgos desconocidos y persistencia local: https://github.com/jonhararagi/botimagen/actions/runs/37887532209.
-**Pendiente:** UI para listar/cargar perfiles guardados, prueba real de navegador/Windows y revisión final del flujo local antes de cerrar la tarea.
+**Estado:** PARTIAL (~90%).  
+**TIMER:** 4–8 horas estimadas para el puente inicial; la API y la UI principal ya están conectadas.
+**Implementado:** servicio Python de biblioteca estándar en `botimagen_server.py`; endpoints `/api/health`, `/api/catalog`, `/api/generate`, `/api/profiles` y lectura por UUID; validación de categorías/opciones contra el catálogo oficial; límite de JSON, semilla/coherencia validadas, guardado atómico con ID generado por servidor y rutas restringidas a UUID; Vite proxy local; UI consume catálogo y motor, guarda perfiles, lista y carga perfiles guardados.
+**Evidencia:** CI #60 PASS, incluidas pruebas HTTP de catálogo, generación, reproducibilidad, rechazo de rasgos desconocidos y persistencia local, junto con compilación de interfaz: https://github.com/jonhararagi/botimagen/actions/runs/37887835609.
+**Pendiente:** smoke test real de navegador/Windows y revisión final del flujo local antes de cerrar la tarea.
 
 **Criterio de aceptación final:** tests del servicio, errores controlados, perfil generado por el motor existente, integración UI/API y persistencia local; documentar el runtime físico por separado.
 

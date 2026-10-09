@@ -1,11 +1,11 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: conexión UI/API local y pruebas CI, 2026-10-09.
+Última actualización de esta ficha: panel de perfiles local y progreso ponderado, 2026-10-09.
 
 ## Repositorio
 
-- HEAD BEFORE de la entrega actual: `15e4ce38efcb630b02961203ed5257db21feda9b`.
-- Commit de código actual: `b9612adf25ef25dd6f3fdcaf5cfefdba126b6e59`.
+- HEAD BEFORE de la tarea de perfiles locales: `1a66b8eda4d6d43046973750418b4a3719f6fc09`.
+- Último commit funcional: `509eb98e2c3fb13134aa23573749f18a1c7d8270`.
 - Para continuar, verifica siempre el HEAD real de `main`, ya que el commit documental posterior puede avanzar la referencia.
 
 - Repositorio: jonhararagi/botimagen
@@ -49,7 +49,6 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 ## Todavía NO implementado
 
 - `web/package-lock.json` para instalaciones reproducibles.
-- UI para listar y cargar perfiles guardados (los endpoints GET existen).
 - Prueba real en Chrome/Edge y Windows.
 - Biblioteca de referencias avanzada con SQLite, miniaturas, filtros y metadatos.
 - Comparación lado a lado de variantes.
@@ -63,17 +62,16 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-001: DONE. Dirección inicial persistida en GitHub.
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~75%). UI React/TypeScript, proxy local y build CI disponibles; faltan lockfile y smoke test de navegador/Windows.
-- BIMG-004: PARTIAL (~80%). API de catálogo/generación/perfiles implementada y conectada para generación/guardado; falta UI para listar/cargar y smoke test físico.
-- Evidencia CI #58: PASS_REAL para tests Python, API local e instalación/build web en commit `b9612adf25ef25dd6f3fdcaf5cfefdba126b6e59`: https://github.com/jonhararagi/botimagen/actions/runs/37887532209.
+- BIMG-004: PARTIAL (~90%). API de catálogo/generación/perfiles y controles UI para listar/cargar integrados; smoke test físico pendiente.
+- Evidencia CI #60: PASS_REAL en commit `509eb98e2c3fb13134aa23573749f18a1c7d8270`: https://github.com/jonhararagi/botimagen/actions/runs/37887835609.
 - Runtime en navegador/Windows: NOT_RUN.
-- Progreso total ponderado hacia la beta local: 31%, calculado en `cerebro/PROGRESO.md`.
+- Progreso total ponderado hacia la beta local: 32%, calculado en `cerebro/PROGRESO.md`.
 
 ## Próxima acción exacta
 
 1. Consultar el HEAD actual y la CI.
 2. Generar y guardar `web/package-lock.json` para instalaciones reproducibles.
-3. Añadir a la UI un panel sencillo para listar y cargar perfiles mediante `/api/profiles`.
-4. Ejecutar un smoke test en navegador real y hacer la prueba física en Windows cuando el entorno esté disponible. Hasta entonces mantenerla NOT_RUN.
-5. Cerrar BIMG-003/BIMG-004 solo cuando se cumplan sus criterios y, después, trabajar en los campos que faltan: tamaño del busto, escamas y zonas de color de cabello.
+3. Hacer un smoke test real en Chrome/Edge y una prueba física en Windows cuando el entorno esté disponible. Hasta entonces mantener runtime como NOT_RUN.
+4. Cerrar BIMG-003/BIMG-004 solo cuando se cumplan sus criterios y, después, trabajar en los campos que faltan: tamaño del busto, escamas y zonas de color de cabello.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
