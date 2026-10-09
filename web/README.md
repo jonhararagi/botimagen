@@ -6,7 +6,7 @@ La interfaz React + TypeScript consume el catálogo y el motor reales mediante e
 
 - Python 3.10+ (sin dependencias Python extra para el servidor actual).
 - Node.js 22 y npm.
-- La instalación inicial de dependencias web requiere Internet para acceder al registro npm. La app no usa APIs de IA ni servicios remotos durante la generación del perfil.
+- `package-lock.json` está versionado: `npm ci` instala el árbol fijado por el proyecto y falla si el manifiesto y el lockfile divergen. La instalación inicial requiere Internet para acceder al registro npm; la app no usa APIs de IA ni servicios remotos durante la generación del perfil.
 
 ## Ejecutar en Windows
 
@@ -24,11 +24,11 @@ El servicio escucha únicamente en `127.0.0.1:8765`. Deja esa terminal abierta.
 
 ```bat
 cd web
-npm install
+npm ci
 npm run dev
 ```
 
-Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. La configuración de Vite reenvía las solicitudes `/api` al servicio local Python. Para comprobar el frontend compilado, ejecuta `npm run build` dentro de `web/`.
+Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. La configuración de Vite reenvía las solicitudes `/api` al servicio local Python. Para comprobar el frontend compilado, ejecuta `npm run build` dentro de `web/`. La CI valida ese mismo camino con `npm ci --no-audit --no-fund` y `npm run build`.
 
 ## Funciones conectadas
 
