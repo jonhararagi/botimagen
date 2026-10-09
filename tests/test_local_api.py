@@ -256,5 +256,55 @@ class LocalApiTests(unittest.TestCase):
                 thread.join(timeout=2)
 
 
+    def test_http_rejects_unsupported_content_type_and_oversized_body(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(self.generator, Path(temp_dir)),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                # Use a fresh connection for each rejected request. In the
+                # oversized case, the declared body is intentionally not sent:
+                # the server must reject by length before reading it.
+                connection = HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=3
+                )
+                try:
+                    connection.request(
+                        "POST",
+                        "/api/generate",
+                        body=b'{"selections": {}}',
+                        headers={"Content-Type": "text/plain"},
+                    )
+                    response = connection.getresponse()
+                    payload = json.loads(response.read().decode("utf-8"))
+                    self.assertEqual(response.status, 415)
+                    self.assertIn("Content-Type", payload["error"])
+                finally:
+                    connection.close()
+
+                connection = HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=3
+                )
+                try:
+                    connection.putrequest("POST", "/api/generate")
+                    connection.putheader("Content-Type", "application/json")
+                    connection.putheader("Content-Length", str(64 * 1024 + 1))
+                    connection.endheaders()
+                    response = connection.getresponse()
+                    payload = json.loads(response.read().decode("utf-8"))
+                    self.assertEqual(response.status, 413)
+                    self.assertIn("64 KiB", payload["error"])
+                finally:
+                    connection.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
