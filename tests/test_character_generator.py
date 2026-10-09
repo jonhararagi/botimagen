@@ -35,7 +35,7 @@ def test_rules_have_expected_categories():
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
-    assert data["version"] == 14
+    assert data["version"] == 15
     expected_scale_patterns = {
         "dorsal_hand_scales",
         "outer_thigh_scales",
@@ -834,6 +834,55 @@ def test_manual_accessory_and_combat_role_locks_are_preserved():
     assert result["profile"]["accessory"] == "batting_glove"
     assert result["profile"]["combat_role"] == "control"
 
+def test_catalog_declares_valid_anatomy_species_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    species_ids = {item["id"] for item in rules["categories"]["species"]}
+    expected_categories = ("ear_style", "tail_style", "horn_style", "scale_pattern")
+    for category in expected_categories:
+        for option in rules["categories"][category]:
+            allowed = option.get("compatible_with", {}).get("species")
+            assert allowed, f"{category}.{option['id']} must declare species compatibility"
+            assert set(allowed).issubset(species_ids), (category, option["id"], allowed)
+
+
+def test_auto_anatomy_respects_species_metadata_across_seed_matrix():
+    generator = CharacterGenerator(RULES)
+    anatomy_categories = ("ear_style", "tail_style", "horn_style", "scale_pattern")
+    species_ids = [item["id"] for item in generator.categories["species"]]
+    for species in species_ids:
+        for seed in range(12):
+            result = generator.generate(
+                {"species": species},
+                seed=seed,
+                coherence=0.4,
+            )
+            for category in anatomy_categories:
+                selected_id = result["profile"][category]
+                selected = next(
+                    option for option in generator.categories[category]
+                    if option["id"] == selected_id
+                )
+                allowed = selected.get("compatible_with", {}).get("species")
+                assert allowed is not None, (category, selected_id, "missing metadata")
+                assert species in allowed, (species, seed, category, selected_id, allowed)
+
+
+def test_manual_anatomy_locks_override_species_compatibility():
+    generator = CharacterGenerator(RULES)
+    locked = {
+        "species": "humana",
+        "ear_style": "orejas_gato",
+        "tail_style": "cola_draconica",
+        "horn_style": "cuernos_oni",
+        "scale_pattern": "cheek_temple_scales",
+    }
+    for seed in (5, 41, 997):
+        result = generator.generate(locked, seed=seed)
+        for category in ("species", "ear_style", "tail_style", "horn_style", "scale_pattern"):
+            assert result["profile"][category] == locked[category], (
+                seed, category, result["profile"][category]
+            )
+
 
 if __name__ == "__main__":
     test_rules_have_expected_categories()
@@ -874,4 +923,7 @@ if __name__ == "__main__":
     test_auto_accessory_respects_manually_selected_combat_role()
     test_auto_combat_role_respects_manually_selected_accessory()
     test_manual_accessory_and_combat_role_locks_are_preserved()
+    test_catalog_declares_valid_anatomy_species_compatibility()
+    test_auto_anatomy_respects_species_metadata_across_seed_matrix()
+    test_manual_anatomy_locks_override_species_compatibility()
     test_all_catalog_compatibility_references_are_valid()

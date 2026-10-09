@@ -273,6 +273,35 @@ try {
   assert.equal(await saveButton.isDisabled(), false,
     "Saving should unlock after role-compatible outfit regeneration");
 
+  // Species-specific anatomy follows catalog constraints; manual locks remain possible.
+  await page.getByRole("tab", { name: /Identidad/i }).click();
+  const speciesLabel = page.locator('label[for="trait-species"]');
+  const speciesField = speciesLabel.locator("xpath=../..");
+  const speciesLock = speciesField.locator("button.lock");
+  const speciesSelect = speciesField.locator("select");
+  if ((await speciesLock.innerText()).includes("AUTO")) await speciesLock.click();
+  await speciesSelect.selectOption("draconica");
+  await page.getByRole("tab", { name: /Anatomía/i }).click();
+  const earSelect = page.locator('label[for="trait-ear_style"]').locator("xpath=../..").locator("select");
+  const tailSelect = page.locator('label[for="trait-tail_style"]').locator("xpath=../..").locator("select");
+  const hornSelect = page.locator('label[for="trait-horn_style"]').locator("xpath=../..").locator("select");
+  const scalesSelect = page.locator('label[for="trait-scale_pattern"]').locator("xpath=../..").locator("select");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+  for (const [category, selected] of [
+    ["ear_style", await earSelect.inputValue()],
+    ["tail_style", await tailSelect.inputValue()],
+    ["horn_style", await hornSelect.inputValue()],
+    ["scale_pattern", await scalesSelect.inputValue()],
+  ]) {
+    const option = catalog.categories[category].find(item => item.id === selected);
+    assert.ok(option?.compatible_with?.species?.includes("draconica"),
+      `AUTO ${category} must respect draconica compatibility; got ${selected}`);
+  }
+  assert.equal(await speciesSelect.inputValue(), "draconica",
+    "The selected species lock must survive anatomy regeneration");
+
+
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const profileSummary = page.locator(".saved-profile-panel summary");
   await profileSummary.waitFor({ state: "visible" });
@@ -333,7 +362,7 @@ try {
     "Loaded profile should retain an accessory compatible with its restored combat role");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified malformed/out-of-range seed rejection, max-safe seed acceptance, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility, combat-role/outfit/outer-layer/footwear/prop compatibility including accessories, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified strict seeds, hair compatibility, species-specific AUTO anatomy, combat-role compatibility across outfit/prop/layer/footwear/accessory, profile save/duplicate/load, stale-snapshot guards, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);

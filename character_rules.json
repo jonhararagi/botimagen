@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -4842,6 +4842,13 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "humana",
+            "oni",
+            "androide"
+          ]
         }
       },
       {
@@ -4865,6 +4872,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_gato"
+          ]
         }
       },
       {
@@ -4888,6 +4900,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_zorro"
+          ]
         }
       },
       {
@@ -4911,6 +4928,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_lobo"
+          ]
         }
       },
       {
@@ -4934,6 +4956,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_conejo"
+          ]
         }
       },
       {
@@ -4957,6 +4984,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "elfa"
+          ]
         }
       },
       {
@@ -4980,6 +5012,11 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5003,6 +5040,11 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "androide"
+          ]
         }
       },
       {
@@ -5026,6 +5068,12 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_gato",
+            "kemonomimi_lobo"
+          ]
         }
       },
       {
@@ -5049,6 +5097,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "espiritu"
+          ]
         }
       }
     ],
@@ -5073,6 +5126,14 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "humana",
+            "elfa",
+            "oni",
+            "androide"
+          ]
         }
       },
       {
@@ -5096,6 +5157,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_gato"
+          ]
         }
       },
       {
@@ -5119,6 +5185,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_zorro"
+          ]
         }
       },
       {
@@ -5142,6 +5213,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_lobo"
+          ]
         }
       },
       {
@@ -5165,6 +5241,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_conejo"
+          ]
         }
       },
       {
@@ -5188,6 +5269,11 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5211,6 +5297,11 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "androide"
+          ]
         }
       },
       {
@@ -5234,6 +5325,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "espiritu"
+          ]
         }
       },
       {
@@ -5257,6 +5353,12 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "kemonomimi_zorro",
+            "espiritu"
+          ]
         }
       },
       {
@@ -5280,6 +5382,13 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "oni",
+            "draconica",
+            "espiritu"
+          ]
         }
       }
     ],
@@ -5304,6 +5413,18 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "humana",
+            "kemonomimi_gato",
+            "kemonomimi_zorro",
+            "kemonomimi_lobo",
+            "kemonomimi_conejo",
+            "elfa",
+            "androide",
+            "espiritu"
+          ]
         }
       },
       {
@@ -5327,6 +5448,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "oni"
+          ]
         }
       },
       {
@@ -5350,6 +5476,11 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5373,6 +5504,11 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5396,6 +5532,11 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "androide"
+          ]
         }
       },
       {
@@ -5419,6 +5560,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "espiritu"
+          ]
         }
       },
       {
@@ -5442,6 +5588,12 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "oni",
+            "draconica"
+          ]
         }
       },
       {
@@ -5465,6 +5617,11 @@
           "species:draconica": -5,
           "species:androide": -5,
           "species:espiritu": 7
+        },
+        "compatible_with": {
+          "species": [
+            "espiritu"
+          ]
         }
       },
       {
@@ -5488,6 +5645,12 @@
           "species:draconica": 7,
           "species:androide": -5,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "oni",
+            "draconica"
+          ]
         }
       },
       {
@@ -5511,6 +5674,11 @@
           "species:draconica": -5,
           "species:androide": 7,
           "species:espiritu": -5
+        },
+        "compatible_with": {
+          "species": [
+            "androide"
+          ]
         }
       }
     ],
@@ -5826,6 +5994,19 @@
           "species:draconica": -4,
           "species:androide": 3,
           "species:espiritu": 3
+        },
+        "compatible_with": {
+          "species": [
+            "humana",
+            "kemonomimi_gato",
+            "kemonomimi_zorro",
+            "kemonomimi_lobo",
+            "kemonomimi_conejo",
+            "elfa",
+            "oni",
+            "androide",
+            "espiritu"
+          ]
         }
       },
       {
@@ -5849,6 +6030,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5872,6 +6058,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5895,6 +6086,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5918,6 +6114,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5942,6 +6143,11 @@
           "species:draconica": 3,
           "species:androide": -3,
           "species:espiritu": -3
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5966,6 +6172,11 @@
           "species:draconica": 3,
           "species:androide": -1,
           "species:espiritu": -1
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -5990,6 +6201,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -6014,6 +6230,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -6038,6 +6259,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       },
       {
@@ -6062,6 +6288,11 @@
           "species:draconica": 3,
           "species:androide": -2,
           "species:espiritu": -2
+        },
+        "compatible_with": {
+          "species": [
+            "draconica"
+          ]
         }
       }
     ],
