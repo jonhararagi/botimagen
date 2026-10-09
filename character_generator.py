@@ -178,17 +178,17 @@ class CharacterGenerator:
             inner = chosen.get("hair_inner_color", "auto")
             tip = chosen.get("hair_tip_color", "auto")
             if root not in {"auto", "matching_base"}:
-                score += 2.2 if candidate_id == "raices_contraste" else 0.0
+                score += 6.0 if candidate_id == "raices_contraste" else 0.0
                 if candidate_id == "color_solido":
-                    score -= 0.6
+                    score -= 1.5
             if inner not in {"auto", "matching_base"}:
-                score += 2.2 if candidate_id == "capa_interior" else 0.0
+                score += 6.0 if candidate_id == "capa_interior" else 0.0
                 if candidate_id == "color_solido":
                     score -= 0.6
             if tip not in {"auto", "matching_base"}:
-                score += 1.8 if candidate_id in tip_patterns else 0.0
+                score += 5.0 if candidate_id in tip_patterns else 0.0
                 if candidate_id == "color_solido":
-                    score -= 0.8
+                    score -= 1.5
             if (
                 secondary_family
                 and base_family
