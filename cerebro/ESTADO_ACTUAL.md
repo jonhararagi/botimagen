@@ -202,7 +202,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 La investigación de aplicaciones y proyectos similares queda integrada al protocolo de Cerebro. Objetivo: aprender arquitectura, patrones de UX, rendimiento, errores habituales, causas raíz, soluciones y lecciones de mantenimiento, y convertirlas en decisiones verificables para BotImagen, sin copiar identidad, código o activos ajenos.
 
 - Método, límites de uso, registro de fuentes y plantilla: [`cerebro/INVESTIGACION_COMPARATIVA.md`](INVESTIGACION_COMPARATIVA.md).
-- El protocolo compara soluciones y registra evidencia, sin copiar activos propietarios. En la tarea de rasgos actual no se hizo búsqueda externa porque se resolvió mediante contratos y código existentes; la consulta comparativa queda `NOT_RUN` para este incremento.
+- BIMG-RESEARCH-001 se completó en la sesión del 2026-10-09: comparación inicial de Avataaars Generator (React web, exportación, componente reutilizable y licencia MIT del código) y Photoshot (stack de IA remota con PostgreSQL/S3/Replicate/Stripe; licencia del repo no verificada). Conclusión: conservar la beta local-first, mantener el intake desacoplado y la generación neuronal opcional. Se registraron fuentes, límites y cuestiones NOT_RUN en `cerebro/INVESTIGACION_COMPARATIVA.md`. No se cambió código de producto ni se aumenta el porcentaje por investigación sola.
 
 ## Próxima acción exacta
 

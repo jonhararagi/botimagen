@@ -74,3 +74,5 @@ Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES
 3. Ejecutar prueba física en Windows, revisar rutas con acentos/espacios y medir RAM/tiempos.
 
 Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse para aparentar avance; solo revisarlos si cambia de forma aprobada el alcance de la beta, documentando la razón.
+
+- BIMG-RESEARCH-001 (2026-10-09): investigación inicial de dos generadores de avatares documentada con fuentes y límites en `cerebro/INVESTIGACION_COMPARATIVA.md`. Decisión: evitar servicios de nube/cuentas en la beta local-first; mantener el intake y la generación neuronal como módulos separados. **El porcentaje no cambia**: investigación sin cambio funcional no cierra criterios de fase. HEAD de código base consultado: `10773b3ac0336697318df8f14cad2c0aeabe256c`.

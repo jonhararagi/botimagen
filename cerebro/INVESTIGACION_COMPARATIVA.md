@@ -81,3 +81,38 @@ Copia esta estructura al registrar cada estudio:
 ## Regla de decisión
 
 Investigar lo suficiente para reducir un riesgo concreto, no para aplazar la entrega. Si no existe evidencia fiable, registrar la incertidumbre. Toda propuesta adoptada debe transformarse en una tarea con alcance, TIMER, criterios de aceptación y pruebas; el cambio solo se considera terminado después de verificarlo y persistirlo en GitHub.
+
+---
+
+## BIMG-RESEARCH-001 · Editor de avatares modular vs. generador de IA en la nube
+
+- **Fecha de consulta:** 2026-10-09.
+- **Pregunta:** ¿Qué patrones de producto ayudan a diseñar un creador de personajes modular sin introducir dependencias de nube, costes recurrentes o deuda innecesaria?
+- **Restricciones BotImagen:** Windows local-first, hardware modesto, rasgos independientes, perfiles persistentes y futuro intake de imágenes. No copiar identidad visual, personajes, activos ni código ajeno.
+- **TIMER:** 5–10 minutos de exploración inicial; esto no sustituye una revisión completa de licencias, seguridad o issues.
+
+### Referencia A · Avataaars Generator
+
+- **Fuentes consultadas:** [README](https://github.com/fangpenlin/avataaars-generator/blob/master/README.md), [package.json](https://github.com/fangpenlin/avataaars-generator/blob/master/package.json), [LICENSE](https://github.com/fangpenlin/avataaars-generator/blob/master/LICENSE).
+- **HECHO OBSERVADO:** el README describe una aplicación web React para crear avatares y enlaza un componente reutilizable separado. El manifiesto contiene comandos separados de start/build/test y una dependencia file-saver; la licencia de código visible es MIT.
+- **HECHO OBSERVADO:** el manifiesto muestra un stack de generaciones anteriores (React 17, react-scripts-ts, Bootstrap 4 y TypeScript 4.3). Esto describe las versiones declaradas, no demuestra por sí solo una vulnerabilidad ni el estado actual de mantenimiento.
+- **INTERPRETACIÓN:** un editor visual y el componente que representa el avatar pueden ser límites distintos. Exportar el resultado debe ser un flujo explícito, no una operación oculta dentro del generador.
+- **Aplicabilidad:** BotImagen ya separa controles de rasgos, motor y prompts. Para el futuro intake conviene mantener separadas la selección/validación del archivo, la vista previa y la escritura final en el destino.
+- **Límite de licencia:** la licencia MIT consultada corresponde al código de ese repositorio. No se verificó la licencia de todos los recursos visuales asociados; no importar ilustraciones ni copiar su composición.
+
+### Referencia B · Photoshot
+
+- **Fuentes consultadas:** [README](https://github.com/premieroctet/photoshot/blob/main/README.md), [package.json](https://github.com/premieroctet/photoshot/blob/main/package.json). La consulta de LICENSE devolvió 404; la licencia del repositorio queda **NO VERIFICADA**.
+- **HECHO OBSERVADO:** el README lo describe como un generador web de avatares con IA. Su stack declara Next.js, Chakra UI, Prisma, Replicate, Stripe y Flux; también documenta PostgreSQL, almacenamiento S3, autenticación y variables secretas de proveedores.
+- **INTERPRETACIÓN:** esa arquitectura responde a un producto remoto con cuentas, almacenamiento y servicios de generación. No es una plantilla adecuada para la beta local-first de BotImagen: sumaría red, credenciales, servicios y costes que no son necesarios para el editor de perfiles.
+- **Patrón transferible:** documentar explícitamente cada dependencia externa y cada secreto; la generación de imágenes debe quedar como capacidad opcional separada, nunca como requisito para abrir el editor o guardar un perfil.
+- **Límite:** se inspeccionaron README y manifiesto, no se ejecutó la aplicación ni se auditaron sus issues, incidentes o dependencias. No se afirma haber encontrado bugs reproducibles.
+
+### Decisión para BotImagen
+
+- **ADAPTAR:** conservar el editor local y sus contratos de rasgos; diseñar el futuro intake como un flujo local separado y con validación explícita; mantener cualquier motor neuronal detrás de una integración opcional.
+- **DESCARTAR:** adoptar la arquitectura de Photoshot con cuentas, Stripe, S3 y servicio de inferencia remoto para la beta.
+- **NO ADOPTAR:** copiar componentes visuales, ilustraciones, personajes o la composición de ninguna de las referencias.
+- **Prueba de validación:** no se cambió código de producto en esta investigación. El criterio queda para la futura tarea BIMG-008: importar un archivo de prueba, validar/rechazar formatos, conservar intacto el original y registrar el destino local sin red ni credenciales.
+- **Estado final:** INVESTIGACIÓN INICIAL COMPLETADA; auditoría de issues/seguridad, ejecución local y comprobación de licencias de recursos visuales NOT_RUN.
+- **Impacto en progreso:** ninguno; investigar no cierra criterios de aceptación ni aumenta el porcentaje de la beta.
