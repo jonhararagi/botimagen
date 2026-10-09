@@ -59,7 +59,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-005 · Migrar el editor de rasgos
 
-**Estado:** PARTIAL (~70%). El editor ofrece 46 rasgos del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. Quedan pendientes QA real en navegador/Windows y una cobertura más profunda de interacciones/recuperación de errores.  
+**Estado:** PARTIAL (~75%). El editor ofrece 47 categorías del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. CI #127 valida desde Chromium headless que un largo fijado restringe corte y arreglo AUTO a metadatos compatibles y que el perfil guardado/duplicado/cargado conserva las elecciones. Quedan más recorridos por pestañas, errores y QA física en Windows.  
 **TIMER:** 1–3 días.  
 **Trabajo:**
 - Implementar las pestañas IDENTIDAD, CUERPO, ANATOMÍA, CARA, CABELLO, VESTUARIO, COMBATE y DETALLE. **Completado:** las ocho pestañas cubren las 46 categorías actuales de `character_rules.json`, cada una con un único control individual.
@@ -68,7 +68,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - **Completado:** semilla editable, coherencia, generación, guardar, cargar y duplicar perfiles; la acción generar regenera cualquier perfil cargado.
 - Incluir el perfil inicial bw-modern-gacha-v1.
 
-**Evidencia parcial:** CI #93 valida las 46 categorías, los 8 grupos, motor/API, `npm ci` y build. La prueba HTTP de perfiles verifica UUID independiente, copia de datos y que el original no sea alterado. CI #86 también comprueba compatibilidad AUTO de escamas en 12 semillas por especie.
+**Evidencia parcial:** CI #93 valida cobertura del editor, motor/API, `npm ci` y build. CI #127 PASS_REAL verifica en Chromium los cambios pendientes, compatibilidad de largo/corte/arreglo a través del API local y el ciclo guardar/duplicar/cargar. La prueba HTTP de perfiles verifica UUID independiente, copia de datos y que el original no sea alterado. CI #86 también comprueba compatibilidad AUTO de escamas en 12 semillas por especie.
 
 **Pendiente para cerrar:** mejorar pruebas de interacciones completas y errores de UI, y realizar smoke test real del navegador/Windows.
 
