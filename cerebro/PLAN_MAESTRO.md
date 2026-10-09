@@ -36,15 +36,15 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-003 · Spike de frontend web
 
-**Estado:** PARTIAL (~75%). Shell React/TypeScript creada, proxy `/api` configurado y UI consumiendo el catálogo y la API. Pendientes: `package-lock.json` y smoke test real en navegador/Windows.  
+**Estado:** PARTIAL (~90%). Shell React/TypeScript, proxy `/api`, conexión a catálogo/API y `web/package-lock.json` están implementados. CI usa `npm ci` y el build pasa. El smoke test real de navegador/Windows sigue pendiente y se mantiene en BIMG-009.  
 **TIMER:** 3–5 horas estimadas para el spike inicial; el tiempo de integración está registrado también en BIMG-004.  
 **Trabajo:**
 - Crear un frontend TypeScript + React + Vite en una carpeta propia, sin tocar ni retirar aún la app Tkinter.
 - Añadir lint/build o comprobaciones equivalentes y una interfaz de shell adaptable.
 - Diseñar una dirección visual de estudio de personajes: panel de categorías, área central del diseño, panel de resumen y vista de prompts.
-- Configurar CI para instalar dependencias directas con versiones exactas y compilar. Pendiente antes de beta: generar y verificar `package-lock.json` reproducible.
+- Configurar CI para instalar dependencias reproducibles desde `package-lock.json` mediante `npm ci` y compilar.
 
-**Evidencia:** build PASS_REAL en CI #60 para `509eb98e2c3fb13134aa23573749f18a1c7d8270`: https://github.com/jonhararagi/botimagen/actions/runs/37887835609. El smoke test real en Chrome/Edge y Windows y `package-lock.json` quedan pendientes.
+**Evidencia:** CI #65 `PASS_REAL` en `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`: `npm ci` y `npm run build` pasaron junto a las pruebas Python. https://github.com/jonhararagi/botimagen/actions/runs/37920504103. El smoke test real en Chrome/Edge y Windows sigue pendiente.
 
 ### BIMG-004 · Puente web hacia el motor Python
 
