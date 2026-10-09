@@ -926,7 +926,7 @@ def test_explicit_none_outer_layer_has_clear_prompt_semantics():
 
     assert result["profile"]["outer_layer"] == "none"
     assert "no outer layer" in result["prompt"]
-    assert "headband" in result["prompt"].lower()
+    assert "vincha deportiva" in result["prompt"].lower()
     assert "tactical baseball combat suit" in result["prompt"].lower()
 
 if __name__ == "__main__":
