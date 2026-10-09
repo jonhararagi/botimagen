@@ -29,10 +29,31 @@ class LocalApiTests(unittest.TestCase):
         self.assertIn("hair_color_pattern", catalog["categories"])
         self.assertIn("hair_tip_color", catalog["categories"])
         self.assertEqual(catalog["catalog_version"], 10)
-        self.assertEqual(
-            catalog["categories"]["hair"],
-            [{"id": item["id"], "label": item["label"], "tags": item.get("tags", [])}
-             for item in self.generator.categories["hair"]],
+        expected_hair = []
+        for item in self.generator.categories["hair"]:
+            public_item = {
+                "id": item["id"],
+                "label": item["label"],
+                "tags": item.get("tags", []),
+            }
+            if "color_family" in item:
+                public_item["color_family"] = item["color_family"]
+            if "compatible_with" in item:
+                public_item["compatible_with"] = item["compatible_with"]
+            expected_hair.append(public_item)
+        self.assertEqual(catalog["categories"]["hair"], expected_hair)
+
+        long_style = next(
+            item for item in catalog["categories"]["hairstyle"]
+            if item["id"] == "long_straight"
+        )
+        self.assertIn("extra_largo", long_style["compatible_with"]["hair_length"])
+        self.assertIn(
+            "pixie",
+            next(
+                item for item in catalog["categories"]["hair_arrangement"]
+                if item["id"] == "suelto"
+            )["compatible_with"]["hair_length"],
         )
 
     def test_generate_returns_official_engine_output(self):

@@ -24,12 +24,33 @@ class ApiInputError(ValueError):
         self.status = status
 
 
+def _public_catalog_option(entry: dict[str, Any]) -> dict[str, Any]:
+    option: dict[str, Any] = {
+        "id": entry["id"],
+        "label": entry["label"],
+        "tags": list(entry.get("tags", [])),
+    }
+    color_family = entry.get("color_family")
+    if isinstance(color_family, str):
+        option["color_family"] = color_family
+
+    compatible_with = entry.get("compatible_with")
+    if isinstance(compatible_with, dict):
+        constraints = {
+            category: list(values)
+            for category, values in compatible_with.items()
+            if isinstance(category, str)
+            and isinstance(values, list)
+            and all(isinstance(value, str) for value in values)
+        }
+        if constraints:
+            option["compatible_with"] = constraints
+    return option
+
+
 def make_catalog(generator: CharacterGenerator) -> dict[str, Any]:
     categories = {
-        key: [
-            {"id": entry["id"], "label": entry["label"], "tags": list(entry.get("tags", []))}
-            for entry in entries
-        ]
+        key: [_public_catalog_option(entry) for entry in entries]
         for key, entries in generator.categories.items()
     }
     return {

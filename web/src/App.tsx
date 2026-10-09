@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
 type FieldId = string;
-type CatalogOption = { id:string; label:string; tags:string[] };
+type CatalogOption = { id:string; label:string; tags:string[]; color_family?:string; compatible_with?:Record<string,string[]> };
 type Catalog = { schema_version:number; catalog_version:number; style:{id:string;name:string;version:number}; categories:Record<string,CatalogOption[]>; trait_labels:Record<string,string>; auto_value:"auto" };
 type Field = { id:FieldId; group:Group; label:string; initial:string; fixed:boolean; note:string };
 type GeneratedCharacter = { version:number; style_id:string; style_name:string; profile:Record<string,string>; labels:Record<string,string>; rationale:string; style_direction:string; prompt:string; negative_prompt:string; seed:number|null; coherence:number; surprise:boolean };
