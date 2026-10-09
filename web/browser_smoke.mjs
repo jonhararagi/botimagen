@@ -128,15 +128,16 @@ try {
     "Regeneration should update the prompt to the new tip color");
   assert.equal(await saveButton.isDisabled(), false, "Saving should unlock after successful regeneration");
 
+  const profileSummary = page.locator(".saved-profile-panel summary");
+  await profileSummary.waitFor({ state: "visible" });
+  const initialCount = Number((await profileSummary.innerText()).match(/\((\d+)\)/)?.[1] ?? 0);
+
   await saveButton.click();
   await page.waitForFunction(
     () => document.querySelector(".main-footer")?.textContent?.includes("Perfil guardado en generated_characters/web_profiles"),
     undefined,
     { timeout: 10000 },
   );
-  const profileSummary = page.locator(".saved-profile-panel summary");
-  await profileSummary.waitFor({ state: "visible" });
-  const initialCount = Number((await profileSummary.innerText()).match(/\((\d+)\)/)?.[1] ?? 0);
   await page.waitForFunction(
     count => Number(document.querySelector(".saved-profile-panel summary")?.textContent?.match(/\((\d+)\)/)?.[1] ?? 0) === count + 1,
     initialCount,
