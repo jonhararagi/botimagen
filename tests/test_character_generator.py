@@ -318,7 +318,23 @@ def test_auto_hair_zone_colors_follow_distribution_without_breaking_manual_locks
         seed=913,
         coherence=0.9,
     )
-    assert solid["profile"]["hair_tip_color"] == "matching_base"
+    selected_tip = solid["profile"]["hair_tip_color"]
+    tip_prompt = next(
+        item["prompt_en"] for item in generator.categories["hair_tip_color"]
+        if item["id"] == selected_tip
+    )
+    assert tip_prompt in solid["prompt"], "The selected tip zone and generated prompt must stay synchronized"
+
+    solid_with_contrast = generator.generate(
+        {
+            "hair": "rojo_coral",
+            "hair_color_pattern": "color_solido",
+            "hair_tip_color": "turquoise",
+        },
+        seed=915,
+    )
+    assert solid_with_contrast["profile"]["hair_tip_color"] == "turquoise"
+    assert "turquoise color confined to the hair tips with a clean transition" in solid_with_contrast["prompt"]
 
     locked = generator.generate(
         {
