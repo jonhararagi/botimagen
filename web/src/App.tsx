@@ -7,6 +7,8 @@ type CatalogOption = { id:string; label:string; tags:string[] };
 type Catalog = { schema_version:number; catalog_version:number; style:{id:string;name:string;version:number}; categories:Record<string,CatalogOption[]>; trait_labels:Record<string,string>; auto_value:"auto" };
 type Field = { id:FieldId; group:Group; label:string; initial:string; note:string };
 type GeneratedCharacter = { version:number; style_id:string; style_name:string; profile:Record<string,string>; labels:Record<string,string>; rationale:string; style_direction:string; prompt:string; negative_prompt:string; seed:number|null; coherence:number; surprise:boolean };
+type SavedProfileSummary = { id:string; name:string; saved_at:string; style_id:string; seed:number|null };
+type SavedProfileRecord = { id:string; name:string; saved_at:string; style_id:string; seed:number|null; profile:{ selections?:Record<string,string>; generated?:GeneratedCharacter; seed?:number|null; coherence?:number; style_id?:string } };
 
 const fields:Field[]=[
  {id:"species",group:"identity",label:"Especie",initial:"draconica",note:"Familia anatómica principal."},
@@ -51,6 +53,8 @@ export default function App(){
  const [saved,setSaved]=useState(false);
  const [loadingCatalog,setLoadingCatalog]=useState(true);
  const [generating,setGenerating]=useState(false);
+ const [savedProfiles,setSavedProfiles]=useState<SavedProfileSummary[]>([]);
+ const [loadingProfiles,setLoadingProfiles]=useState(false);
 
  useEffect(()=>{
   const controller=new AbortController();
@@ -63,7 +67,12 @@ export default function App(){
     const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialValues,seed:314159,coherence:.82,surprise:false}),signal:controller.signal});
     const result=await jsonResponse<GeneratedCharacter>(response);
     if(controller.signal.aborted)return;
-    setGenerated(result);setStatus("Motor Python conectado · "+result.style_name+" · semilla "+result.seed);
+    setGenerated(result);
+    const profilesResponse=await fetch("/api/profiles",{signal:controller.signal});
+    const profileList=await jsonResponse<{profiles:SavedProfileSummary[]}>(profilesResponse);
+    if(controller.signal.aborted)return;
+    setSavedProfiles(profileList.profiles);
+    setStatus("Motor Python conectado · "+result.style_name+" · semilla "+result.seed);
    }catch(error){
     if(controller.signal.aborted)return;
     setLoadingCatalog(false);setStatus(error instanceof Error?error.message+" Inicia el servidor local y vuelve a cargar.":"No se pudo conectar con la API local.");
@@ -93,6 +102,42 @@ export default function App(){
    setSaved(false);setStatus("Perfil generado por Python · semilla "+result.seed+" · "+result.style_name);
   }catch(error){setStatus(error instanceof Error?error.message:"El motor local no pudo generar el perfil.")}finally{setGenerating(false)}
  }
+ async function refreshProfiles(){
+  setLoadingProfiles(true);
+  try{
+   const response=await fetch("/api/profiles");
+   const list=await jsonResponse<{profiles:SavedProfileSummary[]}>(response);
+   setSavedProfiles(list.profiles);
+   setStatus("Lista de perfiles locales actualizada.");
+  }catch(error){setStatus(error instanceof Error?error.message:"No se pudo listar los perfiles locales.")}finally{setLoadingProfiles(false)}
+ }
+ async function loadProfile(profileId:string){
+  try{
+   const response=await fetch("/api/profiles/"+encodeURIComponent(profileId));
+   const record=await jsonResponse<SavedProfileRecord>(response);
+   const selections=record.profile.selections??{};
+   const profileResult=record.profile.generated??null;
+   const nextValues={...values};
+   const nextFixed={...fixed};
+   for(const field of fields){
+    const value=selections[field.id];
+    if(value==="auto"){
+     nextFixed[field.id]=false;
+     const resolved=profileResult?.profile[field.id];
+     if(resolved)nextValues[field.id]=resolved;
+    }else if(typeof value==="string"&&catalog?.categories[field.id]?.some(option=>option.id===value)){
+     nextFixed[field.id]=true;
+     nextValues[field.id]=value;
+    }
+   }
+   setValues(nextValues);setFixed(nextFixed);
+   if(profileResult)setGenerated(profileResult);
+   setSeed(String(profileResult?.seed??record.profile.seed??314159));
+   setCoherence(profileResult?.coherence??record.profile.coherence??.82);
+   setSaved(true);
+   setStatus("Perfil cargado desde la biblioteca local: "+record.name);
+  }catch(error){setStatus(error instanceof Error?error.message:"No se pudo cargar el perfil local.")}
+ }
  function reset(){setValues(initialValues);setFixed(initialFixed);setSeed("314159");setCoherence(.82);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")}
  async function saveProfile(){
   if(!generated){setStatus("Genera un perfil antes de guardarlo.");return}
@@ -100,7 +145,8 @@ export default function App(){
   const name=[labelFor(catalog,"species",values.species),labelFor(catalog,"hair",values.hair),labelFor(catalog,"eyes",values.eyes)].join(" · ");
   try{
    const response=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,profile})});
-   const savedProfile=await jsonResponse<{id:string;name:string}>(response);
+   const savedProfile=await jsonResponse<SavedProfileSummary>(response);
+   setSavedProfiles(previous=>[savedProfile,...previous.filter(item=>item.id!==savedProfile.id)]);
    setSaved(true);setStatus("Perfil guardado en generated_characters/web_profiles · "+savedProfile.name);
   }catch(error){setStatus(error instanceof Error?error.message:"No se pudo guardar el perfil en el disco local.")}
  }
@@ -164,6 +210,11 @@ export default function App(){
       <div className="seed-row"><span><b>SEMILLA DEL GENERADOR</b><small>La semilla se envía al motor Python real.</small></span><input aria-label="Semilla del generador" value={seed} inputMode="numeric" onChange={event=>setSeed(event.target.value.replace(/[^0-9-]/g,"").slice(0,15))}/></div>
       <div className="seed-row"><span><b>COHERENCIA · {Math.round(coherence*100)}%</b><small>Controla las alternativas elegidas en AUTO.</small></span><input aria-label="Coherencia" type="range" min="0" max="100" value={Math.round(coherence*100)} onChange={event=>setCoherence(Number(event.target.value)/100)}/></div>
       <button className="btn primary wide" type="button" disabled={!catalog||generating} onClick={()=>void generateProfile()}>{generating?"Generando…":"✦ Generar perfil con motor local"} <span>→</span></button>
+      <details className="saved-profile-panel">
+       <summary>Perfiles locales ({savedProfiles.length})</summary>
+       <button className="btn muted refresh-profiles" type="button" disabled={loadingProfiles} onClick={()=>void refreshProfiles()}>{loadingProfiles?"Actualizando…":"Actualizar lista"}</button>
+       {savedProfiles.length===0?<p className="saved-profile-empty">Aún no hay perfiles guardados. Genera uno y pulsa Guardar perfil local.</p>:<div className="saved-profile-list">{savedProfiles.map(item=><button className="saved-profile-item" key={item.id} type="button" onClick={()=>void loadProfile(item.id)}><strong>{item.name}</strong><small>{item.style_id||"Estilo sin etiqueta"} · semilla {item.seed??"AUTO"}</small></button>)}</div>}
+      </details>
      </div>
      <div className="prompt-panel"><div className="kicker"><span><i>03</i> DESCRIPCIÓN DEL DISEÑO</span><small>{generated?"MOTOR PYTHON":"ESPERANDO MOTOR"}</small></div><pre>{showNegative?prompt+"\n\nNEGATIVE PROMPT:\n"+negative:prompt}</pre><div className="prompt-actions"><button type="button" className="btn muted" onClick={()=>setShowNegative(v=>!v)}>{showNegative?"Ocultar negativo":"Ver negative prompt"}</button><button type="button" className="btn copy" onClick={()=>void copyPrompt()}>Copiar texto ↗</button><button type="button" className="btn muted" onClick={exportJson}>Exportar JSON</button></div>{generated&&<details className="rationale"><summary>Justificación del motor</summary><p>{generated.rationale}</p></details>}</div>
     </section>

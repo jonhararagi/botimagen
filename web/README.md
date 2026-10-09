@@ -36,11 +36,11 @@ Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. 
 - Generación real de perfiles y prompts mediante `CharacterGenerator`, con elecciones fijadas, campos AUTO, semilla y coherencia.
 - Visualización del prompt y negative prompt oficiales, copia al portapapeles y exportación JSON.
 - Guardado de perfiles mediante `POST /api/profiles` en `generated_characters/web_profiles/`, ignorado por Git por defecto.
-- API para listar y recuperar perfiles guardados; la interfaz aún no incluye la galería de carga/selección de perfiles.
+- Panel de perfiles locales: permite actualizar la lista y cargar un perfil guardado. La API lista y recupera por UUID.
 - Pruebas HTTP del servicio y validación de selecciones para que una opción inventada no se acepte.
 
 ## Límites actuales
 
-La silueta SVG es un marcador temporal de la interfaz, no una ilustración generada. No existe todavía generación neuronal de imagen, biblioteca visual con miniaturas/SQLite, comparación de variantes, carga de perfiles desde la interfaz ni migración del intake de assets. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
+La silueta SVG es un marcador temporal de la interfaz, no una ilustración generada. No existe todavía generación neuronal de imagen, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración del intake de assets. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
 
 El smoke test real en Chrome/Edge y Windows aún debe completarse. La compilación en GitHub Actions no sustituye esa verificación física.
