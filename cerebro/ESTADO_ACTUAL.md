@@ -1,12 +1,12 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: seis rasgos modulares nuevos, editor web de 46 campos y CI verde, 2026-10-09.
+Última actualización de esta ficha: prueba multi-semilla de compatibilidad por especie, CI verde y continuidad, 2026-10-09.
 
 ## Repositorio
 
 - HEAD BEFORE de la tarea de perfiles locales: `1a66b8eda4d6d43046973750418b4a3719f6fc09`.
 - Último commit funcional de interfaz anterior: `509eb98e2c3fb13134aa23573749f18a1c7d8270`.
-- HEAD de código verificado al cerrar los nuevos rasgos: `341d7b7370e676198fb74e7eac5da19f574edae3`. Este checkpoint documental añade commits posteriores, así que hay que consultar `main` antes de retomar.
+- HEAD de implementación/pruebas verificado: `6e2a0c64b239cb12ba07a0a42b534d898afeb327` (se añadió prueba AUTO de compatibilidad de escamas en 12 semillas). Este checkpoint documental añade commits posteriores; consultar `main` antes de retomar.
 - Para continuar, verifica siempre el HEAD real de `main`, ya que el commit documental posterior puede avanzar la referencia.
 
 - Repositorio: jonhararagi/botimagen
@@ -63,11 +63,12 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~90%). UI React/TypeScript y proxy local; `web/package-lock.json` versionado. CI #65 valida `npm ci` y el build. La prueba real de navegador/Windows no se ha ejecutado.
 - BIMG-005: PARTIAL (~60%). Editor expandido a 46 categorías y 8 pestañas; CI #82 comprueba cobertura exacta, grupos sin duplicados, instalación reproducible y build. Duplicación de perfiles y QA real aún pendientes.
-- BIMG-006: PARTIAL (~20%). Catálogo v5 añade `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color` y `hair_inner_color`; motor y prompt conservan elecciones fijadas y los campos se exponen en la UI.
+- BIMG-006: PARTIAL (~20%). Catálogo v5 añade `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color` y `hair_inner_color`; motor y prompt conservan elecciones fijadas, los campos se exponen en la UI, y AUTO escala se verifica con 12 semillas para humana/dracónica.
 - BIMG-004: PARTIAL (~90%). API de catálogo/generación/perfiles y controles UI para listar/cargar integrados; smoke test físico pendiente.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
-- Evidencia CI #82: PASS_REAL en commit `341d7b7370e676198fb74e7eac5da19f574edae3`; pruebas del motor, generación de prompt modular, cobertura de 46 categorías, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37921734995.
+- Evidencia CI #82: PASS_REAL para la primera integración de rasgos y cobertura de 46 categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921734995.
+- Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica, además de pruebas del motor, cobertura de 46 categorías, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Runtime en navegador/Windows: NOT_RUN.
 - Progreso total ponderado hacia la beta local: 47%, calculado en `cerebro/PROGRESO.md` (47,4/100 sin redondear).
 
