@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: panel de perfiles local y progreso ponderado, 2026-10-09.
+Última actualización de esta ficha: protocolo de investigación comparativa y continuidad, 2026-10-09.
 
 ## Repositorio
 
@@ -42,7 +42,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Los selectores cargan opciones mediante `GET /api/catalog`; las listas provienen de `character_rules.json`, no de una copia de opciones en TypeScript.
 - El botón de generar llama a `POST /api/generate` y reutiliza `CharacterGenerator`; respeta IDs manuales, AUTO, semilla y coherencia, y devuelve prompt/negative prompt oficiales.
 - `botimagen_server.py` utiliza `http.server` de la biblioteca estándar, escucha solo en `127.0.0.1:8765`, limita el cuerpo JSON, valida campos contra el catálogo y no expone rutas de archivos arbitrarias.
-- Endpoints de perfiles: `POST /api/profiles` guarda atomicamente bajo `generated_characters/web_profiles/`; `GET /api/profiles` lista; `GET /api/profiles/{uuid}` recupera. El frontend guarda; la lista/carga desde la UI aún está pendiente.
+- Endpoints de perfiles: `POST /api/profiles` guarda atómicamente bajo `generated_characters/web_profiles/`; `GET /api/profiles` lista; `GET /api/profiles/{uuid}` recupera. La UI permite guardar, listar y cargar perfiles. La cobertura CI existe; el smoke test real del navegador y la prueba física Windows siguen `NOT_RUN`.
 - La silueta SVG central es un marcador temporal de interfaz, no una ilustración generada.
 - Vite redirige `/api` al motor local en desarrollo. La interfaz de producción servida desde un único launcher aún está pendiente.
 
@@ -66,6 +66,14 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #60: PASS_REAL en commit `509eb98e2c3fb13134aa23573749f18a1c7d8270`: https://github.com/jonhararagi/botimagen/actions/runs/37887835609.
 - Runtime en navegador/Windows: NOT_RUN.
 - Progreso total ponderado hacia la beta local: 32%, calculado en `cerebro/PROGRESO.md`.
+
+## Investigación comparativa: regla permanente
+
+La investigación de aplicaciones y proyectos similares queda integrada al protocolo de Cerebro. Objetivo: aprender arquitectura, patrones de UX, rendimiento, errores habituales, causas raíz, soluciones y lecciones de mantenimiento, y convertirlas en decisiones verificables para BotImagen, sin copiar identidad, código o activos ajenos.
+
+- Método, límites de uso, registro de fuentes y plantilla: [`cerebro/INVESTIGACION_COMPARATIVA.md`](INVESTIGACION_COMPARATIVA.md).
+- Esta tarea actualiza el proceso y la documentación, pero no cierra fases funcionales de la beta. El progreso ponderado permanece en 32%.
+- La presente actualización documenta el método; no afirma que en esta tarea se haya completado una búsqueda externa de aplicaciones comparables.
 
 ## Próxima acción exacta
 

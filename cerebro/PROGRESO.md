@@ -33,11 +33,14 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - Ejecución: https://github.com/jonhararagi/botimagen/actions/runs/37887835609
 - Smoke test de navegador real y prueba física en Windows: **NOT_RUN**.
 
+## Nota de continuidad · 2026-10-09
+
+Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Es una mejora de método, no un hito funcional de la beta: el cálculo sigue siendo **31,8 / 100 → 32%**. No se suma avance porcentual por cambios únicamente documentales.
+
 ## Siguiente trabajo que más reduce el riesgo
 
 1. Generar y versionar `web/package-lock.json`.
 2. Realizar una prueba de navegador y después una prueba física en Windows.
-3. Generar y guardar `web/package-lock.json` para instalaciones reproducibles.
 4. Ampliar las categorías que hacen falta para el diseño completo: busto, escamas, regiones de color de cabello y más controles de pose.
 
 Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse para aparentar avance; solo revisarlos si cambia de forma aprobada el alcance de la beta, documentando la razón.

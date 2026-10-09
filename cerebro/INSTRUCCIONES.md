@@ -23,6 +23,18 @@ Toda tarea de implementación debe incluir un **TIMER** en horas o días de trab
 
 **Contador obligatorio al cerrar cada tarea:** actualizar `cerebro/PROGRESO.md` con el porcentaje global ponderado de avance hacia la beta web local. Usa los pesos y la fórmula de ese documento; no inventes una subida porcentual por la cantidad de archivos escritos. Actualiza estados por fase y describe qué falta. Informa ese porcentaje en el reporte final, aunque la tarea termine bloqueada o parcial.
 
+## Investigación comparativa y aprendizaje técnico
+
+Antes de resolver decisiones con incertidumbre real (arquitectura, experiencia de usuario, rendimiento, seguridad, biblioteca de archivos, empaquetado o integración con herramientas), evaluar aplicaciones y proyectos similares cuando la consulta externa esté disponible. Investigar es una herramienta normal del trabajo de Cerebro, no un permiso para copiar.
+
+- Comparar 2–4 productos o proyectos pertinentes y, cuando ayude, una solución de otra categoría que resuelva el mismo problema. Priorizar documentación oficial, repositorios públicos con licencia visible, changelogs, issues/PRs, avisos de seguridad, informes técnicos y reproducciones de errores. Usar foros y reseñas como pistas, no como hechos confirmados sin contraste.
+- Buscar patrones de arquitectura, flujos de trabajo, decisiones de diseño, accesibilidad, rendimiento, errores repetidos, causas raíz, correcciones, limitaciones y costes de mantenimiento. No quedarse en capturas bonitas: identificar por qué una solución funciona, dónde falla y qué evidencia lo demuestra.
+- Registrar conclusiones accionables en `cerebro/INVESTIGACION_COMPARATIVA.md`: fuentes y fecha de consulta, observación verificable, nivel de confianza, problema que resuelve, riesgo o limitación, aplicabilidad a BotImagen, decisión propuesta y prueba que confirmaría su valor.
+- Separar siempre **hecho observado**, **interpretación** e **hipótesis**. No declarar una búsqueda o una prueba que no se hizo. Si no hay acceso a navegación o a una fuente, indicar `NOT_RUN` y continuar con lo verificable del repositorio.
+- Aprender de conceptos generales y prácticas documentadas; diseñar una implementación propia que encaje en BotImagen. No copiar código, textos, ilustraciones, marca, layout distintivo ni activos propietarios. Si se considera reutilizar código abierto, verificar antes la licencia, sus obligaciones, la procedencia y la compatibilidad; conservar atribuciones requeridas.
+- No eludir autenticación, paywalls, restricciones de acceso ni términos de servicio; no realizar scraping masivo ni descargar colecciones de referencias automáticamente sin evaluación de permisos, licencias, privacidad y carga al servicio.
+- Cada recomendación debe explicar el beneficio esperado, el coste/risgo, la alternativa descartada y cómo se probará. La evidencia del proyecto y su CI sigue teniendo prioridad al decidir si un cambio está realmente terminado.
+
 ## Estados de evidencia
 
 - PASS_REAL: ejecución real comprobada.
