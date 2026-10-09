@@ -48,6 +48,7 @@ const fields:Field[]=[
  {id:"hair",group:"hair",label:"Color base",initial:"rojo_coral",fixed:true,note:"Color dominante del cabello."},
  {id:"hair_color_pattern",group:"hair",label:"Patrón de color",initial:"puntas_doradas",fixed:true,note:"Distribución, degradado y transiciones del color."},
  {id:"hair_secondary_color",group:"hair",label:"Color secundario",initial:"oro_metalico",fixed:true,note:"Acento general que complementa el patrón de color."},
+ {id:"hair_tip_color",group:"hair",label:"Color de puntas",initial:"matching_base",fixed:false,note:"Controla únicamente las puntas, independiente del color secundario y de las raíces."},
  {id:"hair_root_color",group:"hair",label:"Color de raíces",initial:"matching_base",fixed:false,note:"Zona de raíz independiente del color base y de las puntas."},
  {id:"hair_crown_color",group:"hair",label:"Color de coronilla",initial:"matching_base",fixed:false,note:"Controla únicamente el color sobre la coronilla."},
  {id:"hair_inner_color",group:"hair",label:"Color interior (inner hair)",initial:"matching_base",fixed:false,note:"Controla los mechones interiores sin recolorear toda la melena."},

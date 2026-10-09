@@ -51,6 +51,7 @@ TRAIT_KEYS = {
     "hair": "Color base del cabello",
     "hair_color_pattern": "Patrón de color del cabello",
     "hair_secondary_color": "Color secundario del cabello",
+    "hair_tip_color": "Color de puntas del cabello",
     "hair_root_color": "Color de raíces del cabello",
     "hair_crown_color": "Color de coronilla del cabello",
     "hair_inner_color": "Color interior del cabello",
@@ -218,7 +219,7 @@ class CharacterGenerator:
             "facial_detail", "ear_style", "tail_style", "horn_style", "scale_pattern", "scale_color",
             "hair_length", "hair_bangs", "hairstyle", "hair_arrangement",
             "hair_texture", "side_hair", "back_hair", "hair",
-            "hair_color_pattern", "hair_secondary_color", "hair_root_color", "hair_crown_color",
+            "hair_color_pattern", "hair_secondary_color", "hair_tip_color", "hair_root_color", "hair_crown_color",
             "hair_inner_color", "outfit", "outer_layer",
             "footwear", "accessory", "palette_accent", "voice",
             "combat_role", "baseball_prop", "pose", "quirk",
@@ -305,7 +306,8 @@ class CharacterGenerator:
             f"{p['back_hair']} back hair. "
             f"Hair colors: {p['hair']} base color; {p['hair_color_pattern']} using "
             f"{p['hair_secondary_color']} as the secondary/accent color. Root zone: {p['hair_root_color']}; "
-            f"crown zone: {p['hair_crown_color']}; inner hair zone: {p['hair_inner_color']}. "
+            f"crown zone: {p['hair_crown_color']}; inner hair zone: {p['hair_inner_color']}; "
+            f"tip zone: {p['hair_tip_color']}. "
             f"Clothing: {p['outfit']}, {p['outer_layer']}, {p['footwear']}, "
             f"accessory {p['accessory']}. "
             f"Color direction: {p['palette_accent']}. "
@@ -323,6 +325,9 @@ class CharacterGenerator:
             "When the scale pattern says no visible scales, do not add scales merely because a color is selected; "
             "otherwise apply the selected scale color only to the stated body zones. Bust size is a neutral adult "
             "anatomy proportion and must not become a sexualized focal point. "
+            "Hair color patterns describe placement and transitions, not a hard-coded hue; the dedicated tip, root, "
+            "crown and inner-hair choices control only their named zones. Do not force gold or silver tips unless "
+            "that tip color is selected. "
             "The main haircut, bangs, side hair, back hair and tied-up arrangement must form one plausible "
             "hairstyle rather than several competing styles. Preserve the selected base hair colour and "
             "secondary-colour treatment; if the pattern specifies coloured tips, make the transition visible "

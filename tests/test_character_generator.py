@@ -30,10 +30,12 @@ def test_rules_have_expected_categories():
         "hair_root_color",
         "hair_crown_color",
         "hair_inner_color",
+        "hair_tip_color",
         "scale_pattern",
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
+    assert data["version"] == 7
     assert data["version"] == 6
     expected_scale_patterns = {
         "dorsal_hand_scales",
@@ -159,6 +161,9 @@ def test_modular_bust_scales_and_hair_zones_are_independent():
         "hair_root_color": "metallic_gold",
         "hair_crown_color": "pearl_silver",
         "hair_inner_color": "turquoise",
+        "hair_color_pattern": "puntas_doradas",
+        "hair_secondary_color": "plata_perla",
+        "hair_tip_color": "turquoise",
         "scale_pattern": "forearm_shin_scales",
         "scale_color": "obsidian_black",
     }
@@ -172,10 +177,38 @@ def test_modular_bust_scales_and_hair_zones_are_independent():
     assert "metallic gold roots with a short clean transition into the base hair color" in prompt
     assert "pearl silver color concentrated only across the crown of the head" in prompt
     assert "turquoise color visible only on the inner hair layers" in prompt
+    assert "turquoise color confined to the hair tips with a clean transition" in prompt
+    assert "pearl silver as the secondary/accent color" in prompt
+    assert "metallic gold tips" not in prompt
     assert "small scale patches limited to forearms and shins" in prompt
     assert "obsidian black scales with subtle cool reflections" in prompt
 
 
+
+
+def test_hair_tip_color_is_independent_from_pattern_and_other_zones():
+    generator = CharacterGenerator(RULES)
+    selections = {
+        "hair": "rojo_coral",
+        "hair_color_pattern": "puntas_doradas",
+        "hair_secondary_color": "plata_perla",
+        "hair_tip_color": "turquoise",
+        "hair_root_color": "metallic_gold",
+        "hair_crown_color": "pearl_silver",
+        "hair_inner_color": "bubblegum_pink",
+    }
+    result = generator.generate(selections, seed=7707, coherence=0.95)
+
+    for category, value in selections.items():
+        assert result["profile"][category] == value
+    prompt = result["prompt"]
+    assert "turquoise color confined to the hair tips with a clean transition" in prompt
+    assert "pearl silver as the secondary/accent color" in prompt
+    assert "metallic gold roots with a short clean transition into the base hair color" in prompt
+    assert "pearl silver color concentrated only across the crown of the head" in prompt
+    assert "bubblegum pink color visible only on the inner hair layers" in prompt
+    assert "gradient ending in metallic gold tips" not in prompt
+    assert "silver-tipped hair gradient" not in prompt
 
 def test_scale_color_is_omitted_when_pattern_has_no_visible_scales():
     generator = CharacterGenerator(RULES)
@@ -242,6 +275,7 @@ if __name__ == "__main__":
     test_serious_angry_character_prefers_dark_voice_palette()
     test_height_selections_are_locked_and_drive_stature()
     test_modular_bust_scales_and_hair_zones_are_independent()
+    test_hair_tip_color_is_independent_from_pattern_and_other_zones()
     test_auto_scale_pattern_respects_species_compatibility()
     test_new_scale_regions_are_manual_and_prompted_independently()
     test_scale_color_is_omitted_when_pattern_has_no_visible_scales()

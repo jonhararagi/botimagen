@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -3729,19 +3729,19 @@
     "hair_color_pattern": [
       {
         "id": "color_solido",
-        "label": "Color uniforme",
+        "label": "Color base uniforme",
         "tags": [
           "solid",
           "single_color",
           "clean"
         ],
         "base": 5,
-        "prompt_en": "single solid hair color",
+        "prompt_en": "a solid main hair-shaft color without a full-length gradient; dedicated root, crown, inner-layer and tip colors remain independently controlled",
         "bias": {}
       },
       {
         "id": "puntas_doradas",
-        "label": "Puntas doradas",
+        "label": "Degradado localizado en puntas",
         "tags": [
           "gradient",
           "tips",
@@ -3749,11 +3749,8 @@
           "gold"
         ],
         "base": 1,
-        "prompt_en": "gradient ending in metallic gold tips",
-        "bias": {
-          "hair:verde_esmeralda": 3,
-          "hair_secondary_color:oro_metalico": 8
-        }
+        "prompt_en": "a clean gradient transition concentrated at the hair tips; use the dedicated tip-color selection for hue",
+        "bias": {}
       },
       {
         "id": "degradado_suave",
@@ -3764,7 +3761,7 @@
           "flowing"
         ],
         "base": 1,
-        "prompt_en": "soft hair color gradient",
+        "prompt_en": "a soft hair color gradient between the selected base and secondary/accent colors",
         "bias": {}
       },
       {
@@ -3776,19 +3773,19 @@
           "contrast"
         ],
         "base": 1,
-        "prompt_en": "dark-to-light ombre hair",
+        "prompt_en": "a dark-to-light ombre transition between the selected base and secondary/accent colors",
         "bias": {}
       },
       {
         "id": "raices_contraste",
-        "label": "Raíces en color de contraste",
+        "label": "Transición de color en raíces",
         "tags": [
           "roots",
           "contrast",
           "bold"
         ],
         "base": 1,
-        "prompt_en": "contrasting hair roots",
+        "prompt_en": "a contrasting root transition; the dedicated root-zone selection controls the root hue",
         "bias": {}
       },
       {
@@ -3800,19 +3797,19 @@
           "bold"
         ],
         "base": 1,
-        "prompt_en": "split-dye two-tone hair",
+        "prompt_en": "a split-dye two-tone distribution using the selected base and secondary/accent colors",
         "bias": {}
       },
       {
         "id": "capa_interior",
-        "label": "Capa interior de otro color",
+        "label": "Capa interior de color definida aparte",
         "tags": [
           "underlayer",
           "hidden_color",
           "contrast"
         ],
         "base": 1,
-        "prompt_en": "contrasting inner hair underlayer",
+        "prompt_en": "a contrasting inner-hair underlayer; the dedicated inner-zone selection controls its hue",
         "bias": {}
       },
       {
@@ -3824,31 +3821,31 @@
           "dynamic"
         ],
         "base": 1,
-        "prompt_en": "distinct colored hair streaks",
+        "prompt_en": "distinct colored hair streaks using the selected secondary/accent color",
         "bias": {}
       },
       {
         "id": "reflejos_metalicos",
-        "label": "Reflejos metálicos",
+        "label": "Reflejos en color de acento",
         "tags": [
           "metallic",
           "highlights",
           "technical"
         ],
         "base": 1,
-        "prompt_en": "controlled metallic hair highlights",
+        "prompt_en": "controlled hair highlights in the selected secondary/accent color with restrained reflective sheen",
         "bias": {}
       },
       {
         "id": "puntas_plateadas",
-        "label": "Puntas plateadas",
+        "label": "Contraste luminoso en puntas",
         "tags": [
           "gradient",
           "tips",
           "silver"
         ],
         "base": 1,
-        "prompt_en": "silver-tipped hair gradient",
+        "prompt_en": "a luminous contrast concentrated at the hair tips; the dedicated tip-color selection controls the hue",
         "bias": {}
       }
     ],
@@ -3972,6 +3969,185 @@
         "base": 1,
         "prompt_en": "midnight blue",
         "bias": {}
+      }
+    ],
+    "hair_tip_color": [
+      {
+        "id": "matching_base",
+        "label": "A juego con el color base",
+        "tags": [
+          "base_match",
+          "neutral"
+        ],
+        "prompt_en": "hair tips matching the selected base hair color with no contrasting tip band",
+        "base": 5,
+        "bias": {
+          "hair_color_pattern:color_solido": 5,
+          "hair_color_pattern:puntas_doradas": -3,
+          "hair_color_pattern:puntas_plateadas": -3
+        }
+      },
+      {
+        "id": "metallic_gold",
+        "label": "Oro metálico",
+        "tags": [
+          "gold",
+          "warm",
+          "metallic"
+        ],
+        "prompt_en": "metallic gold color confined to the hair tips with a clean transition",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:oro_metalico": 4
+        }
+      },
+      {
+        "id": "pearl_silver",
+        "label": "Plata perla",
+        "tags": [
+          "silver",
+          "cool",
+          "metallic"
+        ],
+        "prompt_en": "pearl silver color confined to the hair tips with a clean transition",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:plata_perla": 4
+        }
+      },
+      {
+        "id": "luminous_white",
+        "label": "Blanco luminoso",
+        "tags": [
+          "white",
+          "bright",
+          "cool"
+        ],
+        "prompt_en": "luminous white color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:blanco_luminoso": 3
+        }
+      },
+      {
+        "id": "ruby_red",
+        "label": "Rojo rubí",
+        "tags": [
+          "red",
+          "warm",
+          "bold"
+        ],
+        "prompt_en": "ruby red color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:rojo_rubi": 3,
+          "hair:rojo_coral": 1
+        }
+      },
+      {
+        "id": "bubblegum_pink",
+        "label": "Rosa chicle",
+        "tags": [
+          "pink",
+          "cute",
+          "bright"
+        ],
+        "prompt_en": "bubblegum pink color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:rosa_chicle": 3,
+          "hair:rosa_chicle": 1
+        }
+      },
+      {
+        "id": "turquoise",
+        "label": "Turquesa",
+        "tags": [
+          "turquoise",
+          "cool",
+          "bright"
+        ],
+        "prompt_en": "turquoise color confined to the hair tips with a clean transition",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:turquesa": 3,
+          "hair:turquesa": 1
+        }
+      },
+      {
+        "id": "emerald_green",
+        "label": "Verde esmeralda",
+        "tags": [
+          "green",
+          "cool",
+          "distinctive"
+        ],
+        "prompt_en": "emerald green color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:verde_esmeralda": 3,
+          "hair:verde_esmeralda": 1
+        }
+      },
+      {
+        "id": "ice_blue",
+        "label": "Azul hielo",
+        "tags": [
+          "blue",
+          "cool",
+          "bright"
+        ],
+        "prompt_en": "ice blue color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:azul_medianoche": 2,
+          "hair:azul_nocturno": 1
+        }
+      },
+      {
+        "id": "deep_violet",
+        "label": "Violeta profundo",
+        "tags": [
+          "violet",
+          "cool",
+          "mysterious"
+        ],
+        "prompt_en": "deep violet color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:violeta": 2,
+          "hair:violeta_profundo": 2
+        }
+      },
+      {
+        "id": "midnight_blue",
+        "label": "Azul medianoche",
+        "tags": [
+          "blue",
+          "cool",
+          "dark"
+        ],
+        "prompt_en": "midnight blue color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:azul_medianoche": 3,
+          "hair:azul_nocturno": 2
+        }
+      },
+      {
+        "id": "coral_red",
+        "label": "Coral",
+        "tags": [
+          "coral",
+          "warm",
+          "bright"
+        ],
+        "prompt_en": "coral red color confined to the hair tips",
+        "base": 1,
+        "bias": {
+          "hair_secondary_color:coral_vivo": 3,
+          "hair:rojo_coral": 2
+        }
       }
     ],
     "hair_texture": [
