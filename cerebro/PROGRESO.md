@@ -51,6 +51,7 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - CI #127 amplía el E2E a la compatibilidad de largo/corte/arreglo a través del API local, y confirma el ciclo de perfil con el lock restaurado. Corrige el contrato para propagar `color_family` y `compatible_with`; generador/API/build/Chromium PASS_REAL: https://github.com/jonhararagi/botimagen/actions/runs/37929857432.
 - CI #118 detectó una aserción de versión antigua en `tests/test_local_api.py` (`catalog_version == 7` después del cambio a v8). Corregida a v8; CI #119 PASS_REAL ejecuta toda la batería, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/37928453343.
 - BIMG-006 sube de 50% a 55% por compatibilidad outfit/rol; BIMG-005 de 75% a 80% por el recorrido E2E ampliado entre pestañas y perfil persistido. Total ponderado: **58,65 / 100 → 59%**. La prueba física Windows y las mediciones de rendimiento continúan **NOT_RUN**.
+- CI #136/#137 mejora la validación del campo de semilla. Chromium confirma rechazo de formato malformado y fuera de rango, aceptación del máximo entero seguro y recuperación con semilla válida. El porcentaje no cambia porque es una corrección de calidad: **58,65 / 100 → 59%**. https://github.com/jonhararagi/botimagen/actions/runs/37950307373.
 
 
 ## Nota de continuidad · 2026-10-09
