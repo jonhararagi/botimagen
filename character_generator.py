@@ -268,6 +268,57 @@ class CharacterGenerator:
 
         return True
 
+    def _enforce_manual_compatibility(
+        self,
+        profile: dict[str, str],
+        labels: dict[str, str],
+        selections: dict[str, str],
+        rng: random.Random,
+        coherence: float,
+        surprise: bool,
+    ) -> None:
+        """Final guard: re-resolve AUTO fields that conflict with explicit user locks.
+
+        Generation and refinement mix requested values with resolved profile values.
+        Keep the original manual selections separate here so a resolved AUTO value
+        can never hide a hard constraint declared by another manually selected trait.
+        """
+        manual = {
+            category: value
+            for category, value in selections.items()
+            if value != "auto"
+        }
+        if not manual:
+            return
+
+        for category in CATEGORY_ORDER:
+            if selections.get(category, "auto") != "auto":
+                continue
+
+            candidates = self.categories.get(category, [])
+            compatible = [
+                candidate
+                for candidate in candidates
+                if self._candidate_is_compatible(category, candidate, manual)
+            ]
+            if not compatible:
+                # Preserve availability if incomplete metadata produces no solution.
+                continue
+
+            compatible_ids = {str(candidate.get("id", "")) for candidate in compatible}
+            if profile.get(category) in compatible_ids:
+                continue
+
+            value, label = self._choose_category(
+                category,
+                {**manual, category: "auto"},
+                rng,
+                coherence,
+                surprise,
+            )
+            profile[category] = value
+            labels[category] = label
+
     def _choose_category(
         self,
         category: str,
@@ -388,6 +439,14 @@ class CharacterGenerator:
             profile[category] = value
             labels[category] = label
 
+        self._enforce_manual_compatibility(
+            profile,
+            labels,
+            chosen,
+            rng,
+            coherence,
+            surprise,
+        )
         style_direction = self._style_direction(profile)
         rationale = self._rationale(chosen, profile, labels)
 
