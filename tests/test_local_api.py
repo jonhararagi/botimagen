@@ -45,6 +45,38 @@ class LocalApiTests(unittest.TestCase):
             expected_hair.append(public_item)
         self.assertEqual(catalog["categories"]["hair"], expected_hair)
 
+        # Every catalog field used by the compatibility engine must survive the
+        # API projection; otherwise UI/E2E consumers silently lose valid rules.
+        compatibility_edges = 0
+        for category, source_options in self.generator.categories.items():
+            public_options = catalog["categories"][category]
+            self.assertEqual(
+                [option["id"] for option in public_options],
+                [option["id"] for option in source_options],
+                f"Option order/IDs drifted for {category}",
+            )
+            for source_option, public_option in zip(source_options, public_options, strict=True):
+                self.assertEqual(public_option["label"], source_option["label"])
+                self.assertEqual(public_option["tags"], source_option.get("tags", []))
+                if "compatible_with" in source_option:
+                    compatibility_edges += sum(
+                        len(values) for values in source_option["compatible_with"].values()
+                    )
+                    self.assertEqual(
+                        public_option.get("compatible_with"),
+                        source_option["compatible_with"],
+                        f"Compatibility metadata drifted for {category}:{source_option['id']}",
+                    )
+                else:
+                    self.assertNotIn("compatible_with", public_option)
+                if "color_family" in source_option:
+                    self.assertEqual(public_option.get("color_family"), source_option["color_family"])
+                else:
+                    self.assertNotIn("color_family", public_option)
+                self.assertNotIn("bias", public_option, "Internal ranking metadata must stay private")
+                self.assertNotIn("prompt_en", public_option, "Internal prompt fragments are not public catalog fields")
+        self.assertGreaterEqual(compatibility_edges, 100, "The API must preserve the active compatibility graph")
+
         outer_layer = next(
             option for option in catalog["categories"]["outer_layer"]
             if option["id"] == "long_coat"
