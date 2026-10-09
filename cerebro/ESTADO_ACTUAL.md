@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: catálogo v11, compatibilidad de vestuario por rol y E2E bidireccional, 2026-10-09.
+Última actualización de esta ficha: catálogo v12, compatibilidad de prop por rol y validación genérica del catálogo, 2026-10-09.
 
 ## Repositorio
 
@@ -63,7 +63,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~80%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #134 PASS_REAL comprueba en Chromium largo fijo→corte/arreglo AUTO, arreglo fijo→largo AUTO, rol tank fijo→outfit AUTO en otra pestaña, protección por cambios pendientes y restauración compatible tras guardar/duplicar/cargar. Faltan más grupos UI, errores y revisión visual amplia.
-- BIMG-006: PARTIAL (~55%). Catálogo v11 mantiene 47 categorías; `compatible_with` declara compatibilidad entre largo, corte, arreglo y outfit/rol de combate. AUTO respeta las restricciones desde cualquier elección manual relacionada, mientras que dos elecciones manuales incompatibles no se modifican. El API conserva `color_family` y `compatible_with` en todos los items que los declaran. CI #132 y CI #134 PASS_REAL; QA física en Windows sigue pendiente.
+- BIMG-006: PARTIAL (~60%). Catálogo v12 mantiene 47 categorías. `compatible_with` abarca largo/corte/arreglo, outfit/rol y prop/rol de combate. Una pasada final revalida campos AUTO contra las elecciones manuales originales; los locks manuales incompatibles siguen intactos. Una prueba genérica valida todas las referencias de compatibilidad y metadatos `color_family`. CI #140 y #141 PASS_REAL; QA física en Windows sigue pendiente.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -71,7 +71,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **59%**, calculado en `cerebro/PROGRESO.md` (**58,65/100** sin redondear). Último cambio funcional verificado: HEAD `8aead906c9ae9136f71824afd3e1ac2e1e20b30e`, CI #137 PASS_REAL.
+- Progreso total ponderado hacia la beta local: **59%**, calculado en `cerebro/PROGRESO.md` (**59,4/100** sin redondear). Último cambio funcional verificado: HEAD `da74c6261e6bcf970a8b2fb132e0ae2f2beff00c`, CI #140 PASS_REAL; integridad de catálogo verificada en HEAD `c236c83b20d391d46bac316b246f27236f0384ed`, CI #141 PASS_REAL.
 
 ## Validación estricta del campo de semilla · CI #136/#137
 
@@ -81,6 +81,15 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - **CI #137 PASS_REAL** añade pruebas de navegador para el máximo seguro `9007199254740991` (aceptado) y el entero siguiente `9007199254740992` (rechazado sin redondear), además del caso malformado. Toda la batería Python/API, cobertura UI, `npm ci`, build y Chromium E2E pasa: https://github.com/jonhararagi/botimagen/actions/runs/37950307373.
 - La corrección es de calidad de entrada y reproducibilidad. No altera la estimación de fases ni el total: **58,65 / 100 → 59%**.
 - **TIMER:** 30–60 minutos estimados de trabajo de implementación y pruebas. El smoke test físico en Windows sigue `NOT_RUN`.
+
+## Compatibilidad de props de baseball y rol de combate · catálogo v12
+
+- Se actualizó `character_rules.json` de v11 a v12. Continúa con 47 categorías; se añadieron reglas `compatible_with.combat_role` a los diez props, cubriendo los cinco roles.
+- Se detectó una regresión real en la primera CI de este bloque: con el prop `bat` fijado, AUTO podía mantener `control` por mezclar la selección original con el perfil ya resuelto durante la fase de refinamiento.
+- Se corrigió con una pasada final de compatibilidad basada exclusivamente en las selecciones manuales originales. Se reelige solo un campo que continúa en AUTO; ningún campo fijado manualmente se modifica. Si una combinación manual es contradictoria, permanece intacta.
+- Se añadieron 60 escenarios con semilla para rol manual→prop AUTO y 80 para prop manual→rol AUTO, más prueba de combinación manual incompatible. También se agregó un validador genérico para que todas las restricciones del catálogo apunten a categorías/IDs existentes, con listas no vacías y sin duplicados.
+- **CI #139** descubrió el fallo: https://github.com/jonhararagi/botimagen/actions/runs/37960498403. **CI #140 PASS_REAL** verifica la corrección de motor, API, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/37960828210. **CI #141 PASS_REAL** verifica además la integridad de metadatos del catálogo: https://github.com/jonhararagi/botimagen/actions/runs/37961039389.
+- TIMER estimado de trabajo acumulado: 1–2 horas. BIMG-006 sube de 55% a 60%; cálculo ponderado actualizado a **59,4 / 100 → 59%**. Prueba física en Windows y métricas de rendimiento: `NOT_RUN`.
 
 ## Compatibilidad de vestuario y rol de combate · catálogo v11
 

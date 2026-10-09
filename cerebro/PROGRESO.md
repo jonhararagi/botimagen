@@ -17,12 +17,12 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-003 · Shell web y build reproducible | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-005 · Editor completo por categorías | 18% | 80% · PARTIAL | 14,4 |
-| BIMG-006 · Ampliación modular del catálogo | 15% | 55% · PARTIAL | 8,25 |
+| BIMG-006 · Ampliación modular del catálogo | 15% | 60% · PARTIAL | 9,0 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 0% · NOT_STARTED | 0,0 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **58,65 / 100 → 59%** |
+| **Total ponderado** | **100%** | | **59,4 / 100 → 59%** |
 
 BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles.
 
@@ -44,6 +44,9 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - Catálogo v7, **CI #107 PASS_REAL**: nueva categoría `hair_tip_color` con 12 opciones; el patrón de cabello expresa distribución/transición sin codificar la tonalidad de las puntas. Generador, contrato visual, API, cobertura UI, `npm ci` y build pasaron: https://github.com/jonhararagi/botimagen/actions/runs/37926064467.
 - **CI #112 PASS_REAL**: smoke test E2E en Chromium headless, arranque de API/UI, generación con dos colores de puntas, guardado bloqueado con cambios pendientes, regeneración, guardado, duplicación y carga de perfil. https://github.com/jonhararagi/botimagen/actions/runs/37927181644.
 - CI #117 PASS_REAL: compatibilidad semántica AUTO capilar, familias cromáticas declarativas, respeto a bloqueos manuales, batería Python y smoke test Chromium E2E. https://github.com/jonhararagi/botimagen/actions/runs/37927965567.
+- Catálogo v12 y compatibilidad de prop de baseball/rol: CI #139 detectó una regresión de compatibilidad inversa; CI #140 la corrigió con una pasada final basada en selecciones manuales originales. https://github.com/jonhararagi/botimagen/actions/runs/37960828210.
+- CI #141 PASS_REAL verifica las referencias de todas las restricciones del catálogo, 140 escenarios con semilla en la nueva relación prop/rol, API v12, `npm ci`, build y Chromium E2E. https://github.com/jonhararagi/botimagen/actions/runs/37961039389.
+- BIMG-006 se actualiza de 55% a 60%. Total ponderado: **59,4 / 100 → 59%**. La prueba física de Windows y las mediciones de rendimiento siguen `NOT_RUN`.
 - Catálogo v9 y compatibilidad de peinado, **CI #122 PASS_REAL**: referencias de compatibilidad, 120 escenarios con semilla para cinco largos y cinco cortes, locks manuales, API v9, `npm ci`, build y smoke E2E Chromium. https://github.com/jonhararagi/botimagen/actions/runs/37928912408.
 - Catálogo v10 extiende compatibilidad a los diez arreglos capilares, **CI #124 PASS_REAL**: 264 escenarios con semilla entre largo/corte/arreglo, locks manuales, API v10, build y smoke E2E Chromium. https://github.com/jonhararagi/botimagen/actions/runs/37929316506.
 - Catálogo v11 añade compatibilidad declarada entre diez outfits y cinco roles. CI #132 PASS_REAL: 144 escenarios con semilla (60 rol→outfit y 84 outfit→rol), locks manuales, API v11, build y smoke test previo: https://github.com/jonhararagi/botimagen/actions/runs/37935668304.
