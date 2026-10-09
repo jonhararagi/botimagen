@@ -201,6 +201,22 @@ export default function App(){
    setStatus("Perfil cargado desde la biblioteca local: "+record.name);
   }catch(error){setStatus(error instanceof Error?error.message:"No se pudo cargar el perfil local.")}
  }
+ async function duplicateProfile(profileId:string){
+  setDuplicatingProfile(profileId);
+  try{
+   const sourceResponse=await fetch("/api/profiles/"+encodeURIComponent(profileId));
+   const source=await jsonResponse<SavedProfileRecord>(sourceResponse);
+   const name=source.name.slice(0,72)+" · Copia";
+   const copyResponse=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,profile:source.profile})});
+   const copy=await jsonResponse<SavedProfileSummary>(copyResponse);
+   setSavedProfiles(previous=>[copy,...previous.filter(item=>item.id!==copy.id)].slice(0,500));
+   setStatus("Copia creada sin modificar el original · "+copy.name);
+  }catch(error){
+   setStatus(error instanceof Error?error.message:"No se pudo duplicar el perfil local.");
+  }finally{
+   setDuplicatingProfile(null);
+  }
+ }
  function reset(){
   const defaults=catalog?valuesFromCatalog(catalog):initialValues;
   const next={...defaults};
@@ -279,7 +295,7 @@ export default function App(){
       <details className="saved-profile-panel">
        <summary>Perfiles locales ({savedProfiles.length})</summary>
        <button className="btn muted refresh-profiles" type="button" disabled={loadingProfiles} onClick={()=>void refreshProfiles()}>{loadingProfiles?"Actualizando…":"Actualizar lista"}</button>
-       {savedProfiles.length===0?<p className="saved-profile-empty">Aún no hay perfiles guardados. Genera uno y pulsa Guardar perfil local.</p>:<div className="saved-profile-list">{savedProfiles.map(item=><button className="saved-profile-item" key={item.id} type="button" onClick={()=>void loadProfile(item.id)}><strong>{item.name}</strong><small>{item.style_id||"Estilo sin etiqueta"} · semilla {item.seed??"AUTO"}</small></button>)}</div>}
+       {savedProfiles.length===0?<p className="saved-profile-empty">Aún no hay perfiles guardados. Genera uno y pulsa Guardar perfil local.</p>:<div className="saved-profile-list">{savedProfiles.map(item=><div className="saved-profile-row" key={item.id}><button className="saved-profile-item" type="button" onClick={()=>void loadProfile(item.id)}><strong>{item.name}</strong><small>{item.style_id||"Estilo sin etiqueta"} · semilla {item.seed??"AUTO"}</small></button><button className="saved-profile-copy" type="button" aria-label={"Duplicar "+item.name} title="Crear copia independiente" disabled={duplicatingProfile===item.id} onClick={()=>void duplicateProfile(item.id)}>{duplicatingProfile===item.id?"…":"Duplicar"}</button></div>)}</div>}
       </details>
      </div>
      <div className="prompt-panel"><div className="kicker"><span><i>03</i> DESCRIPCIÓN DEL DISEÑO</span><small>{generated?"MOTOR PYTHON":"ESPERANDO MOTOR"}</small></div><pre>{showNegative?prompt+"\n\nNEGATIVE PROMPT:\n"+negative:prompt}</pre><div className="prompt-actions"><button type="button" className="btn muted" onClick={()=>setShowNegative(v=>!v)}>{showNegative?"Ocultar negativo":"Ver negative prompt"}</button><button type="button" className="btn copy" onClick={()=>void copyPrompt()}>Copiar texto ↗</button><button type="button" className="btn muted" onClick={exportJson}>Exportar JSON</button></div>{generated&&<details className="rationale"><summary>Justificación del motor</summary><p>{generated.rationale}</p></details>}</div>
