@@ -1,5 +1,5 @@
 {
-  "version": 10,
+  "version": 11,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -1441,7 +1441,14 @@
           "athletic",
           "technical",
           "combat"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "combat_jacket",
@@ -1450,7 +1457,13 @@
           "street",
           "bold",
           "mobile"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control"
+          ]
+        }
       },
       {
         "id": "techwear_sport",
@@ -1459,7 +1472,14 @@
           "technical",
           "modern",
           "agile"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "light_armor",
@@ -1468,7 +1488,13 @@
           "strong",
           "guardian",
           "powerful"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "tank",
+            "support"
+          ]
+        }
       },
       {
         "id": "idol_combat",
@@ -1477,7 +1503,13 @@
           "bright",
           "social",
           "dramatic"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "striker"
+          ]
+        }
       },
       {
         "id": "elegant_command",
@@ -1486,7 +1518,14 @@
           "elegant",
           "controlled",
           "commanding"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "control",
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "support_coat",
@@ -1495,7 +1534,13 @@
           "warm",
           "support",
           "practical"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "tank"
+          ]
+        }
       },
       {
         "id": "street_bomber",
@@ -1504,7 +1549,13 @@
           "rebelde",
           "bold",
           "playful"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control"
+          ]
+        }
       },
       {
         "id": "baseball_tech_suit",
@@ -1514,7 +1565,13 @@
           "technical",
           "combat"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "armadura_asimetrica",
@@ -1524,7 +1581,13 @@
           "edgy",
           "combat"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "tank",
+            "striker"
+          ]
+        }
       }
     ],
     "outer_layer": [

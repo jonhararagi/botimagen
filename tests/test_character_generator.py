@@ -35,7 +35,7 @@ def test_rules_have_expected_categories():
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
-    assert data["version"] == 10
+    assert data["version"] == 11
     expected_scale_patterns = {
         "dorsal_hand_scales",
         "outer_thigh_scales",
@@ -499,6 +499,70 @@ def test_manual_hair_arrangement_and_length_locks_are_never_overridden():
 
 
 
+
+
+def test_catalog_declares_valid_outfit_role_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    roles = {item["id"] for item in rules["categories"]["combat_role"]}
+    outfits = rules["categories"]["outfit"]
+    assert len(outfits) == 10
+    for outfit in outfits:
+        allowed = outfit.get("compatible_with", {}).get("combat_role")
+        assert allowed, f"{outfit['id']} must declare compatible combat roles"
+        assert set(allowed).issubset(roles), (outfit["id"], allowed)
+
+
+def test_auto_outfit_respects_manually_selected_combat_role():
+    generator = CharacterGenerator(RULES)
+    for role in ("striker", "support", "tank", "control", "pitcher"):
+        for seed in range(12):
+            result = generator.generate(
+                {"combat_role": role, "outfit": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            outfit = next(
+                item for item in generator.categories["outfit"]
+                if item["id"] == result["profile"]["outfit"]
+            )
+            assert role in outfit["compatible_with"]["combat_role"], (
+                role, seed, result["profile"]["outfit"]
+            )
+
+
+def test_auto_combat_role_respects_manually_selected_outfit():
+    generator = CharacterGenerator(RULES)
+    for outfit_id in (
+        "combat_jacket", "light_armor", "idol_combat", "elegant_command",
+        "support_coat", "baseball_tech_suit", "armadura_asimetrica",
+    ):
+        outfit = next(
+            item for item in generator.categories["outfit"]
+            if item["id"] == outfit_id
+        )
+        allowed = set(outfit["compatible_with"]["combat_role"])
+        for seed in range(12):
+            result = generator.generate(
+                {"outfit": outfit_id, "combat_role": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            assert result["profile"]["combat_role"] in allowed, (
+                outfit_id, seed, result["profile"]["combat_role"]
+            )
+
+
+def test_manual_outfit_and_combat_role_locks_are_preserved():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"outfit": "light_armor", "combat_role": "striker"},
+        seed=9919,
+    )
+    assert result["profile"]["outfit"] == "light_armor"
+    assert result["profile"]["combat_role"] == "striker"
+
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -518,3 +582,7 @@ if __name__ == "__main__":
     test_auto_hair_arrangement_respects_manually_selected_length()
     test_auto_hair_length_respects_manually_selected_arrangement()
     test_manual_hair_arrangement_and_length_locks_are_never_overridden()
+    test_catalog_declares_valid_outfit_role_compatibility()
+    test_auto_outfit_respects_manually_selected_combat_role()
+    test_auto_combat_role_respects_manually_selected_outfit()
+    test_manual_outfit_and_combat_role_locks_are_preserved()
