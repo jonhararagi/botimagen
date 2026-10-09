@@ -2,7 +2,7 @@
 
 **Último cálculo:** 2026-10-09  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 47%**
+**Progreso global actual: 49%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -16,13 +16,13 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-002 · Auditoría de base existente | 8% | 100% · DONE | 8,0 |
 | BIMG-003 · Shell web y build reproducible | 12% | 90% · PARTIAL | 10,8 |
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 90% · PARTIAL | 10,8 |
-| BIMG-005 · Editor completo por categorías | 18% | 60% · PARTIAL | 10,8 |
+| BIMG-005 · Editor completo por categorías | 18% | 70% · PARTIAL | 12,6 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 20% · PARTIAL | 3,0 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 0% · NOT_STARTED | 0,0 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 0% · NOT_STARTED | 0,0 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **47,4 / 100 → 47%** |
+| **Total ponderado** | **100%** | | **49,2 / 100 → 49%** |
 
 BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles.
 
@@ -32,17 +32,18 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - CI #65: PASS_REAL en `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; instalación reproducible con `npm ci`, build React/TypeScript y validaciones Python pasan.
 - Ejecución npm reproducible: https://github.com/jonhararagi/botimagen/actions/runs/37920504103
 - Editor web: 46 campos para 46 categorías y 8 pestañas. CI #82 prueba cobertura exacta, motor, prompts, `npm ci` y build: https://github.com/jonhararagi/botimagen/actions/runs/37921734995
-- CI #86: PASS_REAL; test de compatibilidad AUTO de escamas entre humana/dracónica con 12 semillas y coherencia reducida; el resto del motor, cobertura de catálogo, `npm ci` y build también pasan: https://github.com/jonhararagi/botimagen/actions/runs/37921964365
+- CI #86: PASS_REAL; test de compatibilidad AUTO de escamas entre humana/dracónica con 12 semillas y coherencia reducida: https://github.com/jonhararagi/botimagen/actions/runs/37921964365
+- CI #93: PASS_REAL; duplicación de perfil conserva el original, genera UUID distinto y crea segunda entrada en biblioteca. Pruebas del motor/API, cobertura de 46 campos, `npm ci` y build pasan: https://github.com/jonhararagi/botimagen/actions/runs/37922321639
 - Smoke test de navegador real y prueba física en Windows: **NOT_RUN**.
 
 ## Nota de continuidad · 2026-10-09
 
-Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 a 20%. La prueba multi-semilla añade confianza, pero no cuenta como más alcance funcional: el total permanece **47,4 / 100 → 47%**. Browser/Windows continúan `NOT_RUN`.
+Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 a 20%. La prueba multi-semilla redujo incertidumbre sin inflar el alcance. La duplicación local quedó implementada y probada, llevando BIMG-005 a 70%. Total actual: **49,2 / 100 → 49%**. Browser/Windows continúan `NOT_RUN`.
 
 ## Siguiente trabajo que más reduce el riesgo
 
 1. Ampliar patrones/regiones de escamas y verificar compatibilidad adicional por especie.
-2. Añadir duplicación de perfiles y mejorar el flujo de regeneración.
+2. Añadir tests de interacción para fijar/desfijar, generar, cargar y duplicar perfiles.
 3. Realizar smoke test real de navegador y después prueba física en Windows.
 
 Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse para aparentar avance; solo revisarlos si cambia de forma aprobada el alcance de la beta, documentando la razón.
