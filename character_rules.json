@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -3707,7 +3707,21 @@
         ],
         "base": 3,
         "prompt_en": "loose hair arrangement",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "corto",
+            "medio",
+            "largo",
+            "pixie",
+            "muy_corto",
+            "a_la_mandibula",
+            "a_los_hombros",
+            "medio_largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "coleta_alta",
@@ -3720,7 +3734,17 @@
         ],
         "base": 1,
         "prompt_en": "high ponytail",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "coleta_baja",
@@ -3733,7 +3757,17 @@
         ],
         "base": 1,
         "prompt_en": "low ponytail",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "coleta_lateral",
@@ -3746,7 +3780,17 @@
         ],
         "base": 1,
         "prompt_en": "side ponytail",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "coletas_gemelas",
@@ -3759,7 +3803,17 @@
         ],
         "base": 1,
         "prompt_en": "twin ponytails",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "media_coleta",
@@ -3771,7 +3825,17 @@
         ],
         "base": 1,
         "prompt_en": "half-up half-down hairstyle",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "coleta_trenzada",
@@ -3784,7 +3848,16 @@
         ],
         "base": 1,
         "prompt_en": "braided ponytail",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "mono_alto",
@@ -3797,7 +3870,17 @@
         ],
         "base": 1,
         "prompt_en": "high hair bun",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "monos_dobles",
@@ -3810,7 +3893,17 @@
         ],
         "base": 1,
         "prompt_en": "double hair buns",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "trenza_lateral_recogida",
@@ -3823,7 +3916,16 @@
         ],
         "base": 1,
         "prompt_en": "side-braided tied-back hairstyle",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "a_los_hombros",
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       }
     ],
     "hair_color_pattern": [

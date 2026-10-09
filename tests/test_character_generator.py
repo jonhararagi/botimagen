@@ -35,7 +35,7 @@ def test_rules_have_expected_categories():
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
-    assert data["version"] == 9
+    assert data["version"] == 10
     expected_scale_patterns = {
         "dorsal_hand_scales",
         "outer_thigh_scales",
@@ -437,6 +437,67 @@ def test_manual_hairstyle_and_length_locks_are_never_overridden():
     test_scale_color_is_omitted_when_pattern_has_no_visible_scales()
     print("PASS: character generator tests")
 
+def test_catalog_declares_valid_hair_arrangement_length_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    lengths = {item["id"] for item in rules["categories"]["hair_length"]}
+    arrangements = rules["categories"]["hair_arrangement"]
+    assert len(arrangements) == 10
+    for arrangement in arrangements:
+        allowed = arrangement.get("compatible_with", {}).get("hair_length")
+        assert allowed, f"{arrangement['id']} must declare compatible hair lengths"
+        assert set(allowed).issubset(lengths), (arrangement["id"], allowed)
+
+
+def test_auto_hair_arrangement_respects_manually_selected_length():
+    generator = CharacterGenerator(RULES)
+    for length in ("pixie", "muy_corto", "corto", "a_los_hombros", "largo", "extra_largo"):
+        for seed in range(12):
+            result = generator.generate(
+                {"hair_length": length, "hair_arrangement": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            arrangement = next(
+                item for item in generator.categories["hair_arrangement"]
+                if item["id"] == result["profile"]["hair_arrangement"]
+            )
+            assert length in arrangement["compatible_with"]["hair_length"], (
+                length, seed, result["profile"]["hair_arrangement"]
+            )
+
+
+def test_auto_hair_length_respects_manually_selected_arrangement():
+    generator = CharacterGenerator(RULES)
+    for arrangement_id in (
+        "coleta_alta", "coletas_gemelas", "media_coleta",
+        "coleta_trenzada", "mono_alto", "trenza_lateral_recogida",
+    ):
+        arrangement = next(
+            item for item in generator.categories["hair_arrangement"]
+            if item["id"] == arrangement_id
+        )
+        allowed = set(arrangement["compatible_with"]["hair_length"])
+        for seed in range(12):
+            result = generator.generate(
+                {"hair_arrangement": arrangement_id, "hair_length": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            assert result["profile"]["hair_length"] in allowed, (
+                arrangement_id, seed, result["profile"]["hair_length"]
+            )
+
+
+def test_manual_hair_arrangement_and_length_locks_are_never_overridden():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"hair_arrangement": "coleta_alta", "hair_length": "pixie"},
+        seed=9918,
+    )
+    assert result["profile"]["hair_arrangement"] == "coleta_alta"
+    assert result["profile"]["hair_length"] == "pixie"
+
+
 
 if __name__ == "__main__":
     test_rules_have_expected_categories()
@@ -453,65 +514,7 @@ if __name__ == "__main__":
     test_auto_hairstyle_respects_manually_selected_length()
     test_auto_hair_length_respects_manually_selected_hairstyle()
     test_manual_hairstyle_and_length_locks_are_never_overridden()
-
-def test_catalog_declares_valid_hairstyle_length_compatibility():
-    rules = json.loads(RULES.read_text(encoding="utf-8"))
-    lengths = {item["id"] for item in rules["categories"]["hair_length"]}
-    for style in rules["categories"]["hairstyle"]:
-        allowed = style.get("compatible_with", {}).get("hair_length")
-        assert allowed, f"{style['id']} must declare compatible hair lengths"
-        assert set(allowed).issubset(lengths), (style["id"], allowed)
-
-
-def test_auto_hairstyle_respects_manually_selected_length():
-    generator = CharacterGenerator(RULES)
-    rules = generator.rules
-    for length in ("pixie", "corto", "a_los_hombros", "largo", "extra_largo"):
-        for seed in range(12):
-            result = generator.generate(
-                {"hair_length": length, "hairstyle": "auto"},
-                seed=seed,
-                coherence=0.45,
-            )
-            style = next(
-                item for item in rules["categories"]["hairstyle"]
-                if item["id"] == result["profile"]["hairstyle"]
-            )
-            assert length in style["compatible_with"]["hair_length"], (
-                length, seed, result["profile"]["hairstyle"]
-            )
-
-
-def test_auto_hair_length_respects_manually_selected_hairstyle():
-    generator = CharacterGenerator(RULES)
-    for style_id in ("short_wavy", "long_flowing", "hime_cut", "wolf_cut", "long_straight"):
-        style = next(
-            item for item in generator.categories["hairstyle"]
-            if item["id"] == style_id
-        )
-        allowed = set(style["compatible_with"]["hair_length"])
-        for seed in range(12):
-            result = generator.generate(
-                {"hairstyle": style_id, "hair_length": "auto"},
-                seed=seed,
-                coherence=0.45,
-            )
-            assert result["profile"]["hair_length"] in allowed, (
-                style_id, seed, result["profile"]["hair_length"]
-            )
-
-
-def test_manual_hairstyle_and_length_locks_are_never_overridden():
-    generator = CharacterGenerator(RULES)
-    result = generator.generate(
-        {"hairstyle": "long_flowing", "hair_length": "pixie"},
-        seed=9917,
-    )
-    assert result["profile"]["hairstyle"] == "long_flowing"
-    assert result["profile"]["hair_length"] == "pixie"
-
-
-    test_auto_scale_pattern_respects_species_compatibility()
-    test_new_scale_regions_are_manual_and_prompted_independently()
-    test_scale_color_is_omitted_when_pattern_has_no_visible_scales()
-    print("PASS: character generator tests")
+    test_catalog_declares_valid_hair_arrangement_length_compatibility()
+    test_auto_hair_arrangement_respects_manually_selected_length()
+    test_auto_hair_length_respects_manually_selected_arrangement()
+    test_manual_hair_arrangement_and_length_locks_are_never_overridden()
