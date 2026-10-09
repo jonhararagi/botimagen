@@ -174,13 +174,17 @@ export default function App(){
    const nextFixed={...fixed};
    for(const field of fields){
     const value=selections[field.id];
-    if(value==="auto"){
+    if(value==="auto"||typeof value!=="string"){
      nextFixed[field.id]=false;
      const resolved=profileResult?.profile[field.id];
      if(resolved)nextValues[field.id]=resolved;
-    }else if(typeof value==="string"&&catalog?.categories[field.id]?.some(option=>option.id===value)){
+    }else if(catalog?.categories[field.id]?.some(option=>option.id===value)){
      nextFixed[field.id]=true;
      nextValues[field.id]=value;
+    }else{
+     nextFixed[field.id]=false;
+     const resolved=profileResult?.profile[field.id];
+     if(resolved)nextValues[field.id]=resolved;
     }
    }
    setValues(nextValues);setFixed(nextFixed);
