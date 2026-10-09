@@ -103,6 +103,7 @@ export default function App(){
  const [status,setStatus]=useState("Conectando con el motor local de BotImagen…");
  const [showNegative,setShowNegative]=useState(false);
  const [saved,setSaved]=useState(false);
+ const [draftDirty,setDraftDirty]=useState(false);
  const [loadingCatalog,setLoadingCatalog]=useState(true);
  const [generating,setGenerating]=useState(false);
  const [savedProfiles,setSavedProfiles]=useState<SavedProfileSummary[]>([]);
@@ -122,7 +123,7 @@ export default function App(){
     const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialSelections,seed:314159,coherence:.82,surprise:false}),signal:controller.signal});
     const result=await jsonResponse<GeneratedCharacter>(response);
     if(controller.signal.aborted)return;
-    setGenerated(result);
+    setGenerated(result);setDraftDirty(false);
     setValues(previous=>{
      const next={...previous};
      for(const field of fields){if(!field.fixed&&result.profile[field.id])next[field.id]=result.profile[field.id]}
@@ -147,8 +148,8 @@ export default function App(){
  const negative=generated?.negative_prompt??"El negative prompt se cargará desde el motor oficial.";
  const stageVars={"--hair-color":colorFor(values.hair)} as CSSProperties;
 
- function setValue(id:FieldId,value:string){setValues(p=>({...p,[id]:value}));setSaved(false);setStatus("Diseño editado. Pulsa «Generar perfil» para actualizar el resultado oficial.")}
- function toggleFixed(id:FieldId){const willFix=!fixed[id];setFixed(p=>({...p,[id]:willFix}));setSaved(false);setStatus(willFix?"Campo fijado manualmente.":"Campo marcado AUTO; el motor elegirá una opción oficial al generar.")}
+ function setValue(id:FieldId,value:string){setValues(p=>({...p,[id]:value}));setDraftDirty(true);setSaved(false);setStatus("Diseño editado. Pulsa «Generar perfil» para actualizar el resultado oficial.")}
+ function toggleFixed(id:FieldId){const willFix=!fixed[id];setFixed(p=>({...p,[id]:willFix}));setDraftDirty(true);setSaved(false);setStatus(willFix?"Campo fijado manualmente.":"Campo marcado AUTO; el motor elegirá una opción oficial al generar.")}
  async function generateProfile(){
   if(!catalog){setStatus("El catálogo aún no está disponible. Inicia el servicio local y recarga.");return}
   const numericSeed=Number.parseInt(seed,10);
@@ -157,7 +158,7 @@ export default function App(){
   setGenerating(true);setStatus("Generando mediante CharacterGenerator…");
   try{
    const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections,seed:numericSeed,coherence,surprise:false})});
-   const result=await jsonResponse<GeneratedCharacter>(response);setGenerated(result);
+   const result=await jsonResponse<GeneratedCharacter>(response);setGenerated(result);setDraftDirty(false);
    setValues(previous=>{const next={...previous};for(const field of fields){if(!fixed[field.id]&&result.profile[field.id])next[field.id]=result.profile[field.id]}return next});
    setSaved(false);setStatus("Perfil generado por Python · semilla "+result.seed+" · "+result.style_name);
   }catch(error){setStatus(error instanceof Error?error.message:"El motor local no pudo generar el perfil.")}finally{setGenerating(false)}
@@ -177,6 +178,7 @@ export default function App(){
    const record=await jsonResponse<SavedProfileRecord>(response);
    const selections=record.profile.selections??{};
    const profileResult=record.profile.generated??null;
+   const staleSelection=!profileResult||fields.some(field=>{const selected=selections[field.id];return typeof selected!=="string"||(selected!=="auto"&&profileResult.profile[field.id]!==selected)});
    const nextValues={...values};
    const nextFixed={...fixed};
    for(const field of fields){
@@ -195,11 +197,11 @@ export default function App(){
     }
    }
    setValues(nextValues);setFixed(nextFixed);
-   if(profileResult)setGenerated(profileResult);
+   setGenerated(profileResult);
    setSeed(String(profileResult?.seed??record.profile.seed??314159));
    setCoherence(profileResult?.coherence??record.profile.coherence??.82);
-   setSaved(true);
-   setStatus("Perfil cargado desde la biblioteca local: "+record.name);
+   setDraftDirty(staleSelection);setSaved(!staleSelection);
+   setStatus(staleSelection?"Perfil cargado con cambios no sincronizados. Genera el diseño antes de guardarlo o exportarlo.":"Perfil cargado desde la biblioteca local: "+record.name);
   }catch(error){setStatus(error instanceof Error?error.message:"No se pudo cargar el perfil local.")}
  }
  async function duplicateProfile(profileId:string){
@@ -222,10 +224,11 @@ export default function App(){
   const defaults=catalog?valuesFromCatalog(catalog):initialValues;
   const next={...defaults};
   if(generated){for(const field of fields){if(!initialFixed[field.id]&&generated.profile[field.id])next[field.id]=generated.profile[field.id]}}
-  setValues(next);setFixed(initialFixed);setSeed("314159");setCoherence(.82);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")
+  setValues(next);setFixed(initialFixed);setSeed("314159");setCoherence(.82);setDraftDirty(true);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")
  }
  async function saveProfile(){
   if(!generated){setStatus("Genera un perfil antes de guardarlo.");return}
+  if(draftDirty){setStatus("Hay cambios pendientes. Genera el diseño actualizado antes de guardarlo para mantener rasgos y prompt sincronizados.");return}
   const profile={schema_version:1,mode:"local-engine",style_id:generated.style_id,seed:generated.seed,coherence:generated.coherence,selections:Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"])),generated};
   const name=[labelFor(catalog,"species",values.species),labelFor(catalog,"hair",values.hair),labelFor(catalog,"eyes",values.eyes)].join(" · ");
   try{
@@ -255,7 +258,7 @@ export default function App(){
   </aside>
   <main className="main">
    <header className="topbar"><div className="crumb">WORKSPACE <span>/</span> <b>CHARACTER DESIGN</b></div><div className="top-actions"><span className="local-pill"><i/> {catalog?"LOCAL · CONECTADO":"LOCAL · DESCONECTADO"}</span><span className="avatar">BW</span></div></header>
-   <section className="heading"><div><div className="eyebrow"><i/> ESTUDIO DE PERSONAJES <span>BIMG-004</span></div><h1>Diseña una nueva <em>waifu.</em></h1><p>Selecciona rasgos del catálogo real y deja que el motor complete los campos AUTO.</p></div><div className="heading-buttons"><button className="btn muted" onClick={reset} type="button">Restaurar ejemplo</button><button className="btn primary" onClick={() => void saveProfile()} type="button">＋ {saved?"Perfil guardado":"Guardar perfil local"}</button></div></section>
+   <section className="heading"><div><div className="eyebrow"><i/> ESTUDIO DE PERSONAJES <span>BIMG-004</span></div><h1>Diseña una nueva <em>waifu.</em></h1><p>Selecciona rasgos del catálogo real y deja que el motor complete los campos AUTO.</p></div><div className="heading-buttons"><button className="btn muted" onClick={reset} type="button" disabled={generating}>Restaurar ejemplo</button><button className="btn primary" onClick={() => void saveProfile()} type="button" disabled={!generated||draftDirty||generating}>＋ {draftDirty?"Genera para guardar":saved?"Perfil guardado":"Guardar perfil local"}</button></div></section>
    <div className="workspace">
     <section className="preview-area">
      <div className="kicker"><span><i>01</i> LIENZO DEL PERSONAJE</span><small>PREVIEW <i/></small></div>
@@ -286,20 +289,20 @@ export default function App(){
       <div className="fields">{visible.map(field=>{
        const options=catalog?.categories[field.id]??[];const current=values[field.id];const exists=options.some(item=>item.id===current);
        return <div className={fixed[field.id]?"field":"field is-auto"} key={field.id}>
-        <div className="field-label"><label htmlFor={"trait-"+field.id}>{catalog?.trait_labels[field.id]??field.label}</label><button type="button" className={fixed[field.id]?"lock fixed":"lock auto"} aria-pressed={fixed[field.id]} onClick={()=>toggleFixed(field.id)}>{fixed[field.id]?"● FIJO":"◇ AUTO"}</button></div>
-        <select id={"trait-"+field.id} value={exists?current:""} disabled={!fixed[field.id]||loadingCatalog||!options.length} onChange={event=>setValue(field.id,event.target.value)}>{!exists&&<option value="" disabled>{loadingCatalog?"Cargando catálogo…":"Seleccionar opción"}</option>}{options.map(option=><option key={option.id} value={option.id}>{option.label}</option>)}</select><p>{field.note}</p>
+        <div className="field-label"><label htmlFor={"trait-"+field.id}>{catalog?.trait_labels[field.id]??field.label}</label><button type="button" className={fixed[field.id]?"lock fixed":"lock auto"} aria-pressed={fixed[field.id]} onClick={()=>toggleFixed(field.id)} disabled={generating}>{fixed[field.id]?"● FIJO":"◇ AUTO"}</button></div>
+        <select id={"trait-"+field.id} value={exists?current:""} disabled={!fixed[field.id]||loadingCatalog||!options.length||generating} onChange={event=>setValue(field.id,event.target.value)}>{!exists&&<option value="" disabled>{loadingCatalog?"Cargando catálogo…":"Seleccionar opción"}</option>}{options.map(option=><option key={option.id} value={option.id}>{option.label}</option>)}</select><p>{field.note}</p>
        </div>
       })}</div>
-      <div className="seed-row"><span><b>SEMILLA DEL GENERADOR</b><small>La semilla se envía al motor Python real.</small></span><input aria-label="Semilla del generador" value={seed} inputMode="numeric" onChange={event=>setSeed(event.target.value.replace(/[^0-9-]/g,"").slice(0,15))}/></div>
-      <div className="seed-row"><span><b>COHERENCIA · {Math.round(coherence*100)}%</b><small>Controla las alternativas elegidas en AUTO.</small></span><input aria-label="Coherencia" type="range" min="0" max="100" value={Math.round(coherence*100)} onChange={event=>setCoherence(Number(event.target.value)/100)}/></div>
+      <div className="seed-row"><span><b>SEMILLA DEL GENERADOR</b><small>La semilla se envía al motor Python real.</small></span><input aria-label="Semilla del generador" value={seed} inputMode="numeric" disabled={generating} onChange={event=>{setSeed(event.target.value.replace(/[^0-9-]/g,"").slice(0,15));setDraftDirty(true);setSaved(false)}}/></div>
+      <div className="seed-row"><span><b>COHERENCIA · {Math.round(coherence*100)}%</b><small>Controla las alternativas elegidas en AUTO.</small></span><input aria-label="Coherencia" type="range" min="0" max="100" value={Math.round(coherence*100)} disabled={generating} onChange={event=>{setCoherence(Number(event.target.value)/100);setDraftDirty(true);setSaved(false)}}/></div>
       <button className="btn primary wide" type="button" disabled={!catalog||generating} onClick={()=>void generateProfile()}>{generating?"Generando…":"✦ Generar perfil con motor local"} <span>→</span></button>
       <details className="saved-profile-panel">
        <summary>Perfiles locales ({savedProfiles.length})</summary>
-       <button className="btn muted refresh-profiles" type="button" disabled={loadingProfiles} onClick={()=>void refreshProfiles()}>{loadingProfiles?"Actualizando…":"Actualizar lista"}</button>
-       {savedProfiles.length===0?<p className="saved-profile-empty">Aún no hay perfiles guardados. Genera uno y pulsa Guardar perfil local.</p>:<div className="saved-profile-list">{savedProfiles.map(item=><div className="saved-profile-row" key={item.id}><button className="saved-profile-item" type="button" onClick={()=>void loadProfile(item.id)}><strong>{item.name}</strong><small>{item.style_id||"Estilo sin etiqueta"} · semilla {item.seed??"AUTO"}</small></button><button className="saved-profile-copy" type="button" aria-label={"Duplicar "+item.name} title="Crear copia independiente" disabled={duplicatingProfile===item.id} onClick={()=>void duplicateProfile(item.id)}>{duplicatingProfile===item.id?"…":"Duplicar"}</button></div>)}</div>}
+       <button className="btn muted refresh-profiles" type="button" disabled={loadingProfiles||generating} onClick={()=>void refreshProfiles()}>{loadingProfiles?"Actualizando…":"Actualizar lista"}</button>
+       {savedProfiles.length===0?<p className="saved-profile-empty">Aún no hay perfiles guardados. Genera uno y pulsa Guardar perfil local.</p>:<div className="saved-profile-list">{savedProfiles.map(item=><div className="saved-profile-row" key={item.id}><button className="saved-profile-item" type="button" disabled={generating} onClick={()=>void loadProfile(item.id)}><strong>{item.name}</strong><small>{item.style_id||"Estilo sin etiqueta"} · semilla {item.seed??"AUTO"}</small></button><button className="saved-profile-copy" type="button" aria-label={"Duplicar "+item.name} title="Crear copia independiente" disabled={duplicatingProfile===item.id||generating} onClick={()=>void duplicateProfile(item.id)}>{duplicatingProfile===item.id?"…":"Duplicar"}</button></div>)}</div>}
       </details>
      </div>
-     <div className="prompt-panel"><div className="kicker"><span><i>03</i> DESCRIPCIÓN DEL DISEÑO</span><small>{generated?"MOTOR PYTHON":"ESPERANDO MOTOR"}</small></div><pre>{showNegative?prompt+"\n\nNEGATIVE PROMPT:\n"+negative:prompt}</pre><div className="prompt-actions"><button type="button" className="btn muted" onClick={()=>setShowNegative(v=>!v)}>{showNegative?"Ocultar negativo":"Ver negative prompt"}</button><button type="button" className="btn copy" onClick={()=>void copyPrompt()}>Copiar texto ↗</button><button type="button" className="btn muted" onClick={exportJson}>Exportar JSON</button></div>{generated&&<details className="rationale"><summary>Justificación del motor</summary><p>{generated.rationale}</p></details>}</div>
+     <div className="prompt-panel"><div className="kicker"><span><i>03</i> DESCRIPCIÓN DEL DISEÑO</span><small>{draftDirty?"CAMBIOS PENDIENTES":generated?"MOTOR PYTHON":"ESPERANDO MOTOR"}</small></div><pre>{showNegative?prompt+"\n\nNEGATIVE PROMPT:\n"+negative:prompt}</pre><div className="prompt-actions"><button type="button" className="btn muted" disabled={draftDirty||!generated||generating} onClick={()=>setShowNegative(v=>!v)}>{showNegative?"Ocultar negativo":"Ver negative prompt"}</button><button type="button" className="btn copy" disabled={draftDirty||!generated||generating} onClick={()=>void copyPrompt()}>Copiar texto ↗</button><button type="button" className="btn muted" disabled={draftDirty||!generated||generating} onClick={exportJson}>{draftDirty?"Genera antes de exportar":"Exportar JSON"}</button></div>{generated&&<details className="rationale"><summary>Justificación del motor</summary><p>{generated.rationale}</p></details>}</div>
     </section>
    </div>
    <footer className="main-footer"><span><i/>{status}</span><small>{catalog?"CATÁLOGO OFICIAL · MOTOR LOCAL":"API LOCAL · 127.0.0.1:8765"}</small></footer>

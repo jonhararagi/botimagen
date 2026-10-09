@@ -34,8 +34,17 @@ def main() -> None:
     )
     assert len(tab_ids) == 8, f"Expected 8 editor categories, found {len(tab_ids)}"
 
+
+    # Guard against saving/exporting a selection draft with a stale generated prompt.
+    assert 'const [draftDirty,setDraftDirty]=useState(false);' in source
+    assert 'if(draftDirty){setStatus("Hay cambios pendientes.' in source
+    assert 'disabled={!generated||draftDirty||generating}' in source
+    assert 'draftDirty?"CAMBIOS PENDIENTES"' in source
+    assert 'setDraftDirty(true);setSaved(false)' in source, "Seed/coherence edits must invalidate the generated snapshot"
+    assert 'staleSelection=!profileResult||fields.some' in source, "Legacy inconsistent profiles should require regeneration"
+
     print(
-        f"PASS: {len(configured)} catalog categories map to {len(tab_ids)} web editor tabs"
+        f"PASS: {len(configured)} catalog categories map to {len(tab_ids)} web editor tabs and draft sync safeguards"
     )
 
 
