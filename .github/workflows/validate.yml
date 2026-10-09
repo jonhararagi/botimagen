@@ -39,3 +39,11 @@ jobs:
       - name: Build web interface
         working-directory: web
         run: npm run build
+
+      - name: Export generated npm lockfile (temporary bootstrap)
+        uses: actions/upload-artifact@v4
+        with:
+          name: botimagen-package-lock-bootstrap
+          path: web/package-lock.json
+          if-no-files-found: error
+          retention-days: 1
