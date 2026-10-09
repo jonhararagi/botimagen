@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -1961,7 +1961,12 @@
         "tags": [
           "baseball",
           "striker"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker"
+          ]
+        }
       },
       {
         "id": "pitching_glove",
@@ -1969,7 +1974,12 @@
         "tags": [
           "baseball",
           "technical"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "energy_ball",
@@ -1977,7 +1987,14 @@
         "tags": [
           "baseball",
           "powerful"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "tactical_shield",
@@ -1985,7 +2002,12 @@
         "tags": [
           "guardian",
           "tank"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "tank"
+          ]
+        }
       },
       {
         "id": "support_device",
@@ -1993,7 +2015,12 @@
         "tags": [
           "support",
           "technical"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "support"
+          ]
+        }
       },
       {
         "id": "baton_energetico",
@@ -2003,7 +2030,13 @@
           "powerful",
           "technical"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control"
+          ]
+        }
       },
       {
         "id": "guante_mecanico",
@@ -2013,7 +2046,13 @@
           "technical",
           "support"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "pelota_dron",
@@ -2023,7 +2062,13 @@
           "technical",
           "agile"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "pitcher",
+            "control"
+          ]
+        }
       },
       {
         "id": "bate_transformable",
@@ -2033,7 +2078,13 @@
           "bold",
           "powerful"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "tank"
+          ]
+        }
       },
       {
         "id": "receptor_energia",
@@ -2043,7 +2094,14 @@
           "support",
           "control"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "control",
+            "pitcher"
+          ]
+        }
       }
     ],
     "pose": [

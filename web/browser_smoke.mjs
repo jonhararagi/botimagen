@@ -222,8 +222,13 @@ try {
   const roleField = roleLabel.locator("xpath=../..");
   const roleLock = roleField.locator("button.lock");
   const roleSelect = roleField.locator("select");
+  const propLabel = page.locator('label[for="trait-baseball_prop"]');
+  const propField = propLabel.locator("xpath=../..");
+  const propLock = propField.locator("button.lock");
+  const propSelect = propField.locator("select");
   if ((await roleLock.innerText()).includes("AUTO")) await roleLock.click();
   await roleSelect.selectOption("tank");
+  if (!(await propLock.innerText()).includes("AUTO")) await propLock.click();
 
   await page.getByRole("tab", { name: /Vestuario/i }).click();
   const outfitLabel = page.locator('label[for="trait-outfit"]');
@@ -238,6 +243,12 @@ try {
   const allowedOutfits = catalog.categories.outfit
     .filter(option => option.compatible_with?.combat_role?.includes("tank"))
     .map(option => option.id);
+  const allowedProps = catalog.categories.baseball_prop
+    .filter(option => option.compatible_with?.combat_role?.includes("tank"))
+    .map(option => option.id);
+  await page.getByRole("tab", { name: /Combate/i }).click();
+  assert.ok(allowedProps.includes(await propSelect.inputValue()),
+    `AUTO baseball prop must match the manually locked tank role; got ${await propSelect.inputValue()}`);
   await page.getByRole("tab", { name: /Vestuario/i }).click();
   assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
     `AUTO outfit must match the manually locked tank role; got ${await outfitSelect.inputValue()}`);
@@ -291,12 +302,14 @@ try {
   await page.getByRole("tab", { name: /Combate/i }).click();
   assert.equal(await roleSelect.inputValue(), "tank",
     "Loading a profile should restore the manually locked combat role");
+  assert.ok(allowedProps.includes(await propSelect.inputValue()),
+    "Loading a profile should restore a baseball prop compatible with its combat role");
   await page.getByRole("tab", { name: /Vestuario/i }).click();
   assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
     "Loaded profile should retain an outfit compatible with its restored combat role");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified malformed/out-of-range seed rejection, max-safe seed acceptance, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility, combat-role/outfit compatibility, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified malformed/out-of-range seed rejection, max-safe seed acceptance, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility, combat-role/outfit/prop compatibility, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);

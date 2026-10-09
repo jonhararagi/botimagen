@@ -35,7 +35,7 @@ def test_rules_have_expected_categories():
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
-    assert data["version"] == 11
+    assert data["version"] == 12
     expected_scale_patterns = {
         "dorsal_hand_scales",
         "outer_thigh_scales",
@@ -561,6 +561,62 @@ def test_manual_outfit_and_combat_role_locks_are_preserved():
     assert result["profile"]["outfit"] == "light_armor"
     assert result["profile"]["combat_role"] == "striker"
 
+def test_catalog_declares_valid_baseball_prop_role_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    roles = {item["id"] for item in rules["categories"]["combat_role"]}
+    props = rules["categories"]["baseball_prop"]
+    assert len(props) == 10
+    covered_roles = set()
+    for prop in props:
+        allowed = prop.get("compatible_with", {}).get("combat_role")
+        assert allowed, f"{prop['id']} must declare compatible combat roles"
+        assert set(allowed).issubset(roles), (prop["id"], allowed)
+        covered_roles.update(allowed)
+    assert covered_roles == roles, (covered_roles, roles)
+
+
+def test_auto_baseball_prop_respects_manually_selected_combat_role():
+    generator = CharacterGenerator(RULES)
+    for role in ("striker", "support", "tank", "control", "pitcher"):
+        for seed in range(12):
+            result = generator.generate(
+                {"combat_role": role, "baseball_prop": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            prop = next(
+                item for item in generator.categories["baseball_prop"]
+                if item["id"] == result["profile"]["baseball_prop"]
+            )
+            assert role in prop["compatible_with"]["combat_role"], (
+                role, seed, result["profile"]["baseball_prop"]
+            )
+
+
+def test_auto_combat_role_respects_manually_selected_baseball_prop():
+    generator = CharacterGenerator(RULES)
+    for prop in generator.categories["baseball_prop"]:
+        allowed = set(prop["compatible_with"]["combat_role"])
+        for seed in range(8):
+            result = generator.generate(
+                {"baseball_prop": prop["id"], "combat_role": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            assert result["profile"]["combat_role"] in allowed, (
+                prop["id"], seed, result["profile"]["combat_role"]
+            )
+
+
+def test_manual_baseball_prop_and_combat_role_locks_are_preserved():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"baseball_prop": "tactical_shield", "combat_role": "striker"},
+        seed=9920,
+    )
+    assert result["profile"]["baseball_prop"] == "tactical_shield"
+    assert result["profile"]["combat_role"] == "striker"
+
 
 
 if __name__ == "__main__":
@@ -586,3 +642,7 @@ if __name__ == "__main__":
     test_auto_outfit_respects_manually_selected_combat_role()
     test_auto_combat_role_respects_manually_selected_outfit()
     test_manual_outfit_and_combat_role_locks_are_preserved()
+    test_catalog_declares_valid_baseball_prop_role_compatibility()
+    test_auto_baseball_prop_respects_manually_selected_combat_role()
+    test_auto_combat_role_respects_manually_selected_baseball_prop()
+    test_manual_baseball_prop_and_combat_role_locks_are_preserved()
