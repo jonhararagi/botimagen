@@ -234,3 +234,14 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **CI #159 PASS_REAL:** cobertura de tipo de contenido y tamaño máximo de cuerpo; generador, API, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38001028451.
 - **CI #160 PASS_REAL:** pruebas de longitud obligatoria y recuperación del mensaje UI, además de la suite completa Python, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38001184083.
 - **Estado:** PASS_REAL en CI Linux. No equivale a QA física en Windows; esta y las mediciones de rendimiento siguen NOT_RUN. El porcentaje beta se mantiene en 62%, porque la mejora refuerza las guardas y la recuperación sin cerrar una fase completa.
+
+
+## Checkpoint de trabajo continuo · 2026-10-09 · semántica explícita de «ninguno»
+
+- **HEAD BEFORE del bloque de código:** `3d4692d95d101b43dcc044f969d9f89d737c764a`.
+- **HEAD AFTER de código probado:** `d892a26521be272c83b4d445a3f9148705440f4b`.
+- **Archivos de producto/pruebas:** `character_rules.json`, `tests/test_character_generator.py`, `tests/test_local_api.py`, `web/browser_smoke.mjs`.
+- **Cambio:** catálogo v16 declara `prompt_en: "no outer layer"` para la opción explícita `outer_layer=none`. El E2E selecciona esa opción desde la interfaz, regenera, confirma que el prompt expresa la ausencia y conserva la sección de vestuario, y comprueba que guardar siga habilitado.
+- **Correcciones descubiertas por CI:** la fixture inicial usaba un ID de vestuario inexistente y una etiqueta de accesorio en inglés que no existe en el catálogo; ambos se corrigieron. Se retiró una expectativa de que el API público expusiera `prompt_en`: ese campo es interno al motor, mientras que el catálogo público publica IDs, etiquetas, tags y metadatos de compatibilidad.
+- **CI #167 PASS_REAL:** generador, contrato visual, API local, cobertura del editor, `npm ci`, build React/TypeScript y E2E Chromium headless. https://github.com/jonhararagi/botimagen/actions/runs/38003917950.
+- **TIMER:** ~5 minutos de trabajo de implementación y diagnóstico dentro de esta sesión. La mejora no cierra una fase; progreso global se mantiene en **62,16 / 100 → 62%**. QA física Windows y métricas de rendimiento siguen `NOT_RUN`.
