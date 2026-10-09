@@ -25,6 +25,7 @@ function startProcess(key, command, args, cwd) {
     cwd,
     env: process.env,
     stdio: ["ignore", "pipe", "pipe"],
+    detached: process.platform !== "win32",
   });
   child.stdout.on("data", chunk => appendLog(key, chunk));
   child.stderr.on("data", chunk => appendLog(key, chunk));
@@ -56,10 +57,11 @@ function assertRunning(child, description) {
 
 try {
   const api = startProcess("api", process.env.PYTHON ?? "python", ["botimagen_server.py"], root);
+  const viteEntry = resolve(webRoot, "node_modules", "vite", "bin", "vite.js");
   const vite = startProcess(
     "vite",
-    process.env.NPM ?? "npm",
-    ["run", "dev", "--", "--host", "127.0.0.1", "--port", "5173", "--strictPort"],
+    process.execPath,
+    [viteEntry, "--host", "127.0.0.1", "--port", "5173", "--strictPort"],
     webRoot,
   );
 
@@ -132,10 +134,22 @@ try {
     undefined,
     { timeout: 10000 },
   );
-  await page.getByText("Perfiles locales (1)", { exact: true }).waitFor({ state: "visible" });
+  const profileSummary = page.locator(".saved-profile-panel summary");
+  await profileSummary.waitFor({ state: "visible" });
+  const initialCount = Number((await profileSummary.innerText()).match(/\((\d+)\)/)?.[1] ?? 0);
+  await page.waitForFunction(
+    count => Number(document.querySelector(".saved-profile-panel summary")?.textContent?.match(/\((\d+)\)/)?.[1] ?? 0) === count + 1,
+    initialCount,
+    { timeout: 10000 },
+  );
 
+  await profileSummary.click();
   await page.locator(".saved-profile-copy").first().click();
-  await page.getByText("Perfiles locales (2)", { exact: true }).waitFor({ state: "visible" });
+  await page.waitForFunction(
+    count => Number(document.querySelector(".saved-profile-panel summary")?.textContent?.match(/\((\d+)\)/)?.[1] ?? 0) === count + 2,
+    initialCount,
+    { timeout: 10000 },
+  );
   await page.locator(".saved-profile-item").first().click();
   await page.waitForFunction(
     () => document.querySelector(".main-footer")?.textContent?.includes("Perfil cargado desde la biblioteca local"),
@@ -155,6 +169,31 @@ try {
 } finally {
   if (browser) await browser.close();
   for (const child of children.reverse()) {
-    if (child.exitCode === null && child.signalCode === null) child.kill("SIGTERM");
+    if (child.exitCode !== null || child.signalCode !== null) continue;
+    const exited = new Promise(resolveExit => child.once("exit", () => resolveExit(true)));
+    try {
+      if (process.platform !== "win32") process.kill(-child.pid, "SIGTERM");
+      else child.kill("SIGTERM");
+    } catch {
+      child.kill("SIGTERM");
+    }
+    let timer;
+    const stopped = await Promise.race([
+      exited,
+      new Promise(resolveTimeout => { timer = setTimeout(() => resolveTimeout(false), 2500); }),
+    ]);
+    clearTimeout(timer);
+    if (!stopped) {
+      try {
+        if (process.platform !== "win32") process.kill(-child.pid, "SIGKILL");
+        else child.kill("SIGKILL");
+      } catch {
+        child.kill("SIGKILL");
+      }
+      await Promise.race([
+        exited,
+        new Promise(resolveTimeout => setTimeout(resolveTimeout, 1000)),
+      ]);
+    }
   }
 }
