@@ -302,6 +302,22 @@ try {
   assert.equal(await speciesSelect.inputValue(), "draconica",
     "The selected species lock must survive anatomy regeneration");
 
+  // Manual anatomy is an intentional override, even when species metadata disagrees.
+  await speciesSelect.selectOption("humana");
+  await page.getByRole("tab", { name: /Anatomía/i }).click();
+  const scaleLabel = page.locator('label[for="trait-scale_pattern"]');
+  const scaleField = scaleLabel.locator("xpath=../..");
+  const scaleLock = scaleField.locator("button.lock");
+  if ((await scaleLock.innerText()).includes("AUTO")) await scaleLock.click();
+  await scalesSelect.selectOption("cheek_temple_scales");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+  await page.getByRole("tab", { name: /Identidad/i }).click();
+  assert.equal(await speciesSelect.inputValue(), "humana",
+    "A manually selected species must survive a deliberate anatomy override");
+  await page.getByRole("tab", { name: /Anatomía/i }).click();
+  assert.equal(await scalesSelect.inputValue(), "cheek_temple_scales",
+    "A manually locked anatomy option must not be silently normalized to the species");
 
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const profileSummary = page.locator(".saved-profile-panel summary");
@@ -361,9 +377,16 @@ try {
     "Loaded profile should retain footwear compatible with its restored combat role");
   assert.ok(allowedAccessories.includes(await accessorySelect.inputValue()),
     "Loaded profile should retain an accessory compatible with its restored combat role");
+
+  await page.getByRole("tab", { name: /Identidad/i }).click();
+  assert.equal(await speciesSelect.inputValue(), "humana",
+    "Loading a saved profile must restore the manually selected species");
+  await page.getByRole("tab", { name: /Anatomía/i }).click();
+  assert.equal(await scalesSelect.inputValue(), "cheek_temple_scales",
+    "Loading a saved profile must retain deliberately incompatible manual anatomy");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified strict seeds, hair compatibility, species-specific AUTO anatomy, combat-role compatibility across outfit/prop/layer/footwear/accessory, profile save/duplicate/load, stale-snapshot guards, and no page errors.");
+  console.log("PASS_REAL: Chromium verified strict seeds, hair compatibility, AUTO anatomy by species, manual anatomy overrides across regeneration and save/load, combat-role compatibility, stale-snapshot guards, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
