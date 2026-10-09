@@ -42,3 +42,13 @@ jobs:
       - name: Build web interface
         working-directory: web
         run: npm run build
+
+      - name: Install isolated Chromium smoke-test runtime
+        run: |
+          npm install --prefix /tmp/botimagen-playwright --no-save --no-package-lock --no-audit --no-fund playwright@1.55.0
+          /tmp/botimagen-playwright/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Smoke test web UI in Chromium
+        env:
+          BOTIMAGEN_PLAYWRIGHT_MODULE: /tmp/botimagen-playwright/node_modules/playwright/index.mjs
+        run: node web/browser_smoke.mjs
