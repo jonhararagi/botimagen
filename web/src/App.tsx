@@ -1,37 +1,83 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
-type Group = "identity" | "body" | "hair" | "face" | "pose";
-type FieldId = "species" | "height_cm" | "body_build" | "body_proportions" | "hair" | "hair_color_pattern" | "hair_secondary_color" | "eyes" | "pupil_shape" | "pose";
+type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
+type FieldId = string;
 type CatalogOption = { id:string; label:string; tags:string[] };
 type Catalog = { schema_version:number; catalog_version:number; style:{id:string;name:string;version:number}; categories:Record<string,CatalogOption[]>; trait_labels:Record<string,string>; auto_value:"auto" };
-type Field = { id:FieldId; group:Group; label:string; initial:string; note:string };
+type Field = { id:FieldId; group:Group; label:string; initial:string; fixed:boolean; note:string };
 type GeneratedCharacter = { version:number; style_id:string; style_name:string; profile:Record<string,string>; labels:Record<string,string>; rationale:string; style_direction:string; prompt:string; negative_prompt:string; seed:number|null; coherence:number; surprise:boolean };
 type SavedProfileSummary = { id:string; name:string; saved_at:string; style_id:string; seed:number|null };
 type SavedProfileRecord = { id:string; name:string; saved_at:string; style_id:string; seed:number|null; profile:{ selections?:Record<string,string>; generated?:GeneratedCharacter; seed?:number|null; coherence?:number; style_id?:string } };
 
 const fields:Field[]=[
- {id:"species",group:"identity",label:"Especie",initial:"draconica",note:"Familia anatómica principal."},
- {id:"height_cm",group:"body",label:"Altura",initial:"h170",note:"La altura no determina por sí sola la constitución."},
- {id:"body_build",group:"body",label:"Constitución",initial:"fuerte_guardiana",note:"Independiente de altura y proporciones."},
- {id:"body_proportions",group:"body",label:"Proporciones corporales",initial:"esbelta_elegante",note:"Parámetro independiente del catálogo actual."},
- {id:"hair",group:"hair",label:"Color base del cabello",initial:"rojo_coral",note:"El color base es independiente del patrón y acento."},
- {id:"hair_color_pattern",group:"hair",label:"Patrón de color",initial:"puntas_doradas",note:"Patrones ofrecidos por el catálogo oficial."},
- {id:"hair_secondary_color",group:"hair",label:"Color secundario",initial:"oro_metalico",note:"Raíces, coronilla e inner hair aún no son campos separados."},
- {id:"eyes",group:"face",label:"Color de ojos",initial:"ambar",note:"El iris y la pupila son independientes."},
- {id:"pupil_shape",group:"face",label:"Forma de pupila",initial:"estrella",note:"Opciones especiales disponibles en el catálogo."},
- {id:"pose",group:"pose",label:"Pose",initial:"defiant",note:"La cámara y composición avanzada aún no tienen controles independientes."}
+ {id:"personality",group:"identity",label:"Personalidad",initial:"alegre",fixed:false,note:"Preferencia de carácter que orienta las afinidades del motor."},
+ {id:"species",group:"identity",label:"Especie",initial:"draconica",fixed:true,note:"Familia anatómica principal."},
+ {id:"stature",group:"identity",label:"Estatura general",initial:"bajita",fixed:false,note:"Categoría visual de altura, separada de la medida exacta."},
+ {id:"silhouette",group:"identity",label:"Silueta",initial:"compacta_agil",fixed:false,note:"Lectura general de la figura en pantalla."},
+
+ {id:"height_cm",group:"body",label:"Altura exacta",initial:"h170",fixed:true,note:"La altura no determina por sí sola la constitución."},
+ {id:"body_build",group:"body",label:"Constitución",initial:"fuerte_guardiana",fixed:true,note:"Volumen y lectura física, independiente de la altura."},
+ {id:"body_proportions",group:"body",label:"Proporciones corporales",initial:"esbelta_elegante",fixed:true,note:"Relación de proporciones, no un preset de cuerpo completo."},
+ {id:"skin_tone",group:"body",label:"Tono de piel",initial:"porcelana_neutra",fixed:false,note:"Tono base de piel definido por el catálogo."},
+
+ {id:"ear_style",group:"anatomy",label:"Orejas",initial:"orejas_gato",fixed:false,note:"Forma de orejas independiente de la etiqueta de especie."},
+ {id:"tail_style",group:"anatomy",label:"Cola",initial:"sin_cola",fixed:false,note:"Tipo de cola o ausencia explícita."},
+ {id:"horn_style",group:"anatomy",label:"Cuernos / rasgo craneal",initial:"sin_cuernos",fixed:false,note:"Rasgos craneales controlados por separado."},
+
+ {id:"expression",group:"face",label:"Expresión",initial:"mirada_enfocada",fixed:false,note:"Emoción visible de la cara."},
+ {id:"face_shape",group:"face",label:"Forma del rostro",initial:"equilibrada",fixed:false,note:"Estructura general del rostro."},
+ {id:"nose_style",group:"face",label:"Nariz",initial:"minima",fixed:false,note:"Tratamiento visual de nariz."},
+ {id:"eye_shape",group:"face",label:"Forma de ojos",initial:"grande_expresiva",fixed:false,note:"Silueta ocular independiente del color del iris."},
+ {id:"eyes",group:"face",label:"Color de ojos",initial:"ambar",fixed:true,note:"El iris y la pupila son independientes."},
+ {id:"pupil_shape",group:"face",label:"Forma de pupila",initial:"estrella",fixed:true,note:"Opciones especiales disponibles en el catálogo."},
+ {id:"eyebrow_style",group:"face",label:"Cejas",initial:"rectas",fixed:false,note:"Forma y peso de las cejas."},
+ {id:"mouth_style",group:"face",label:"Boca",initial:"sonrisa_pequena",fixed:false,note:"Forma de la boca y lectura de expresión."},
+ {id:"facial_detail",group:"face",label:"Detalle facial",initial:"sin_marca",fixed:false,note:"Pecas, marcas u otros detalles expresivos."},
+
+ {id:"hair_length",group:"hair",label:"Largo del cabello",initial:"medio",fixed:false,note:"Longitud separada del corte y el recogido."},
+ {id:"hair_bangs",group:"hair",label:"Flequillo",initial:"recto",fixed:false,note:"Forma del flequillo como capa independiente."},
+ {id:"hairstyle",group:"hair",label:"Corte / forma base",initial:"bob",fixed:false,note:"Estructura principal del peinado."},
+ {id:"hair_arrangement",group:"hair",label:"Recogido / coleta",initial:"suelto",fixed:false,note:"Cómo se recoge o distribuye el cabello."},
+ {id:"hair_texture",group:"hair",label:"Textura",initial:"liso_sedoso",fixed:false,note:"Acabado del cabello, independiente del corte."},
+ {id:"side_hair",group:"hair",label:"Cabello lateral",initial:"mechones_largos",fixed:false,note:"Mechones y silueta lateral."},
+ {id:"back_hair",group:"hair",label:"Cabello trasero",initial:"recto_liso",fixed:false,note:"Capas y perfil posterior."},
+ {id:"hair",group:"hair",label:"Color base",initial:"rojo_coral",fixed:true,note:"Color dominante del cabello."},
+ {id:"hair_color_pattern",group:"hair",label:"Patrón de color",initial:"puntas_doradas",fixed:true,note:"Distribución, degradado y transiciones del color."},
+ {id:"hair_secondary_color",group:"hair",label:"Color secundario",initial:"oro_metalico",fixed:true,note:"Color de acento usado por los patrones del catálogo; raíz/coronilla/inner hair separados son una ampliación futura."},
+
+ {id:"outfit",group:"outfit",label:"Vestimenta",initial:"tactical_baseball",fixed:false,note:"Conjunto principal de vestuario."},
+ {id:"outer_layer",group:"outfit",label:"Capa exterior",initial:"none",fixed:false,note:"Chaqueta, capa u otra pieza exterior."},
+ {id:"footwear",group:"outfit",label:"Calzado",initial:"combat_sneakers",fixed:false,note:"Calzado seleccionado de forma independiente."},
+ {id:"accessory",group:"outfit",label:"Accesorio",initial:"minimal",fixed:false,note:"Accesorios compatibles sin rehacer el personaje completo."},
+
+ {id:"combat_role",group:"combat",label:"Rol de combate",initial:"striker",fixed:false,note:"Rol conceptual del personaje."},
+ {id:"baseball_prop",group:"combat",label:"Prop de baseball",initial:"bat",fixed:false,note:"Prop característico asociado a baseball/combat."},
+ {id:"pose",group:"combat",label:"Pose",initial:"defiant",fixed:true,note:"Actitud y dirección corporal; cámara avanzada pendiente."},
+
+ {id:"voice",group:"detail",label:"Voz / timbre",initial:"coral_brillante",fixed:false,note:"Identidad sonora conceptual, también expresada en el perfil."},
+ {id:"palette_accent",group:"detail",label:"Acento de paleta",initial:"sunset",fixed:false,note:"Color secundario de diseño para reforzar la lectura visual."},
+ {id:"quirk",group:"detail",label:"Detalle / quirk",initial:"bat_named",fixed:false,note:"Pequeño detalle distintivo del personaje."}
 ];
 const tabs:{id:Group;label:string;no:string;title:string;subtitle:string}[]=[
- {id:"identity",label:"Identidad",no:"01",title:"Identidad",subtitle:"Especie y familia visual"},
- {id:"body",label:"Cuerpo",no:"02",title:"Cuerpo y anatomía",subtitle:"Estatura y proporciones"},
- {id:"hair",label:"Cabello",no:"03",title:"Diseño de cabello",subtitle:"Color base, patrón y acento"},
- {id:"face",label:"Rostro",no:"04",title:"Ojos y rostro",subtitle:"Iris y forma de pupila"},
- {id:"pose",label:"Pose",no:"05",title:"Pose y presencia",subtitle:"Actitud y dirección corporal"}
+ {id:"identity",label:"Identidad",no:"01",title:"Identidad",subtitle:"Personalidad, especie y silueta"},
+ {id:"body",label:"Cuerpo",no:"02",title:"Cuerpo",subtitle:"Altura, constitución y proporciones"},
+ {id:"anatomy",label:"Anatomía",no:"03",title:"Anatomía",subtitle:"Orejas, cola y rasgos craneales"},
+ {id:"face",label:"Cara",no:"04",title:"Cara y expresión",subtitle:"Rasgos faciales, ojos y pupilas"},
+ {id:"hair",label:"Cabello",no:"05",title:"Diseño de cabello",subtitle:"Corte, capas, textura y color"},
+ {id:"outfit",label:"Vestuario",no:"06",title:"Vestuario",subtitle:"Prendas y accesorios por separado"},
+ {id:"combat",label:"Combate",no:"07",title:"Combate",subtitle:"Rol, prop y pose"},
+ {id:"detail",label:"Detalle",no:"08",title:"Detalles",subtitle:"Voz, paleta y quirk"}
 ];
 const initialValues=Object.fromEntries(fields.map(f=>[f.id,f.initial])) as Record<FieldId,string>;
-const initialFixed=Object.fromEntries(fields.map(f=>[f.id,true])) as Record<FieldId,boolean>;
-
+const initialFixed=Object.fromEntries(fields.map(f=>[f.id,f.fixed])) as Record<FieldId,boolean>;
+function valuesFromCatalog(data:Catalog):Record<FieldId,string>{
+ return Object.fromEntries(fields.map(field=>{
+  const options=data.categories[field.id]??[];
+  const preferred=options.find(option=>option.id===field.initial)?.id;
+  return [field.id,preferred??options[0]?.id??"auto"];
+ })) as Record<FieldId,string>;
+}
 function labelFor(catalog:Catalog|null,id:FieldId,value:string):string{return catalog?.categories[id]?.find(x=>x.id===value)?.label??value}
 function colorFor(id:string):string{return ({rojo_coral:"#ef646b",naranja_tangerina:"#ef8b43",rosa_chicle:"#ec78bd",violeta_profundo:"#8e7ae7",negro_obsidiana:"#38384b",azul_nocturno:"#4761b1",plateado_perla:"#bbc6d8",castano_miel:"#a97851",rubio_platino:"#e8dfba",turquesa:"#35c5bd",verde_esmeralda:"#2da987",rubio_dorado:"#d4a440"} as Record<string,string>)[id]??"#ef646b"}
 async function jsonResponse<T>(response:Response):Promise<T>{
@@ -63,11 +109,18 @@ export default function App(){
     const catalogResponse=await fetch("/api/catalog",{signal:controller.signal});
     const data=await jsonResponse<Catalog>(catalogResponse);
     if(controller.signal.aborted)return;
-    setCatalog(data);setLoadingCatalog(false);setStatus("Catálogo oficial conectado. Generando la ficha inicial…");
-    const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialValues,seed:314159,coherence:.82,surprise:false}),signal:controller.signal});
+    const defaults=valuesFromCatalog(data);
+    setCatalog(data);setValues(defaults);setLoadingCatalog(false);setStatus("Catálogo oficial conectado. Generando la ficha inicial…");
+    const initialSelections=Object.fromEntries(fields.map(field=>[field.id,field.fixed?defaults[field.id]:"auto"]));
+    const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialSelections,seed:314159,coherence:.82,surprise:false}),signal:controller.signal});
     const result=await jsonResponse<GeneratedCharacter>(response);
     if(controller.signal.aborted)return;
     setGenerated(result);
+    setValues(previous=>{
+     const next={...previous};
+     for(const field of fields){if(!field.fixed&&result.profile[field.id])next[field.id]=result.profile[field.id]}
+     return next;
+    });
     const profilesResponse=await fetch("/api/profiles",{signal:controller.signal});
     const profileList=await jsonResponse<{profiles:SavedProfileSummary[]}>(profilesResponse);
     if(controller.signal.aborted)return;
@@ -138,7 +191,12 @@ export default function App(){
    setStatus("Perfil cargado desde la biblioteca local: "+record.name);
   }catch(error){setStatus(error instanceof Error?error.message:"No se pudo cargar el perfil local.")}
  }
- function reset(){setValues(initialValues);setFixed(initialFixed);setSeed("314159");setCoherence(.82);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")}
+ function reset(){
+  const defaults=catalog?valuesFromCatalog(catalog):initialValues;
+  const next={...defaults};
+  if(generated){for(const field of fields){if(!initialFixed[field.id]&&generated.profile[field.id])next[field.id]=generated.profile[field.id]}}
+  setValues(next);setFixed(initialFixed);setSeed("314159");setCoherence(.82);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")
+ }
  async function saveProfile(){
   if(!generated){setStatus("Genera un perfil antes de guardarlo.");return}
   const profile={schema_version:1,mode:"local-engine",style_id:generated.style_id,seed:generated.seed,coherence:generated.coherence,selections:Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"])),generated};
@@ -195,7 +253,7 @@ export default function App(){
     </section>
     <section className="controls-area">
      <div className="control-panel">
-      <div className="kicker"><span><i>02</i> CONFIGURACIÓN</span><small>{tab.no} / 05</small></div>
+      <div className="kicker"><span><i>02</i> CONFIGURACIÓN</span><small>{tab.no} / 08</small></div>
       <div className="tabs" role="tablist" aria-label="Categorías del personaje">{tabs.map(t=><button key={t.id} type="button" role="tab" aria-selected={group===t.id} className={group===t.id?"tab selected":"tab"} onClick={()=>setGroup(t.id)}><small>{t.no}</small>{t.label}</button>)}</div>
       <div className="control-heading"><h2>{tab.title}</h2><p>{tab.subtitle}</p></div>
       <div className="fields">{visible.map(field=>{
