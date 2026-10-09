@@ -435,7 +435,6 @@ def test_manual_hairstyle_and_length_locks_are_never_overridden():
     test_auto_scale_pattern_respects_species_compatibility()
     test_new_scale_regions_are_manual_and_prompted_independently()
     test_scale_color_is_omitted_when_pattern_has_no_visible_scales()
-    test_explicit_none_outer_layer_has_clear_prompt_semantics()
     print("PASS: character generator tests")
 
 def test_catalog_declares_valid_hair_arrangement_length_compatibility():
@@ -918,7 +917,7 @@ def test_explicit_none_outer_layer_has_clear_prompt_semantics():
     result = generator.generate(
         {
             "species": "humana",
-            "outfit": "uniforme_combate",
+            "outfit": "tactical_baseball",
             "outer_layer": "none",
             "accessory": "headband",
         },
@@ -928,7 +927,7 @@ def test_explicit_none_outer_layer_has_clear_prompt_semantics():
     assert result["profile"]["outer_layer"] == "none"
     assert "no outer layer" in result["prompt"]
     assert "headband" in result["prompt"].lower()
-    assert "uniforme" in result["prompt"].lower()
+    assert "tactical baseball combat suit" in result["prompt"].lower()
 
 if __name__ == "__main__":
     test_rules_have_expected_categories()
@@ -974,3 +973,4 @@ if __name__ == "__main__":
     test_manual_anatomy_locks_override_species_compatibility()
     test_all_catalog_compatibility_references_are_valid()
     test_every_catalog_compatibility_option_is_honored_with_auto_target()
+    test_explicit_none_outer_layer_has_clear_prompt_semantics()
