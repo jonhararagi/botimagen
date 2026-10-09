@@ -19,11 +19,14 @@ const fields:Field[]=[
  {id:"height_cm",group:"body",label:"Altura exacta",initial:"h170",fixed:true,note:"La altura no determina por sí sola la constitución."},
  {id:"body_build",group:"body",label:"Constitución",initial:"fuerte_guardiana",fixed:true,note:"Volumen y lectura física, independiente de la altura."},
  {id:"body_proportions",group:"body",label:"Proporciones corporales",initial:"esbelta_elegante",fixed:true,note:"Relación de proporciones, no un preset de cuerpo completo."},
+ {id:"bust_size",group:"body",label:"Tamaño del busto",initial:"balanced",fixed:false,note:"Proporción anatómica adulta, independiente de la constitución corporal."},
  {id:"skin_tone",group:"body",label:"Tono de piel",initial:"porcelana_neutra",fixed:false,note:"Tono base de piel definido por el catálogo."},
 
  {id:"ear_style",group:"anatomy",label:"Orejas",initial:"orejas_gato",fixed:false,note:"Forma de orejas independiente de la etiqueta de especie."},
  {id:"tail_style",group:"anatomy",label:"Cola",initial:"sin_cola",fixed:false,note:"Tipo de cola o ausencia explícita."},
  {id:"horn_style",group:"anatomy",label:"Cuernos / rasgo craneal",initial:"sin_cuernos",fixed:false,note:"Rasgos craneales controlados por separado."},
+ {id:"scale_pattern",group:"anatomy",label:"Zonas / patrón de escamas",initial:"no_visible_scales",fixed:false,note:"Define primero dónde aparecen las escamas, no su color."},
+ {id:"scale_color",group:"anatomy",label:"Color de escamas",initial:"metallic_gold",fixed:false,note:"El color solo se aplica si el patrón establece zonas visibles."},
 
  {id:"expression",group:"face",label:"Expresión",initial:"mirada_enfocada",fixed:false,note:"Emoción visible de la cara."},
  {id:"face_shape",group:"face",label:"Forma del rostro",initial:"equilibrada",fixed:false,note:"Estructura general del rostro."},
@@ -44,7 +47,10 @@ const fields:Field[]=[
  {id:"back_hair",group:"hair",label:"Cabello trasero",initial:"recto_liso",fixed:false,note:"Capas y perfil posterior."},
  {id:"hair",group:"hair",label:"Color base",initial:"rojo_coral",fixed:true,note:"Color dominante del cabello."},
  {id:"hair_color_pattern",group:"hair",label:"Patrón de color",initial:"puntas_doradas",fixed:true,note:"Distribución, degradado y transiciones del color."},
- {id:"hair_secondary_color",group:"hair",label:"Color secundario",initial:"oro_metalico",fixed:true,note:"Color de acento usado por los patrones del catálogo; raíz/coronilla/inner hair separados son una ampliación futura."},
+ {id:"hair_secondary_color",group:"hair",label:"Color secundario",initial:"oro_metalico",fixed:true,note:"Acento general que complementa el patrón de color."},
+ {id:"hair_root_color",group:"hair",label:"Color de raíces",initial:"matching_base",fixed:false,note:"Zona de raíz independiente del color base y de las puntas."},
+ {id:"hair_crown_color",group:"hair",label:"Color de coronilla",initial:"matching_base",fixed:false,note:"Controla únicamente el color sobre la coronilla."},
+ {id:"hair_inner_color",group:"hair",label:"Color interior (inner hair)",initial:"matching_base",fixed:false,note:"Controla los mechones interiores sin recolorear toda la melena."},
 
  {id:"outfit",group:"outfit",label:"Vestimenta",initial:"tactical_baseball",fixed:false,note:"Conjunto principal de vestuario."},
  {id:"outer_layer",group:"outfit",label:"Capa exterior",initial:"none",fixed:false,note:"Chaqueta, capa u otra pieza exterior."},
@@ -253,7 +259,7 @@ export default function App(){
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>ILUSTRACIÓN NO GENERADA</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <div className="roadmap"><b>✦ Próximos rasgos</b><span>Color y zonas de escamas, tamaño del busto, raíces, coronilla e inner hair aún requieren ampliar el catálogo.</span></div>
+     <div className="roadmap"><b>✦ Diseño modular</b><span>Busto, patrón/color de escamas y raíces, coronilla e interior del cabello se controlan como rasgos separados. La silueta SVG sigue siendo provisional.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">
@@ -267,8 +273,6 @@ export default function App(){
         <select id={"trait-"+field.id} value={exists?current:""} disabled={!fixed[field.id]||loadingCatalog||!options.length} onChange={event=>setValue(field.id,event.target.value)}>{!exists&&<option value="" disabled>{loadingCatalog?"Cargando catálogo…":"Seleccionar opción"}</option>}{options.map(option=><option key={option.id} value={option.id}>{option.label}</option>)}</select><p>{field.note}</p>
        </div>
       })}</div>
-      {group==="body"&&<div className="future-trait"><b>＋</b><span><strong>Tamaño del busto</strong><small>Se añadirá como rasgo independiente en la ampliación del catálogo.</small></span><em>PLANIFICADO</em></div>}
-      {group==="identity"&&values.species==="draconica"&&<div className="future-trait"><b>＋</b><span><strong>Color / distribución de escamas</strong><small>La especie existe; estos selectores aún no están en el catálogo.</small></span><em>PLANIFICADO</em></div>}
       <div className="seed-row"><span><b>SEMILLA DEL GENERADOR</b><small>La semilla se envía al motor Python real.</small></span><input aria-label="Semilla del generador" value={seed} inputMode="numeric" onChange={event=>setSeed(event.target.value.replace(/[^0-9-]/g,"").slice(0,15))}/></div>
       <div className="seed-row"><span><b>COHERENCIA · {Math.round(coherence*100)}%</b><small>Controla las alternativas elegidas en AUTO.</small></span><input aria-label="Coherencia" type="range" min="0" max="100" value={Math.round(coherence*100)} onChange={event=>setCoherence(Number(event.target.value)/100)}/></div>
       <button className="btn primary wide" type="button" disabled={!catalog||generating} onClick={()=>void generateProfile()}>{generating?"Generando…":"✦ Generar perfil con motor local"} <span>→</span></button>
