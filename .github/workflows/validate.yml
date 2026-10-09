@@ -1,5 +1,8 @@
 name: Validate BotImagen
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [main]
@@ -40,10 +43,15 @@ jobs:
         working-directory: web
         run: npm run build
 
-      - name: Export generated npm lockfile (temporary bootstrap)
-        uses: actions/upload-artifact@v4
-        with:
-          name: botimagen-package-lock-bootstrap
-          path: web/package-lock.json
-          if-no-files-found: error
-          retention-days: 1
+      - name: Bootstrap npm lockfile once
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if git ls-files --error-unmatch web/package-lock.json >/dev/null 2>&1; then
+            echo "package-lock.json is already tracked; no bootstrap needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/package-lock.json
+          git commit -m "chore: add npm lockfile"
+          git push
