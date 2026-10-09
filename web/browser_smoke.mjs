@@ -108,6 +108,20 @@ try {
   assert.ok(prompt.includes("turquoise color confined to the hair tips with a clean transition"),
     "Generated prompt should honor the independently selected turquoise tip color");
 
+  const seedInput = page.locator('input[aria-label="Semilla del generador"]');
+  await seedInput.fill("12-3");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("La semilla debe ser un número entero válido.", { exact: true }).waitFor();
+  assert.equal(await page.locator(".heading-buttons .btn.primary").isDisabled(), true,
+    "Invalid seed syntax must leave saving disabled until regeneration succeeds");
+  await seedInput.fill("314159");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("Perfil generado por Python"),
+    undefined,
+    { timeout: 15000 },
+  );
+
   await tipSelect.selectOption("metallic_gold");
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
   const saveButton = page.locator(".heading-buttons .btn.primary");
@@ -266,7 +280,7 @@ try {
     "Loaded profile should retain an outfit compatible with its restored combat role");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility in both directions, combat-role/outfit compatibility, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified strict seed validation, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility in both directions, combat-role/outfit compatibility, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);

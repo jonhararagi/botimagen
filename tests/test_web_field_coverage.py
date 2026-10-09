@@ -35,6 +35,10 @@ def main() -> None:
     assert len(tab_ids) == 8, f"Expected 8 editor categories, found {len(tab_ids)}"
 
 
+    # Seed input must be parsed strictly, not truncated by parseInt (e.g. 12-3 -> 12).
+    assert r'if(!/^-?\d+$/.test(normalizedSeed)||!Number.isSafeInteger(Number(normalizedSeed)))' in source
+    assert 'const numericSeed=Number(normalizedSeed);' in source
+
     # Guard against saving/exporting a selection draft with a stale generated prompt.
     assert 'const [draftDirty,setDraftDirty]=useState(false);' in source
     assert 'if(draftDirty){setStatus("Hay cambios pendientes.' in source

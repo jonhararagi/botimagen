@@ -153,8 +153,9 @@ export default function App(){
  function toggleFixed(id:FieldId){const willFix=!fixed[id];setFixed(p=>({...p,[id]:willFix}));setDraftDirty(true);setSaved(false);setStatus(willFix?"Campo fijado manualmente.":"Campo marcado AUTO; el motor elegirá una opción oficial al generar.")}
  async function generateProfile(){
   if(!catalog){setStatus("El catálogo aún no está disponible. Inicia el servicio local y recarga.");return}
-  const numericSeed=Number.parseInt(seed,10);
-  if(!Number.isSafeInteger(numericSeed)){setStatus("La semilla debe ser un número entero válido.");return}
+  const normalizedSeed=seed.trim();
+  if(!/^-?\d+$/.test(normalizedSeed)||!Number.isSafeInteger(Number(normalizedSeed))){setStatus("La semilla debe ser un número entero válido.");return}
+  const numericSeed=Number(normalizedSeed);
   const selections=Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"]));
   setGenerating(true);setStatus("Generando mediante CharacterGenerator…");
   try{
