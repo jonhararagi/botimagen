@@ -1,0 +1,145 @@
+from __future__ import annotations
+
+import json
+import sys
+import tempfile
+import threading
+import unittest
+from http.client import HTTPConnection
+from http.server import ThreadingHTTPServer
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from character_generator import CharacterGenerator
+from botimagen_server import ApiInputError, generate_from_payload, make_catalog, make_handler
+
+
+class LocalApiTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.generator = CharacterGenerator(ROOT / "character_rules.json")
+
+    def test_catalog_is_loaded_from_real_rules(self):
+        catalog = make_catalog(self.generator)
+        self.assertEqual(catalog["style"]["id"], "bw-modern-gacha-v1")
+        self.assertEqual(catalog["categories"]["species"][0]["id"], "humana")
+        self.assertIn("hair_color_pattern", catalog["categories"])
+        self.assertEqual(
+            catalog["categories"]["hair"],
+            [{"id": item["id"], "label": item["label"], "tags": item.get("tags", [])}
+             for item in self.generator.categories["hair"]],
+        )
+
+    def test_generate_returns_official_engine_output(self):
+        result = generate_from_payload(
+            {"selections": {
+                "species": "draconica", "hair": "rojo_coral", "eyes": "ambar",
+                "body_build": "fuerte_guardiana", "pupil_shape": "estrella",
+            }, "seed": 12007, "coherence": 0.9, "surprise": False},
+            self.generator,
+        )
+        self.assertEqual(result["profile"]["species"], "draconica")
+        self.assertEqual(result["profile"]["hair"], "rojo_coral")
+        self.assertEqual(result["profile"]["eyes"], "ambar")
+        self.assertEqual(result["profile"]["body_build"], "fuerte_guardiana")
+        self.assertEqual(result["profile"]["pupil_shape"], "estrella")
+        self.assertEqual(result["seed"], 12007)
+        self.assertEqual(result["style_id"], "bw-modern-gacha-v1")
+        self.assertTrue(result["prompt"])
+        self.assertTrue(result["negative_prompt"])
+
+    def test_same_seed_reproduces_profile(self):
+        payload = {"selections": {"species": "draconica"}, "seed": 2718, "coherence": 0.82}
+        first = generate_from_payload(payload, self.generator)
+        second = generate_from_payload(payload, self.generator)
+        self.assertEqual(first["profile"], second["profile"])
+        self.assertEqual(first["prompt"], second["prompt"])
+
+    def test_rejects_unknown_field_and_option(self):
+        with self.assertRaises(ApiInputError):
+            generate_from_payload({"selections": {"made_up_field": "red"}}, self.generator)
+        with self.assertRaises(ApiInputError):
+            generate_from_payload({"selections": {"hair": "acuamarina_inventada"}}, self.generator)
+
+    def test_rejects_bad_numeric_and_unknown_top_level_inputs(self):
+        with self.assertRaises(ApiInputError):
+            generate_from_payload({"seed": True}, self.generator)
+        with self.assertRaises(ApiInputError):
+            generate_from_payload({"coherence": 1.5}, self.generator)
+        with self.assertRaises(ApiInputError):
+            generate_from_payload({"exec": "del files"}, self.generator)
+
+    def test_http_health_catalog_generate_and_profile_persistence(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(self.generator, Path(temp_dir)))
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=3)
+            try:
+                connection.request("GET", "/api/health")
+                response = connection.getresponse()
+                health = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(health["status"], "ok")
+
+                connection.request("GET", "/api/catalog")
+                response = connection.getresponse()
+                catalog = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertIn("draconica", [item["id"] for item in catalog["categories"]["species"]])
+
+                payload = json.dumps({"selections": {"species": "draconica"}, "seed": 12}).encode("utf-8")
+                connection.request("POST", "/api/generate", body=payload, headers={"Content-Type": "application/json"})
+                response = connection.getresponse()
+                result = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(result["profile"]["species"], "draconica")
+
+                invalid = json.dumps({"selections": {"hair": "not-in-catalog"}}).encode("utf-8")
+                connection.request("POST", "/api/generate", body=invalid, headers={"Content-Type": "application/json"})
+                response = connection.getresponse()
+                error = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 400)
+                self.assertIn("no disponible", error["error"])
+
+                saved_payload = json.dumps({
+                    "name": "Dragonkin rojo",
+                    "profile": {"style_id": "bw-modern-gacha-v1", "seed": 12, "values": {"species": "draconica"}}
+                }).encode("utf-8")
+                connection.request("POST", "/api/profiles", body=saved_payload, headers={"Content-Type": "application/json"})
+                response = connection.getresponse()
+                saved = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 201)
+                self.assertEqual(saved["name"], "Dragonkin rojo")
+                self.assertRegex(saved["id"], r"^[0-9a-f-]{36}$")
+
+                connection.request("GET", "/api/profiles")
+                response = connection.getresponse()
+                listing = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(len(listing["profiles"]), 1)
+                self.assertEqual(listing["profiles"][0]["id"], saved["id"])
+
+                connection.request("GET", "/api/profiles/" + saved["id"])
+                response = connection.getresponse()
+                loaded = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(loaded["profile"]["values"]["species"], "draconica")
+
+                connection.request("GET", "/api/profiles/../../README.md")
+                response = connection.getresponse()
+                response.read()
+                self.assertIn(response.status, (400, 404))
+            finally:
+                connection.close()
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

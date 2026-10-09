@@ -1,6 +1,6 @@
 # BotImagen · BaseWarriors Asset Intake
 
-> **Nueva dirección web-first:** consulta el [Cerebro de BotImagen](cerebro/README.md) para ver la arquitectura acordada, el plan por fases y el estado verificado de la migración web local. El prototipo web inicial ya existe en `web/`; aún no está conectado al motor Python.
+> **Nueva dirección web-first:** consulta el [Cerebro de BotImagen](cerebro/README.md) para ver la arquitectura acordada, el plan por fases y el estado verificado de la migración web local. El prototipo web inicial vive en `web/` y ya consume el catálogo y el motor Python mediante una API local; consulta `cerebro/ESTADO_ACTUAL.md` para ver los límites pendientes.
 
 
 Herramienta local para recibir imágenes generadas por IA y colocarlas en el destino correcto del proyecto.
@@ -307,10 +307,13 @@ El esquema contiene 40 categorías en total. Hay 35 categorías visuales con die
 La validación automática comprueba los recuentos, compatibilidad de especie, altura, reproducción por semilla y el caso de prueba del cabello verde esmeralda con puntas doradas y pupilas de estrella.
 
 
-## Interfaz web local (prototipo en desarrollo)
+## Interfaz web local (beta en construcción)
 
-La nueva interfaz vive en `web/` y utiliza React + TypeScript + Vite. Para iniciarla durante el desarrollo, entra en esa carpeta, ejecuta `npm install` y después `npm run dev`. El servidor Vite se limita a `127.0.0.1`.
+La interfaz React + TypeScript vive en `web/`. Para utilizarla durante el desarrollo, abre dos terminales:
 
-El prototipo incluye pestañas de rasgos, selectores con opciones existentes del catálogo, modos FIJO/AUTO, semilla demostrativa, vista del prompt, exportación JSON y guardado temporal en el navegador. La silueta central es un marcador vectorial, no una ilustración generada. Todavía no se comunica con `character_generator.py`, no guarda perfiles en carpetas de Windows y no incluye la biblioteca visual.
+1. Ejecuta `py botimagen_server.py` desde la raíz del repositorio.
+2. En otra terminal ejecuta `cd web`, `npm install` y `npm run dev`.
 
-La continuidad técnica está en [`cerebro/ESTADO_ACTUAL.md`](cerebro/ESTADO_ACTUAL.md) y [`cerebro/PLAN_MAESTRO.md`](cerebro/PLAN_MAESTRO.md).
+Abre la URL local indicada por Vite. El servicio Python solo escucha en `127.0.0.1:8765`; Vite redirige las solicitudes `/api` al motor. El catálogo procede de `character_rules.json` y la generación de prompts utiliza `CharacterGenerator`. Los perfiles se guardan en `generated_characters/web_profiles/`, excluida de Git.
+
+La figura central todavía es un marcador vectorial, no una imagen generada. La galería de perfiles en la UI, la biblioteca visual, el intake de assets en web y la prueba real completa en Windows siguen pendientes. Revisa [`web/README.md`](web/README.md) para comandos y límites, y [`cerebro/PROGRESO.md`](cerebro/PROGRESO.md) para el porcentaje global ponderado.

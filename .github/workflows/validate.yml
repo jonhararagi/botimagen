@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Python syntax
-        run: python -m py_compile app.py doctor.py character_generator.py tests/test_character_generator.py tests/test_visual_style_contract.py
+        run: python -m py_compile app.py doctor.py character_generator.py botimagen_server.py tests/test_character_generator.py tests/test_visual_style_contract.py tests/test_local_api.py
 
       - name: Validate asset manifest
         run: python tests/validate_manifest.py
@@ -23,6 +23,9 @@ jobs:
 
       - name: Validate universal visual style contract
         run: python tests/test_visual_style_contract.py
+
+      - name: Validate local API bridge
+        run: python tests/test_local_api.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
