@@ -884,6 +884,34 @@ def test_manual_anatomy_locks_override_species_compatibility():
             )
 
 
+
+def test_every_catalog_compatibility_option_is_honored_with_auto_target():
+    generator = CharacterGenerator(RULES)
+    checks = 0
+
+    for source_category, options in generator.categories.items():
+        for option in options:
+            for related_category, allowed_ids in option.get("compatible_with", {}).items():
+                result = generator.generate(
+                    {
+                        source_category: option["id"],
+                        related_category: "auto",
+                    },
+                    seed=120000 + checks,
+                    coherence=0.4,
+                )
+                selected_id = result["profile"][related_category]
+                assert selected_id in allowed_ids, (
+                    source_category,
+                    option["id"],
+                    related_category,
+                    selected_id,
+                    allowed_ids,
+                )
+                checks += 1
+
+    assert checks >= 100, f"Expected broad coverage of catalog compatibility metadata, got {checks}"
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -927,3 +955,4 @@ if __name__ == "__main__":
     test_auto_anatomy_respects_species_metadata_across_seed_matrix()
     test_manual_anatomy_locks_override_species_compatibility()
     test_all_catalog_compatibility_references_are_valid()
+    test_every_catalog_compatibility_option_is_honored_with_auto_target()
