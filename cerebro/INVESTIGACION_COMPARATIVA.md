@@ -125,3 +125,12 @@ Investigar lo suficiente para reducir un riesgo concreto, no para aplazar la ent
 - **Patrones transferibles:** usar un lockfile y una instalación limpia como prueba reproducible; alinear versiones de framework y paquetes acoplados; no resolver conflictos instalando dependencias al azar; distinguir errores de la aplicación de fallos del proveedor remoto; diseñar mensajes de error recuperables.
 - **Aplicación ya pertinente:** BotImagen usa package-lock.json y npm ci en CI. La nueva prueba E2E inyecta un 500 temporal en /api/generate y comprueba que el usuario ve el error y puede volver a generar cuando el servicio responde. Este test valida recuperación del lado UI; no simula fallos de instalación ni de proveedor externo.
 - **Estado de investigación:** los issues fueron leídos como reportes, no reproducidos. Causa raíz y estado actual de los incidentes permanecen NOT_RUN salvo donde el texto del issue describe explícitamente el mensaje observado.
+
+
+### Referencia adicional · DiceBear Editor: opciones vacías y semántica de “ninguno”
+
+- **Fuente:** [DiceBear #538 · Empty or partly empty preview style options in editor](https://github.com/dicebear/dicebear/issues/538), consultado el 2026-10-09.
+- **HECHO OBSERVADO:** un usuario reportó que ciertas opciones vacías/“none” dejaban la vista previa vacía o parcialmente vacía. Un mantenedor respondió el 2026-07-03 que el reporte estaba corregido y publicado. En agosto otro comentario aún preguntó si “no hair” debía ser una opción; el hilo por sí solo no demuestra una regresión ni su causa.
+- **INTERPRETACIÓN:** los valores vacíos necesitan una semántica explícita y consistente. “Ninguno” puede ser una selección válida, no un dato faltante; la UI no debería ocultar accidentalmente otras opciones ni confundir una ausencia intencional con un error de render.
+- **Aplicabilidad a BotImagen:** al ampliar categorías, distinguir `auto`, selección manual de un valor y ausencia intencional del rasgo. Si se añade una opción “sin X”, cubrirla en catálogo, prompt y render/preview con una prueba dedicada. No copiar el diseño ni el código de DiceBear.
+- **Prueba local pendiente:** revisar las categorías de BotImagen que podrían necesitar “ninguno” explícito y comprobar que las opciones se muestren, generen prompts coherentes y sobrevivan guardar/cargar. No se aumenta el porcentaje de beta por esta investigación.

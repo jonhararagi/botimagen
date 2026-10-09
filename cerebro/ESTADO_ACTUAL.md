@@ -223,3 +223,14 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **Investigación comparativa:** BIMG-RESEARCH-001 y revisión de issues públicos quedan registradas en `cerebro/INVESTIGACION_COMPARATIVA.md`. Las incidencias externas fueron leídas, no reproducidas; no se afirman causas raíz que los reportes no demuestran.
 - **HEAD AFTER del código probado:** `c48acb0a1dc7e6a6029411e830d89be14886362e`; después se añadió documentación de investigación. Consultar el HEAD actual de `main` antes de otra escritura.
 - **Estado:** E2E de recuperación de error PASS_REAL. Chrome/Edge físico, Windows y métricas de rendimiento siguen NOT_RUN.
+
+
+## Checkpoint de trabajo continuo · 2026-10-09 · validación HTTP y recuperación de UI
+
+- **HEAD BEFORE:** `0b0d3fb7b5ae381c3aad7db739781a309010aee1`.
+- **HEAD AFTER de código:** `dde43254aac817c8d08d85e139a74b173a2c6c54`.
+- **Archivos:** `tests/test_local_api.py`, `web/browser_smoke.mjs`.
+- **Cambios:** pruebas HTTP reales contra el servidor local para `415 Unsupported Media Type`, `413 Content Too Large` sin enviar el cuerpo sobredimensionado y `411 Length Required` cuando falta `Content-Length`. E2E Chromium ahora verifica que el mensaje del error transitorio desaparezca después de reintentar con éxito.
+- **CI #159 PASS_REAL:** cobertura de tipo de contenido y tamaño máximo de cuerpo; generador, API, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38001028451.
+- **CI #160 PASS_REAL:** pruebas de longitud obligatoria y recuperación del mensaje UI, además de la suite completa Python, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38001184083.
+- **Estado:** PASS_REAL en CI Linux. No equivale a QA física en Windows; esta y las mediciones de rendimiento siguen NOT_RUN. El porcentaje beta se mantiene en 62%, porque la mejora refuerza las guardas y la recuperación sin cerrar una fase completa.
