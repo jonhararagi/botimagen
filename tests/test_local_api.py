@@ -28,7 +28,7 @@ class LocalApiTests(unittest.TestCase):
         self.assertEqual(catalog["categories"]["species"][0]["id"], "humana")
         self.assertIn("hair_color_pattern", catalog["categories"])
         self.assertIn("hair_tip_color", catalog["categories"])
-        self.assertEqual(catalog["catalog_version"], 7)
+        self.assertEqual(catalog["catalog_version"], 8)
         self.assertEqual(
             catalog["categories"]["hair"],
             [{"id": item["id"], "label": item["label"], "tags": item.get("tags", [])}
