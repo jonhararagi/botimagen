@@ -234,6 +234,40 @@ class CharacterGenerator:
 
         return score
 
+    def _candidate_is_compatible(
+        self,
+        category: str,
+        candidate: dict[str, Any],
+        chosen: dict[str, str],
+    ) -> bool:
+        """Evaluate catalog-declared constraints in both directions."""
+        candidate_id = str(candidate.get("id", ""))
+
+        # Constraints declared by the candidate, e.g. a hairstyle's allowed lengths.
+        for related_category, allowed_ids in candidate.get("compatible_with", {}).items():
+            selected_id = chosen.get(related_category, "auto")
+            if selected_id != "auto" and selected_id not in allowed_ids:
+                return False
+
+        # Also read constraints from an already selected option in the related field.
+        for related_category, selected_id in chosen.items():
+            if related_category == category or selected_id == "auto":
+                continue
+            selected_item = next(
+                (
+                    entry for entry in self.categories.get(related_category, [])
+                    if entry.get("id") == selected_id
+                ),
+                None,
+            )
+            if not selected_item:
+                continue
+            allowed_ids = selected_item.get("compatible_with", {}).get(category)
+            if allowed_ids is not None and candidate_id not in allowed_ids:
+                return False
+
+        return True
+
     def _choose_category(
         self,
         category: str,
@@ -262,6 +296,15 @@ class CharacterGenerator:
             "puntas_doradas", "puntas_plateadas", "degradado_suave", "ombre_oscuro_claro"
         }:
             values = [item for item in values if item["id"] != "matching_base"]
+
+        compatible_values = [
+            item for item in values
+            if self._candidate_is_compatible(category, item, chosen)
+        ]
+        # If metadata ever becomes incomplete, keep generation available rather
+        # than turning an editor preference into a hard failure.
+        if compatible_values:
+            values = compatible_values
 
         if not values:
             raise ValueError(f"No candidates available for {category}")

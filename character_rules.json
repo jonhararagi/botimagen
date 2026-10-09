@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -1137,7 +1137,15 @@
         ],
         "base": 1,
         "prompt_en": "clean bob haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "corto",
+            "medio",
+            "a_la_mandibula",
+            "a_los_hombros"
+          ]
+        }
       },
       {
         "id": "short_wavy",
@@ -1149,7 +1157,15 @@
         ],
         "base": 1,
         "prompt_en": "short wavy haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "muy_corto",
+            "pixie",
+            "corto",
+            "a_la_mandibula"
+          ]
+        }
       },
       {
         "id": "long_flowing",
@@ -1161,7 +1177,15 @@
         ],
         "base": 1,
         "prompt_en": "long flowing hair",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "largo",
+            "medio_largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "hime_cut",
@@ -1173,7 +1197,15 @@
         ],
         "base": 1,
         "prompt_en": "hime cut with straight bangs and side locks",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio_largo",
+            "largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "layered_shag",
@@ -1185,7 +1217,17 @@
         ],
         "base": 1,
         "prompt_en": "layered shag haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "corto",
+            "medio",
+            "a_la_mandibula",
+            "a_los_hombros",
+            "medio_largo",
+            "largo"
+          ]
+        }
       },
       {
         "id": "asymmetrical",
@@ -1197,7 +1239,21 @@
         ],
         "base": 1,
         "prompt_en": "asymmetrical haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "corto",
+            "medio",
+            "largo",
+            "pixie",
+            "muy_corto",
+            "a_la_mandibula",
+            "a_los_hombros",
+            "medio_largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "wolf_cut",
@@ -1209,7 +1265,16 @@
         ],
         "base": 1,
         "prompt_en": "layered wolf cut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "a_la_mandibula",
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo"
+          ]
+        }
       },
       {
         "id": "long_straight",
@@ -1221,7 +1286,15 @@
         ],
         "base": 1,
         "prompt_en": "long straight haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "largo",
+            "medio_largo",
+            "muy_largo",
+            "extra_largo"
+          ]
+        }
       },
       {
         "id": "curly_lob",
@@ -1233,7 +1306,14 @@
         ],
         "base": 1,
         "prompt_en": "curly long bob haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo"
+          ]
+        }
       },
       {
         "id": "medium_layers",
@@ -1245,7 +1325,15 @@
         ],
         "base": 1,
         "prompt_en": "medium-length layered haircut",
-        "bias": {}
+        "bias": {},
+        "compatible_with": {
+          "hair_length": [
+            "medio",
+            "a_los_hombros",
+            "medio_largo",
+            "largo"
+          ]
+        }
       }
     ],
     "eye_shape": [

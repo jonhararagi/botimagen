@@ -35,7 +35,7 @@ def test_rules_have_expected_categories():
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
-    assert data["version"] == 8
+    assert data["version"] == 9
     expected_scale_patterns = {
         "dorsal_hand_scales",
         "outer_thigh_scales",
@@ -386,6 +386,68 @@ if __name__ == "__main__":
     test_auto_hair_pattern_responds_to_explicit_zone_contrast()
     test_auto_hair_zone_colors_follow_distribution_without_breaking_manual_locks()
     test_auto_secondary_color_contrasts_with_base_for_accent_patterns()
+    test_catalog_declares_valid_hairstyle_length_compatibility()
+    test_auto_hairstyle_respects_manually_selected_length()
+    test_auto_hair_length_respects_manually_selected_hairstyle()
+    test_manual_hairstyle_and_length_locks_are_never_overridden()
+
+def test_catalog_declares_valid_hairstyle_length_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    lengths = {item["id"] for item in rules["categories"]["hair_length"]}
+    for style in rules["categories"]["hairstyle"]:
+        allowed = style.get("compatible_with", {}).get("hair_length")
+        assert allowed, f"{style['id']} must declare compatible hair lengths"
+        assert set(allowed).issubset(lengths), (style["id"], allowed)
+
+
+def test_auto_hairstyle_respects_manually_selected_length():
+    generator = CharacterGenerator(RULES)
+    rules = generator.rules
+    for length in ("pixie", "corto", "a_los_hombros", "largo", "extra_largo"):
+        for seed in range(12):
+            result = generator.generate(
+                {"hair_length": length, "hairstyle": "auto"},
+                seed=seed,
+                coherence=0.45,
+            )
+            style = next(
+                item for item in rules["categories"]["hairstyle"]
+                if item["id"] == result["profile"]["hairstyle"]
+            )
+            assert length in style["compatible_with"]["hair_length"], (
+                length, seed, result["profile"]["hairstyle"]
+            )
+
+
+def test_auto_hair_length_respects_manually_selected_hairstyle():
+    generator = CharacterGenerator(RULES)
+    for style_id in ("short_wavy", "long_flowing", "hime_cut", "wolf_cut", "long_straight"):
+        style = next(
+            item for item in generator.categories["hairstyle"]
+            if item["id"] == style_id
+        )
+        allowed = set(style["compatible_with"]["hair_length"])
+        for seed in range(12):
+            result = generator.generate(
+                {"hairstyle": style_id, "hair_length": "auto"},
+                seed=seed,
+                coherence=0.45,
+            )
+            assert result["profile"]["hair_length"] in allowed, (
+                style_id, seed, result["profile"]["hair_length"]
+            )
+
+
+def test_manual_hairstyle_and_length_locks_are_never_overridden():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"hairstyle": "long_flowing", "hair_length": "pixie"},
+        seed=9917,
+    )
+    assert result["profile"]["hairstyle"] == "long_flowing"
+    assert result["profile"]["hair_length"] == "pixie"
+
+
     test_auto_scale_pattern_respects_species_compatibility()
     test_new_scale_regions_are_manual_and_prompted_independently()
     test_scale_color_is_omitted_when_pattern_has_no_visible_scales()
