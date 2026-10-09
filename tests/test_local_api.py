@@ -56,6 +56,37 @@ class LocalApiTests(unittest.TestCase):
             )["compatible_with"]["hair_length"],
         )
 
+    def test_catalog_preserves_declared_metadata_for_every_option(self):
+        catalog = make_catalog(self.generator)
+        self.assertEqual(set(catalog["categories"]), set(self.generator.categories))
+
+        for category, source_options in self.generator.categories.items():
+            public_options = catalog["categories"][category]
+            self.assertEqual(len(public_options), len(source_options), category)
+            for source, public in zip(source_options, public_options, strict=True):
+                self.assertEqual(public["id"], source["id"], (category, source["id"]))
+                self.assertEqual(public["label"], source["label"], (category, source["id"]))
+                self.assertEqual(public["tags"], source.get("tags", []), (category, source["id"]))
+
+                if isinstance(source.get("color_family"), str):
+                    self.assertEqual(
+                        public.get("color_family"),
+                        source["color_family"],
+                        (category, source["id"], "color_family"),
+                    )
+                else:
+                    self.assertNotIn("color_family", public, (category, source["id"]))
+
+                compatible = source.get("compatible_with")
+                if isinstance(compatible, dict):
+                    self.assertEqual(
+                        public.get("compatible_with"),
+                        compatible,
+                        (category, source["id"], "compatible_with"),
+                    )
+                else:
+                    self.assertNotIn("compatible_with", public, (category, source["id"]))
+
     def test_generate_returns_official_engine_output(self):
         result = generate_from_payload(
             {"selections": {
