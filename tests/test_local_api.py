@@ -292,6 +292,20 @@ class LocalApiTests(unittest.TestCase):
                 try:
                     connection.putrequest("POST", "/api/generate")
                     connection.putheader("Content-Type", "application/json")
+                    connection.endheaders()
+                    response = connection.getresponse()
+                    payload = json.loads(response.read().decode("utf-8"))
+                    self.assertEqual(response.status, 411)
+                    self.assertIn("Content-Length", payload["error"])
+                finally:
+                    connection.close()
+
+                connection = HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=3
+                )
+                try:
+                    connection.putrequest("POST", "/api/generate")
+                    connection.putheader("Content-Type", "application/json")
                     connection.putheader("Content-Length", str(64 * 1024 + 1))
                     connection.endheaders()
                     response = connection.getresponse()

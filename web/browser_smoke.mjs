@@ -118,6 +118,11 @@ try {
     undefined,
     { timeout: 15000 },
   );
+  assert.equal(
+    await page.getByText("Error de prueba del navegador.", { exact: false }).count(),
+    0,
+    "A successful retry must replace the transient error message with the success status",
+  );
 
   let prompt = await page.locator(".prompt-panel pre").innerText();
   assert.ok(prompt.includes("turquoise color confined to the hair tips with a clean transition"),
