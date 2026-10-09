@@ -128,6 +128,43 @@ try {
     "Regeneration should update the prompt to the new tip color");
   assert.equal(await saveButton.isDisabled(), false, "Saving should unlock after successful regeneration");
 
+  // Exercise catalog-driven compatibility in the real UI, not only unit tests.
+  const catalog = await page.evaluate(async () => {
+    const response = await fetch("/api/catalog");
+    if (!response.ok) throw new Error("Unable to load the character catalog for the E2E check");
+    return response.json();
+  });
+  const lengthLabel = page.locator('label[for="trait-hair_length"]');
+  const lengthField = lengthLabel.locator("xpath=../..");
+  const lengthLock = lengthField.locator("button.lock");
+  const lengthSelect = lengthField.locator("select");
+  const styleSelect = page.locator('label[for="trait-hairstyle"]').locator("xpath=../..").locator("select");
+  const arrangementSelect = page.locator('label[for="trait-hair_arrangement"]').locator("xpath=../..").locator("select");
+  if ((await lengthLock.innerText()).includes("AUTO")) await lengthLock.click();
+  await lengthSelect.selectOption("pixie");
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
+  assert.equal(await saveButton.isDisabled(), true,
+    "Changing the hair length must invalidate the old generated snapshot");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+
+  assert.equal(await lengthSelect.inputValue(), "pixie",
+    "A manually locked hair length must survive regeneration");
+  const selectedStyle = await styleSelect.inputValue();
+  const allowedStyles = catalog.categories.hairstyle
+    .filter(option => option.compatible_with?.hair_length?.includes("pixie"))
+    .map(option => option.id);
+  assert.ok(allowedStyles.includes(selectedStyle),
+    `AUTO hairstyle must match the manually locked pixie length; got ${selectedStyle}`);
+  const selectedArrangement = await arrangementSelect.inputValue();
+  const allowedArrangements = catalog.categories.hair_arrangement
+    .filter(option => option.compatible_with?.hair_length?.includes("pixie"))
+    .map(option => option.id);
+  assert.ok(allowedArrangements.includes(selectedArrangement),
+    `AUTO hair arrangement must match the manually locked pixie length; got ${selectedArrangement}`);
+  assert.equal(await saveButton.isDisabled(), false,
+    "Saving should unlock after compatible regeneration");
+
   const profileSummary = page.locator(".saved-profile-panel summary");
   await profileSummary.waitFor({ state: "visible" });
   const initialCount = Number((await profileSummary.innerText()).match(/\((\d+)\)/)?.[1] ?? 0);
@@ -159,9 +196,15 @@ try {
   );
   assert.equal(await tipSelect.inputValue(), "metallic_gold",
     "Loading a saved profile should restore the tip color selection");
+  assert.equal(await lengthSelect.inputValue(), "pixie",
+    "Loading a saved profile should restore the manually locked hair length");
+  assert.ok(allowedStyles.includes(await styleSelect.inputValue()),
+    "Loaded profile should restore a hairstyle compatible with its locked length");
+  assert.ok(allowedArrangements.includes(await arrangementSelect.inputValue()),
+    "Loaded profile should restore a hair arrangement compatible with its locked length");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium loaded the local app, generated independent hair-tip prompts, blocked stale save/export/copy, saved/duplicated/loaded profiles, and reported no page errors.");
+  console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair length/hairstyle/arrangement compatibility, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
