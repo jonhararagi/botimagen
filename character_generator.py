@@ -132,6 +132,106 @@ class CharacterGenerator:
                 source_tags = set(source_item.get("tags", []))
                 score += 0.40 * len(candidate_tags.intersection(source_tags))
 
+        score += self._hair_color_compatibility_score(category, candidate, chosen)
+        return score
+
+    def _selected_color_family(self, category: str, value: str | None) -> str | None:
+        if not value or value in {"auto", "matching_base"}:
+            return None
+        item = next(
+            (entry for entry in self.categories.get(category, []) if entry.get("id") == value),
+            None,
+        )
+        family = item.get("color_family") if item else None
+        return str(family) if family else None
+
+    def _hair_color_compatibility_score(
+        self,
+        category: str,
+        candidate: dict[str, Any],
+        chosen: dict[str, str],
+    ) -> float:
+        """Bias AUTO toward coherent hair-color placement without overriding locks."""
+        tip_patterns = {
+            "puntas_doradas",
+            "puntas_plateadas",
+            "degradado_suave",
+            "ombre_oscuro_claro",
+        }
+        accent_patterns = {
+            *tip_patterns,
+            "dos_tonos_divididos",
+            "mechones_color",
+            "reflejos_metalicos",
+        }
+        pattern = chosen.get("hair_color_pattern", "auto")
+        candidate_id = str(candidate.get("id", ""))
+        candidate_family = candidate.get("color_family")
+        base_family = self._selected_color_family("hair", chosen.get("hair"))
+        secondary_family = self._selected_color_family(
+            "hair_secondary_color", chosen.get("hair_secondary_color")
+        )
+        score = 0.0
+
+        if category == "hair_color_pattern":
+            root = chosen.get("hair_root_color", "auto")
+            inner = chosen.get("hair_inner_color", "auto")
+            tip = chosen.get("hair_tip_color", "auto")
+            if root not in {"auto", "matching_base"}:
+                score += 2.2 if candidate_id == "raices_contraste" else 0.0
+                if candidate_id == "color_solido":
+                    score -= 0.6
+            if inner not in {"auto", "matching_base"}:
+                score += 2.2 if candidate_id == "capa_interior" else 0.0
+                if candidate_id == "color_solido":
+                    score -= 0.6
+            if tip not in {"auto", "matching_base"}:
+                score += 1.8 if candidate_id in tip_patterns else 0.0
+                if candidate_id == "color_solido":
+                    score -= 0.8
+            if (
+                secondary_family
+                and base_family
+                and secondary_family != base_family
+                and candidate_id in accent_patterns
+            ):
+                score += 0.5
+
+        elif category == "hair_secondary_color":
+            if pattern in accent_patterns and candidate_family and base_family:
+                if candidate_family == base_family:
+                    score -= 2.4
+                else:
+                    score += 0.25
+
+        elif category == "hair_tip_color":
+            if pattern == "color_solido":
+                score += 2.5 if candidate_id == "matching_base" else -0.85
+            elif pattern in tip_patterns:
+                score += -2.4 if candidate_id == "matching_base" else 0.65
+                if candidate_family and base_family and candidate_family == base_family:
+                    score -= 1.6
+                if secondary_family and candidate_family == secondary_family:
+                    score += 0.35
+
+        elif category == "hair_root_color" and pattern == "raices_contraste":
+            score += -2.8 if candidate_id == "matching_base" else 0.65
+            if candidate_family and base_family and candidate_family == base_family:
+                score -= 1.5
+            if secondary_family and candidate_family == secondary_family:
+                score += 0.25
+
+        elif category == "hair_inner_color" and pattern == "capa_interior":
+            score += -2.8 if candidate_id == "matching_base" else 0.65
+            if candidate_family and base_family and candidate_family == base_family:
+                score -= 1.5
+            if secondary_family and candidate_family == secondary_family:
+                score += 0.25
+
+        elif category == "hair_crown_color":
+            if secondary_family and candidate_family == secondary_family:
+                score += 0.65
+
         return score
 
     def _choose_category(

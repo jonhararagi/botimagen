@@ -267,6 +267,98 @@ def test_new_scale_regions_are_manual_and_prompted_independently():
         assert "metallic gold scale color with controlled highlights" in result["prompt"]
 
 
+
+def test_auto_hair_pattern_responds_to_explicit_zone_contrast():
+    generator = CharacterGenerator(RULES)
+    scenarios = (
+        ({"hair_root_color": "metallic_gold"}, "raices_contraste"),
+        ({"hair_inner_color": "turquoise"}, "capa_interior"),
+    )
+    for extra, expected_pattern in scenarios:
+        for seed in range(8):
+            result = generator.generate(
+                {"hair": "rojo_coral", **extra},
+                seed=seed,
+                coherence=0.9,
+            )
+            assert result["profile"]["hair_color_pattern"] == expected_pattern, (
+                extra, seed, result["profile"]["hair_color_pattern"]
+            )
+
+    tip_result = generator.generate(
+        {"hair": "rojo_coral", "hair_tip_color": "turquoise"},
+        seed=7707,
+        coherence=0.9,
+    )
+    assert tip_result["profile"]["hair_color_pattern"] in {
+        "puntas_doradas", "puntas_plateadas", "degradado_suave", "ombre_oscuro_claro"
+    }
+
+
+def test_auto_hair_zone_colors_follow_distribution_without_breaking_manual_locks():
+    generator = CharacterGenerator(RULES)
+    scenarios = (
+        ("raices_contraste", "hair_root_color"),
+        ("capa_interior", "hair_inner_color"),
+        ("puntas_doradas", "hair_tip_color"),
+    )
+    for pattern_value, zone in scenarios:
+        for seed in range(16):
+            result = generator.generate(
+                {"hair": "rojo_coral", "hair_color_pattern": pattern_value},
+                seed=seed,
+                coherence=0.55,
+            )
+            assert result["profile"][zone] != "matching_base", (
+                pattern_value, zone, seed, result["profile"][zone]
+            )
+
+    solid = generator.generate(
+        {"hair": "rojo_coral", "hair_color_pattern": "color_solido"},
+        seed=913,
+        coherence=0.9,
+    )
+    assert solid["profile"]["hair_tip_color"] == "matching_base"
+
+    locked = generator.generate(
+        {
+            "hair": "rojo_coral",
+            "hair_color_pattern": "puntas_doradas",
+            "hair_tip_color": "turquoise",
+        },
+        seed=914,
+    )
+    assert locked["profile"]["hair_tip_color"] == "turquoise"
+    assert "turquoise color confined to the hair tips with a clean transition" in locked["prompt"]
+    assert "golden tips" not in locked["prompt"]
+    assert "metallic gold color confined to the hair tips" not in locked["prompt"]
+
+
+def test_auto_secondary_color_contrasts_with_base_for_accent_patterns():
+    generator = CharacterGenerator(RULES)
+    base_family = next(
+        item["color_family"] for item in generator.categories["hair"]
+        if item["id"] == "rojo_coral"
+    )
+    for seed in range(16):
+        result = generator.generate(
+            {
+                "hair": "rojo_coral",
+                "hair_color_pattern": "mechones_color",
+                "hair_secondary_color": "auto",
+            },
+            seed=seed,
+            coherence=0.55,
+        )
+        selected = result["profile"]["hair_secondary_color"]
+        selected_family = next(
+            item["color_family"] for item in generator.categories["hair_secondary_color"]
+            if item["id"] == selected
+        )
+        assert selected_family != base_family, (seed, selected)
+        assert result["profile"]["hair_color_pattern"] == "mechones_color"
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -275,6 +367,9 @@ if __name__ == "__main__":
     test_height_selections_are_locked_and_drive_stature()
     test_modular_bust_scales_and_hair_zones_are_independent()
     test_hair_tip_color_is_independent_from_pattern_and_other_zones()
+    test_auto_hair_pattern_responds_to_explicit_zone_contrast()
+    test_auto_hair_zone_colors_follow_distribution_without_breaking_manual_locks()
+    test_auto_secondary_color_contrasts_with_base_for_accent_patterns()
     test_auto_scale_pattern_respects_species_compatibility()
     test_new_scale_regions_are_manual_and_prompted_independently()
     test_scale_color_is_omitted_when_pattern_has_no_visible_scales()

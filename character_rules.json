@@ -362,7 +362,8 @@
           "bright",
           "bold"
         ],
-        "prompt_en": "coral red"
+        "prompt_en": "coral red",
+        "color_family": "coral_red"
       },
       {
         "id": "naranja_tangerina",
@@ -379,7 +380,8 @@
           "bright",
           "energetic"
         ],
-        "prompt_en": "tangerine orange"
+        "prompt_en": "tangerine orange",
+        "color_family": "orange"
       },
       {
         "id": "rosa_chicle",
@@ -395,7 +397,8 @@
           "bright",
           "playful"
         ],
-        "prompt_en": "bubblegum pink"
+        "prompt_en": "bubblegum pink",
+        "color_family": "bubblegum_pink"
       },
       {
         "id": "violeta_profundo",
@@ -414,7 +417,8 @@
           "elegant",
           "mysterious"
         ],
-        "prompt_en": "deep violet"
+        "prompt_en": "deep violet",
+        "color_family": "deep_violet"
       },
       {
         "id": "negro_obsidiana",
@@ -433,7 +437,8 @@
           "bold",
           "focused"
         ],
-        "prompt_en": "obsidian black"
+        "prompt_en": "obsidian black",
+        "color_family": "obsidian_black"
       },
       {
         "id": "azul_nocturno",
@@ -451,7 +456,8 @@
           "technical",
           "focused"
         ],
-        "prompt_en": "midnight blue"
+        "prompt_en": "midnight blue",
+        "color_family": "midnight_blue"
       },
       {
         "id": "plateado_perla",
@@ -468,7 +474,8 @@
           "elegant",
           "soft"
         ],
-        "prompt_en": "pearl silver"
+        "prompt_en": "pearl silver",
+        "color_family": "pearl_silver"
       },
       {
         "id": "castano_miel",
@@ -485,7 +492,8 @@
           "soft",
           "friendly"
         ],
-        "prompt_en": "honey brown"
+        "prompt_en": "honey brown",
+        "color_family": "honey_brown"
       },
       {
         "id": "rubio_platino",
@@ -496,7 +504,8 @@
           "elegant"
         ],
         "base": 1,
-        "prompt_en": "platinum blonde"
+        "prompt_en": "platinum blonde",
+        "color_family": "platinum_blonde"
       },
       {
         "id": "turquesa",
@@ -507,7 +516,8 @@
           "technical"
         ],
         "base": 1,
-        "prompt_en": "turquoise"
+        "prompt_en": "turquoise",
+        "color_family": "turquoise"
       },
       {
         "id": "verde_esmeralda",
@@ -520,7 +530,8 @@
         ],
         "base": 1,
         "prompt_en": "emerald green",
-        "bias": {}
+        "bias": {},
+        "color_family": "emerald_green"
       },
       {
         "id": "rubio_dorado",
@@ -532,7 +543,8 @@
         ],
         "base": 1,
         "prompt_en": "golden blonde",
-        "bias": {}
+        "bias": {},
+        "color_family": "golden_blonde"
       }
     ],
     "eyes": [
@@ -3745,8 +3757,7 @@
         "tags": [
           "gradient",
           "tips",
-          "metallic",
-          "gold"
+          "localized_transition"
         ],
         "base": 1,
         "prompt_en": "a clean gradient transition concentrated at the hair tips; use the dedicated tip-color selection for hue",
@@ -3842,7 +3853,7 @@
         "tags": [
           "gradient",
           "tips",
-          "silver"
+          "high_contrast"
         ],
         "base": 1,
         "prompt_en": "a luminous contrast concentrated at the hair tips; the dedicated tip-color selection controls the hue",
@@ -3860,7 +3871,8 @@
         ],
         "base": 1,
         "prompt_en": "metallic gold",
-        "bias": {}
+        "bias": {},
+        "color_family": "metallic_gold"
       },
       {
         "id": "plata_perla",
@@ -3872,7 +3884,8 @@
         ],
         "base": 1,
         "prompt_en": "pearl silver",
-        "bias": {}
+        "bias": {},
+        "color_family": "pearl_silver"
       },
       {
         "id": "blanco_luminoso",
@@ -3884,7 +3897,8 @@
         ],
         "base": 1,
         "prompt_en": "luminous white",
-        "bias": {}
+        "bias": {},
+        "color_family": "luminous_white"
       },
       {
         "id": "coral_vivo",
@@ -3896,7 +3910,8 @@
         ],
         "base": 1,
         "prompt_en": "vivid coral",
-        "bias": {}
+        "bias": {},
+        "color_family": "coral_red"
       },
       {
         "id": "rojo_rubi",
@@ -3908,7 +3923,8 @@
         ],
         "base": 1,
         "prompt_en": "ruby red",
-        "bias": {}
+        "bias": {},
+        "color_family": "ruby_red"
       },
       {
         "id": "rosa_chicle",
@@ -3920,7 +3936,8 @@
         ],
         "base": 1,
         "prompt_en": "bubblegum pink",
-        "bias": {}
+        "bias": {},
+        "color_family": "bubblegum_pink"
       },
       {
         "id": "violeta",
@@ -3932,7 +3949,8 @@
         ],
         "base": 1,
         "prompt_en": "violet purple",
-        "bias": {}
+        "bias": {},
+        "color_family": "deep_violet"
       },
       {
         "id": "verde_esmeralda",
@@ -3944,7 +3962,8 @@
         ],
         "base": 1,
         "prompt_en": "emerald green",
-        "bias": {}
+        "bias": {},
+        "color_family": "emerald_green"
       },
       {
         "id": "turquesa",
@@ -3956,7 +3975,8 @@
         ],
         "base": 1,
         "prompt_en": "turquoise",
-        "bias": {}
+        "bias": {},
+        "color_family": "turquoise"
       },
       {
         "id": "azul_medianoche",
@@ -3968,7 +3988,8 @@
         ],
         "base": 1,
         "prompt_en": "midnight blue",
-        "bias": {}
+        "bias": {},
+        "color_family": "midnight_blue"
       }
     ],
     "hair_tip_color": [
@@ -3985,7 +4006,8 @@
           "hair_color_pattern:color_solido": 5,
           "hair_color_pattern:puntas_doradas": -3,
           "hair_color_pattern:puntas_plateadas": -3
-        }
+        },
+        "color_family": "base"
       },
       {
         "id": "metallic_gold",
@@ -3999,7 +4021,8 @@
         "base": 1,
         "bias": {
           "hair_secondary_color:oro_metalico": 4
-        }
+        },
+        "color_family": "metallic_gold"
       },
       {
         "id": "pearl_silver",
@@ -4013,7 +4036,8 @@
         "base": 1,
         "bias": {
           "hair_secondary_color:plata_perla": 4
-        }
+        },
+        "color_family": "pearl_silver"
       },
       {
         "id": "luminous_white",
@@ -4027,7 +4051,8 @@
         "base": 1,
         "bias": {
           "hair_secondary_color:blanco_luminoso": 3
-        }
+        },
+        "color_family": "luminous_white"
       },
       {
         "id": "ruby_red",
@@ -4042,7 +4067,8 @@
         "bias": {
           "hair_secondary_color:rojo_rubi": 3,
           "hair:rojo_coral": 1
-        }
+        },
+        "color_family": "ruby_red"
       },
       {
         "id": "bubblegum_pink",
@@ -4057,7 +4083,8 @@
         "bias": {
           "hair_secondary_color:rosa_chicle": 3,
           "hair:rosa_chicle": 1
-        }
+        },
+        "color_family": "bubblegum_pink"
       },
       {
         "id": "turquoise",
@@ -4072,7 +4099,8 @@
         "bias": {
           "hair_secondary_color:turquesa": 3,
           "hair:turquesa": 1
-        }
+        },
+        "color_family": "turquoise"
       },
       {
         "id": "emerald_green",
@@ -4087,7 +4115,8 @@
         "bias": {
           "hair_secondary_color:verde_esmeralda": 3,
           "hair:verde_esmeralda": 1
-        }
+        },
+        "color_family": "emerald_green"
       },
       {
         "id": "ice_blue",
@@ -4102,7 +4131,8 @@
         "bias": {
           "hair_secondary_color:azul_medianoche": 2,
           "hair:azul_nocturno": 1
-        }
+        },
+        "color_family": "ice_blue"
       },
       {
         "id": "deep_violet",
@@ -4117,7 +4147,8 @@
         "bias": {
           "hair_secondary_color:violeta": 2,
           "hair:violeta_profundo": 2
-        }
+        },
+        "color_family": "deep_violet"
       },
       {
         "id": "midnight_blue",
@@ -4132,7 +4163,8 @@
         "bias": {
           "hair_secondary_color:azul_medianoche": 3,
           "hair:azul_nocturno": 2
-        }
+        },
+        "color_family": "midnight_blue"
       },
       {
         "id": "coral_red",
@@ -4147,7 +4179,8 @@
         "bias": {
           "hair_secondary_color:coral_vivo": 3,
           "hair:rojo_coral": 2
-        }
+        },
+        "color_family": "coral_red"
       }
     ],
     "hair_texture": [
@@ -5020,7 +5053,8 @@
           "neutral"
         ],
         "prompt_en": "roots matching the selected base hair color with no visible contrast",
-        "base": 5
+        "base": 5,
+        "color_family": "base"
       },
       {
         "id": "shadow_obsidian",
@@ -5036,7 +5070,8 @@
           "hair:negro_obsidiana": 4,
           "hair:violeta_profundo": 2,
           "hair:azul_nocturno": 2
-        }
+        },
+        "color_family": "obsidian_black"
       },
       {
         "id": "metallic_gold",
@@ -5052,7 +5087,8 @@
           "hair:rojo_coral": 2,
           "hair:naranja_tangerina": 2,
           "hair:negro_obsidiana": 2
-        }
+        },
+        "color_family": "metallic_gold"
       },
       {
         "id": "pearl_silver",
@@ -5063,7 +5099,8 @@
           "contrast"
         ],
         "prompt_en": "pearl silver roots transitioning cleanly into the base hair color",
-        "base": 1
+        "base": 1,
+        "color_family": "pearl_silver"
       },
       {
         "id": "coral_red",
@@ -5073,7 +5110,8 @@
           "bright"
         ],
         "prompt_en": "coral red roots blending naturally into the selected hair base",
-        "base": 1
+        "base": 1,
+        "color_family": "coral_red"
       },
       {
         "id": "midnight_blue",
@@ -5088,7 +5126,8 @@
         "bias": {
           "hair:azul_nocturno": 3,
           "hair:negro_obsidiana": 2
-        }
+        },
+        "color_family": "midnight_blue"
       }
     ],
     "hair_crown_color": [
@@ -5100,7 +5139,8 @@
           "neutral"
         ],
         "prompt_en": "crown matching the selected base hair color",
-        "base": 5
+        "base": 5,
+        "color_family": "base"
       },
       {
         "id": "metallic_gold",
@@ -5111,7 +5151,8 @@
           "contrast"
         ],
         "prompt_en": "metallic gold color concentrated only across the crown of the head",
-        "base": 1
+        "base": 1,
+        "color_family": "metallic_gold"
       },
       {
         "id": "pearl_silver",
@@ -5122,7 +5163,8 @@
           "contrast"
         ],
         "prompt_en": "pearl silver color concentrated only across the crown of the head",
-        "base": 1
+        "base": 1,
+        "color_family": "pearl_silver"
       },
       {
         "id": "rose_pink",
@@ -5133,7 +5175,8 @@
           "bright"
         ],
         "prompt_en": "soft rose pink color concentrated only across the crown of the head",
-        "base": 1
+        "base": 1,
+        "color_family": "bubblegum_pink"
       },
       {
         "id": "ice_blue",
@@ -5144,7 +5187,8 @@
           "bright"
         ],
         "prompt_en": "ice blue color concentrated only across the crown of the head",
-        "base": 1
+        "base": 1,
+        "color_family": "ice_blue"
       },
       {
         "id": "emerald_green",
@@ -5155,7 +5199,8 @@
           "bright"
         ],
         "prompt_en": "emerald green color concentrated only across the crown of the head",
-        "base": 1
+        "base": 1,
+        "color_family": "emerald_green"
       }
     ],
     "hair_inner_color": [
@@ -5167,7 +5212,8 @@
           "neutral"
         ],
         "prompt_en": "inner hair layers matching the selected base hair color",
-        "base": 5
+        "base": 5,
+        "color_family": "base"
       },
       {
         "id": "metallic_gold",
@@ -5178,7 +5224,8 @@
           "contrast"
         ],
         "prompt_en": "metallic gold color visible only on the inner hair layers",
-        "base": 1
+        "base": 1,
+        "color_family": "metallic_gold"
       },
       {
         "id": "pearl_silver",
@@ -5189,7 +5236,8 @@
           "contrast"
         ],
         "prompt_en": "pearl silver color visible only on the inner hair layers",
-        "base": 1
+        "base": 1,
+        "color_family": "pearl_silver"
       },
       {
         "id": "bubblegum_pink",
@@ -5200,7 +5248,8 @@
           "playful"
         ],
         "prompt_en": "bubblegum pink color visible only on the inner hair layers",
-        "base": 1
+        "base": 1,
+        "color_family": "bubblegum_pink"
       },
       {
         "id": "turquoise",
@@ -5211,7 +5260,8 @@
           "technical"
         ],
         "prompt_en": "turquoise color visible only on the inner hair layers",
-        "base": 1
+        "base": 1,
+        "color_family": "turquoise"
       },
       {
         "id": "ruby_red",
@@ -5222,7 +5272,8 @@
           "intense"
         ],
         "prompt_en": "ruby red color visible only on the inner hair layers",
-        "base": 1
+        "base": 1,
+        "color_family": "ruby_red"
       },
       {
         "id": "deep_violet",
@@ -5233,7 +5284,8 @@
           "mysterious"
         ],
         "prompt_en": "deep violet color visible only on the inner hair layers",
-        "base": 1
+        "base": 1,
+        "color_family": "deep_violet"
       }
     ],
     "scale_pattern": [
