@@ -1,6 +1,6 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor todavía no es la beta completa: no incluye el catálogo anatómico ampliado, la biblioteca visual ni una imagen generada.
+La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 46 categorías en 8 pestañas, incluida una primera ampliación para busto, escamas y zonas independientes de color del cabello. Todavía faltan categorías avanzadas, la biblioteca visual, las pruebas reales de navegador/Windows y una imagen generada.
 
 ## Requisitos
 
@@ -32,11 +32,12 @@ Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. 
 
 ## Funciones conectadas
 
-- Catálogo de especies, cuerpo, cabello, ojos y poses servido desde `character_rules.json`; la UI ya no mantiene sus propias listas de opciones.
+- 46 categorías de identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle servidas desde `character_rules.json`; la UI mantiene solo la estructura de los campos y no duplica sus listas de opciones.
+- Rasgos anatómicos/visuales independientes: tamaño del busto, distribución y color de escamas, raíces, coronilla e interior del cabello.
 - Generación real de perfiles y prompts mediante `CharacterGenerator`, con elecciones fijadas, campos AUTO, semilla y coherencia.
 - Visualización del prompt y negative prompt oficiales, copia al portapapeles y exportación JSON.
 - Guardado de perfiles mediante `POST /api/profiles` en `generated_characters/web_profiles/`, ignorado por Git por defecto.
-- Panel de perfiles locales: permite actualizar la lista y cargar un perfil guardado. La API lista y recupera por UUID.
+- Panel de perfiles locales: permite actualizar la lista, cargar un perfil guardado y duplicarlo como copia independiente. El guardado genera un UUID nuevo y la prueba HTTP confirma que el original permanece intacto.
 - Pruebas HTTP del servicio y validación de selecciones para que una opción inventada no se acepte.
 
 ## Límites actuales
