@@ -1,5 +1,8 @@
 # BotImagen · BaseWarriors Asset Intake
 
+> **Nueva dirección web-first:** consulta el [Cerebro de BotImagen](cerebro/README.md) para ver la arquitectura acordada, el plan por fases y el estado verificado de la migración web local. La interfaz web todavía está planificada, no implementada.
+
+
 Herramienta local para recibir imágenes generadas por IA y colocarlas en el destino correcto del proyecto.
 
 ## Objetivo
