@@ -9,14 +9,19 @@
       "name": "Anime moderno de gacha",
       "status": "ACTIVE_BETA_UNIVERSAL",
       "prompt_core": "Original premium modern Japanese anime gacha-game character illustration, consistent 2D anime key-visual art direction, clean controlled line art, crisp readable contours, polished cel shading with restrained soft secondary gradients, expressive detailed anime eyes, deliberate hair strand grouping and clean highlights, coherent color design, original tactical baseball hero-collector character, 2.5D-ready silhouette.",
-      "prompt_suffix": "Maintain the same unified rendering language across every character: consistent contour weight, cel-shading structure, eye rendering, hair highlights, skin treatment, material response and detail density. Keep personality, outfit and color variations within this fixed art direction. Create one original adult heroine with a readable full-body silhouette, visible head and shoes, three-quarter idle combat pose, clean hands, clear feet, transparent background, generous padding, no crop, production-ready PNG cutout, subtle rim light, controlled highlights, clear shadow grouping, mobile-game key art and 2.5D parallax-friendly contours. Use the chosen face and hair components as compatible design pieces, not as conflicting hairstyles layered on top of each other. The signature quirk should be a small believable behavior that can appear in idle animation, dialogue, victory poses, props or slice-of-life scenes without turning the character into a one-joke caricature.",
+      "prompt_suffix": "Maintain the same unified rendering language across every character: consistent contour weight, cel-shading structure, eye rendering, hair highlights, skin treatment, material response and detail density. Keep personality, outfit and color variations within this fixed art direction. Create one original adult heroine with a readable full-body silhouette, visible head and shoes, three-quarter idle combat pose, clean hands, clear feet, transparent background, generous padding, no crop, production-ready PNG cutout, subtle rim light, controlled highlights, clear shadow grouping, mobile-game key art and 2.5D parallax-friendly contours. Use the chosen face, species anatomy, hair cut, tied-up arrangement, colour pattern and secondary hair colour as compatible design pieces, not as conflicting anatomy or hairstyles layered on top of each other. Keep the selected exact height and body proportions consistent. The signature quirk should be a small believable behavior that can appear in idle animation, dialogue, victory poses, props or slice-of-life scenes without turning the character into a one-joke caricature.",
       "negative_prompt_additions": "mixed art styles, inconsistent line weight, inconsistent shading, photorealistic skin, live-action, realistic portrait photography, 3D CGI render, low-poly, chibi proportions, watercolor bleed, painterly brushwork, retro film grain, overexposed bloom, over-rendered microtexture, duplicate hair masses, conflicting bangs, duplicate pupils, random facial markings, cluttered accessories",
       "consistency_rules": [
         "Art style is fixed to modern polished 2D anime gacha key art.",
         "Variations may alter character traits but cannot switch the rendering style.",
         "Line art, cel shading, eyes, hair highlights and detail density remain consistent.",
         "Manual selections are hard locks; AUTO fields are chosen by compatibility scores.",
-        "The negative prompt rejects competing rendering styles and common composition defects."
+        "The negative prompt rejects competing rendering styles and common composition defects.",
+        "Hair base colour, secondary colour, and colour pattern are separate controls.",
+        "Ponytail/bun arrangement is independent from haircut and hair length.",
+        "Species choice drives automatic compatibility for ears, tail, and head features.",
+        "Selected height in centimetres remains separate from the broad stature class.",
+        "Body build, overall proportions, and skin tone remain independently controllable."
       ]
     }
   ],
@@ -176,7 +181,66 @@
       "Keep source metadata distinct from machine-inferred tags.",
       "Unknown or unverified licences remain reference-only until checked.",
       "Never mark scraped or imported content as reusable merely because it is publicly visible.",
-      "Use normalized tags to search and compare; do not reproduce an existing character as an output target."
+      "Use normalized tags to search and compare; do not reproduce an existing character as an output target.",
+      "Hair colour must allow separate base colour, pattern/gradient, and secondary tip colour fields.",
+      "Species and machine-detected anatomy must remain suggestions unless confirmed or selected by the user."
+    ]
+  },
+  "character_design_schema": {
+    "version": 1,
+    "categories": {
+      "hair": [
+        "hair_length",
+        "hairstyle",
+        "hair_arrangement",
+        "hair_texture",
+        "hair_bangs",
+        "side_hair",
+        "back_hair",
+        "hair",
+        "hair_color_pattern",
+        "hair_secondary_color"
+      ],
+      "face": [
+        "face_shape",
+        "eye_shape",
+        "eyes",
+        "pupil_shape",
+        "eyebrow_style",
+        "nose_style",
+        "mouth_style",
+        "facial_detail",
+        "skin_tone"
+      ],
+      "anatomy": [
+        "species",
+        "ear_style",
+        "tail_style",
+        "horn_style"
+      ],
+      "physique": [
+        "height_cm",
+        "stature",
+        "body_build",
+        "body_proportions",
+        "silhouette"
+      ]
+    },
+    "design_example": {
+      "species": "kemonomimi_zorro",
+      "height_cm": "h160",
+      "hair_length": "largo",
+      "hair_arrangement": "coleta_alta",
+      "hair": "verde_esmeralda",
+      "hair_color_pattern": "puntas_doradas",
+      "hair_secondary_color": "oro_metalico",
+      "pupil_shape": "estrella"
+    },
+    "compatibility": [
+      "User-selected options are immutable locks during generation.",
+      "AUTO anatomy features score against selected species.",
+      "Exact height scores the broad stature class; exact height is not an age field.",
+      "Hair base colour, gradient/pattern, secondary colour and arrangement are independent parameters."
     ]
   }
 }

@@ -19,9 +19,13 @@ DEFAULT_NEGATIVE = (
 
 TRAIT_KEYS = {
     "personality": "Personalidad",
+    "species": "Especie / tipo",
     "stature": "Estatura",
+    "height_cm": "Altura exacta",
     "body_build": "Constitución",
+    "body_proportions": "Proporciones corporales",
     "silhouette": "Silueta",
+    "skin_tone": "Tono de piel",
     "expression": "Expresión",
     "face_shape": "Forma del rostro",
     "nose_style": "Nariz",
@@ -31,12 +35,19 @@ TRAIT_KEYS = {
     "eyebrow_style": "Cejas",
     "mouth_style": "Boca",
     "facial_detail": "Detalle facial",
+    "ear_style": "Orejas",
+    "tail_style": "Cola",
+    "horn_style": "Cuernos / rasgo craneal",
     "hair_length": "Largo del cabello",
     "hair_bangs": "Flequillo",
-    "hairstyle": "Peinado principal",
+    "hairstyle": "Corte / forma base",
+    "hair_arrangement": "Coleta / recogido",
+    "hair_texture": "Textura del cabello",
     "side_hair": "Cabello lateral",
-    "back_hair": "Cabello trasero / recogido",
-    "hair": "Color de cabello",
+    "back_hair": "Cabello trasero",
+    "hair": "Color base del cabello",
+    "hair_color_pattern": "Patrón de color del cabello",
+    "hair_secondary_color": "Color secundario del cabello",
     "outfit": "Vestimenta",
     "outer_layer": "Capa exterior",
     "footwear": "Calzado",
@@ -80,6 +91,14 @@ class CharacterGenerator:
         if not style.get("prompt_core") or not style.get("prompt_suffix"):
             raise ValueError("Active visual style is missing prompt instructions")
         return catalog, style
+
+    def _prompt_value(self, category: str, profile: dict[str, str], fallback: str) -> str:
+        trait_id = profile.get(category)
+        item = next(
+            (entry for entry in self.categories.get(category, []) if entry.get("id") == trait_id),
+            None,
+        )
+        return str(item.get("prompt_en", fallback)) if item else fallback
 
     def options(self, category: str) -> list[dict[str, Any]]:
         return [{"id": "auto", "label": "AUTO · el sistema decide"}] + self.categories.get(category, [])
@@ -187,10 +206,13 @@ class CharacterGenerator:
         # Final coherence pass over visual/combat traits. Explicit choices
         # remain hard-locked, AUTO traits are refined with the whole profile.
         refine = (
-            "body_build", "silhouette", "face_shape", "nose_style",
+            "species", "stature", "height_cm", "body_build", "body_proportions",
+            "silhouette", "skin_tone", "face_shape", "nose_style",
             "eye_shape", "eyes", "pupil_shape", "eyebrow_style", "mouth_style",
-            "facial_detail", "hair_length", "hair_bangs", "hairstyle",
-            "side_hair", "back_hair", "hair", "outfit", "outer_layer",
+            "facial_detail", "ear_style", "tail_style", "horn_style",
+            "hair_length", "hair_bangs", "hairstyle", "hair_arrangement",
+            "hair_texture", "side_hair", "back_hair", "hair",
+            "hair_color_pattern", "hair_secondary_color", "outfit", "outer_layer",
             "footwear", "accessory", "palette_accent", "voice",
             "combat_role", "baseball_prop", "pose", "quirk",
         )
@@ -249,35 +271,50 @@ class CharacterGenerator:
         labels: dict[str, str],
         style_direction: str,
     ) -> str:
+        p = {
+            key: self._prompt_value(key, profile, value)
+            for key, value in labels.items()
+        }
         return (
             f"{self.visual_standard['prompt_core']} "
-            f"Character identity: {labels['personality']} personality. "
-            f"Physical direction: {labels['stature']}, {labels['body_build']}, {labels['silhouette']}. "
-            f"Face construction: {labels['face_shape']}, {labels['nose_style']} nose, "
-            f"{labels['expression']} expression. "
-            f"Eyes: {labels['eye_shape']} shape, {labels['eyes']} iris color, "
-            f"{labels['pupil_shape']} pupils, {labels['eyebrow_style']} eyebrows, "
-            f"{labels['mouth_style']} mouth, {labels['facial_detail']} facial detail. "
-            f"Hair construction: {labels['hair_length']}, {labels['hair_bangs']} bangs, "
-            f"{labels['hairstyle']} main style, {labels['side_hair']} side hair, "
-            f"{labels['back_hair']} back hair, {labels['hair']} hair color. "
-            f"Clothing: {labels['outfit']}, {labels['outer_layer']}, {labels['footwear']}, "
-            f"accessory {labels['accessory']}. "
-            f"Color direction: {labels['palette_accent']}. "
-            f"Voice identity: {labels['voice']}. "
-            f"Combat role: {labels['combat_role']}. "
-            f"Signature baseball prop: {labels['baseball_prop']}. "
-            f"Pose: {labels['pose']}. "
-            f"Signature character quirk: {labels['quirk']}. "
+            f"Character identity: {p['personality']} personality. "
+            f"Species/type: {p['species']}. "
+            f"Height: {p['height_cm']}; overall stature: {p['stature']}. "
+            f"Body: {p['body_build']}, {p['body_proportions']}, {p['silhouette']}, "
+            f"{p['skin_tone']}. "
+            f"Face construction: {p['face_shape']}, {p['nose_style']} nose, "
+            f"{p['expression']} expression. "
+            f"Eyes: {p['eye_shape']} shape, {p['eyes']} iris color, "
+            f"{p['pupil_shape']}, {p['eyebrow_style']} eyebrows, "
+            f"{p['mouth_style']} mouth, {p['facial_detail']} facial detail. "
+            f"Species anatomy: {p['ear_style']}; {p['tail_style']}; {p['horn_style']}. "
+            f"Hair: {p['hair_length']}, {p['hairstyle']}, {p['hair_arrangement']}, "
+            f"{p['hair_texture']}, {p['hair_bangs']} bangs, {p['side_hair']} side hair, "
+            f"{p['back_hair']} back hair. "
+            f"Hair colors: {p['hair']} base color; {p['hair_color_pattern']} using "
+            f"{p['hair_secondary_color']} as the secondary/accent color. "
+            f"Clothing: {p['outfit']}, {p['outer_layer']}, {p['footwear']}, "
+            f"accessory {p['accessory']}. "
+            f"Color direction: {p['palette_accent']}. "
+            f"Voice identity: {p['voice']}. "
+            f"Combat role: {p['combat_role']}. "
+            f"Signature baseball prop: {p['baseball_prop']}. "
+            f"Pose: {p['pose']}. "
+            f"Signature character quirk: {p['quirk']}. "
             f"Character-specific mood direction: {style_direction}. "
             "Use selected traits as one coherent design system, not disconnected keywords. "
-            "Personality should read through posture, eye tension, hair motion, costume geometry "
-            "and one controlled accent palette. The main hairstyle, bangs, side hair and back hair "
-            "must form one plausible hairstyle rather than several competing styles. Keep iris and "
-            "pupil design intentional and readable at thumbnail size; treat facial markings as optional "
-            "single accents, not random decoration. Clothing must communicate the baseball-combat role "
-            "while remaining original, functional and non-sexualized. Baseball is the language of combat, "
-            "not a school-sports uniform. "
+            "The selected species, ears, tail and head features must agree anatomically. "
+            "For human characters, do not add animal ears, tails or horns unless explicitly chosen; "
+            "for kemonomimi, fantasy species and androids, use the selected species features and avoid "
+            "unselected extra anatomy. Explicit manual combinations remain intentional design locks. "
+            "The main haircut, bangs, side hair, back hair and tied-up arrangement must form one plausible "
+            "hairstyle rather than several competing styles. Preserve the selected base hair colour and "
+            "secondary-colour treatment; if the pattern specifies coloured tips, make the transition visible "
+            "at the ends rather than colouring the entire head. Keep star-shaped pupils clearly recognizable "
+            "when selected. Make all selected eye and hair details readable at thumbnail size, without random "
+            "decoration. The exact height is a design constraint for an adult heroine, not an age indicator. "
+            "Clothing must communicate the baseball-combat role while remaining original, functional and "
+            "non-sexualized. Baseball is the language of combat, not a school-sports uniform. "
             f"{self.visual_standard['prompt_suffix']}"
         )
 

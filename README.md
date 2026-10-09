@@ -271,3 +271,34 @@ El mismo archivo define el esquema futuro de la biblioteca de referencias: orige
 ### Validación
 
 GitHub Actions valida que cada categoría visual configurada tenga diez opciones únicas, que exista un único estilo activo, que esté definido el esquema de metadatos, y que el prompt utilice las piezas separadas de cara y cabello sin perder las elecciones bloqueadas. También prueba que la semilla reproduzca el mismo perfil y prompt.
+
+
+## Diseño composable ampliado: cabello, especie, cuerpo y altura
+
+La beta conserva el estilo universal `bw-modern-gacha-v1`, pero cada vez permite expresar diseños más precisos mediante piezas separadas.
+
+### Combinaciones de cabello
+
+- `hair_length`: longitud del cabello.
+- `hairstyle`: corte o forma base, como bob, wolf cut, hime cut, largo liso o capas.
+- `hair_arrangement`: suelto, coleta alta/baja/lateral, coletas gemelas, media coleta, coleta trenzada o moños.
+- `hair_texture`: liso, ondas, rizos, volumen, hebras finas o capas texturizadas.
+- `hair`: color base; la biblioteca incluye verde esmeralda y rubio dorado.
+- `hair_color_pattern`: color sólido, puntas doradas, degradados, split-dye, capa interior de color, mechones o reflejos.
+- `hair_secondary_color`: color de las puntas/degradado o acento secundario.
+
+Ejemplo reproducible: cabello largo + coleta alta + base verde esmeralda + patrón de puntas doradas + color secundario oro metálico + pupilas de estrella.
+
+### Especie y rasgos anatómicos
+
+`species` ofrece diez familias iniciales: humana, gato, zorro, lobo, conejo, elfa, oni, dracónica, androide y espíritu de energía. Los controles de orejas, cola y cuernos/rasgo craneal son independientes. Cuando quedan en AUTO, se eligen por compatibilidad con la especie; las selecciones manuales se conservan para permitir híbridos deliberados.
+
+### Cuerpo y altura
+
+`body_build`, `body_proportions` y `silhouette` son controles diferentes. `height_cm` ofrece diez alturas desde 145 cm hasta 190 cm en saltos de 5 cm; la categoría amplia de estatura se ajusta a la altura escogida. También se puede seleccionar uno de diez tonos de piel estilizados, manteniendo el diseño como heroína adulta y no sexualizada.
+
+### Estado del catálogo
+
+El esquema contiene 40 categorías en total. Hay 35 categorías visuales con diez opciones cada una, y la paleta de color base de cabello tiene doce opciones. Las categorías de personalidad, estatura general, voz, rol de combate y quirk mantienen sus recuentos propios. Los controles siguen siendo listas locales ligeras: no requieren modelos de visión ni de generación de imágenes.
+
+La validación automática comprueba los recuentos, compatibilidad de especie, altura, reproducción por semilla y el caso de prueba del cabello verde esmeralda con puntas doradas y pupilas de estrella.

@@ -13,11 +13,13 @@ from character_generator import CharacterGenerator
 RULES_PATH = ROOT / "character_rules.json"
 STYLE_PATH = ROOT / "visual_style_catalog.json"
 TEN_OPTION_CATEGORIES = (
-    "face_shape", "hair_length", "hairstyle", "hair", "eyes", "eye_shape",
+    "face_shape", "hair_length", "hairstyle", "eyes", "eye_shape",
     "outfit", "accessory", "expression", "hair_bangs", "side_hair",
     "back_hair", "pupil_shape", "eyebrow_style", "mouth_style", "nose_style",
     "facial_detail", "outer_layer", "footwear", "palette_accent", "pose",
-    "silhouette", "body_build", "baseball_prop",
+    "silhouette", "body_build", "baseball_prop", "height_cm", "species",
+    "body_proportions", "skin_tone", "hair_arrangement", "hair_color_pattern",
+    "hair_secondary_color", "hair_texture", "ear_style", "tail_style", "horn_style",
 )
 
 
@@ -30,6 +32,12 @@ def test_visual_categories_have_ten_unique_options():
         ids = [item["id"] for item in items]
         assert len(ids) == len(set(ids)), f"{category} contains duplicate IDs"
         assert all(item.get("label") and item.get("tags") for item in items)
+    assert all(item.get("prompt_en") for item in items)
+
+    hair_colours = categories["hair"]
+    assert len(hair_colours) == 12
+    assert len({item["id"] for item in hair_colours}) == 12
+    assert {item["id"] for item in hair_colours}.issuperset({"verde_esmeralda", "rubio_dorado"})
 
 
 def test_one_universal_style_contract_and_reference_schema():
@@ -87,4 +95,66 @@ if __name__ == "__main__":
     test_one_universal_style_contract_and_reference_schema()
     test_prompt_uses_separated_face_and_hair_parts_and_preserves_locks()
     test_seed_reproduces_profile_and_prompt()
+    test_complex_hairstyle_colour_and_star_pupils_are_composable()
+    test_exact_height_guides_auto_stature()
+    test_human_auto_anatomy_has_no_animal_features()
     print("PASS: visual style contract and catalog tests")
+
+
+
+def test_complex_hairstyle_colour_and_star_pupils_are_composable():
+    generator = CharacterGenerator(RULES_PATH)
+    result = generator.generate(
+        {
+            "species": "kemonomimi_zorro",
+            "height_cm": "h160",
+            "hair_length": "largo",
+            "hair_arrangement": "coleta_alta",
+            "hair": "verde_esmeralda",
+            "hair_color_pattern": "puntas_doradas",
+            "hair_secondary_color": "oro_metalico",
+            "pupil_shape": "estrella",
+        },
+        seed=90814,
+        coherence=0.95,
+    )
+    profile = result["profile"]
+    prompt = result["prompt"]
+    assert profile["hair_length"] == "largo"
+    assert profile["hair_arrangement"] == "coleta_alta"
+    assert profile["hair"] == "verde_esmeralda"
+    assert profile["hair_color_pattern"] == "puntas_doradas"
+    assert profile["hair_secondary_color"] == "oro_metalico"
+    assert profile["pupil_shape"] == "estrella"
+    assert profile["height_cm"] == "h160"
+    assert profile["species"] == "kemonomimi_zorro"
+    assert profile["ear_style"] == "orejas_zorro"
+    assert profile["tail_style"] == "cola_zorro"
+    assert profile["horn_style"] == "sin_cuernos"
+    assert "long hair" in prompt
+    assert "high ponytail" in prompt
+    assert "emerald green base color" in prompt
+    assert "metallic gold tips gradient" in prompt
+    assert "metallic gold as the secondary" in prompt
+    assert "star-shaped pupils" in prompt
+
+
+def test_exact_height_guides_auto_stature():
+    generator = CharacterGenerator(RULES_PATH)
+    short = generator.generate({"height_cm": "h145"}, seed=100)
+    tall = generator.generate({"height_cm": "h190"}, seed=100)
+    assert short["profile"]["height_cm"] == "h145"
+    assert short["profile"]["stature"] == "bajita"
+    assert tall["profile"]["height_cm"] == "h190"
+    assert tall["profile"]["stature"] == "alta"
+
+
+def test_human_auto_anatomy_has_no_animal_features():
+    generator = CharacterGenerator(RULES_PATH)
+    result = generator.generate(
+        {"species": "humana", "ear_style": "auto", "tail_style": "auto", "horn_style": "auto"},
+        seed=405,
+    )
+    assert result["profile"]["ear_style"] == "orejas_humanas"
+    assert result["profile"]["tail_style"] == "sin_cola"
+    assert result["profile"]["horn_style"] == "sin_cuernos"

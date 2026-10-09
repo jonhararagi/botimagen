@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -92,16 +92,44 @@
         "tags": [
           "compact",
           "cute",
-          "agile"
-        ]
+          "agile",
+          "petite",
+          "short"
+        ],
+        "bias": {
+          "height_cm:h145": 7,
+          "height_cm:h150": 7,
+          "height_cm:h155": 6,
+          "height_cm:h160": 1,
+          "height_cm:h165": -2,
+          "height_cm:h170": -4,
+          "height_cm:h175": -6,
+          "height_cm:h180": -7,
+          "height_cm:h185": -8,
+          "height_cm:h190": -8
+        }
       },
       {
         "id": "media",
         "label": "Estatura media",
         "tags": [
           "balanced",
-          "versatile"
-        ]
+          "versatile",
+          "average",
+          "balanced"
+        ],
+        "bias": {
+          "height_cm:h145": -4,
+          "height_cm:h150": -3,
+          "height_cm:h155": 0,
+          "height_cm:h160": 6,
+          "height_cm:h165": 7,
+          "height_cm:h170": 3,
+          "height_cm:h175": 0,
+          "height_cm:h180": -2,
+          "height_cm:h185": -4,
+          "height_cm:h190": -6
+        }
       },
       {
         "id": "alta",
@@ -109,8 +137,22 @@
         "tags": [
           "elegant",
           "commanding",
+          "long",
+          "tall",
           "long"
-        ]
+        ],
+        "bias": {
+          "height_cm:h145": -8,
+          "height_cm:h150": -7,
+          "height_cm:h155": -6,
+          "height_cm:h160": -4,
+          "height_cm:h165": -1,
+          "height_cm:h170": 4,
+          "height_cm:h175": 7,
+          "height_cm:h180": 7,
+          "height_cm:h185": 7,
+          "height_cm:h190": 8
+        }
       }
     ],
     "silhouette": [
@@ -319,7 +361,8 @@
           "warm",
           "bright",
           "bold"
-        ]
+        ],
+        "prompt_en": "coral red"
       },
       {
         "id": "naranja_tangerina",
@@ -335,7 +378,8 @@
           "warm",
           "bright",
           "energetic"
-        ]
+        ],
+        "prompt_en": "tangerine orange"
       },
       {
         "id": "rosa_chicle",
@@ -350,7 +394,8 @@
           "cute",
           "bright",
           "playful"
-        ]
+        ],
+        "prompt_en": "bubblegum pink"
       },
       {
         "id": "violeta_profundo",
@@ -368,7 +413,8 @@
           "cool",
           "elegant",
           "mysterious"
-        ]
+        ],
+        "prompt_en": "deep violet"
       },
       {
         "id": "negro_obsidiana",
@@ -386,7 +432,8 @@
           "cool",
           "bold",
           "focused"
-        ]
+        ],
+        "prompt_en": "obsidian black"
       },
       {
         "id": "azul_nocturno",
@@ -403,7 +450,8 @@
           "cool",
           "technical",
           "focused"
-        ]
+        ],
+        "prompt_en": "midnight blue"
       },
       {
         "id": "plateado_perla",
@@ -419,7 +467,8 @@
           "cool",
           "elegant",
           "soft"
-        ]
+        ],
+        "prompt_en": "pearl silver"
       },
       {
         "id": "castano_miel",
@@ -435,7 +484,8 @@
           "warm",
           "soft",
           "friendly"
-        ]
+        ],
+        "prompt_en": "honey brown"
       },
       {
         "id": "rubio_platino",
@@ -445,7 +495,8 @@
           "cool",
           "elegant"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "platinum blonde"
       },
       {
         "id": "turquesa",
@@ -455,7 +506,33 @@
           "bright",
           "technical"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "turquoise"
+      },
+      {
+        "id": "verde_esmeralda",
+        "label": "Verde esmeralda",
+        "tags": [
+          "emerald",
+          "green",
+          "cool",
+          "distinctive"
+        ],
+        "base": 1,
+        "prompt_en": "emerald green",
+        "bias": {}
+      },
+      {
+        "id": "rubio_dorado",
+        "label": "Rubio dorado",
+        "tags": [
+          "golden_blonde",
+          "warm",
+          "gold"
+        ],
+        "base": 1,
+        "prompt_en": "golden blonde",
+        "bias": {}
       }
     ],
     "eyes": [
@@ -472,7 +549,8 @@
           "warm",
           "bright",
           "confident"
-        ]
+        ],
+        "prompt_en": "golden amber"
       },
       {
         "id": "rojo_rubi",
@@ -488,7 +566,8 @@
           "bold",
           "intense",
           "defiant"
-        ]
+        ],
+        "prompt_en": "ruby red"
       },
       {
         "id": "violeta",
@@ -504,7 +583,8 @@
           "cool",
           "mysterious",
           "elegant"
-        ]
+        ],
+        "prompt_en": "violet"
       },
       {
         "id": "azul_hielo",
@@ -520,7 +600,8 @@
           "cool",
           "calm",
           "focused"
-        ]
+        ],
+        "prompt_en": "ice blue"
       },
       {
         "id": "verde_esmeralda",
@@ -534,7 +615,8 @@
           "fresh",
           "balanced",
           "natural"
-        ]
+        ],
+        "prompt_en": "emerald green"
       },
       {
         "id": "gris_grafito",
@@ -550,7 +632,8 @@
           "cool",
           "reserved",
           "controlled"
-        ]
+        ],
+        "prompt_en": "graphite gray"
       },
       {
         "id": "azul_profundo",
@@ -560,7 +643,8 @@
           "focused",
           "calm"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "deep blue"
       },
       {
         "id": "celeste",
@@ -570,7 +654,8 @@
           "soft",
           "fresh"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "sky blue"
       },
       {
         "id": "verde_lima",
@@ -580,7 +665,8 @@
           "energetic",
           "bold"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "lime green"
       },
       {
         "id": "rosa_opalina",
@@ -590,7 +676,8 @@
           "cute",
           "bright"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "opal pink"
       }
     ],
     "voice": [
@@ -928,7 +1015,8 @@
           "compact",
           "agile",
           "energetic"
-        ]
+        ],
+        "prompt_en": "short hair"
       },
       {
         "id": "medio",
@@ -936,7 +1024,8 @@
         "tags": [
           "balanced",
           "versatile"
-        ]
+        ],
+        "prompt_en": "medium-length hair"
       },
       {
         "id": "largo",
@@ -944,7 +1033,8 @@
         "tags": [
           "elegant",
           "flowing"
-        ]
+        ],
+        "prompt_en": "long hair"
       },
       {
         "id": "pixie",
@@ -954,7 +1044,8 @@
           "compact",
           "bold"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "pixie cut"
       },
       {
         "id": "muy_corto",
@@ -964,7 +1055,8 @@
           "agile",
           "sporty"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "very short hair"
       },
       {
         "id": "a_la_mandibula",
@@ -974,7 +1066,8 @@
           "clean",
           "versatile"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "jaw-length hair"
       },
       {
         "id": "a_los_hombros",
@@ -984,7 +1077,8 @@
           "balanced",
           "versatile"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "shoulder-length hair"
       },
       {
         "id": "medio_largo",
@@ -994,7 +1088,8 @@
           "versatile",
           "soft"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "medium-long hair"
       },
       {
         "id": "muy_largo",
@@ -1004,7 +1099,8 @@
           "flowing",
           "dramatic"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "very long hair"
       },
       {
         "id": "extra_largo",
@@ -1014,7 +1110,8 @@
           "dramatic",
           "elegant"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "extra-long hair"
       }
     ],
     "hairstyle": [
@@ -1025,85 +1122,118 @@
           "compact",
           "cute",
           "clean"
-        ]
+        ],
+        "base": 1,
+        "prompt_en": "clean bob haircut",
+        "bias": {}
       },
       {
         "id": "short_wavy",
         "label": "Corto ondulado",
         "tags": [
+          "short",
           "energetic",
           "soft"
-        ]
+        ],
+        "base": 1,
+        "prompt_en": "short wavy haircut",
+        "bias": {}
       },
       {
         "id": "long_flowing",
         "label": "Largo fluido",
         "tags": [
+          "long",
           "elegant",
-          "flowing",
-          "dramatic"
-        ]
-      },
-      {
-        "id": "ponytail",
-        "label": "Cola alta",
-        "tags": [
-          "athletic",
-          "energetic",
-          "focused"
-        ]
-      },
-      {
-        "id": "side_ponytail",
-        "label": "Cola lateral",
-        "tags": [
-          "playful",
-          "social",
-          "agile"
-        ]
-      },
-      {
-        "id": "twin_tails",
-        "label": "Coletas gemelas",
-        "tags": [
-          "cute",
-          "bright",
-          "playful"
-        ]
-      },
-      {
-        "id": "braided",
-        "label": "Trenzado",
-        "tags": [
-          "disciplined",
-          "refined"
-        ]
+          "flowing"
+        ],
+        "base": 1,
+        "prompt_en": "long flowing hair",
+        "bias": {}
       },
       {
         "id": "hime_cut",
         "label": "Hime cut",
         "tags": [
           "elegant",
-          "controlled"
-        ]
+          "controlled",
+          "classic"
+        ],
+        "base": 1,
+        "prompt_en": "hime cut with straight bangs and side locks",
+        "bias": {}
       },
       {
         "id": "layered_shag",
-        "label": "Capas dinámicas",
+        "label": "Capas despeinadas",
         "tags": [
+          "layered",
           "rebellious",
-          "energetic",
-          "bold"
-        ]
+          "energetic"
+        ],
+        "base": 1,
+        "prompt_en": "layered shag haircut",
+        "bias": {}
       },
       {
         "id": "asymmetrical",
-        "label": "Asimétrico",
+        "label": "Corte asimétrico",
         "tags": [
           "edgy",
           "bold",
-          "defiant"
-        ]
+          "distinctive"
+        ],
+        "base": 1,
+        "prompt_en": "asymmetrical haircut",
+        "bias": {}
+      },
+      {
+        "id": "wolf_cut",
+        "label": "Wolf cut",
+        "tags": [
+          "layered",
+          "dynamic",
+          "edgy"
+        ],
+        "base": 1,
+        "prompt_en": "layered wolf cut",
+        "bias": {}
+      },
+      {
+        "id": "long_straight",
+        "label": "Largo liso",
+        "tags": [
+          "long",
+          "straight",
+          "clean"
+        ],
+        "base": 1,
+        "prompt_en": "long straight haircut",
+        "bias": {}
+      },
+      {
+        "id": "curly_lob",
+        "label": "Bob largo rizado",
+        "tags": [
+          "curly",
+          "medium",
+          "soft"
+        ],
+        "base": 1,
+        "prompt_en": "curly long bob haircut",
+        "bias": {}
+      },
+      {
+        "id": "medium_layers",
+        "label": "Capas medias",
+        "tags": [
+          "medium",
+          "layered",
+          "versatile"
+        ],
+        "base": 1,
+        "prompt_en": "medium-length layered haircut",
+        "bias": {}
       }
     ],
     "eye_shape": [
@@ -2289,101 +2419,121 @@
         "id": "recto_liso",
         "label": "Parte trasera lisa",
         "tags": [
+          "straight",
           "clean",
-          "elegant",
           "controlled"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "straight back hair",
+        "bias": {}
       },
       {
         "id": "capas_largas",
         "label": "Capas largas",
         "tags": [
+          "long",
           "flowing",
-          "dynamic",
           "elegant"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "long layered back hair",
+        "bias": {}
       },
       {
         "id": "nuca_corta",
         "label": "Nuca corta",
         "tags": [
+          "short",
           "compact",
-          "agile",
           "sporty"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "short nape and compact back hair",
+        "bias": {}
       },
       {
-        "id": "coleta_alta",
-        "label": "Parte trasera en coleta alta",
+        "id": "capas_medias",
+        "label": "Capas medias",
         "tags": [
-          "athletic",
-          "energetic",
-          "focused"
+          "medium",
+          "layered",
+          "versatile"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "medium layered back hair",
+        "bias": {}
       },
       {
-        "id": "coleta_baja",
-        "label": "Parte trasera en coleta baja",
+        "id": "nuca_despeinada",
+        "label": "Nuca despeinada",
         "tags": [
-          "calm",
-          "elegant",
-          "practical"
+          "shaggy",
+          "dynamic",
+          "edgy"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "shaggy nape",
+        "bias": {}
       },
       {
-        "id": "doble_coleta",
-        "label": "Parte trasera en coletas dobles",
+        "id": "ondas_traseras",
+        "label": "Ondas traseras",
         "tags": [
-          "cute",
-          "bright",
-          "playful"
+          "wavy",
+          "soft",
+          "flowing"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "soft wavy back hair",
+        "bias": {}
       },
       {
-        "id": "trenza_trasera",
-        "label": "Trenza trasera",
+        "id": "panel_trenzado",
+        "label": "Panel trasero trenzado",
         "tags": [
-          "disciplined",
+          "braided",
           "refined",
-          "practical"
+          "disciplined"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "braided back section integrated into the hairstyle",
+        "bias": {}
       },
       {
-        "id": "recogido",
-        "label": "Recogido completo",
+        "id": "bob_trasero",
+        "label": "Volumen trasero de bob",
         "tags": [
-          "elegant",
-          "controlled",
+          "bob",
+          "compact",
           "clean"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "rounded bob back volume",
+        "bias": {}
       },
       {
-        "id": "media_coleta",
-        "label": "Media coleta",
+        "id": "puntas_largas",
+        "label": "Puntas traseras largas",
         "tags": [
-          "versatile",
-          "playful",
-          "balanced"
+          "long",
+          "tapered",
+          "dynamic"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "long tapered back hair ends",
+        "bias": {}
       },
       {
-        "id": "ondas_sueltas",
-        "label": "Ondas sueltas traseras",
+        "id": "seccion_asimetrica",
+        "label": "Sección trasera asimétrica",
         "tags": [
-          "soft",
-          "flowing",
-          "warm"
+          "asymmetric",
+          "edgy",
+          "distinctive"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "asymmetrical back hair section",
+        "bias": {}
       }
     ],
     "pupil_shape": [
@@ -2425,7 +2575,8 @@
           "playful",
           "distinctive"
         ],
-        "base": 1
+        "base": 1,
+        "prompt_en": "star-shaped pupils"
       },
       {
         "id": "corazon",
@@ -2895,6 +3046,1748 @@
         ],
         "base": 1
       }
+    ],
+    "height_cm": [
+      {
+        "id": "h145",
+        "label": "145 cm",
+        "tags": [
+          "petite",
+          "compact"
+        ],
+        "base": 1,
+        "prompt_en": "145 cm tall",
+        "bias": {
+          "stature:bajita": 7,
+          "stature:media": -4,
+          "stature:alta": -8
+        }
+      },
+      {
+        "id": "h150",
+        "label": "150 cm",
+        "tags": [
+          "petite",
+          "compact"
+        ],
+        "base": 1,
+        "prompt_en": "150 cm tall",
+        "bias": {
+          "stature:bajita": 7,
+          "stature:media": -3,
+          "stature:alta": -7
+        }
+      },
+      {
+        "id": "h155",
+        "label": "155 cm",
+        "tags": [
+          "petite",
+          "short"
+        ],
+        "base": 1,
+        "prompt_en": "155 cm tall",
+        "bias": {
+          "stature:bajita": 6,
+          "stature:media": 0,
+          "stature:alta": -6
+        }
+      },
+      {
+        "id": "h160",
+        "label": "160 cm",
+        "tags": [
+          "average",
+          "balanced"
+        ],
+        "base": 1,
+        "prompt_en": "160 cm tall",
+        "bias": {
+          "stature:bajita": 1,
+          "stature:media": 6,
+          "stature:alta": -4
+        }
+      },
+      {
+        "id": "h165",
+        "label": "165 cm",
+        "tags": [
+          "average",
+          "balanced"
+        ],
+        "base": 1,
+        "prompt_en": "165 cm tall",
+        "bias": {
+          "stature:bajita": -2,
+          "stature:media": 7,
+          "stature:alta": -1
+        }
+      },
+      {
+        "id": "h170",
+        "label": "170 cm",
+        "tags": [
+          "tall",
+          "long"
+        ],
+        "base": 1,
+        "prompt_en": "170 cm tall",
+        "bias": {
+          "stature:bajita": -4,
+          "stature:media": 3,
+          "stature:alta": 4
+        }
+      },
+      {
+        "id": "h175",
+        "label": "175 cm",
+        "tags": [
+          "tall",
+          "long"
+        ],
+        "base": 1,
+        "prompt_en": "175 cm tall",
+        "bias": {
+          "stature:bajita": -6,
+          "stature:media": 0,
+          "stature:alta": 7
+        }
+      },
+      {
+        "id": "h180",
+        "label": "180 cm",
+        "tags": [
+          "tall",
+          "long"
+        ],
+        "base": 1,
+        "prompt_en": "180 cm tall",
+        "bias": {
+          "stature:bajita": -7,
+          "stature:media": -2,
+          "stature:alta": 7
+        }
+      },
+      {
+        "id": "h185",
+        "label": "185 cm",
+        "tags": [
+          "tall",
+          "long"
+        ],
+        "base": 1,
+        "prompt_en": "185 cm tall",
+        "bias": {
+          "stature:bajita": -8,
+          "stature:media": -4,
+          "stature:alta": 7
+        }
+      },
+      {
+        "id": "h190",
+        "label": "190 cm",
+        "tags": [
+          "tall",
+          "long"
+        ],
+        "base": 1,
+        "prompt_en": "190 cm tall",
+        "bias": {
+          "stature:bajita": -8,
+          "stature:media": -6,
+          "stature:alta": 8
+        }
+      }
+    ],
+    "species": [
+      {
+        "id": "humana",
+        "label": "Humana",
+        "tags": [
+          "human",
+          "human_ears",
+          "no_tail",
+          "no_horns",
+          "athletic",
+          "versatile"
+        ],
+        "base": 8,
+        "prompt_en": "human adult heroine",
+        "bias": {}
+      },
+      {
+        "id": "kemonomimi_gato",
+        "label": "Kemonomimi de gato",
+        "tags": [
+          "cat",
+          "animal_ears",
+          "cat_ears",
+          "cat_tail",
+          "agile",
+          "cute"
+        ],
+        "base": 1,
+        "prompt_en": "cat-eared kemonomimi adult heroine",
+        "bias": {}
+      },
+      {
+        "id": "kemonomimi_zorro",
+        "label": "Kemonomimi de zorro",
+        "tags": [
+          "fox",
+          "animal_ears",
+          "fox_ears",
+          "fox_tail",
+          "clever",
+          "elegant"
+        ],
+        "base": 1,
+        "prompt_en": "fox-eared kemonomimi adult heroine",
+        "bias": {}
+      },
+      {
+        "id": "kemonomimi_lobo",
+        "label": "Kemonomimi de lobo",
+        "tags": [
+          "wolf",
+          "animal_ears",
+          "wolf_ears",
+          "wolf_tail",
+          "strong",
+          "athletic"
+        ],
+        "base": 1,
+        "prompt_en": "wolf-eared kemonomimi adult heroine",
+        "bias": {}
+      },
+      {
+        "id": "kemonomimi_conejo",
+        "label": "Kemonomimi de conejo",
+        "tags": [
+          "rabbit",
+          "animal_ears",
+          "rabbit_ears",
+          "rabbit_tail",
+          "agile",
+          "bright"
+        ],
+        "base": 1,
+        "prompt_en": "rabbit-eared kemonomimi adult heroine",
+        "bias": {}
+      },
+      {
+        "id": "elfa",
+        "label": "Elfa",
+        "tags": [
+          "elf",
+          "elf_ears",
+          "long_ears",
+          "fantasy",
+          "elegant",
+          "no_tail",
+          "no_horns"
+        ],
+        "base": 1,
+        "prompt_en": "elf adult heroine with long pointed ears",
+        "bias": {}
+      },
+      {
+        "id": "oni",
+        "label": "Oni",
+        "tags": [
+          "oni",
+          "normal_ears",
+          "oni_horns",
+          "fantasy",
+          "strong",
+          "no_tail"
+        ],
+        "base": 1,
+        "prompt_en": "oni adult heroine with small stylized oni horns",
+        "bias": {}
+      },
+      {
+        "id": "draconica",
+        "label": "Dracónica",
+        "tags": [
+          "dragon",
+          "dragon_ears",
+          "dragon_horns",
+          "dragon_tail",
+          "fantasy",
+          "powerful"
+        ],
+        "base": 1,
+        "prompt_en": "dragon-kin adult heroine with coordinated dragon features",
+        "bias": {}
+      },
+      {
+        "id": "androide",
+        "label": "Androide",
+        "tags": [
+          "android",
+          "sensor_ears",
+          "mechanical",
+          "no_tail",
+          "no_horns",
+          "technical"
+        ],
+        "base": 1,
+        "prompt_en": "android adult heroine with subtle synthetic details",
+        "bias": {}
+      },
+      {
+        "id": "espiritu",
+        "label": "Espíritu de energía",
+        "tags": [
+          "spirit",
+          "luminous_ears",
+          "spectral_tail",
+          "ethereal",
+          "fantasy",
+          "glow"
+        ],
+        "base": 1,
+        "prompt_en": "ethereal energy-spirit adult heroine",
+        "bias": {}
+      }
+    ],
+    "body_proportions": [
+      {
+        "id": "equilibradas",
+        "label": "Proporciones equilibradas",
+        "tags": [
+          "balanced",
+          "athletic",
+          "versatile"
+        ],
+        "base": 3,
+        "prompt_en": "balanced adult anime proportions",
+        "bias": {}
+      },
+      {
+        "id": "piernas_largas",
+        "label": "Piernas largas estilizadas",
+        "tags": [
+          "long_legs",
+          "tall",
+          "elegant"
+        ],
+        "base": 1,
+        "prompt_en": "stylized long-leg proportions",
+        "bias": {}
+      },
+      {
+        "id": "compactas_agiles",
+        "label": "Compactas y ágiles",
+        "tags": [
+          "compact",
+          "agile",
+          "petite"
+        ],
+        "base": 1,
+        "prompt_en": "compact agile adult proportions",
+        "bias": {}
+      },
+      {
+        "id": "torso_corto_deportivo",
+        "label": "Torso compacto deportivo",
+        "tags": [
+          "compact",
+          "athletic",
+          "sporty"
+        ],
+        "base": 1,
+        "prompt_en": "compact sporty torso proportions",
+        "bias": {}
+      },
+      {
+        "id": "extremidades_largas",
+        "label": "Extremidades largas",
+        "tags": [
+          "long_limbs",
+          "lean",
+          "dynamic"
+        ],
+        "base": 1,
+        "prompt_en": "long-limbed athletic proportions",
+        "bias": {}
+      },
+      {
+        "id": "hombros_deportivos",
+        "label": "Hombros deportivos definidos",
+        "tags": [
+          "athletic",
+          "strong",
+          "sporty"
+        ],
+        "base": 1,
+        "prompt_en": "athletic shoulder proportions",
+        "bias": {}
+      },
+      {
+        "id": "centro_bajo",
+        "label": "Centro de gravedad bajo",
+        "tags": [
+          "grounded",
+          "stable",
+          "powerful"
+        ],
+        "base": 1,
+        "prompt_en": "low-center-of-gravity athletic proportions",
+        "bias": {}
+      },
+      {
+        "id": "esbelta_elegante",
+        "label": "Esbelta y elegante",
+        "tags": [
+          "lean",
+          "elegant",
+          "refined"
+        ],
+        "base": 1,
+        "prompt_en": "slender elegant adult proportions",
+        "bias": {}
+      },
+      {
+        "id": "potencia_compacta",
+        "label": "Potencia compacta",
+        "tags": [
+          "compact",
+          "strong",
+          "powerful"
+        ],
+        "base": 1,
+        "prompt_en": "compact powerful athletic proportions",
+        "bias": {}
+      },
+      {
+        "id": "movilidad_flexible",
+        "label": "Flexible y móvil",
+        "tags": [
+          "flexible",
+          "agile",
+          "dynamic"
+        ],
+        "base": 1,
+        "prompt_en": "flexible agile athletic proportions",
+        "bias": {}
+      }
+    ],
+    "skin_tone": [
+      {
+        "id": "porcelana_neutra",
+        "label": "Porcelana neutra",
+        "tags": [
+          "light",
+          "neutral",
+          "soft"
+        ],
+        "base": 1,
+        "prompt_en": "neutral porcelain skin tone",
+        "bias": {}
+      },
+      {
+        "id": "marfil_calido",
+        "label": "Marfil cálido",
+        "tags": [
+          "light",
+          "warm",
+          "soft"
+        ],
+        "base": 1,
+        "prompt_en": "warm ivory skin tone",
+        "bias": {}
+      },
+      {
+        "id": "beige_claro",
+        "label": "Beige claro",
+        "tags": [
+          "light",
+          "neutral",
+          "natural"
+        ],
+        "base": 1,
+        "prompt_en": "light beige skin tone",
+        "bias": {}
+      },
+      {
+        "id": "durazno",
+        "label": "Durazno suave",
+        "tags": [
+          "warm",
+          "soft",
+          "natural"
+        ],
+        "base": 1,
+        "prompt_en": "soft peach skin tone",
+        "bias": {}
+      },
+      {
+        "id": "beige_dorado",
+        "label": "Beige dorado",
+        "tags": [
+          "warm",
+          "golden",
+          "natural"
+        ],
+        "base": 1,
+        "prompt_en": "golden beige skin tone",
+        "bias": {}
+      },
+      {
+        "id": "oliva_suave",
+        "label": "Oliva suave",
+        "tags": [
+          "olive",
+          "natural",
+          "warm"
+        ],
+        "base": 1,
+        "prompt_en": "soft olive skin tone",
+        "bias": {}
+      },
+      {
+        "id": "canela",
+        "label": "Canela",
+        "tags": [
+          "warm",
+          "brown",
+          "natural"
+        ],
+        "base": 1,
+        "prompt_en": "cinnamon brown skin tone",
+        "bias": {}
+      },
+      {
+        "id": "bronce_calido",
+        "label": "Bronce cálido",
+        "tags": [
+          "warm",
+          "bronze",
+          "deep"
+        ],
+        "base": 1,
+        "prompt_en": "warm bronze skin tone",
+        "bias": {}
+      },
+      {
+        "id": "marron_profundo",
+        "label": "Marrón profundo",
+        "tags": [
+          "deep",
+          "brown",
+          "rich"
+        ],
+        "base": 1,
+        "prompt_en": "deep rich brown skin tone",
+        "bias": {}
+      },
+      {
+        "id": "fantasia_azul_suave",
+        "label": "Azul fantasía suave",
+        "tags": [
+          "fantasy",
+          "cool",
+          "blue"
+        ],
+        "base": 0.7,
+        "prompt_en": "subtle fantasy blue skin tone",
+        "bias": {}
+      }
+    ],
+    "hair_arrangement": [
+      {
+        "id": "suelto",
+        "label": "Suelto",
+        "tags": [
+          "loose",
+          "flowing",
+          "versatile"
+        ],
+        "base": 3,
+        "prompt_en": "loose hair arrangement",
+        "bias": {}
+      },
+      {
+        "id": "coleta_alta",
+        "label": "Coleta alta",
+        "tags": [
+          "ponytail",
+          "tied",
+          "athletic",
+          "energetic"
+        ],
+        "base": 1,
+        "prompt_en": "high ponytail",
+        "bias": {}
+      },
+      {
+        "id": "coleta_baja",
+        "label": "Coleta baja",
+        "tags": [
+          "ponytail",
+          "tied",
+          "calm",
+          "practical"
+        ],
+        "base": 1,
+        "prompt_en": "low ponytail",
+        "bias": {}
+      },
+      {
+        "id": "coleta_lateral",
+        "label": "Coleta lateral",
+        "tags": [
+          "ponytail",
+          "side",
+          "playful",
+          "agile"
+        ],
+        "base": 1,
+        "prompt_en": "side ponytail",
+        "bias": {}
+      },
+      {
+        "id": "coletas_gemelas",
+        "label": "Coletas gemelas",
+        "tags": [
+          "twin_tails",
+          "tied",
+          "cute",
+          "energetic"
+        ],
+        "base": 1,
+        "prompt_en": "twin ponytails",
+        "bias": {}
+      },
+      {
+        "id": "media_coleta",
+        "label": "Media coleta",
+        "tags": [
+          "half_up",
+          "tied",
+          "versatile"
+        ],
+        "base": 1,
+        "prompt_en": "half-up half-down hairstyle",
+        "bias": {}
+      },
+      {
+        "id": "coleta_trenzada",
+        "label": "Coleta trenzada",
+        "tags": [
+          "ponytail",
+          "braided",
+          "athletic",
+          "refined"
+        ],
+        "base": 1,
+        "prompt_en": "braided ponytail",
+        "bias": {}
+      },
+      {
+        "id": "mono_alto",
+        "label": "Moño alto",
+        "tags": [
+          "bun",
+          "tied",
+          "clean",
+          "disciplined"
+        ],
+        "base": 1,
+        "prompt_en": "high hair bun",
+        "bias": {}
+      },
+      {
+        "id": "monos_dobles",
+        "label": "Moños dobles",
+        "tags": [
+          "double_bun",
+          "tied",
+          "cute",
+          "playful"
+        ],
+        "base": 1,
+        "prompt_en": "double hair buns",
+        "bias": {}
+      },
+      {
+        "id": "trenza_lateral_recogida",
+        "label": "Recogido con trenza lateral",
+        "tags": [
+          "braided",
+          "tied",
+          "elegant",
+          "practical"
+        ],
+        "base": 1,
+        "prompt_en": "side-braided tied-back hairstyle",
+        "bias": {}
+      }
+    ],
+    "hair_color_pattern": [
+      {
+        "id": "color_solido",
+        "label": "Color uniforme",
+        "tags": [
+          "solid",
+          "single_color",
+          "clean"
+        ],
+        "base": 5,
+        "prompt_en": "single solid hair color",
+        "bias": {}
+      },
+      {
+        "id": "puntas_doradas",
+        "label": "Puntas doradas",
+        "tags": [
+          "gradient",
+          "tips",
+          "metallic",
+          "gold"
+        ],
+        "base": 1,
+        "prompt_en": "emerald-compatible metallic gold tips gradient",
+        "bias": {
+          "hair:verde_esmeralda": 3,
+          "hair_secondary_color:oro_metalico": 8
+        }
+      },
+      {
+        "id": "degradado_suave",
+        "label": "Degradado suave de color",
+        "tags": [
+          "gradient",
+          "soft",
+          "flowing"
+        ],
+        "base": 1,
+        "prompt_en": "soft hair color gradient",
+        "bias": {}
+      },
+      {
+        "id": "ombre_oscuro_claro",
+        "label": "Ombré de oscuro a claro",
+        "tags": [
+          "ombre",
+          "gradient",
+          "contrast"
+        ],
+        "base": 1,
+        "prompt_en": "dark-to-light ombre hair",
+        "bias": {}
+      },
+      {
+        "id": "raices_contraste",
+        "label": "Raíces en color de contraste",
+        "tags": [
+          "roots",
+          "contrast",
+          "bold"
+        ],
+        "base": 1,
+        "prompt_en": "contrasting hair roots",
+        "bias": {}
+      },
+      {
+        "id": "dos_tonos_divididos",
+        "label": "Dos tonos divididos",
+        "tags": [
+          "split_dye",
+          "two_tone",
+          "bold"
+        ],
+        "base": 1,
+        "prompt_en": "split-dye two-tone hair",
+        "bias": {}
+      },
+      {
+        "id": "capa_interior",
+        "label": "Capa interior de otro color",
+        "tags": [
+          "underlayer",
+          "hidden_color",
+          "contrast"
+        ],
+        "base": 1,
+        "prompt_en": "contrasting inner hair underlayer",
+        "bias": {}
+      },
+      {
+        "id": "mechones_color",
+        "label": "Mechones de color",
+        "tags": [
+          "streaks",
+          "accent",
+          "dynamic"
+        ],
+        "base": 1,
+        "prompt_en": "distinct colored hair streaks",
+        "bias": {}
+      },
+      {
+        "id": "reflejos_metalicos",
+        "label": "Reflejos metálicos",
+        "tags": [
+          "metallic",
+          "highlights",
+          "technical"
+        ],
+        "base": 1,
+        "prompt_en": "controlled metallic hair highlights",
+        "bias": {}
+      },
+      {
+        "id": "puntas_plateadas",
+        "label": "Puntas plateadas",
+        "tags": [
+          "gradient",
+          "tips",
+          "silver"
+        ],
+        "base": 1,
+        "prompt_en": "silver-tipped hair gradient",
+        "bias": {}
+      }
+    ],
+    "hair_secondary_color": [
+      {
+        "id": "oro_metalico",
+        "label": "Oro metálico",
+        "tags": [
+          "gold",
+          "metallic",
+          "warm"
+        ],
+        "base": 1,
+        "prompt_en": "metallic gold",
+        "bias": {}
+      },
+      {
+        "id": "plata_perla",
+        "label": "Plata perla",
+        "tags": [
+          "silver",
+          "cool",
+          "metallic"
+        ],
+        "base": 1,
+        "prompt_en": "pearl silver",
+        "bias": {}
+      },
+      {
+        "id": "blanco_luminoso",
+        "label": "Blanco luminoso",
+        "tags": [
+          "white",
+          "bright",
+          "cool"
+        ],
+        "base": 1,
+        "prompt_en": "luminous white",
+        "bias": {}
+      },
+      {
+        "id": "coral_vivo",
+        "label": "Coral vivo",
+        "tags": [
+          "coral",
+          "warm",
+          "bright"
+        ],
+        "base": 1,
+        "prompt_en": "vivid coral",
+        "bias": {}
+      },
+      {
+        "id": "rojo_rubi",
+        "label": "Rojo rubí",
+        "tags": [
+          "red",
+          "bold",
+          "warm"
+        ],
+        "base": 1,
+        "prompt_en": "ruby red",
+        "bias": {}
+      },
+      {
+        "id": "rosa_chicle",
+        "label": "Rosa chicle",
+        "tags": [
+          "pink",
+          "cute",
+          "bright"
+        ],
+        "base": 1,
+        "prompt_en": "bubblegum pink",
+        "bias": {}
+      },
+      {
+        "id": "violeta",
+        "label": "Violeta",
+        "tags": [
+          "violet",
+          "cool",
+          "elegant"
+        ],
+        "base": 1,
+        "prompt_en": "violet purple",
+        "bias": {}
+      },
+      {
+        "id": "verde_esmeralda",
+        "label": "Verde esmeralda",
+        "tags": [
+          "emerald",
+          "green",
+          "cool"
+        ],
+        "base": 1,
+        "prompt_en": "emerald green",
+        "bias": {}
+      },
+      {
+        "id": "turquesa",
+        "label": "Turquesa",
+        "tags": [
+          "turquoise",
+          "cool",
+          "bright"
+        ],
+        "base": 1,
+        "prompt_en": "turquoise",
+        "bias": {}
+      },
+      {
+        "id": "azul_medianoche",
+        "label": "Azul medianoche",
+        "tags": [
+          "blue",
+          "cool",
+          "dark"
+        ],
+        "base": 1,
+        "prompt_en": "midnight blue",
+        "bias": {}
+      }
+    ],
+    "hair_texture": [
+      {
+        "id": "liso_sedoso",
+        "label": "Liso sedoso",
+        "tags": [
+          "straight",
+          "smooth",
+          "clean"
+        ],
+        "base": 1,
+        "prompt_en": "silky straight hair",
+        "bias": {}
+      },
+      {
+        "id": "ondas_suaves",
+        "label": "Ondas suaves",
+        "tags": [
+          "wavy",
+          "soft",
+          "flowing"
+        ],
+        "base": 1,
+        "prompt_en": "soft wavy hair",
+        "bias": {}
+      },
+      {
+        "id": "rizos_sueltos",
+        "label": "Rizos sueltos",
+        "tags": [
+          "curly",
+          "soft",
+          "flowing"
+        ],
+        "base": 1,
+        "prompt_en": "loose curls",
+        "bias": {}
+      },
+      {
+        "id": "rizos_definidos",
+        "label": "Rizos definidos",
+        "tags": [
+          "curly",
+          "defined",
+          "voluminous"
+        ],
+        "base": 1,
+        "prompt_en": "defined curls",
+        "bias": {}
+      },
+      {
+        "id": "esponjado_suave",
+        "label": "Volumen esponjado suave",
+        "tags": [
+          "fluffy",
+          "soft",
+          "cute"
+        ],
+        "base": 1,
+        "prompt_en": "soft fluffy hair volume",
+        "bias": {}
+      },
+      {
+        "id": "hebras_finas",
+        "label": "Hebras finas definidas",
+        "tags": [
+          "fine_strands",
+          "light",
+          "refined"
+        ],
+        "base": 1,
+        "prompt_en": "fine individually defined hair strands",
+        "bias": {}
+      },
+      {
+        "id": "volumen_grueso",
+        "label": "Volumen abundante",
+        "tags": [
+          "thick",
+          "voluminous",
+          "bold"
+        ],
+        "base": 1,
+        "prompt_en": "thick voluminous hair",
+        "bias": {}
+      },
+      {
+        "id": "capas_texturizadas",
+        "label": "Capas texturizadas",
+        "tags": [
+          "layered",
+          "dynamic",
+          "modern"
+        ],
+        "base": 1,
+        "prompt_en": "textured layered hair",
+        "bias": {}
+      },
+      {
+        "id": "puntas_dinamicas",
+        "label": "Puntas dinámicas",
+        "tags": [
+          "spiky",
+          "dynamic",
+          "energetic"
+        ],
+        "base": 1,
+        "prompt_en": "dynamic tapered hair ends",
+        "bias": {}
+      },
+      {
+        "id": "textura_mixta",
+        "label": "Textura mixta controlada",
+        "tags": [
+          "mixed_texture",
+          "layered",
+          "natural"
+        ],
+        "base": 1,
+        "prompt_en": "controlled mixed hair texture",
+        "bias": {}
+      }
+    ],
+    "ear_style": [
+      {
+        "id": "orejas_humanas",
+        "label": "Orejas humanas naturales",
+        "tags": [
+          "human_ears",
+          "normal_ears"
+        ],
+        "base": 1,
+        "prompt_en": "natural human-shaped ears",
+        "bias": {
+          "species:humana": 7,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": 7,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_gato",
+        "label": "Orejas de gato",
+        "tags": [
+          "cat_ears",
+          "animal_ears",
+          "cat"
+        ],
+        "base": 1,
+        "prompt_en": "cat ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": 7,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_zorro",
+        "label": "Orejas de zorro",
+        "tags": [
+          "fox_ears",
+          "animal_ears",
+          "fox"
+        ],
+        "base": 1,
+        "prompt_en": "fox ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": 7,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_lobo",
+        "label": "Orejas de lobo",
+        "tags": [
+          "wolf_ears",
+          "animal_ears",
+          "wolf"
+        ],
+        "base": 1,
+        "prompt_en": "wolf ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": 7,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_conejo",
+        "label": "Orejas de conejo",
+        "tags": [
+          "rabbit_ears",
+          "animal_ears",
+          "rabbit"
+        ],
+        "base": 1,
+        "prompt_en": "long rabbit ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": 7,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_elficas",
+        "label": "Orejas élficas puntiagudas",
+        "tags": [
+          "elf_ears",
+          "long_ears",
+          "fantasy"
+        ],
+        "base": 1,
+        "prompt_en": "long pointed elf ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": 7,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_draconicas",
+        "label": "Orejas dracónicas",
+        "tags": [
+          "dragon_ears",
+          "fantasy",
+          "scaled"
+        ],
+        "base": 1,
+        "prompt_en": "subtle dragon-like ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "aletas_sensor",
+        "label": "Aletas sensor de androide",
+        "tags": [
+          "sensor_ears",
+          "mechanical",
+          "technical"
+        ],
+        "base": 1,
+        "prompt_en": "subtle android sensor fins in place of external ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_lince",
+        "label": "Orejas de lince",
+        "tags": [
+          "animal_ears",
+          "cat",
+          "tufted_ears"
+        ],
+        "base": 1,
+        "prompt_en": "tufted lynx-like ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": 7,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": 7,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "orejas_luminosas",
+        "label": "Orejas luminosas de energía",
+        "tags": [
+          "luminous_ears",
+          "spirit",
+          "ethereal"
+        ],
+        "base": 1,
+        "prompt_en": "subtle luminous spirit ears",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": 7
+        }
+      }
+    ],
+    "tail_style": [
+      {
+        "id": "sin_cola",
+        "label": "Sin cola",
+        "tags": [
+          "no_tail",
+          "human"
+        ],
+        "base": 1,
+        "prompt_en": "no tail",
+        "bias": {
+          "species:humana": 7,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": 7,
+          "species:oni": 7,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_gato",
+        "label": "Cola de gato",
+        "tags": [
+          "cat_tail",
+          "tail_cat",
+          "cat"
+        ],
+        "base": 1,
+        "prompt_en": "cat tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": 7,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_zorro",
+        "label": "Cola de zorro",
+        "tags": [
+          "fox_tail",
+          "tail_fox",
+          "fox"
+        ],
+        "base": 1,
+        "prompt_en": "fox tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": 7,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_lobo",
+        "label": "Cola de lobo",
+        "tags": [
+          "wolf_tail",
+          "tail_wolf",
+          "wolf"
+        ],
+        "base": 1,
+        "prompt_en": "wolf tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": 7,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_conejo",
+        "label": "Cola pequeña de conejo",
+        "tags": [
+          "rabbit_tail",
+          "tail_rabbit",
+          "rabbit"
+        ],
+        "base": 1,
+        "prompt_en": "small rabbit tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": 7,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_draconica",
+        "label": "Cola dracónica",
+        "tags": [
+          "dragon_tail",
+          "tail_dragon",
+          "scaled"
+        ],
+        "base": 1,
+        "prompt_en": "dragon tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_mecanica",
+        "label": "Cola mecánica segmentada",
+        "tags": [
+          "robot_tail",
+          "mechanical",
+          "technical"
+        ],
+        "base": 1,
+        "prompt_en": "optional segmented mechanical tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cola_energia",
+        "label": "Cola de energía luminosa",
+        "tags": [
+          "spectral_tail",
+          "spirit",
+          "ethereal"
+        ],
+        "base": 1,
+        "prompt_en": "luminous spectral energy tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": 7
+        }
+      },
+      {
+        "id": "cola_pluma",
+        "label": "Cola plumosa estilizada",
+        "tags": [
+          "feather_tail",
+          "fantasy",
+          "soft"
+        ],
+        "base": 1,
+        "prompt_en": "stylized soft feather-like tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": 7,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": 7
+        }
+      },
+      {
+        "id": "cola_energetica_corta",
+        "label": "Cola corta de energía",
+        "tags": [
+          "energy_tail",
+          "glow",
+          "fantasy"
+        ],
+        "base": 1,
+        "prompt_en": "short stylized energy tail",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": 7,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": 7
+        }
+      }
+    ],
+    "horn_style": [
+      {
+        "id": "sin_cuernos",
+        "label": "Sin cuernos",
+        "tags": [
+          "no_horns",
+          "human"
+        ],
+        "base": 1,
+        "prompt_en": "no horns or extra head protrusions",
+        "bias": {
+          "species:humana": 7,
+          "species:kemonomimi_gato": 7,
+          "species:kemonomimi_zorro": 7,
+          "species:kemonomimi_lobo": 7,
+          "species:kemonomimi_conejo": 7,
+          "species:elfa": 7,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": 7
+        }
+      },
+      {
+        "id": "cuernos_oni",
+        "label": "Cuernos pequeños de oni",
+        "tags": [
+          "oni_horns",
+          "horns",
+          "fantasy"
+        ],
+        "base": 1,
+        "prompt_en": "small stylized oni horns",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": 7,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cuernos_dragon",
+        "label": "Cuernos dracónicos curvados",
+        "tags": [
+          "dragon_horns",
+          "horns",
+          "fantasy"
+        ],
+        "base": 1,
+        "prompt_en": "curved dragon horns",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "cuernos_dragon_cortos",
+        "label": "Cuernos dracónicos cortos",
+        "tags": [
+          "dragon_horns",
+          "horns",
+          "fantasy"
+        ],
+        "base": 1,
+        "prompt_en": "short swept-back dragon horns",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "antenas_mecanicas",
+        "label": "Antenas mecánicas discretas",
+        "tags": [
+          "mechanical",
+          "android",
+          "technical"
+        ],
+        "base": 1,
+        "prompt_en": "small discreet mechanical antennae",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "corona_luminosa",
+        "label": "Corona luminosa flotante",
+        "tags": [
+          "halo",
+          "spirit",
+          "ethereal"
+        ],
+        "base": 1,
+        "prompt_en": "small floating luminous halo, not biological horns",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": 7
+        }
+      },
+      {
+        "id": "cuernos_cristal",
+        "label": "Cuernos de cristal pequeños",
+        "tags": [
+          "crystal",
+          "horns",
+          "fantasy"
+        ],
+        "base": 1,
+        "prompt_en": "small stylized crystal horns",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": 7,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "astas_elegantes",
+        "label": "Astas fantásticas elegantes",
+        "tags": [
+          "antlers",
+          "fantasy",
+          "elegant"
+        ],
+        "base": 1,
+        "prompt_en": "small elegant fantasy antlers",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": -5,
+          "species:espiritu": 7
+        }
+      },
+      {
+        "id": "cuernos_asimetricos",
+        "label": "Cuernos asimétricos",
+        "tags": [
+          "asymmetric",
+          "horns",
+          "distinctive"
+        ],
+        "base": 1,
+        "prompt_en": "asymmetrical stylized horns",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": 7,
+          "species:draconica": 7,
+          "species:androide": -5,
+          "species:espiritu": -5
+        }
+      },
+      {
+        "id": "aleta_cabeza",
+        "label": "Aleta craneal tecnológica",
+        "tags": [
+          "technical",
+          "android",
+          "modern"
+        ],
+        "base": 1,
+        "prompt_en": "small streamlined cranial fin",
+        "bias": {
+          "species:humana": -5,
+          "species:kemonomimi_gato": -5,
+          "species:kemonomimi_zorro": -5,
+          "species:kemonomimi_lobo": -5,
+          "species:kemonomimi_conejo": -5,
+          "species:elfa": -5,
+          "species:oni": -5,
+          "species:draconica": -5,
+          "species:androide": 7,
+          "species:espiritu": -5
+        }
+      }
     ]
   },
   "style_core": "original premium modern Japanese anime gacha-game character illustration, consistent 2D anime key visual, clean controlled line art, crisp readable contours, polished cel shading with restrained soft secondary gradients, expressive detailed anime eyes, deliberate hair strand grouping and clean highlights, coherent color design, original tactical baseball hero-collector character, 2.5D-ready silhouette",
@@ -2910,6 +4803,11 @@
     "name": "Anime moderno de gacha",
     "mode": "BETA_UNIVERSAL",
     "catalog_file": "visual_style_catalog.json",
-    "rule": "Character traits may vary; rendering style remains fixed."
+    "rule": "Character traits may vary; rendering style remains fixed.",
+    "option_count_target": {
+      "total_categories": 40,
+      "normalized_options_per_visual_category": 10,
+      "note": "The hair base-colour palette has 12 options; five legacy identity/voice/quirk categories keep their own natural counts."
+    }
   }
 }

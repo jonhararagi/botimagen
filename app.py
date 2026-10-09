@@ -331,20 +331,26 @@ class AssetIntake(tk.Tk):
         lookups = {}
         category_groups = {
             "IDENTIDAD": (
-                "personality", "stature", "body_build",
-                "silhouette", "expression", "face_shape", "pose",
+                "personality", "expression", "pose",
+            ),
+            "CUERPO": (
+                "stature", "height_cm", "body_build",
+                "body_proportions", "silhouette", "skin_tone",
+            ),
+            "ANATOMÍA": (
+                "species", "ear_style", "tail_style", "horn_style",
             ),
             "CARA": (
-                "eye_shape", "eyes", "pupil_shape", "eyebrow_style",
-                "nose_style", "mouth_style", "facial_detail",
+                "face_shape", "eye_shape", "eyes", "pupil_shape",
+                "eyebrow_style", "nose_style", "mouth_style", "facial_detail",
             ),
             "CABELLO": (
                 "hair_length", "hair_bangs", "hairstyle",
-                "side_hair", "back_hair", "hair",
+                "hair_arrangement", "hair_texture", "side_hair", "back_hair",
+                "hair", "hair_color_pattern", "hair_secondary_color",
             ),
             "VESTUARIO": (
-                "outfit", "outer_layer", "footwear",
-                "accessory", "palette_accent",
+                "outfit", "outer_layer", "footwear", "accessory", "palette_accent",
             ),
             "COMBATE": (
                 "voice", "combat_role", "baseball_prop",
@@ -409,8 +415,14 @@ class AssetIntake(tk.Tk):
 
         reference_options = {
             "Personaje completo": "full_character",
-            "Cabello": "hair",
-            "Peinado": "hairstyle",
+            "Cabello completo": "hair",
+            "Corte / peinado": "hairstyle",
+            "Coletas / recogidos": "hair_arrangement",
+            "Colores y puntas del cabello": "hair_color_pattern",
+            "Ojos y pupilas": "pupil_shape",
+            "Forma del rostro": "face_shape",
+            "Especie / anatomía": "species",
+            "Cuerpo / altura": "body_build",
             "Ropa / vestimenta": "outfit",
             "Paleta de color": "palette_accent",
             "Expresión": "expression",
