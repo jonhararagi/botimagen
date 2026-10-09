@@ -1,6 +1,6 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 47 categorías en 8 pestañas, incluida una ampliación para busto, color independiente por raíz/coronilla/interior/puntas y 11 opciones de patrón/región de escamas (catálogo v7). Todavía faltan categorías avanzadas, la biblioteca visual, la prueba manual de navegador en Windows y una imagen generada. La CI ya ejecuta un smoke test headless de Chromium en Linux.
+La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 47 categorías en 8 pestañas, incluida una ampliación para busto, color independiente por raíz/coronilla/interior/puntas y reglas de compatibilidad declaradas en el catálogo v16. Todavía faltan categorías avanzadas, la biblioteca visual, la prueba manual de navegador en Windows y una imagen generada. La CI ya ejecuta un smoke test headless de Chromium en Linux.
 
 ## Requisitos
 
@@ -32,9 +32,9 @@ Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. 
 
 ## Smoke test automatizado del navegador
 
-La CI instala Playwright y Chromium en un directorio temporal y ejecuta `web/browser_smoke.mjs`. El test arranca la API local y Vite, abre Chromium headless y verifica el catálogo, el color independiente de puntas, el bloqueo de acciones con cambios pendientes, la regeneración y el ciclo de guardar/duplicar/cargar perfiles.
+La CI instala Playwright y Chromium en un directorio temporal y ejecuta `web/browser_smoke.mjs`. El test arranca la API local y Vite, abre Chromium headless y verifica el catálogo, semántica de opciones explícitas «ninguno», fallos HTTP recuperables, bloqueo de acciones con cambios pendientes, compatibilidad de rasgos entre categorías, preservación de elecciones manuales y ciclo de guardar/duplicar/cargar perfiles.
 
-Evidencia actual: CI #112 **PASS_REAL**, https://github.com/jonhararagi/botimagen/actions/runs/37927181644. Playwright no se añade a las dependencias de ejecución de la aplicación ni modifica `web/package-lock.json`. Esta prueba corre en Linux; la validación manual en Chrome/Edge y Windows sigue pendiente.
+Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botimagen/actions/runs/38004033939. CI #167 también pasó tras ajustar el contrato para no publicar el campo interno `prompt_en`: https://github.com/jonhararagi/botimagen/actions/runs/38003917950. Playwright no se añade a las dependencias de ejecución de la aplicación ni modifica `web/package-lock.json`. Esta prueba corre en Linux; la validación manual en Chrome/Edge y Windows sigue pendiente.
 
 ## Funciones conectadas
 

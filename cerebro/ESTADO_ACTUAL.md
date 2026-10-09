@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: catálogo v15, compatibilidad de accesorios/anatomía y matriz total de reglas, 2026-10-09.
+Última actualización de esta ficha: catálogo v16, recuperación de UI/API y contrato público del catálogo, 2026-10-09.
 
 ## Repositorio
 
@@ -245,3 +245,14 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **Correcciones descubiertas por CI:** la fixture inicial usaba un ID de vestuario inexistente y una etiqueta de accesorio en inglés que no existe en el catálogo; ambos se corrigieron. Se retiró una expectativa de que el API público expusiera `prompt_en`: ese campo es interno al motor, mientras que el catálogo público publica IDs, etiquetas, tags y metadatos de compatibilidad.
 - **CI #167 PASS_REAL:** generador, contrato visual, API local, cobertura del editor, `npm ci`, build React/TypeScript y E2E Chromium headless. https://github.com/jonhararagi/botimagen/actions/runs/38003917950.
 - **TIMER:** ~5 minutos de trabajo de implementación y diagnóstico dentro de esta sesión. La mejora no cierra una fase; progreso global se mantiene en **62,16 / 100 → 62%**. QA física Windows y métricas de rendimiento siguen `NOT_RUN`.
+
+
+## Checkpoint de trabajo continuo · 2026-10-09 · catálogo público, docs y aprendizaje del intake
+
+- **HEAD BEFORE:** `9d742aacec1ee8c2d926e76599adc93f0cc03817`.
+- **Estado verificado:** CI #168 **PASS_REAL** en `9d742aacec1ee8c2d926e76599adc93f0cc03817`: https://github.com/jonhararagi/botimagen/actions/runs/38004033939. CI #167 también PASS_REAL después de ajustar el contrato del catálogo público: https://github.com/jonhararagi/botimagen/actions/runs/38003917950.
+- **Auditoría documental:** `web/README.md` seguía describiendo el catálogo como v7 y el smoke test como si solo cubriera el flujo inicial. Se actualiza a catálogo v16 y se enumeran los casos que hoy cubre el E2E: fallos recuperables, semántica de «ninguno», compatibilidad, locks manuales y persistencia.
+- **Investigación comparativa BIMG-RESEARCH-002:** MDN/W3C sobre validación de archivos y ciclo de vida de blob URLs; issues públicos de Filerobot Image Editor sobre canvas en Firefox y calidad de imagen. Las incidencias se registran como reportes, no como bugs reproducidos. Se definen pruebas para BIMG-008 sin copiar código ni assets.
+- **Hallazgo técnico aplicado al plan, no al producto:** `accept` es una ayuda del selector, no validación; las object URLs deben revocarse cuando la preview deja de ser accesible, sin revocarlas antes de tiempo. El original debe conservarse y cualquier exportación debe tener contrato explícito.
+- **TIMER:** 5–10 minutos para revisión documental y exploración comparativa. No se implementó el intake ni se ejecutó un benchmark de memoria.
+- **HEAD AFTER de esta entrega:** se consultará tras el commit. **Progreso ponderado sin cambio: 62,16 / 100 → 62%**; investigación y limpieza documental no cierran una fase. QA física Windows y métricas de rendimiento siguen `NOT_RUN`.

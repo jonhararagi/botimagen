@@ -135,3 +135,45 @@ Investigar lo suficiente para reducir un riesgo concreto, no para aplazar la ent
 - **Aplicabilidad a BotImagen:** al ampliar categorías, distinguir `auto`, selección manual de un valor y ausencia intencional del rasgo. Si se añade una opción “sin X”, cubrirla en catálogo, prompt y render/preview con una prueba dedicada. No copiar el diseño ni el código de DiceBear.
 - **Aplicación validada en BotImagen:** catálogo v16 da semántica de prompt explícita a `outer_layer=none`; el test del generador comprueba el texto y el E2E Chromium comprueba selección desde la UI, regeneración, conservación de la sección de vestuario y que guardar continúe habilitado. CI #167 PASS_REAL: https://github.com/jonhararagi/botimagen/actions/runs/38003917950.
 - **Pendiente:** revisar otras categorías que puedan necesitar “ninguno” explícito y comprobar su prompt/guardado/carga de forma independiente. No se aumenta el porcentaje de beta por esta mejora aislada.
+
+
+---
+
+## BIMG-RESEARCH-002 · Intake local de imágenes: validación real y ciclo de vida de previews
+
+- **Fecha de consulta:** 2026-10-09.
+- **Pregunta concreta:** ¿Qué fallos conviene anticipar antes de migrar el intake de assets a la web y cómo prevenir consumo de memoria, archivos mal clasificados y previews que se rompen?
+- **Problema de BotImagen:** BIMG-008 debe permitir elegir una imagen local, previsualizarla, validarla y copiarla a un destino explícito sin alterar el original ni depender de servicios remotos.
+- **TIMER:** 5–10 minutos para exploración inicial. Esto no reemplaza pruebas de formatos, rendimiento ni revisión de licencias.
+
+### Referencia A · MDN: selección de archivos en HTML
+
+- **Fuente oficial:** [MDN · `<input type="file">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file), consultado el 2026-10-09.
+- **HECHO OBSERVADO:** el atributo `accept` permite orientar el selector hacia extensiones o tipos MIME, pero no constituye por sí solo validación del contenido recibido.
+- **INTERPRETACIÓN:** ocultar archivos no deseados en el diálogo mejora la experiencia, pero no es una frontera de validación. La app debe volver a comprobar el archivo elegido antes de decodificarlo, previsualizarlo o copiarlo.
+- **Aplicabilidad:** la futura importación de BotImagen debe tener una lista permitida explícita de formatos, comprobar tamaño y decodificación real, mostrar errores recuperables y nunca decidir solo por la extensión o el MIME informado por el navegador.
+
+### Referencia B · MDN y W3C: ciclo de vida de URL de objeto
+
+- **Fuentes oficiales:** [MDN · blob URLs](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/blob), [MDN · URL.createObjectURL](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static), [W3C · File API](https://www.w3.org/TR/FileAPI/).
+- **HECHO OBSERVADO:** una URL creada con `URL.createObjectURL(file)` mantiene una referencia al recurso mientras siga activa; MDN/W3C recomiendan revocarla cuando ya no sea necesaria. Revocarla demasiado pronto puede romper acciones del usuario como abrir o guardar la imagen.
+- **INTERPRETACIÓN:** un editor que permite previsualizar muchos archivos puede acumular memoria si no libera URLs anteriores; liberarlas en el evento equivocado puede causar previews rotas.
+- **Decisión técnica candidata:** encapsular la URL temporal en un hook/componente que la revoque al reemplazar el archivo o desmontarse, no inmediatamente al terminar la carga. Cubrir selección A → B, limpiar selección, error de lectura y desmontaje.
+
+### Referencia C · Filerobot Image Editor: errores reales reportados
+
+- **Fuente:** [Issue #242 · Canvas CORS error on Firefox](https://github.com/scaleflex/filerobot-image-editor/issues/242).
+- **HECHO OBSERVADO:** el issue reportó un error de filtro/canvas en Firefox y está marcado como corregido/publicado. El extracto consultado no basta para atribuir una causa raíz general a todos los casos CORS.
+- **Fuente adicional:** [Issue #478 · Image quality is terrible](https://github.com/scaleflex/filerobot-image-editor/issues/478).
+- **HECHO OBSERVADO:** el usuario reportó diferencias de calidad entre una imagen comprimida y la entrada del editor. La búsqueda consultada no confirma la causa raíz ni una solución final.
+- **INTERPRETACIÓN:** la preview y el archivo final deben probarse como salidas distintas. Escalar una imagen en pantalla no debe cambiar silenciosamente los bytes del original; cualquier conversión/exportación debe declarar dimensiones, formato y política de calidad.
+
+### Patrones transferibles y decisión para BotImagen
+
+- **ADAPTAR:** separar selección, validación, preview, preparación del destino y copia final; validar contenido y tamaño además de extensión; preservar el original; registrar hash/tamaño/formato/dimensiones; liberar object URLs al retirar el recurso; distinguir errores de lectura, decodificación, permisos y escritura.
+- **DESCARTAR:** confiar exclusivamente en `accept`, extensión o MIME; codificar imágenes grandes en Base64 por defecto sin medir memoria; revocar la URL inmediatamente en `load`; sobrescribir el archivo original durante una conversión implícita.
+- **Hipótesis a probar en BIMG-008:** una imagen grande y una serie de reemplazos de preview pueden elevar la memoria o dejar URLs activas si el ciclo de vida no está centralizado. **NOT_RUN:** no se midió memoria ni se reprodujo un leak en BotImagen.
+- **Pruebas de aceptación sugeridas:** PNG/JPEG válido; extensión falsa; archivo no imagen; archivo sobredimensionado; imagen corrupta; rutas con espacios/acentos; selección y reemplazo repetido; cancelar; error de destino; verificar hash del original antes/después; confirmar que preview/export no cambian el original.
+- **Límites:** issues externos leídos como reportes, no reproducidos. No se importó código ni assets de esas referencias; no se ha realizado auditoría de licencias de sus recursos.
+- **Estado final:** INVESTIGACIÓN INICIAL COMPLETADA; implementar y probar queda pendiente de BIMG-008.
+- **Impacto en progreso:** ninguno. La investigación reduce incertidumbre, pero no cierra criterios de la beta ni aumenta el porcentaje.
