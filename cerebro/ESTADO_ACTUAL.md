@@ -10,7 +10,7 @@
 - Commit base: test: fix visual catalog test execution order
 - Árbol del commit base: a9a2f79ca0da4af637bf6e21519d3ccf76fc720a
 
-El HEAD debe volver a consultarse en GitHub antes de iniciar la próxima tarea. El commit que incorpora esta carpeta debe registrarse después en el reporte de entrega.
+Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52895a7d6e. Commit: https://github.com/jonhararagi/botimagen/commit/33de0c8fd08448e2767a6fa9fb0efe52895a7d6e. El HEAD debe volver a consultarse en GitHub antes de iniciar la próxima tarea.
 
 ## Qué existe antes de la migración
 
@@ -26,7 +26,8 @@ El HEAD debe volver a consultarse en GitHub antes de iniciar la próxima tarea. 
 ## Evidencia previa disponible
 
 - La búsqueda de commits de GitHub devolvió HEAD 0a23a7136632d4e66ecee5f871ea40a47ea324e4 como el commit más reciente visible al comenzar este trabajo.
-- En la continuidad previa del proyecto, la ejecución de GitHub Actions 37868974765 (run #53) figura como SUCCESS con validación de sintaxis, manifiesto, generador y contrato de estilo. Debe confirmarse la ejecución asociada a este commit documental antes de declarar las pruebas actuales PASS.
+- La ejecución de GitHub Actions 37880305833 (run #54), asociada al commit 33de0c8fd08448e2767a6fa9fb0efe52895a7d6e, finalizó SUCCESS. Pasaron validación de sintaxis Python, manifiesto de assets, tests del generador y contrato de estilo: https://github.com/jonhararagi/botimagen/actions/runs/37880305833.
+- La CI cubre las validaciones automatizadas configuradas; no ejecuta una prueba real de interfaz en Windows.
 - La interfaz Tkinter no se consideraba probada físicamente en Windows. La migración no debe convertir esa ausencia de evidencia en una afirmación de funcionamiento web o Windows.
 
 ## Todavía NO implementado
@@ -42,8 +43,8 @@ El HEAD debe volver a consultarse en GitHub antes de iniciar la próxima tarea. 
 
 ## Estado de la entrega actual
 
-- BIMG-001: la documentación de dirección técnica se está incorporando en esta entrega.
-- BIMG-002: NEXT, auditar y ejecutar las pruebas del baseline actual.
+- BIMG-001: DONE. Documentación y arquitectura persistidas en main en commit 33de0c8fd08448e2767a6fa9fb0efe52895a7d6e; CI #54 PASS.
+- BIMG-002: NEXT. Auditar y ejecutar las pruebas del baseline actual antes de crear la interfaz web.
 - Evidencia de runtime de la nueva interfaz: NOT_RUN, porque la interfaz todavía no existe.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
