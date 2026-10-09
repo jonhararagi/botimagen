@@ -107,6 +107,7 @@ export default function App(){
  const [generating,setGenerating]=useState(false);
  const [savedProfiles,setSavedProfiles]=useState<SavedProfileSummary[]>([]);
  const [loadingProfiles,setLoadingProfiles]=useState(false);
+ const [duplicatingProfile,setDuplicatingProfile]=useState<string|null>(null);
 
  useEffect(()=>{
   const controller=new AbortController();
