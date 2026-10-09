@@ -97,6 +97,21 @@ try {
 
   if ((await tipLock.innerText()).includes("AUTO")) await tipLock.click();
   await tipSelect.selectOption("turquoise");
+  // Simulate a transient API failure, verify the message reaches the user, then recover.
+  const footer = page.locator(".main-footer");
+  await page.route("**/api/generate", async route => {
+    await route.fulfill({
+      status: 500,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "Error de prueba del navegador." }),
+    });
+  });
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("Error de prueba del navegador.", { exact: false }).waitFor({
+    state: "visible",
+    timeout: 10000,
+  });
+  await page.unroute("**/api/generate");
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.waitForFunction(
     () => document.querySelector(".main-footer")?.textContent?.includes("Perfil generado por Python"),
@@ -386,7 +401,7 @@ try {
     "Loading a saved profile must retain deliberately incompatible manual anatomy");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified strict seeds, hair compatibility, AUTO anatomy by species, manual anatomy overrides across regeneration and save/load, combat-role compatibility, stale-snapshot guards, and no page errors.");
+  console.log("PASS_REAL: Chromium verified recoverable API generation failure, strict seeds, catalog compatibility, manual overrides across save/load, stale-snapshot guards, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
