@@ -3749,7 +3749,7 @@
           "gold"
         ],
         "base": 1,
-        "prompt_en": "emerald-compatible metallic gold tips gradient",
+        "prompt_en": "gradient ending in metallic gold tips",
         "bias": {
           "hair:verde_esmeralda": 3,
           "hair_secondary_color:oro_metalico": 8

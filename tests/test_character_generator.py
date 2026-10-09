@@ -125,16 +125,6 @@ def test_serious_angry_character_prefers_dark_voice_palette():
     }
 
 
-if __name__ == "__main__":
-    test_rules_have_expected_categories()
-    test_generator_locks_user_choices_and_fills_auto()
-    test_joyful_short_character_prefers_warm_hair()
-    test_serious_angry_character_prefers_dark_voice_palette()
-    test_height_selections_are_locked_and_drive_stature()
-    print("PASS: character generator tests")
-
-
-
 def test_height_selections_are_locked_and_drive_stature():
     generator = CharacterGenerator(RULES)
     short = generator.generate({"height_cm": "h145"}, seed=345)
@@ -143,3 +133,12 @@ def test_height_selections_are_locked_and_drive_stature():
     assert short["profile"]["stature"] == "bajita"
     assert tall["profile"]["height_cm"] == "h190"
     assert tall["profile"]["stature"] == "alta"
+
+
+if __name__ == "__main__":
+    test_rules_have_expected_categories()
+    test_generator_locks_user_choices_and_fills_auto()
+    test_joyful_short_character_prefers_warm_hair()
+    test_serious_angry_character_prefers_dark_voice_palette()
+    test_height_selections_are_locked_and_drive_stature()
+    print("PASS: character generator tests")

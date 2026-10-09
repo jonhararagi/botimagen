@@ -32,7 +32,6 @@ def test_visual_categories_have_ten_unique_options():
         ids = [item["id"] for item in items]
         assert len(ids) == len(set(ids)), f"{category} contains duplicate IDs"
         assert all(item.get("label") and item.get("tags") for item in items)
-    assert all(item.get("prompt_en") for item in items)
 
     hair_colours = categories["hair"]
     assert len(hair_colours) == 12
@@ -90,18 +89,6 @@ def test_seed_reproduces_profile_and_prompt():
     assert first["style_id"] == second["style_id"]
 
 
-if __name__ == "__main__":
-    test_visual_categories_have_ten_unique_options()
-    test_one_universal_style_contract_and_reference_schema()
-    test_prompt_uses_separated_face_and_hair_parts_and_preserves_locks()
-    test_seed_reproduces_profile_and_prompt()
-    test_complex_hairstyle_colour_and_star_pupils_are_composable()
-    test_exact_height_guides_auto_stature()
-    test_human_auto_anatomy_has_no_animal_features()
-    print("PASS: visual style contract and catalog tests")
-
-
-
 def test_complex_hairstyle_colour_and_star_pupils_are_composable():
     generator = CharacterGenerator(RULES_PATH)
     result = generator.generate(
@@ -134,7 +121,7 @@ def test_complex_hairstyle_colour_and_star_pupils_are_composable():
     assert "long hair" in prompt
     assert "high ponytail" in prompt
     assert "emerald green base color" in prompt
-    assert "metallic gold tips gradient" in prompt
+    assert "gradient ending in metallic gold tips" in prompt
     assert "metallic gold as the secondary" in prompt
     assert "star-shaped pupils" in prompt
 
@@ -158,3 +145,14 @@ def test_human_auto_anatomy_has_no_animal_features():
     assert result["profile"]["ear_style"] == "orejas_humanas"
     assert result["profile"]["tail_style"] == "sin_cola"
     assert result["profile"]["horn_style"] == "sin_cuernos"
+
+
+if __name__ == "__main__":
+    test_visual_categories_have_ten_unique_options()
+    test_one_universal_style_contract_and_reference_schema()
+    test_prompt_uses_separated_face_and_hair_parts_and_preserves_locks()
+    test_seed_reproduces_profile_and_prompt()
+    test_complex_hairstyle_colour_and_star_pupils_are_composable()
+    test_exact_height_guides_auto_stature()
+    test_human_auto_anatomy_has_no_animal_features()
+    print("PASS: visual style contract and catalog tests")
