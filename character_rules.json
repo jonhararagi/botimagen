@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -1606,7 +1606,8 @@
             "control",
             "pitcher"
           ]
-        }
+        },
+        "prompt_en": "no outer layer"
       },
       {
         "id": "short_bomber",
