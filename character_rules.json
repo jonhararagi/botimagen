@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -5222,6 +5222,102 @@
           "species:draconica": 3,
           "species:androide": -1,
           "species:espiritu": -1
+        }
+      },
+      {
+        "id": "dorsal_hand_scales",
+        "label": "Escamas en dorso de manos y nudillos",
+        "tags": [
+          "dragon",
+          "scales",
+          "hands",
+          "fine_detail"
+        ],
+        "prompt_en": "small smooth overlapping scales limited to the backs of the hands and knuckles",
+        "base": 0.9,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "outer_thigh_scales",
+        "label": "Escamas en caderas externas y muslos",
+        "tags": [
+          "dragon",
+          "scales",
+          "thighs",
+          "movement"
+        ],
+        "prompt_en": "fine scale accents limited to the outer hips and upper thighs, following a balanced adult combat silhouette",
+        "base": 0.9,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "nape_spine_scales",
+        "label": "Cresta fina en nuca y columna alta",
+        "tags": [
+          "dragon",
+          "scales",
+          "spine",
+          "armor"
+        ],
+        "prompt_en": "a narrow orderly ridge of overlapping scales from the nape along the upper spine, not full-body armor",
+        "base": 0.9,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "jawline_scales",
+        "label": "Escamas finas en línea mandibular",
+        "tags": [
+          "dragon",
+          "scales",
+          "jawline",
+          "subtle"
+        ],
+        "prompt_en": "tiny refined scales tracing the jawline below the ears, leaving the eyes and lips unobstructed",
+        "base": 0.9,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
         }
       }
     ],

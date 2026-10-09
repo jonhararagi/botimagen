@@ -34,6 +34,15 @@ def test_rules_have_expected_categories():
         "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
+    assert data["version"] == 6
+    expected_scale_patterns = {
+        "dorsal_hand_scales",
+        "outer_thigh_scales",
+        "nape_spine_scales",
+        "jawline_scales",
+    }
+    actual_scale_patterns = {item["id"] for item in data["categories"]["scale_pattern"]}
+    assert expected_scale_patterns.issubset(actual_scale_patterns)
 
 
 def test_generator_locks_user_choices_and_fills_auto():
@@ -186,21 +195,44 @@ def test_scale_color_is_omitted_when_pattern_has_no_visible_scales():
 
 def test_auto_scale_pattern_respects_species_compatibility():
     generator = CharacterGenerator(RULES)
+    species_ids = [item["id"] for item in generator.categories["species"]]
 
-    for seed in range(12):
-        human = generator.generate(
-            {"species": "humana", "scale_pattern": "auto"},
-            seed=seed,
-            coherence=0.4,
-        )
-        assert human["profile"]["scale_pattern"] == "no_visible_scales"
+    for species in species_ids:
+        for seed in range(12):
+            result = generator.generate(
+                {"species": species, "scale_pattern": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            selected = result["profile"]["scale_pattern"]
+            if species == "draconica":
+                assert selected != "no_visible_scales", (species, seed, selected)
+            else:
+                assert selected == "no_visible_scales", (species, seed, selected)
 
-        dragon = generator.generate(
-            {"species": "draconica", "scale_pattern": "auto"},
-            seed=seed,
-            coherence=0.4,
+
+def test_new_scale_regions_are_manual_and_prompted_independently():
+    generator = CharacterGenerator(RULES)
+    expected_prompts = {
+        "dorsal_hand_scales": "small smooth overlapping scales limited to the backs of the hands and knuckles",
+        "outer_thigh_scales": "fine scale accents limited to the outer hips and upper thighs",
+        "nape_spine_scales": "a narrow orderly ridge of overlapping scales from the nape along the upper spine",
+        "jawline_scales": "tiny refined scales tracing the jawline below the ears",
+    }
+
+    for pattern_id, prompt_fragment in expected_prompts.items():
+        result = generator.generate(
+            {
+                "species": "draconica",
+                "scale_pattern": pattern_id,
+                "scale_color": "metallic_gold",
+            },
+            seed=8701,
+            coherence=0.95,
         )
-        assert dragon["profile"]["scale_pattern"] != "no_visible_scales"
+        assert result["profile"]["scale_pattern"] == pattern_id
+        assert prompt_fragment in result["prompt"]
+        assert "metallic gold scale color with controlled highlights" in result["prompt"]
 
 
 if __name__ == "__main__":
@@ -211,5 +243,6 @@ if __name__ == "__main__":
     test_height_selections_are_locked_and_drive_stature()
     test_modular_bust_scales_and_hair_zones_are_independent()
     test_auto_scale_pattern_respects_species_compatibility()
+    test_new_scale_regions_are_manual_and_prompted_independently()
     test_scale_color_is_omitted_when_pattern_has_no_visible_scales()
     print("PASS: character generator tests")
