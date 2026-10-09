@@ -112,7 +112,7 @@ try {
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
   const saveButton = page.locator(".heading-buttons .btn.primary");
   assert.equal(await saveButton.isDisabled(), true, "Saving must be blocked while the generated snapshot is stale");
-  assert.equal(await page.getByRole("button", { name: /Exportar JSON/i }).isDisabled(), true,
+  assert.equal(await page.locator(".prompt-actions button").nth(2).isDisabled(), true,
     "Exporting must be blocked while a stale prompt is displayed");
   assert.equal(await page.getByRole("button", { name: /Copiar texto/i }).isDisabled(), true,
     "Copying must be blocked while a stale prompt is displayed");
