@@ -28,7 +28,7 @@ class LocalApiTests(unittest.TestCase):
         self.assertEqual(catalog["categories"]["species"][0]["id"], "humana")
         self.assertIn("hair_color_pattern", catalog["categories"])
         self.assertIn("hair_tip_color", catalog["categories"])
-        self.assertEqual(catalog["catalog_version"], 13)
+        self.assertEqual(catalog["catalog_version"], 14)
         expected_hair = []
         for item in self.generator.categories["hair"]:
             public_item = {
@@ -56,6 +56,14 @@ class LocalApiTests(unittest.TestCase):
             if option["id"] == "calzado_ligero_pitcher"
         )
         self.assertEqual(footwear["compatible_with"]["combat_role"], ["pitcher"])
+        accessory = next(
+            option for option in catalog["categories"]["accessory"]
+            if option["id"] == "headband"
+        )
+        self.assertEqual(
+            accessory["compatible_with"]["combat_role"],
+            ["striker", "support", "pitcher"],
+        )
 
         for prop in catalog["categories"]["baseball_prop"]:
             source = next(

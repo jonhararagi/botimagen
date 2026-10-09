@@ -1,5 +1,5 @@
 {
-  "version": 13,
+  "version": 14,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -1915,7 +1915,16 @@
         "tags": [
           "clean",
           "controlled"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "tank",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "hair_ribbon",
@@ -1924,7 +1933,16 @@
           "cute",
           "bright",
           "social"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "tank",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "headband",
@@ -1932,7 +1950,14 @@
         "tags": [
           "athletic",
           "focused"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "earpiece",
@@ -1940,7 +1965,14 @@
         "tags": [
           "technical",
           "controlled"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "batting_glove",
@@ -1948,7 +1980,13 @@
         "tags": [
           "baseball",
           "athletic"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "utility_pouch",
@@ -1956,7 +1994,14 @@
         "tags": [
           "technical",
           "practical"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "tank",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "signature_charm",
@@ -1964,7 +2009,16 @@
         "tags": [
           "personal",
           "soft"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "tank",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "hairclip",
@@ -1974,7 +2028,16 @@
           "cute",
           "hair"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "tank",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "earrings",
@@ -1984,7 +2047,13 @@
           "distinctive",
           "refined"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "support",
+            "control"
+          ]
+        }
       },
       {
         "id": "visor_goggles",
@@ -1994,7 +2063,14 @@
           "sporty",
           "focused"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "control",
+            "pitcher",
+            "striker"
+          ]
+        }
       }
     ],
     "palette_accent": [

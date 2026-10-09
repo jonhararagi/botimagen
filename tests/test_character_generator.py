@@ -773,6 +773,68 @@ def test_manual_footwear_and_combat_role_locks_are_preserved():
     assert result["profile"]["combat_role"] == "striker"
 
 
+
+
+def test_catalog_declares_valid_accessory_role_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    roles = {item["id"] for item in rules["categories"]["combat_role"]}
+    accessories = rules["categories"]["accessory"]
+    assert len(accessories) == 10
+    covered_roles = set()
+    for accessory in accessories:
+        allowed = accessory.get("compatible_with", {}).get("combat_role")
+        assert allowed, f"{accessory['id']} must declare compatible combat roles"
+        assert set(allowed).issubset(roles), (accessory["id"], allowed)
+        covered_roles.update(allowed)
+    assert covered_roles == roles
+
+
+def test_auto_accessory_respects_manually_selected_combat_role():
+    generator = CharacterGenerator(RULES)
+    for role in ("striker", "support", "tank", "control", "pitcher"):
+        for seed in range(12):
+            result = generator.generate(
+                {"combat_role": role, "accessory": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            accessory = next(item for item in generator.categories["accessory"]
+                             if item["id"] == result["profile"]["accessory"])
+            assert role in accessory["compatible_with"]["combat_role"], (
+                role, seed, result["profile"]["accessory"]
+            )
+
+
+def test_auto_combat_role_respects_manually_selected_accessory():
+    generator = CharacterGenerator(RULES)
+    for accessory_id in (
+        "headband", "earpiece", "batting_glove", "utility_pouch",
+        "earrings", "visor_goggles",
+    ):
+        accessory = next(item for item in generator.categories["accessory"]
+                         if item["id"] == accessory_id)
+        allowed = set(accessory["compatible_with"]["combat_role"])
+        for seed in range(12):
+            result = generator.generate(
+                {"accessory": accessory_id, "combat_role": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            assert result["profile"]["combat_role"] in allowed, (
+                accessory_id, seed, result["profile"]["combat_role"]
+            )
+
+
+def test_manual_accessory_and_combat_role_locks_are_preserved():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"accessory": "batting_glove", "combat_role": "control"},
+        seed=9923,
+    )
+    assert result["profile"]["accessory"] == "batting_glove"
+    assert result["profile"]["combat_role"] == "control"
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -808,4 +870,8 @@ if __name__ == "__main__":
     test_auto_footwear_respects_manually_selected_combat_role()
     test_auto_combat_role_respects_manually_selected_footwear()
     test_manual_footwear_and_combat_role_locks_are_preserved()
+    test_catalog_declares_valid_accessory_role_compatibility()
+    test_auto_accessory_respects_manually_selected_combat_role()
+    test_auto_combat_role_respects_manually_selected_accessory()
+    test_manual_accessory_and_combat_role_locks_are_preserved()
     test_all_catalog_compatibility_references_are_valid()
