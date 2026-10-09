@@ -59,7 +59,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-005 · Migrar el editor de rasgos
 
-**Estado:** PARTIAL (~75%). El editor ofrece 47 categorías del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. CI #127 valida desde Chromium headless que un largo fijado restringe corte y arreglo AUTO a metadatos compatibles y que el perfil guardado/duplicado/cargado conserva las elecciones. Quedan más recorridos por pestañas, errores y QA física en Windows.  
+**Estado:** PARTIAL (~85%). El editor ofrece 47 categorías del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. CI #144 PASS_REAL verifica en Chromium que el rol tank restringe AUTO de vestuario, capa exterior, calzado y prop mediante el catálogo servido por la API, y que el perfil conserva compatibilidad al guardar, duplicar y cargar. Quedan pruebas de otros flujos de error, revisión visual amplia y QA física en Windows.  
 **TIMER:** 1–3 días.  
 **Trabajo:**
 - Implementar las pestañas IDENTIDAD, CUERPO, ANATOMÍA, CARA, CABELLO, VESTUARIO, COMBATE y DETALLE. **Completado:** las ocho pestañas cubren las 46 categorías actuales de `character_rules.json`, cada una con un único control individual.
@@ -76,19 +76,19 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-006 · Ampliar el modelo modular de rasgos
 
-**Estado:** PARTIAL (~60%). El catálogo v12 mantiene 47 categorías y declara compatibilidad en diez cortes, diez arreglos capilares, diez vestimentas/roles y diez props de baseball/roles. Se añadió una pasada final que valida AUTO contra las selecciones manuales originales, y una prueba genérica comprueba todas las referencias `compatible_with` y los `color_family`. CI #140 y #141 PASS_REAL incluyen batería de motor/API, build y Chromium E2E. 
+**Estado:** PARTIAL (~65%). El catálogo v13 mantiene 47 categorías y declara compatibilidad en diez cortes, diez arreglos capilares, diez vestimentas, diez props de baseball, diez capas exteriores y diez tipos de calzado. El motor filtra AUTO en ambas direcciones y conserva cualquier elección manual aunque contradiga las reglas. CI #144 PASS_REAL incluye batería de motor/API, referencias declarativas, build y Chromium E2E con comprobación de vestuario, capa, calzado y prop por rol. 
 **TIMER:** 1–3 días por el primer bloque de mejoras; la ampliación de catálogos será continua.  
 **Prioridad:** cabello, ojos y anatomía/cuerpo.  
 **Trabajo:**
 - **Completado en este bloque:** añadir campos independientes con IDs estables y conectarlos al catálogo, motor, prompt y UI: `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color`, `hair_inner_color`, `hair_tip_color`.
 - Modelar, tras definir vocabulario compatible, color de base, raíz, coronilla, interior, puntas, mechones, patrón/gradiente y acabado del cabello.
 - Añadir opciones de ojos, forma/pupila y heterocromía, y proporciones/categorías de cuerpo, incluido busto.
-- Catálogo v6 añadió cuatro regiones de escamas; v7 añadió `hair_tip_color`; v8 incorporó familias cromáticas; v9 definió compatibilidad entre cortes y largos; v10 extendió esas reglas a los arreglos capilares; v11 añadió compatibilidad entre outfit y rol; v12 añadió compatibilidad entre props de baseball y rol, más validación genérica de todas las referencias. Quedan anatomía, accesorios, capas exteriores y calzado por revisar.
+- Catálogo v6 añadió cuatro regiones de escamas; v7 añadió `hair_tip_color`; v8 incorporó familias cromáticas; v9 definió compatibilidad entre cortes y largos; v10 extendió esas reglas a los arreglos capilares; v11 añadió compatibilidad entre outfit y rol; v12 añadió compatibilidad entre props de baseball y rol; v13 cubre capas exteriores y calzado. La validación genérica de referencias evita IDs huérfanos. Quedan accesorios y combinaciones de anatomía por revisar.
 - Añadir compatibilidad, exclusiones, selección AUTO y pruebas por combinación.
 
 **Evidencia parcial:** CI #132 y CI #134 PASS_REAL prueban compatibilidad declarativa outfit/rol y el flujo UI/API en Chromium. CI #140 confirma la corrección de una regresión encontrada al probar prop→rol AUTO; CI #141 valida el catálogo v12, referencias declarativas, API y recorrido Chromium. CI #86 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`, que comprueba elecciones fijadas y la presencia independiente de busto, patrón/color de escamas y raíces/coronilla/interior de cabello en el prompt. `test_auto_scale_pattern_respects_species_compatibility` verifica las 10 especies con 12 semillas a coherencia 0,4: bajo la política actual, la especie dracónica recibe un patrón visible y las otras nueve no. `test_new_scale_regions_are_manual_and_prompted_independently` verifica el prompt de las cuatro nuevas regiones. CI #102: PASS_REAL, https://github.com/jonhararagi/botimagen/actions/runs/37925309773. CI #107 también valida `hair_tip_color` y el nuevo contrato de color capilar: https://github.com/jonhararagi/botimagen/actions/runs/37926064467. La prueba de cobertura exige un control UI por cada categoría.
 
-**Pendiente para cerrar:** sumar opciones de zonas/patrones de cabello y extender compatibilidad/exclusiones declarativas a capas exteriores, calzado, accesorios y anatomía. La generación de imagen no está incluida en este criterio.
+**Pendiente para cerrar:** sumar opciones de zonas/patrones de cabello y extender compatibilidad/exclusiones declarativas a accesorios y combinaciones de anatomía. La generación de imagen no está incluida en este criterio.
 
 ### BIMG-007 · Biblioteca visual local
 

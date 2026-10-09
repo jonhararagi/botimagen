@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: catálogo v12, compatibilidad de prop por rol y validación genérica del catálogo, 2026-10-09.
+Última actualización de esta ficha: catálogo v13, compatibilidad de capas exteriores/calzado y E2E ampliado, 2026-10-09.
 
 ## Repositorio
 
@@ -62,8 +62,8 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-001: DONE. Dirección inicial persistida en GitHub.
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
-- BIMG-005: PARTIAL (~80%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #134 PASS_REAL comprueba en Chromium largo fijo→corte/arreglo AUTO, arreglo fijo→largo AUTO, rol tank fijo→outfit AUTO en otra pestaña, protección por cambios pendientes y restauración compatible tras guardar/duplicar/cargar. Faltan más grupos UI, errores y revisión visual amplia.
-- BIMG-006: PARTIAL (~60%). Catálogo v12 mantiene 47 categorías. `compatible_with` abarca largo/corte/arreglo, outfit/rol y prop/rol de combate. Una pasada final revalida campos AUTO contra las elecciones manuales originales; los locks manuales incompatibles siguen intactos. Una prueba genérica valida todas las referencias de compatibilidad y metadatos `color_family`. CI #140 y #141 PASS_REAL; QA física en Windows sigue pendiente.
+- BIMG-005: PARTIAL (~85%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #144 PASS_REAL comprueba en Chromium un rol tank FIJO que restringe vestuario, capa exterior, calzado y prop AUTO entre pestañas; el ciclo guardar/duplicar/cargar conserva las selecciones compatibles. Faltan más recorridos de error y revisión visual amplia.
+- BIMG-006: PARTIAL (~65%). Catálogo v13 mantiene 47 categorías. `compatible_with` abarca largo/corte/arreglo, outfit/rol, prop/rol, capa exterior/rol y calzado/rol. AUTO consulta las reglas en ambas direcciones; si los dos campos son manuales, no modifica ninguno. CI #144 PASS_REAL verifica generador, API, metadatos, build y Chromium E2E. QA física en Windows sigue pendiente.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -71,7 +71,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **59%**, calculado en `cerebro/PROGRESO.md` (**59,4/100** sin redondear). Último cambio funcional verificado: HEAD `da74c6261e6bcf970a8b2fb132e0ae2f2beff00c`, CI #140 PASS_REAL; integridad de catálogo verificada en HEAD `c236c83b20d391d46bac316b246f27236f0384ed`, CI #141 PASS_REAL.
+- Progreso total ponderado hacia la beta local: **61%**, calculado en `cerebro/PROGRESO.md` (**61,05/100** sin redondear). Último cambio funcional verificado: HEAD `2f1468d2e054c10c5102725e0f3c666dc2c69ee0`, CI #144 PASS_REAL.
 
 ## Validación estricta del campo de semilla · CI #136/#137
 
@@ -81,6 +81,16 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - **CI #137 PASS_REAL** añade pruebas de navegador para el máximo seguro `9007199254740991` (aceptado) y el entero siguiente `9007199254740992` (rechazado sin redondear), además del caso malformado. Toda la batería Python/API, cobertura UI, `npm ci`, build y Chromium E2E pasa: https://github.com/jonhararagi/botimagen/actions/runs/37950307373.
 - La corrección es de calidad de entrada y reproducibilidad. No altera la estimación de fases ni el total: **58,65 / 100 → 59%**.
 - **TIMER:** 30–60 minutos estimados de trabajo de implementación y pruebas. El smoke test físico en Windows sigue `NOT_RUN`.
+
+## Capas exteriores y calzado por rol · catálogo v13
+
+- Se actualizó `character_rules.json` de v12 a v13 sin añadir ni quitar categorías: siguen siendo 47, con IDs de rasgos estables.
+- Los diez valores de `outer_layer` y diez valores de `footwear` declaran `compatible_with.combat_role`. Todas las opciones ofrecen una lista no vacía, los cinco roles quedan cubiertos y el validador genérico comprueba referencias de categoría e ID.
+- El generador aplica el contrato por ambas direcciones: rol manual → capa/calzado AUTO y capa/calzado manual → rol AUTO. La pasada final contra las elecciones originales preserva expresamente combinaciones manuales incompatibles.
+- Se añadieron pruebas con semilla: 60 escenarios para rol→capa, 72 para capa→rol, 60 para rol→calzado y 72 para calzado→rol, más validación de cobertura y locks manuales.
+- El API expone las reglas y la prueba `tests/test_local_api.py` verifica dos opciones representativas. El smoke E2E Chromium comprueba el rol tank a través de vestuario, capa, calzado y prop, y restaura esas selecciones tras guardar/duplicar/cargar.
+- CI #143 descubrió una aserción de versión obsoleta en el test del catálogo; se alineó con v13. **CI #144 PASS_REAL**: generador, API local, build web y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/37962093038.
+- TIMER estimado de este bloque: 1–2 horas de trabajo técnico. BIMG-006 avanza de 60% a 65%; BIMG-005 de 80% a 85% por la cobertura E2E ampliada. Total ponderado actualizado a **61,05 / 100 → 61%**. QA física de Windows y rendimiento continúan `NOT_RUN`.
 
 ## Compatibilidad de props de baseball y rol de combate · catálogo v12
 
@@ -186,8 +196,8 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 
 ## Próxima acción exacta
 
-1. **BIMG-006 · Compatibilidad restante:** ampliar pruebas semánticas a vestuario, anatomía y combinaciones de peinado, sin convertirlas en presets completos.
-2. **BIMG-005 · Interacciones:** ampliar los recorridos E2E más allá del campo de cabello probado, cubriendo FIJO/AUTO, validaciones, perfiles heredados y casos de error.
+1. **BIMG-006 · Compatibilidad restante:** extender reglas declarativas a accesorios y combinaciones anatómicas, sin convertirlas en presets completos.
+2. **BIMG-005 · Interacciones:** ampliar los recorridos E2E a errores API, perfil heredado inconsistente, restaurar ejemplo y estados de error recuperables.
 3. **BIMG-009 · QA física:** ejecutar prueba manual en Chrome/Edge y en Windows, revisar rutas con acentos/espacios y medir memoria/tiempos. Mantener el estado físico `NOT_RUN` hasta realizarla; CI Linux no equivale al PC del usuario.
 4. Cerrar BIMG-003/BIMG-004 solo después de completar los criterios funcionales y el QA que les corresponda.
 
