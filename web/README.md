@@ -1,6 +1,6 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 47 categorías en 8 pestañas, incluida una ampliación para busto, color independiente por raíz/coronilla/interior/puntas y 11 opciones de patrón/región de escamas (catálogo v7). Todavía faltan categorías avanzadas, la biblioteca visual, las pruebas reales de navegador/Windows y una imagen generada.
+La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 47 categorías en 8 pestañas, incluida una ampliación para busto, color independiente por raíz/coronilla/interior/puntas y 11 opciones de patrón/región de escamas (catálogo v7). Todavía faltan categorías avanzadas, la biblioteca visual, la prueba manual de navegador en Windows y una imagen generada. La CI ya ejecuta un smoke test headless de Chromium en Linux.
 
 ## Requisitos
 
@@ -30,6 +30,12 @@ npm run dev
 
 Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. La configuración de Vite reenvía las solicitudes `/api` al servicio local Python. Para comprobar el frontend compilado, ejecuta `npm run build` dentro de `web/`. La CI valida ese mismo camino con `npm ci --no-audit --no-fund` y `npm run build`.
 
+## Smoke test automatizado del navegador
+
+La CI instala Playwright y Chromium en un directorio temporal y ejecuta `web/browser_smoke.mjs`. El test arranca la API local y Vite, abre Chromium headless y verifica el catálogo, el color independiente de puntas, el bloqueo de acciones con cambios pendientes, la regeneración y el ciclo de guardar/duplicar/cargar perfiles.
+
+Evidencia actual: CI #112 **PASS_REAL**, https://github.com/jonhararagi/botimagen/actions/runs/37927181644. Playwright no se añade a las dependencias de ejecución de la aplicación ni modifica `web/package-lock.json`. Esta prueba corre en Linux; la validación manual en Chrome/Edge y Windows sigue pendiente.
+
 ## Funciones conectadas
 
 - 47 categorías de identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle servidas desde `character_rules.json`; la UI mantiene solo la estructura de los campos y no duplica sus listas de opciones.
@@ -44,4 +50,4 @@ Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. 
 
 La silueta SVG es un marcador temporal de la interfaz, no una ilustración generada. No existe todavía generación neuronal de imagen, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración del intake de assets. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
 
-El smoke test real en Chrome/Edge y Windows aún debe completarse. La compilación en GitHub Actions no sustituye esa verificación física.
+El smoke test automatizado headless de Chromium en Linux ya pasa en GitHub Actions. Falta probar manualmente en Chrome/Edge en Windows y medir memoria/rendimiento; la prueba de CI no sustituye esa verificación física.

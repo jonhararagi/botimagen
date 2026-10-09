@@ -36,7 +36,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-003 · Spike de frontend web
 
-**Estado:** PARTIAL (~90%). Shell React/TypeScript, proxy `/api`, conexión a catálogo/API y `web/package-lock.json` están implementados. CI usa `npm ci` y el build pasa. El smoke test real de navegador/Windows sigue pendiente y se mantiene en BIMG-009.  
+**Estado:** PARTIAL (~95%). Shell React/TypeScript, proxy `/api`, catálogo/API y `web/package-lock.json` están implementados. `npm ci`, build y smoke E2E headless Chromium pasan en CI #112. Falta prueba manual en Chrome/Edge sobre Windows.  
 **TIMER:** 3–5 horas estimadas para el spike inicial; el tiempo de integración está registrado también en BIMG-004.  
 **Trabajo:**
 - Crear un frontend TypeScript + React + Vite en una carpeta propia, sin tocar ni retirar aún la app Tkinter.
@@ -44,15 +44,16 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - Diseñar una dirección visual de estudio de personajes: panel de categorías, área central del diseño, panel de resumen y vista de prompts.
 - Configurar CI para instalar dependencias reproducibles desde `package-lock.json` mediante `npm ci` y compilar.
 
-**Evidencia:** CI #65 `PASS_REAL` en `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`: `npm ci` y `npm run build` pasaron junto a las pruebas Python. https://github.com/jonhararagi/botimagen/actions/runs/37920504103. El smoke test real en Chrome/Edge y Windows sigue pendiente.
+**Evidencia:** CI #65 `PASS_REAL` en `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`: `npm ci` y `npm run build` pasaron junto a las pruebas Python. CI #112 `PASS_REAL` ejecuta Chromium headless contra API y Vite locales, cubriendo generación, cambios pendientes, guardado, duplicación y carga: https://github.com/jonhararagi/botimagen/actions/runs/37927181644. Falta ejecutar manualmente Chrome/Edge en Windows.
 
 ### BIMG-004 · Puente web hacia el motor Python
 
-**Estado:** PARTIAL (~90%).  
+**Estado:** PARTIAL (~95%).  
 **TIMER:** 4–8 horas estimadas para el puente inicial; la API y la UI principal ya están conectadas.
 **Implementado:** servicio Python de biblioteca estándar en `botimagen_server.py`; endpoints `/api/health`, `/api/catalog`, `/api/generate`, `/api/profiles` y lectura por UUID; validación de categorías/opciones contra el catálogo oficial; límite de JSON, semilla/coherencia validadas, guardado atómico con ID generado por servidor y rutas restringidas a UUID; Vite proxy local; UI consume catálogo y motor, guarda perfiles, lista y carga perfiles guardados.
 **Evidencia:** CI #60 PASS, incluidas pruebas HTTP de catálogo, generación, reproducibilidad, rechazo de rasgos desconocidos y persistencia local, junto con compilación de interfaz: https://github.com/jonhararagi/botimagen/actions/runs/37887835609.
-**Pendiente:** smoke test real de navegador/Windows y revisión final del flujo local antes de cerrar la tarea.
+**Evidencia nueva:** CI #112 `PASS_REAL` comprueba desde Chromium headless que el catálogo y generador Python funcionan a través del navegador, incluyendo guardar/duplicar/cargar y bloquear acciones con snapshot desactualizado: https://github.com/jonhararagi/botimagen/actions/runs/37927181644.
+**Pendiente:** prueba manual en Windows y revisión final del flujo local antes de cerrar la tarea.
 
 **Criterio de aceptación final:** tests del servicio, errores controlados, perfil generado por el motor existente, integración UI/API y persistencia local; documentar el runtime físico por separado.
 
@@ -112,11 +113,11 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-009 · QA real de Windows y rendimiento
 
-**Estado:** NOT_STARTED.  
-**TIMER:** 4–8 horas, sin contar correcciones imprevistas.  
+**Estado:** PARTIAL (~20%). El smoke test automatizado Chromium headless en Linux está implementado y pasa en CI #112; cubre generación, actualización de prompt, protección frente a cambios pendientes y persistencia de perfiles. La prueba física Windows y las mediciones de rendimiento aún no se hicieron.  
+**TIMER pendiente:** 4–8 horas, sin contar correcciones imprevistas.  
 **Trabajo:** iniciar y detener con .bat, abrir el navegador, diseñar/guardar/recargar un perfil, importar imágenes, probar caracteres de rutas con acentos y espacios, revisar errores y medir RAM/tiempo al navegar por un catálogo de prueba.
 
-**Aceptación:** resultado real en el PC, con versión de Windows, pasos ejecutados, mediciones observadas y fallos pendientes. CI verde no sustituye esta prueba.
+**Aceptación:** resultado real en el PC, con versión de Windows, pasos ejecutados, mediciones observadas y fallos pendientes. El smoke headless de CI cubre solo una parte; no sustituye esta prueba.
 
 ### BIMG-010 · Empaquetar y publicar la beta local
 
