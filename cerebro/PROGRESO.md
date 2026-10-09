@@ -44,6 +44,7 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - Catálogo v7, **CI #107 PASS_REAL**: nueva categoría `hair_tip_color` con 12 opciones; el patrón de cabello expresa distribución/transición sin codificar la tonalidad de las puntas. Generador, contrato visual, API, cobertura UI, `npm ci` y build pasaron: https://github.com/jonhararagi/botimagen/actions/runs/37926064467.
 - **CI #112 PASS_REAL**: smoke test E2E en Chromium headless, arranque de API/UI, generación con dos colores de puntas, guardado bloqueado con cambios pendientes, regeneración, guardado, duplicación y carga de perfil. https://github.com/jonhararagi/botimagen/actions/runs/37927181644.
 - CI #117 PASS_REAL: compatibilidad semántica AUTO capilar, familias cromáticas declarativas, respeto a bloqueos manuales, batería Python y smoke test Chromium E2E. https://github.com/jonhararagi/botimagen/actions/runs/37927965567.
+- CI #118 detectó una aserción de versión antigua en `tests/test_local_api.py` (`catalog_version == 7` después del cambio a v8). Corregida a v8; CI #119 PASS_REAL ejecuta toda la batería, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/37928453343.
 - BIMG-006 actualizado de 30% a 40% por el bloque de compatibilidad capilar probado. Total ponderado: **54,6 / 100 → 55%**. La prueba física Windows y las mediciones de rendimiento continúan **NOT_RUN**.
 
 

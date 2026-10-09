@@ -76,7 +76,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-006 · Ampliar el modelo modular de rasgos
 
-**Estado:** PARTIAL (~40%). El catálogo v8 mantiene 47 categorías e incorpora `color_family` en las 53 opciones de seis categorías de color capilar. El motor armoniza AUTO según la distribución (raíces, capa interior, puntas y acentos), y filtra `matching_base` en patrones cuyo significado exige contraste; las elecciones manuales siguen bloqueadas. CI #117 pasa las pruebas de motor y el smoke test E2E en Chromium headless. 
+**Estado:** PARTIAL (~40%). El catálogo v8 mantiene 47 categorías e incorpora `color_family` en las 53 opciones de seis categorías de color capilar. El motor armoniza AUTO según la distribución (raíces, capa interior, puntas y acentos), y filtra `matching_base` en patrones cuyo significado exige contraste; las elecciones manuales siguen bloqueadas. CI #119 PASS_REAL: pruebas de motor/API con catálogo v8, build web y smoke test E2E en Chromium headless. 
 **TIMER:** 1–3 días por el primer bloque de mejoras; la ampliación de catálogos será continua.  
 **Prioridad:** cabello, ojos y anatomía/cuerpo.  
 **Trabajo:**

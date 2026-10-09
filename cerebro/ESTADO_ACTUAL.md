@@ -63,7 +63,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~70%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #112 prueba generación de cabello, bloqueo por cambios pendientes y ciclo guardar/duplicar/cargar. Faltan recorridos E2E para más campos y revisión visual amplia.
-- BIMG-006: PARTIAL (~40%). Catálogo v8 conserva 47 categorías y añade `color_family` a 53 opciones de seis categorías capilares. AUTO considera contraste en raíces/interior/puntas, color de acento y patrones de distribución; las opciones `matching_base` se excluyen solo cuando contradicen un patrón contrastante, sin anular elecciones manuales. CI #117 valida los nuevos escenarios.
+- BIMG-006: PARTIAL (~40%). Catálogo v8 conserva 47 categorías y añade `color_family` a 53 opciones de seis categorías capilares. AUTO considera contraste en raíces/interior/puntas, color de acento y patrones de distribución; las opciones `matching_base` se excluyen solo cuando contradicen un patrón contrastante, sin anular elecciones manuales. CI #117 valida el comportamiento del motor; CI #119 PASS_REAL confirma además la API con la versión v8, `npm ci`, build y smoke E2E Chromium. La prueba manual en Windows sigue pendiente.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -72,6 +72,13 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
 - Progreso total ponderado hacia la beta local: **55%**, calculado en `cerebro/PROGRESO.md` (**54,6/100** sin redondear).
+
+## Ajuste de contrato API tras catálogo v8
+
+- Al elevar `character_rules.json` de v7 a v8, la prueba de contrato `tests/test_local_api.py` todavía exigía `catalog_version == 7`. La CI #118 detectó la expectativa obsoleta; no era un fallo de generación de perfiles.
+- Se sincronizó la aserción con la versión real v8. **CI #119 PASS_REAL**: pruebas del generador, contrato visual, API, cobertura del editor, `npm ci`, compilación y smoke E2E Chromium: https://github.com/jonhararagi/botimagen/actions/runs/37928453343.
+- HEAD de esa verificación: `64b11b11cd5bea5dddc486abac08e82ac1953c2e`. El porcentaje global no cambia por esta corrección de test: 54,6/100 → 55%.
+- Navegador manual y rendimiento en Windows: `NOT_RUN`.
 
 ## Última ampliación capilar · catálogo v7
 
