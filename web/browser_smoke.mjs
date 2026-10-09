@@ -165,6 +165,27 @@ try {
   assert.equal(await saveButton.isDisabled(), false,
     "Saving should unlock after compatible regeneration");
 
+  // Reverse the constraint direction: lock an updo and let AUTO choose its length.
+  const arrangementLabel = page.locator('label[for="trait-hair_arrangement"]');
+  const arrangementField = arrangementLabel.locator("xpath=../..");
+  const arrangementLock = arrangementField.locator("button.lock");
+  if ((await arrangementLock.innerText()).includes("AUTO")) await arrangementLock.click();
+  await arrangementSelect.selectOption("coleta_trenzada");
+  if (!(await lengthLock.innerText()).includes("AUTO")) await lengthLock.click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+
+  assert.equal(await arrangementSelect.inputValue(), "coleta_trenzada",
+    "A manually locked braided ponytail must survive regeneration");
+  const allowedLengthsForArrangement = catalog.categories.hair_arrangement
+    .find(option => option.id === "coleta_trenzada")?.compatible_with?.hair_length ?? [];
+  const selectedLengthForArrangement = await lengthSelect.inputValue();
+  assert.ok(allowedLengthsForArrangement.includes(selectedLengthForArrangement),
+    `AUTO hair length must match a manually locked braided ponytail; got ${selectedLengthForArrangement}`);
+  assert.equal(await saveButton.isDisabled(), false,
+    "Saving should unlock after reverse-direction compatibility succeeds");
+
   const profileSummary = page.locator(".saved-profile-panel summary");
   await profileSummary.waitFor({ state: "visible" });
   const initialCount = Number((await profileSummary.innerText()).match(/\((\d+)\)/)?.[1] ?? 0);
@@ -196,15 +217,17 @@ try {
   );
   assert.equal(await tipSelect.inputValue(), "metallic_gold",
     "Loading a saved profile should restore the tip color selection");
-  assert.equal(await lengthSelect.inputValue(), "pixie",
-    "Loading a saved profile should restore the manually locked hair length");
+  assert.equal(await arrangementSelect.inputValue(), "coleta_trenzada",
+    "Loading a saved profile should restore the manually locked braided ponytail");
+  assert.equal(await lengthSelect.inputValue(), selectedLengthForArrangement,
+    "Loading a saved profile should restore the AUTO-selected compatible hair length");
+  assert.ok(allowedLengthsForArrangement.includes(await lengthSelect.inputValue()),
+    "Loaded profile should keep the hair length compatible with its locked arrangement");
   assert.ok(allowedStyles.includes(await styleSelect.inputValue()),
-    "Loaded profile should restore a hairstyle compatible with its locked length");
-  assert.ok(allowedArrangements.includes(await arrangementSelect.inputValue()),
-    "Loaded profile should restore a hair arrangement compatible with its locked length");
+    "The generated hairstyle should remain compatible with the earlier locked pixie length check");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair length/hairstyle/arrangement compatibility, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair length/hairstyle/arrangement compatibility in both directions, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
