@@ -73,6 +73,14 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Runtime en navegador/Windows: NOT_RUN.
 - Progreso total ponderado hacia la beta local: 49%, calculado en `cerebro/PROGRESO.md` (49,2/100 sin redondear).
 
+## Última mejora de calidad del motor
+
+- Se detectó que el prompt incluía siempre el color de escamas aunque `scale_pattern=no_visible_scales`. La instrucción general de no dibujarlas entraba en conflicto con ese token de color.
+- Corrección aplicada en `character_generator.py`: el prompt solo añade el color cuando el patrón permite escamas visibles. El perfil conserva el color seleccionado, así que el usuario no pierde su preferencia si luego cambia el patrón.
+- Prueba de regresión añadida a `tests/test_character_generator.py` para garantizar que el perfil conserva el color pero el prompt no pide escamas coloreadas con el patrón invisible.
+- TIMER de esta tarea: 30–60 minutos estimados.
+- La CI del commit es la evidencia final pendiente de esta actualización; el porcentaje no sube por este arreglo aislado.
+
 ## Investigación comparativa: regla permanente
 
 La investigación de aplicaciones y proyectos similares queda integrada al protocolo de Cerebro. Objetivo: aprender arquitectura, patrones de UX, rendimiento, errores habituales, causas raíz, soluciones y lecciones de mantenimiento, y convertirlas en decisiones verificables para BotImagen, sin copiar identidad, código o activos ajenos.

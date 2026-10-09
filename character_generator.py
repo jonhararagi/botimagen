@@ -282,6 +282,10 @@ class CharacterGenerator:
             key: self._prompt_value(key, profile, value)
             for key, value in labels.items()
         }
+        scale_prompt = f"Scale placement: {p['scale_pattern']}. "
+        if profile.get("scale_pattern") != "no_visible_scales":
+            scale_prompt += f"Scale color: {p['scale_color']}. "
+
         return (
             f"{self.visual_standard['prompt_core']} "
             f"Character identity: {p['personality']} personality. "
@@ -295,7 +299,7 @@ class CharacterGenerator:
             f"{p['pupil_shape']}, {p['eyebrow_style']} eyebrows, "
             f"{p['mouth_style']} mouth, {p['facial_detail']} facial detail. "
             f"Species anatomy: {p['ear_style']}; {p['tail_style']}; {p['horn_style']}. "
-            f"Scale placement: {p['scale_pattern']}; scale color: {p['scale_color']}. "
+            f"{scale_prompt}"
             f"Hair: {p['hair_length']}, {p['hairstyle']}, {p['hair_arrangement']}, "
             f"{p['hair_texture']}, {p['hair_bangs']} bangs, {p['side_hair']} side hair, "
             f"{p['back_hair']} back hair. "

@@ -167,6 +167,23 @@ def test_modular_bust_scales_and_hair_zones_are_independent():
     assert "obsidian black scales with subtle cool reflections" in prompt
 
 
+
+def test_scale_color_is_omitted_when_pattern_has_no_visible_scales():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {
+            "species": "humana",
+            "scale_pattern": "no_visible_scales",
+            "scale_color": "obsidian_black",
+        },
+        seed=2048,
+    )
+
+    assert result["profile"]["scale_pattern"] == "no_visible_scales"
+    assert result["profile"]["scale_color"] == "obsidian_black"
+    assert "no visible scales on the character" in result["prompt"]
+    assert "obsidian black scales with subtle cool reflections" not in result["prompt"]
+
 def test_auto_scale_pattern_respects_species_compatibility():
     generator = CharacterGenerator(RULES)
 
@@ -194,4 +211,5 @@ if __name__ == "__main__":
     test_height_selections_are_locked_and_drive_stature()
     test_modular_bust_scales_and_hair_zones_are_independent()
     test_auto_scale_pattern_respects_species_compatibility()
+    test_scale_color_is_omitted_when_pattern_has_no_visible_scales()
     print("PASS: character generator tests")
