@@ -58,18 +58,18 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-005 · Migrar el editor de rasgos
 
-**Estado:** PARTIAL (~60%). El editor ofrece 46 rasgos del catálogo oficial repartidos en 8 pestañas; quedan pendientes duplicación/regeneración más pulida, pruebas de interacción completa y QA real en navegador/Windows.  
+**Estado:** PARTIAL (~70%). El editor ofrece 46 rasgos del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. Quedan pendientes QA real en navegador/Windows y una cobertura más profunda de interacciones/recuperación de errores.  
 **TIMER:** 1–3 días.  
 **Trabajo:**
 - Implementar las pestañas IDENTIDAD, CUERPO, ANATOMÍA, CARA, CABELLO, VESTUARIO, COMBATE y DETALLE. **Completado:** las ocho pestañas cubren las 46 categorías actuales de `character_rules.json`, cada una con un único control individual.
 - Mantener la regla: las opciones disponibles provienen del catálogo; las búsquedas no crean rasgos.
 - Mostrar de forma explícita valores fijados y AUTO.
-- Añadir semilla editable, coherencia/variedad, generar, guardar, duplicar, cargar y regenerar desde un favorito.
+- **Completado:** semilla editable, coherencia, generación, guardar, cargar y duplicar perfiles; la acción generar regenera cualquier perfil cargado.
 - Incluir el perfil inicial bw-modern-gacha-v1.
 
 **Evidencia parcial:** CI #86 valida que cada una de las 46 categorías del catálogo tenga exactamente un control de edición, que no existan campos duplicados y que los 8 grupos y pestañas coincidan; `npm ci`, generación de perfiles, compatibilidad de escamas para 12 semillas por especie y build pasan.
 
-**Pendiente para cerrar:** duplicar perfiles desde la UI, reforzar pruebas de combinaciones/locks y realizar smoke test real del navegador/Windows.
+**Pendiente para cerrar:** mejorar pruebas de interacciones completas y errores de UI, y realizar smoke test real del navegador/Windows.
 
 **Aceptación:** se genera un perfil JSON válido y un prompt desde elecciones estructuradas; las elecciones bloqueadas no cambian; la semilla queda registrada y las pruebas cubren combinaciones compatibles.
 
