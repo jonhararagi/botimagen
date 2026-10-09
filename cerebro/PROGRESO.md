@@ -2,7 +2,7 @@
 
 **Último cálculo:** 2026-10-09  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 53%**
+**Progreso global actual: 55%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -17,12 +17,12 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-003 · Shell web y build reproducible | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-005 · Editor completo por categorías | 18% | 70% · PARTIAL | 12,6 |
-| BIMG-006 · Ampliación modular del catálogo | 15% | 30% · PARTIAL | 4,5 |
+| BIMG-006 · Ampliación modular del catálogo | 15% | 40% · PARTIAL | 6,0 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 0% · NOT_STARTED | 0,0 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **53,1 / 100 → 53%** |
+| **Total ponderado** | **100%** | | **54,6 / 100 → 55%** |
 
 BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles.
 
@@ -43,16 +43,17 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - Esta ampliación sí aumenta la terminación estimada de BIMG-006 del 20% al 24%. Total actualizado: **49,8 / 100 → 50%**. Navegador físico/Windows sigue **NOT_RUN**.
 - Catálogo v7, **CI #107 PASS_REAL**: nueva categoría `hair_tip_color` con 12 opciones; el patrón de cabello expresa distribución/transición sin codificar la tonalidad de las puntas. Generador, contrato visual, API, cobertura UI, `npm ci` y build pasaron: https://github.com/jonhararagi/botimagen/actions/runs/37926064467.
 - **CI #112 PASS_REAL**: smoke test E2E en Chromium headless, arranque de API/UI, generación con dos colores de puntas, guardado bloqueado con cambios pendientes, regeneración, guardado, duplicación y carga de perfil. https://github.com/jonhararagi/botimagen/actions/runs/37927181644.
-- Terminación estimada de BIMG-006 actualizada de 24% a 30%; el smoke test headless también elevó BIMG-003 y BIMG-004 a 95% y BIMG-009 a 20%. Progreso total actual **53,1 / 100 → 53%**. La prueba física Windows y las mediciones de rendimiento continúan **NOT_RUN**.
+- CI #117 PASS_REAL: compatibilidad semántica AUTO capilar, familias cromáticas declarativas, respeto a bloqueos manuales, batería Python y smoke test Chromium E2E. https://github.com/jonhararagi/botimagen/actions/runs/37927965567.
+- BIMG-006 actualizado de 30% a 40% por el bloque de compatibilidad capilar probado. Total ponderado: **54,6 / 100 → 55%**. La prueba física Windows y las mediciones de rendimiento continúan **NOT_RUN**.
 
 
 ## Nota de continuidad · 2026-10-09
 
-Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías de rasgo en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 inicialmente a 20%. La duplicación local quedó implementada y probada, llevando BIMG-005 a 70%. Ese checkpoint era **49,2 / 100 → 49%**. El catálogo v6 amplió cuatro regiones de escamas y llevó el checkpoint a **49,8 / 100 → 50%**. El catálogo v7 añadió color de puntas y actualizó el checkpoint a **50,7 / 100 → 51%**. La CI #112 añadió smoke test headless Chromium y elevó el checkpoint actual a **53,1 / 100 → 53%**. La prueba física Windows continúa `NOT_RUN`.
+Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías de rasgo en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 inicialmente a 20%. La duplicación local quedó implementada y probada, llevando BIMG-005 a 70%. Ese checkpoint era **49,2 / 100 → 49%**. El catálogo v6 amplió cuatro regiones de escamas y llevó el checkpoint a **49,8 / 100 → 50%**. El catálogo v7 añadió color de puntas y actualizó el checkpoint a **50,7 / 100 → 51%**. La CI #112 añadió smoke test headless Chromium y elevó el checkpoint a **53,1 / 100 → 53%**. La compatibilidad capilar AUTO y la CI #117 subieron el checkpoint actual a **54,6 / 100 → 55%**. La prueba física Windows continúa `NOT_RUN`.
 
 ## Siguiente trabajo que más reduce el riesgo
 
-1. Ampliar compatibilidad semántica AUTO entre raíz, coronilla, interior, puntas, gradientes y colores de acento.
+1. Ampliar compatibilidad AUTO a vestuario, anatomía y peinados, aprovechando los patrones y las familias de color sin crear combinaciones prefabricadas.
 2. Ampliar tests E2E de Chromium a más campos, errores de validación y perfiles heredados.
 3. Ejecutar prueba física en Windows, revisar rutas con acentos/espacios y medir RAM/tiempos.
 

@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: catálogo v7 y smoke test end-to-end en Chromium, 2026-10-09.
+Última actualización de esta ficha: compatibilidad semántica AUTO capilar y catálogo v8, 2026-10-09.
 
 ## Repositorio
 
@@ -63,7 +63,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~70%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #112 prueba generación de cabello, bloqueo por cambios pendientes y ciclo guardar/duplicar/cargar. Faltan recorridos E2E para más campos y revisión visual amplia.
-- BIMG-006: PARTIAL (~30%). Catálogo v7 contiene 47 categorías: añade `hair_tip_color` con 12 opciones y convierte `hair_color_pattern` en un control de distribución/transición sin imponer color fijo en las puntas. Las pruebas compuestas verifican patrón, color secundario, puntas, raíces, coronilla e interior como decisiones independientes.
+- BIMG-006: PARTIAL (~40%). Catálogo v8 conserva 47 categorías y añade `color_family` a 53 opciones de seis categorías capilares. AUTO considera contraste en raíces/interior/puntas, color de acento y patrones de distribución; las opciones `matching_base` se excluyen solo cuando contradicen un patrón contrastante, sin anular elecciones manuales. CI #117 valida los nuevos escenarios.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -71,7 +71,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **53%**, calculado en `cerebro/PROGRESO.md` (**53,1/100** sin redondear).
+- Progreso total ponderado hacia la beta local: **55%**, calculado en `cerebro/PROGRESO.md` (**54,6/100** sin redondear).
 
 ## Última ampliación capilar · catálogo v7
 
@@ -108,6 +108,15 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - **CI #100: PASS_REAL**, con pruebas Python, contrato de editor, `npm ci` y build React/TypeScript: https://github.com/jonhararagi/botimagen/actions/runs/37925030261.
 - TIMER de la mejora: 30–60 minutos estimados. El total ponderado sigue siendo **49,2 / 100 → 49%** porque la QA real en navegador/Windows sigue pendiente.
 
+## Última mejora semántica AUTO capilar · catálogo v8
+
+- Se actualizó `character_rules.json` de v7 a v8. Continúa con 47 categorías; no se cambiaron IDs ni se añadieron categorías de interfaz.
+- Se añadió `color_family` a 53 opciones entre color base, acento, puntas, raíces, coronilla e interior para inferir parentesco cromático mediante datos, no una tabla de IDs dentro del motor.
+- `hair_color_pattern` mantiene los IDs históricos `puntas_doradas` y `puntas_plateadas`, pero sus etiquetas, tags y prompt ya describen ubicación/transición, no un tono obligatorio.
+- AUTO ahora considera los patrones de raíces contrastantes, capa interior, puntas y acentos. En patrones donde el significado exige contraste, AUTO no puede seleccionar `matching_base`; una elección manual sigue respetándose aunque el usuario diseñe una combinación no convencional.
+- Se añadieron tres pruebas para adaptación de patrón a zonas elegidas, selección de contraste en AUTO y sincronía perfil/prompt. **CI #117 PASS_REAL** con batería Python, `npm ci`, build web y smoke test Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/37927965567.
+- TIMER estimado: 1–2 horas para implementación y ajuste de las regresiones. BIMG-006 sube de 30% a 40%; avance ponderado recalculado en **54,6 / 100 → 55%**. Navegador físico/Windows y pruebas de rendimiento permanecen `NOT_RUN`.
+
 ## Investigación comparativa: regla permanente
 
 La investigación de aplicaciones y proyectos similares queda integrada al protocolo de Cerebro. Objetivo: aprender arquitectura, patrones de UX, rendimiento, errores habituales, causas raíz, soluciones y lecciones de mantenimiento, y convertirlas en decisiones verificables para BotImagen, sin copiar identidad, código o activos ajenos.
@@ -117,7 +126,7 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 
 ## Próxima acción exacta
 
-1. **BIMG-006 · Cabello modular:** separar y probar mejor puntas, mechones, reflejos y transiciones de color sin multiplicar presets completos.
+1. **BIMG-006 · Compatibilidad restante:** ampliar pruebas semánticas a vestuario, anatomía y combinaciones de peinado, sin convertirlas en presets completos.
 2. **BIMG-005 · Interacciones:** ampliar los recorridos E2E más allá del campo de cabello probado, cubriendo FIJO/AUTO, validaciones, perfiles heredados y casos de error.
 3. **BIMG-009 · QA física:** ejecutar prueba manual en Chrome/Edge y en Windows, revisar rutas con acentos/espacios y medir memoria/tiempos. Mantener el estado físico `NOT_RUN` hasta realizarla; CI Linux no equivale al PC del usuario.
 4. Cerrar BIMG-003/BIMG-004 solo después de completar los criterios funcionales y el QA que les corresponda.

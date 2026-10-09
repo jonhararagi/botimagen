@@ -76,14 +76,14 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-006 · Ampliar el modelo modular de rasgos
 
-**Estado:** PARTIAL (~30%). El catálogo v7 contiene 47 categorías, con busto, 11 regiones/patrones de escamas y colores capilares independientes para raíces, coronilla, interior y puntas. El patrón describe la distribución/transición y ya no impone el color de puntas. CI #107 valida el contrato visual, API y UI; faltan pruebas semánticas más amplias de AUTO capilar.  
+**Estado:** PARTIAL (~40%). El catálogo v8 mantiene 47 categorías e incorpora `color_family` en las 53 opciones de seis categorías de color capilar. El motor armoniza AUTO según la distribución (raíces, capa interior, puntas y acentos), y filtra `matching_base` en patrones cuyo significado exige contraste; las elecciones manuales siguen bloqueadas. CI #117 pasa las pruebas de motor y el smoke test E2E en Chromium headless. 
 **TIMER:** 1–3 días por el primer bloque de mejoras; la ampliación de catálogos será continua.  
 **Prioridad:** cabello, ojos y anatomía/cuerpo.  
 **Trabajo:**
 - **Completado en este bloque:** añadir campos independientes con IDs estables y conectarlos al catálogo, motor, prompt y UI: `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color`, `hair_inner_color`, `hair_tip_color`.
 - Modelar, tras definir vocabulario compatible, color de base, raíz, coronilla, interior, puntas, mechones, patrón/gradiente y acabado del cabello.
 - Añadir opciones de ojos, forma/pupila y heterocromía, y proporciones/categorías de cuerpo, incluido busto.
-- Catálogo v6 añadió `dorsal_hand_scales`, `outer_thigh_scales`, `nape_spine_scales` y `jawline_scales` dentro de `scale_pattern`. Catálogo v7 añadió `hair_tip_color` y desacopló el color de puntas del patrón de distribución. Faltan más compatibilidades AUTO capilares, transiciones por zona y validaciones semánticas adicionales.
+- Catálogo v6 añadió cuatro regiones de escamas; v7 añadió `hair_tip_color` y desacopló su color del patrón; v8 añade metadatos de familia de color y compatibilidad semántica de AUTO para las zonas capilares. Quedan combinaciones de vestuario, anatomía y otros rasgos por revisar.
 - Añadir compatibilidad, exclusiones, selección AUTO y pruebas por combinación.
 
 **Evidencia parcial:** CI #86 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`, que comprueba elecciones fijadas y la presencia independiente de busto, patrón/color de escamas y raíces/coronilla/interior de cabello en el prompt. `test_auto_scale_pattern_respects_species_compatibility` verifica las 10 especies con 12 semillas a coherencia 0,4: bajo la política actual, la especie dracónica recibe un patrón visible y las otras nueve no. `test_new_scale_regions_are_manual_and_prompted_independently` verifica el prompt de las cuatro nuevas regiones. CI #102: PASS_REAL, https://github.com/jonhararagi/botimagen/actions/runs/37925309773. CI #107 también valida `hair_tip_color` y el nuevo contrato de color capilar: https://github.com/jonhararagi/botimagen/actions/runs/37926064467. La prueba de cobertura exige un control UI por cada categoría.
