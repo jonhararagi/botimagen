@@ -1,12 +1,12 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: lockfile npm reproducible y CI con npm ci, 2026-10-09.
+Última actualización de esta ficha: editor web ampliado a 40 rasgos y 8 pestañas, 2026-10-09.
 
 ## Repositorio
 
 - HEAD BEFORE de la tarea de perfiles locales: `1a66b8eda4d6d43046973750418b4a3719f6fc09`.
 - Último commit funcional de interfaz anterior: `509eb98e2c3fb13134aa23573749f18a1c7d8270`.
-- HEAD verificado al actualizar esta ficha: `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b` (lockfile versionado y CI reproducible).
+- HEAD verificado al actualizar esta ficha: `4d05ffd8ef955b555b15c5a3d699a9c66ef576cb` (editor ampliado, cobertura de catálogo y CI reproducible).
 - Para continuar, verifica siempre el HEAD real de `main`, ya que el commit documental posterior puede avanzar la referencia.
 
 - Repositorio: jonhararagi/botimagen
@@ -39,7 +39,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 
 ## Implementación web y API local
 
-- `web/` contiene React + TypeScript + Vite con editor adaptable de 5 grupos: identidad, cuerpo, cabello, rostro y pose.
+- `web/` contiene React + TypeScript + Vite con editor adaptable de 8 pestañas: identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle. Las 40 categorías actuales del catálogo tienen un control individual.
 - Los selectores cargan opciones mediante `GET /api/catalog`; las listas provienen de `character_rules.json`, no de una copia de opciones en TypeScript.
 - El botón de generar llama a `POST /api/generate` y reutiliza `CharacterGenerator`; respeta IDs manuales, AUTO, semilla y coherencia, y devuelve prompt/negative prompt oficiales.
 - `botimagen_server.py` utiliza `http.server` de la biblioteca estándar, escucha solo en `127.0.0.1:8765`, limita el cuerpo JSON, valida campos contra el catálogo y no expone rutas de archivos arbitrarias.
@@ -62,8 +62,10 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-001: DONE. Dirección inicial persistida en GitHub.
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~90%). UI React/TypeScript y proxy local; `web/package-lock.json` versionado. CI #65 valida `npm ci` y el build. La prueba real de navegador/Windows no se ha ejecutado.
+- BIMG-005: PARTIAL (~55%). Editor expandido a 40 categorías y 8 pestañas; CI #75 comprueba cobertura exacta y ausencia de categorías duplicadas. Duplicación de perfiles y QA real aún pendientes.
 - BIMG-004: PARTIAL (~90%). API de catálogo/generación/perfiles y controles UI para listar/cargar integrados; smoke test físico pendiente.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
+- Evidencia CI #75: PASS_REAL en commit `4d05ffd8ef955b555b15c5a3d699a9c66ef576cb`; cobertura de categorías del editor, instalación y build pasan: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
 - Runtime en navegador/Windows: NOT_RUN.
 - Progreso total ponderado hacia la beta local: 32%, calculado en `cerebro/PROGRESO.md`.
 
@@ -79,7 +81,7 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 
 1. Consultar el HEAD actual y la CI.
 2. Preparar el smoke test real de Chrome/Edge y realizar la prueba física en Windows con el entorno disponible. Mientras no se ejecute, mantener runtime como `NOT_RUN`.
-3. Cerrar BIMG-003/BIMG-004 solo cuando se cumplan sus criterios.
-4. Continuar con el editor y los campos modulares pendientes: tamaño del busto, escamas y regiones de color de cabello.
+3. Continuar con BIMG-005: duplicación de perfiles y pruebas de elecciones fijadas/AUTO.
+4. Trabajar en BIMG-006: tamaño del busto, escamas y regiones de color de cabello. Cerrar BIMG-003/BIMG-004 solo tras los criterios funcionales y QA pertinentes.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
