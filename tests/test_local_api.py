@@ -319,6 +319,23 @@ class LocalApiTests(unittest.TestCase):
                     self.assertIn("64 KiB", payload["error"])
                 finally:
                     connection.close()
+
+                connection = HTTPConnection(
+                    "127.0.0.1", server.server_address[1], timeout=3
+                )
+                try:
+                    connection.request("PUT", "/api/generate")
+                    response = connection.getresponse()
+                    payload = json.loads(response.read().decode("utf-8"))
+                    self.assertEqual(response.status, 405)
+                    self.assertEqual(
+                        response.getheader("Content-Type"),
+                        "application/json; charset=utf-8",
+                    )
+                    self.assertEqual(response.getheader("Allow"), "POST")
+                    self.assertIn("Método HTTP", payload["error"])
+                finally:
+                    connection.close()
             finally:
                 server.shutdown()
                 server.server_close()

@@ -146,13 +146,20 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
         server_version = "BotImagenLocal/0.2"
         sys_version = ""
 
-        def _send_json(self, status: HTTPStatus, payload: dict[str, Any]) -> None:
+        def _send_json(
+            self,
+            status: HTTPStatus,
+            payload: dict[str, Any],
+            extra_headers: dict[str, str] | None = None,
+        ) -> None:
             raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
             self.send_response(status.value)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(raw)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
+            for name, value in (extra_headers or {}).items():
+                self.send_header(name, value)
             self.end_headers()
             self.wfile.write(raw)
 
@@ -175,6 +182,36 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 raise ApiInputError("El cuerpo debe estar codificado en UTF-8.") from exc
             except json.JSONDecodeError as exc:
                 raise ApiInputError("JSON inválido.") from exc
+
+        def _method_not_allowed(self) -> None:
+            path = urlsplit(self.path).path
+            allowed_by_path = {
+                "/api/health": ("GET",),
+                "/api/catalog": ("GET",),
+                "/api/profiles": ("GET", "POST"),
+                "/api/generate": ("POST",),
+            }
+            allowed = allowed_by_path.get(path)
+            if allowed is None:
+                self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
+                return
+            self._send_json(
+                HTTPStatus.METHOD_NOT_ALLOWED,
+                {"error": "Método HTTP no permitido para este endpoint."},
+                {"Allow": ", ".join(allowed)},
+            )
+
+        def do_PUT(self) -> None:
+            self._method_not_allowed()
+
+        def do_PATCH(self) -> None:
+            self._method_not_allowed()
+
+        def do_DELETE(self) -> None:
+            self._method_not_allowed()
+
+        def do_OPTIONS(self) -> None:
+            self._method_not_allowed()
 
         def do_GET(self) -> None:
             path = urlsplit(self.path).path
