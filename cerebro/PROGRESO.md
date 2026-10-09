@@ -2,7 +2,7 @@
 
 **Último cálculo:** 2026-10-09  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 61%**
+**Progreso global actual: 62%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -17,12 +17,12 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-003 · Shell web y build reproducible | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-005 · Editor completo por categorías | 18% | 85% · PARTIAL | 15,3 |
-| BIMG-006 · Ampliación modular del catálogo | 15% | 65% · PARTIAL | 9,75 |
+| BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 0% · NOT_STARTED | 0,0 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **61,05 / 100 → 61%** |
+| **Total ponderado** | **100%** | | **61,8 / 100 → 62%** |
 
 BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles.
 
@@ -47,6 +47,11 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - Catálogo v12 y compatibilidad de prop de baseball/rol: CI #139 detectó una regresión de compatibilidad inversa; CI #140 la corrigió con una pasada final basada en selecciones manuales originales. https://github.com/jonhararagi/botimagen/actions/runs/37960828210.
 - CI #141 PASS_REAL verifica las referencias de todas las restricciones del catálogo, 140 escenarios con semilla en la nueva relación prop/rol, API v12, `npm ci`, build y Chromium E2E. https://github.com/jonhararagi/botimagen/actions/runs/37961039389.
 - **CI #144 PASS_REAL**: catálogo v13 añade compatibilidad de capa exterior/rol y calzado/rol. Batería con 264 escenarios con semilla en esas relaciones (60+72 por tipo), locks manuales, API v13, `npm ci`, build y Chromium E2E comprobando rol tank en outfit/capa/calzado/prop y roundtrip de perfiles: https://github.com/jonhararagi/botimagen/actions/runs/37962093038.
+- CI #149 PASS_REAL: Chromium verifica la compatibilidad de anatomía AUTO con especie a través del editor local: https://github.com/jonhararagi/botimagen/actions/runs/37965447416.
+- CI #151 PASS_REAL: se consolidó la paridad de metadatos del catálogo, cubriendo ID/orden, etiqueta, tags, color_family, compatible_with y evitando exponer bias/prompt_en internos: https://github.com/jonhararagi/botimagen/actions/runs/37995430125.
+- CI #152 PASS_REAL: el override manual de anatomía incompatible sobrevive regeneración y roundtrip de guardar/duplicar/cargar en Chromium: https://github.com/jonhararagi/botimagen/actions/runs/37995518309.
+- CI #153 PASS_REAL: matriz del generador para las 111 opciones que declaran compatibilidad, más API, build y smoke E2E Chromium: https://github.com/jonhararagi/botimagen/actions/runs/37995616096.
+- El catálogo v15 mantiene 47 categorías; compatible_with abarca 303 valores permitidos en 11 relaciones. BIMG-006 sube de 65% a 70%; total ponderado **61,8 / 100 → 62%**. QA física Windows y mediciones de rendimiento siguen NOT_RUN.
 - BIMG-006 sube de 60% a 65% y BIMG-005 de 80% a 85% por el E2E ampliado. Total ponderado: **61,05 / 100 → 61%**. La prueba física de Windows y las mediciones de rendimiento siguen `NOT_RUN`.
 - Catálogo v9 y compatibilidad de peinado, **CI #122 PASS_REAL**: referencias de compatibilidad, 120 escenarios con semilla para cinco largos y cinco cortes, locks manuales, API v9, `npm ci`, build y smoke E2E Chromium. https://github.com/jonhararagi/botimagen/actions/runs/37928912408.
 - Catálogo v10 extiende compatibilidad a los diez arreglos capilares, **CI #124 PASS_REAL**: 264 escenarios con semilla entre largo/corte/arreglo, locks manuales, API v10, build y smoke E2E Chromium. https://github.com/jonhararagi/botimagen/actions/runs/37929316506.
@@ -60,7 +65,7 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 
 ## Nota de continuidad · 2026-10-09
 
-Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías de rasgo en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 inicialmente a 20%. La duplicación local quedó implementada y probada, llevando BIMG-005 a 70%. Ese checkpoint era **49,2 / 100 → 49%**. El catálogo v6 amplió cuatro regiones de escamas y llevó el checkpoint a **49,8 / 100 → 50%**. El catálogo v7 añadió color de puntas y actualizó el checkpoint a **50,7 / 100 → 51%**. La CI #112 añadió smoke test headless Chromium y elevó el checkpoint a **53,1 / 100 → 53%**. La compatibilidad capilar AUTO y la CI #117 subieron el checkpoint a **54,6 / 100 → 55%**. Catálogo v9 y las pruebas de largo/corte llevaron el checkpoint a **55,35 / 100 → 55%**. Catálogo v10 amplió compatibilidad a arreglos capilares y dejó el checkpoint en **56,1 / 100 → 56%**. CI #127 añadió el primer E2E de compatibilidad UI/API y llevó BIMG-005 a 75%. Catálogo v11 amplió compatibilidad a outfit/rol; CI #134 validó el recorrido entre pestañas y perfiles, elevando BIMG-005 a 80%, BIMG-006 a 55% y el total actual a **58,65 / 100 → 59%**. La prueba física Windows continúa `NOT_RUN`.
+Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías de rasgo en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 inicialmente a 20%. La duplicación local quedó implementada y probada, llevando BIMG-005 a 70%. Ese checkpoint era **49,2 / 100 → 49%**. El catálogo v6 amplió cuatro regiones de escamas y llevó el checkpoint a **49,8 / 100 → 50%**. El catálogo v7 añadió color de puntas y actualizó el checkpoint a **50,7 / 100 → 51%**. La CI #112 añadió smoke test headless Chromium y elevó el checkpoint a **53,1 / 100 → 53%**. La compatibilidad capilar AUTO y la CI #117 subieron el checkpoint a **54,6 / 100 → 55%**. Catálogo v9 y las pruebas de largo/corte llevaron el checkpoint a **55,35 / 100 → 55%**. Catálogo v10 amplió compatibilidad a arreglos capilares y dejó el checkpoint en **56,1 / 100 → 56%**. CI #127 añadió el primer E2E de compatibilidad UI/API y llevó BIMG-005 a 75%. Catálogo v11 amplió compatibilidad a outfit/rol; CI #134 validó el recorrido entre pestañas y perfiles, elevando BIMG-005 a 80%, BIMG-006 a 55% y el total actual a **58,65 / 100 → 59%**. La prueba física Windows continúa `NOT_RUN`. Catálogo v14 añade accesorio/rol y v15 anatomía/especie; CI #149/#151/#152/#153 verifica compatibilidad, proyección de metadatos y persistencia manual. BIMG-006 sube a 70% y el checkpoint actual es **61,8 / 100 → 62%**. La prueba física Windows continúa NOT_RUN.
 
 ## Siguiente trabajo que más reduce el riesgo
 
