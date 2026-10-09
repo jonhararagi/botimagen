@@ -4,7 +4,7 @@
 
 Construir una experiencia **web local-first** con tecnologías de navegador, conservando el motor Python existente. Primero funcionará en Chrome/Edge en la misma PC; una envoltura de escritorio y una versión web remota se estudiarán después como destinos distintos.
 
-Esta arquitectura no significa que la aplicación ya esté migrada. Es la dirección autorizada para las próximas fases.
+Esta arquitectura no significa que la aplicación ya esté migrada. Es la dirección autorizada para las próximas fases. La shell inicial de React/TypeScript ahora vive en `web/` y el build se incorpora a CI; la conexión al motor, la fuente única del catálogo y la prueba física aún no existen.
 
 ## Capas propuestas
 
@@ -12,7 +12,7 @@ Esta arquitectura no significa que la aplicación ya esté migrada. Es la direcc
 
 - TypeScript.
 - React.
-- Vite para desarrollo y compilación.
+- Vite para desarrollo y compilación. La shell usa versiones exactas en dependencias directas; `package-lock.json` debe generarse y confirmarse antes de la beta.
 - HTML/CSS para la presentación adaptable.
 - Componentes de editor por categorías, controles de color, filtros, formularios, galería y comparador de variantes.
 - Accesibilidad básica mediante etiquetas, foco de teclado, contraste y mensajes claros de validación.

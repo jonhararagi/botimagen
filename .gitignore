@@ -92,3 +92,9 @@ botimagen_history.json
 generated_characters/
 references/
 character_favorites.json
+
+
+# Local web frontend build artifacts
+web/node_modules/
+web/dist/
+web/.vite/

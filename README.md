@@ -1,6 +1,6 @@
 # BotImagen · BaseWarriors Asset Intake
 
-> **Nueva dirección web-first:** consulta el [Cerebro de BotImagen](cerebro/README.md) para ver la arquitectura acordada, el plan por fases y el estado verificado de la migración web local. La interfaz web todavía está planificada, no implementada.
+> **Nueva dirección web-first:** consulta el [Cerebro de BotImagen](cerebro/README.md) para ver la arquitectura acordada, el plan por fases y el estado verificado de la migración web local. El prototipo web inicial ya existe en `web/`; aún no está conectado al motor Python.
 
 
 Herramienta local para recibir imágenes generadas por IA y colocarlas en el destino correcto del proyecto.
@@ -305,3 +305,12 @@ Ejemplo reproducible: cabello largo + coleta alta + base verde esmeralda + patr�
 El esquema contiene 40 categorías en total. Hay 35 categorías visuales con diez opciones cada una, y la paleta de color base de cabello tiene doce opciones. Las categorías de personalidad, estatura general, voz, rol de combate y quirk mantienen sus recuentos propios. Los controles siguen siendo listas locales ligeras: no requieren modelos de visión ni de generación de imágenes.
 
 La validación automática comprueba los recuentos, compatibilidad de especie, altura, reproducción por semilla y el caso de prueba del cabello verde esmeralda con puntas doradas y pupilas de estrella.
+
+
+## Interfaz web local (prototipo en desarrollo)
+
+La nueva interfaz vive en `web/` y utiliza React + TypeScript + Vite. Para iniciarla durante el desarrollo, entra en esa carpeta, ejecuta `npm install` y después `npm run dev`. El servidor Vite se limita a `127.0.0.1`.
+
+El prototipo incluye pestañas de rasgos, selectores con opciones existentes del catálogo, modos FIJO/AUTO, semilla demostrativa, vista del prompt, exportación JSON y guardado temporal en el navegador. La silueta central es un marcador vectorial, no una ilustración generada. Todavía no se comunica con `character_generator.py`, no guarda perfiles en carpetas de Windows y no incluye la biblioteca visual.
+
+La continuidad técnica está en [`cerebro/ESTADO_ACTUAL.md`](cerebro/ESTADO_ACTUAL.md) y [`cerebro/PLAN_MAESTRO.md`](cerebro/PLAN_MAESTRO.md).

@@ -19,8 +19,8 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-002 · Auditar y preservar la base vigente
 
-**Estado:** NEXT.  
-**TIMER:** 2–4 horas.  
+**Estado:** DONE en esta entrega del 2026-10-09.  
+**TIMER:** 2–4 horas estimadas.  
 **Trabajo:**
 - Ejecutar o volver a confirmar toda la CI actual y documentar el resultado.
 - Inspeccionar character_generator.py, character_rules.json, favoritos, guardado de perfil, manifest, intake y validaciones.
@@ -28,19 +28,19 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - Ejecutar doctor.py en Windows si el equipo local está disponible.
 - Anotar contratos de entrada/salida y muestras de perfil.
 
-**Aceptación:** lista real de capacidades conservables, pruebas PASS/FAIL y límites; sin reescritura destructiva.
+**Aceptación:** completada con inspección del código y pruebas automatizadas de CI. `doctor.py` y la UI en Windows: NOT_RUN porque no se dispuso de una sesión física de Windows. La app Tkinter se conserva.
 
 ### BIMG-003 · Spike de frontend web
 
-**Estado:** NOT_STARTED.  
-**TIMER:** 3–5 horas.  
+**Estado:** PARTIAL. Shell React/TypeScript creada; el build se añade a CI. Pendientes: `package-lock.json`, prueba real en navegador/Windows y conexión al motor por BIMG-004.  
+**TIMER:** 3–5 horas estimadas para el spike; implementación inicial realizada.  
 **Trabajo:**
 - Crear un frontend TypeScript + React + Vite en una carpeta propia, sin tocar ni retirar aún la app Tkinter.
 - Añadir lint/build o comprobaciones equivalentes y una interfaz de shell adaptable.
 - Diseñar una dirección visual de estudio de personajes: panel de categorías, área central del diseño, panel de resumen y vista de prompts.
-- Configurar CI para instalar dependencias bloqueadas y compilar.
+- Configurar CI para instalar dependencias directas con versiones exactas y compilar. Pendiente antes de beta: generar y verificar `package-lock.json` reproducible.
 
-**Aceptación:** el build del frontend pasa en CI; la página puede abrirse localmente en navegador; no afirma todavía que existe integración con el motor.
+**Aceptación:** el build del frontend debe pasar en CI. El smoke test real en Chrome/Edge y Windows queda pendiente; no se afirma todavía que exista integración con el motor.
 
 ### BIMG-004 · Puente web hacia el motor Python
 

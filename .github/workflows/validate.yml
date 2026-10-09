@@ -23,3 +23,16 @@ jobs:
 
       - name: Validate universal visual style contract
         run: python tests/test_visual_style_contract.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --no-audit --no-fund
+
+      - name: Build web interface
+        working-directory: web
+        run: npm run build
