@@ -32,15 +32,16 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - CI #65: PASS_REAL en `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; instalación reproducible con `npm ci`, build React/TypeScript y validaciones Python pasan.
 - Ejecución npm reproducible: https://github.com/jonhararagi/botimagen/actions/runs/37920504103
 - Editor web: 46 campos para 46 categorías y 8 pestañas. CI #82 prueba cobertura exacta, motor, prompts, `npm ci` y build: https://github.com/jonhararagi/botimagen/actions/runs/37921734995
+- CI #86: PASS_REAL; test de compatibilidad AUTO de escamas entre humana/dracónica con 12 semillas y coherencia reducida; el resto del motor, cobertura de catálogo, `npm ci` y build también pasan: https://github.com/jonhararagi/botimagen/actions/runs/37921964365
 - Smoke test de navegador real y prueba física en Windows: **NOT_RUN**.
 
 ## Nota de continuidad · 2026-10-09
 
-Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 a 20%. Total actual: **47,4 / 100 → 47%**. Browser/Windows continúan `NOT_RUN`.
+Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES.md` y `cerebro/INVESTIGACION_COMPARATIVA.md`. Esta entrega cierra la reproducibilidad de dependencias web: `web/package-lock.json` se generó desde npm y CI valida `npm ci`. La reproducibilidad web elevó el total a 33,6/100. La expansión del editor a 46 controles actualizó BIMG-005 a 60%. El primer bloque modular añadió seis categorías en catálogo, motor, prompt, UI y pruebas, llevando BIMG-006 a 20%. La prueba multi-semilla añade confianza, pero no cuenta como más alcance funcional: el total permanece **47,4 / 100 → 47%**. Browser/Windows continúan `NOT_RUN`.
 
 ## Siguiente trabajo que más reduce el riesgo
 
-1. Ampliar las pruebas de compatibilidad de escamas por especie y ejecución con múltiples semillas en AUTO.
+1. Ampliar patrones/regiones de escamas y verificar compatibilidad adicional por especie.
 2. Añadir duplicación de perfiles y mejorar el flujo de regeneración.
 3. Realizar smoke test real de navegador y después prueba física en Windows.
 
