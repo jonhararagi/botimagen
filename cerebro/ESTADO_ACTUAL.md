@@ -26,7 +26,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Contrato de estilo bw-modern-gacha-v1 documentado en visual_style_catalog.json.
 - Tests Python en tests/ para manifiesto, motor de personajes y contrato de estilo.
 - CI en .github/workflows/validate.yml valida sintaxis Python, manifiesto, generador y contrato de estilo.
-- Catálogo actual v6: 46 categorías y 11 opciones de patrón/región de escamas; incluye busto y zonas independientes de color de raíces, coronilla e interior del cabello.
+- Catálogo actual v7: 47 categorías y 11 opciones de patrón/región de escamas. El color de puntas de cabello es independiente del patrón de distribución, del color secundario y de las zonas de raíces/coronilla/interior.
 
 ## Evidencia previa disponible
 
@@ -39,7 +39,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 
 ## Implementación web y API local
 
-- `web/` contiene React + TypeScript + Vite con editor adaptable de 8 pestañas: identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle. Las 46 categorías actuales del catálogo tienen un control individual.
+- `web/` contiene React + TypeScript + Vite con editor adaptable de 8 pestañas: identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle. Las 47 categorías actuales del catálogo tienen un control individual.
 - Los selectores cargan opciones mediante `GET /api/catalog`; las listas provienen de `character_rules.json`, no de una copia de opciones en TypeScript.
 - El botón de generar llama a `POST /api/generate` y reutiliza `CharacterGenerator`; respeta IDs manuales, AUTO, semilla y coherencia, y devuelve prompt/negative prompt oficiales.
 - `botimagen_server.py` utiliza `http.server` de la biblioteca estándar, escucha solo en `127.0.0.1:8765`, limita el cuerpo JSON, valida campos contra el catálogo y no expone rutas de archivos arbitrarias.
@@ -63,7 +63,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~90%). UI React/TypeScript y proxy local; `web/package-lock.json` versionado. CI #65 valida `npm ci` y el build. La prueba real de navegador/Windows no se ha ejecutado.
 - BIMG-005: PARTIAL (~70%). Editor expandido a 46 categorías y 8 pestañas; guarda, lista, carga y duplica perfiles de forma independiente. CI #93 prueba API, motor, cobertura del editor, `npm ci` y build. QA real e interacciones visuales completas pendientes.
-- BIMG-006: PARTIAL (~24%). Catálogo v6 mantiene 46 categorías y amplía `scale_pattern` con cuatro regiones estables: dorso de manos/nudillos, caderas externas/muslos, nuca/columna alta y línea mandibular. Pruebas manuales verifican que cada opción llega al prompt; AUTO se verifica en las 10 especies y 12 semillas por especie.
+- BIMG-006: PARTIAL (~30%). Catálogo v7 contiene 47 categorías: añade `hair_tip_color` con 12 opciones y convierte `hair_color_pattern` en un control de distribución/transición sin imponer color fijo en las puntas. Las pruebas compuestas verifican patrón, color secundario, puntas, raíces, coronilla e interior como decisiones independientes.
 - BIMG-004: PARTIAL (~90%). API de catálogo/generación/perfiles y controles UI para listar/cargar integrados; smoke test físico pendiente.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -72,6 +72,15 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime en navegador/Windows: NOT_RUN.
 - Progreso total ponderado hacia la beta local: 49%, calculado en `cerebro/PROGRESO.md` (49,2/100 sin redondear).
+
+## Última ampliación capilar · catálogo v7
+
+- El catálogo subió de v6 a v7 y de 46 a 47 categorías al añadir `hair_tip_color` con 12 opciones.
+- `hair_color_pattern` ahora define distribución/transición, no una tonalidad fija para las puntas. El ID `puntas_doradas` permanece estable por compatibilidad, pero su etiqueta pasó a «Degradado localizado en puntas» y el prompt consume el color de puntas independiente.
+- El prompt controla raíces, coronilla, interior y puntas por separado. Se añadió una instrucción para no imponer oro o plata salvo elección explícita.
+- El test de composición combina pelo base esmeralda, patrón de puntas, acento dorado y color de puntas controlado explícitamente, validando el nuevo contrato.
+- **CI #107: PASS_REAL** para generador, contrato visual, API, cobertura del editor, `npm ci` y build: https://github.com/jonhararagi/botimagen/actions/runs/37926064467.
+- TIMER: 1–2 horas estimadas incluyendo ajuste de la prueba anterior. BIMG-006 sube de 24% a 30%; total ponderado **50,7 / 100 → 51%**. Prueba real de navegador/Windows continúa `NOT_RUN`.
 
 ## Última ampliación del catálogo
 
@@ -95,7 +104,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - `web/src/App.tsx` mantiene ahora un estado explícito de cambios pendientes. Editar rasgos, cambiar FIJO/AUTO, semilla o coherencia invalida el snapshot previo; guardar, copiar prompt y exportar quedan bloqueados hasta regenerar.
 - Los controles de edición/carga/restauración también se bloquean mientras el generador está trabajando para evitar carreras con la respuesta asíncrona.
 - Al cargar perfiles antiguos, la UI compara selecciones fijadas con el perfil generado y exige regeneración si detecta inconsistencia.
-- `tests/test_web_field_coverage.py` valida estáticamente estos guardarraíles y conserva la comprobación de las 46 categorías/8 pestañas. Es cobertura de contrato fuente, no sustituye el test de navegador.
+- `tests/test_web_field_coverage.py` valida estáticamente estos guardarraíles y conserva la comprobación de las 47 categorías/8 pestañas. Es cobertura de contrato fuente, no sustituye el test de navegador.
 - **CI #100: PASS_REAL**, con pruebas Python, contrato de editor, `npm ci` y build React/TypeScript: https://github.com/jonhararagi/botimagen/actions/runs/37925030261.
 - TIMER de la mejora: 30–60 minutos estimados. El total ponderado sigue siendo **49,2 / 100 → 49%** porque la QA real en navegador/Windows sigue pendiente.
 
