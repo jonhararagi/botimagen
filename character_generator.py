@@ -251,6 +251,18 @@ class CharacterGenerator:
                 raise ValueError(f"Unknown {category} value: {requested}")
             return requested, by_id[requested]["label"]
 
+        # Placement patterns that explicitly require contrast must not allow AUTO
+        # to quietly collapse the affected zone back into the base hair color.
+        pattern = chosen.get("hair_color_pattern", "auto")
+        if category == "hair_root_color" and pattern == "raices_contraste":
+            values = [item for item in values if item["id"] != "matching_base"]
+        elif category == "hair_inner_color" and pattern == "capa_interior":
+            values = [item for item in values if item["id"] != "matching_base"]
+        elif category == "hair_tip_color" and pattern in {
+            "puntas_doradas", "puntas_plateadas", "degradado_suave", "ombre_oscuro_claro"
+        }:
+            values = [item for item in values if item["id"] != "matching_base"]
+
         if not values:
             raise ValueError(f"No candidates available for {category}")
 
