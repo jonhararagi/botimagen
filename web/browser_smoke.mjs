@@ -186,6 +186,33 @@ try {
   assert.equal(await saveButton.isDisabled(), false,
     "Saving should unlock after reverse-direction compatibility succeeds");
 
+  // A locked combat role constrains AUTO outfit selection across editor tabs.
+  await page.getByRole("tab", { name: /Combate/i }).click();
+  const roleLabel = page.locator('label[for="trait-combat_role"]');
+  const roleField = roleLabel.locator("xpath=../..");
+  const roleLock = roleField.locator("button.lock");
+  const roleSelect = roleField.locator("select");
+  if ((await roleLock.innerText()).includes("AUTO")) await roleLock.click();
+  await roleSelect.selectOption("tank");
+
+  await page.getByRole("tab", { name: /Vestuario/i }).click();
+  const outfitLabel = page.locator('label[for="trait-outfit"]');
+  const outfitSelect = outfitLabel.locator("xpath=../..").locator("select");
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+
+  assert.equal(await roleSelect.inputValue(), "tank",
+    "A manually locked combat role must survive regeneration");
+  const allowedOutfits = catalog.categories.outfit
+    .filter(option => option.compatible_with?.combat_role?.includes("tank"))
+    .map(option => option.id);
+  assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
+    `AUTO outfit must match the manually locked tank role; got ${await outfitSelect.inputValue()}`);
+  assert.equal(await saveButton.isDisabled(), false,
+    "Saving should unlock after role-compatible outfit regeneration");
+
+  await page.getByRole("tab", { name: /Cabello/i }).click();
   const profileSummary = page.locator(".saved-profile-panel summary");
   await profileSummary.waitFor({ state: "visible" });
   const initialCount = Number((await profileSummary.innerText()).match(/\((\d+)\)/)?.[1] ?? 0);
@@ -228,9 +255,16 @@ try {
     .map(option => option.id);
   assert.ok(allowedStylesForLoadedLength.includes(await styleSelect.inputValue()),
     "Loaded profile should keep the hairstyle compatible with its restored hair length");
+
+  await page.getByRole("tab", { name: /Combate/i }).click();
+  assert.equal(await roleSelect.inputValue(), "tank",
+    "Loading a profile should restore the manually locked combat role");
+  await page.getByRole("tab", { name: /Vestuario/i }).click();
+  assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
+    "Loaded profile should retain an outfit compatible with its restored combat role");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair length/hairstyle/arrangement compatibility in both directions, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility in both directions, combat-role/outfit compatibility, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
