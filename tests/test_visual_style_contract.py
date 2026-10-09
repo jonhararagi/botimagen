@@ -100,6 +100,7 @@ def test_complex_hairstyle_colour_and_star_pupils_are_composable():
             "hair": "verde_esmeralda",
             "hair_color_pattern": "puntas_doradas",
             "hair_secondary_color": "oro_metalico",
+            "hair_tip_color": "metallic_gold",
             "pupil_shape": "estrella",
         },
         seed=90814,
@@ -112,6 +113,7 @@ def test_complex_hairstyle_colour_and_star_pupils_are_composable():
     assert profile["hair"] == "verde_esmeralda"
     assert profile["hair_color_pattern"] == "puntas_doradas"
     assert profile["hair_secondary_color"] == "oro_metalico"
+    assert profile["hair_tip_color"] == "metallic_gold"
     assert profile["pupil_shape"] == "estrella"
     assert profile["height_cm"] == "h160"
     assert profile["species"] == "kemonomimi_zorro"
@@ -121,7 +123,7 @@ def test_complex_hairstyle_colour_and_star_pupils_are_composable():
     assert "long hair" in prompt
     assert "high ponytail" in prompt
     assert "emerald green base color" in prompt
-    assert "gradient ending in metallic gold tips" in prompt
+    assert "metallic gold color confined to the hair tips with a clean transition" in prompt
     assert "metallic gold as the secondary" in prompt
     assert "star-shaped pupils" in prompt
 
