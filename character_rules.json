@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -4787,6 +4787,543 @@
           "species:androide": 7,
           "species:espiritu": -5
         }
+      }
+    ],
+    "bust_size": [
+      {
+        "id": "small",
+        "label": "Pequeño y discreto",
+        "tags": [
+          "compact",
+          "subtle",
+          "athletic"
+        ],
+        "prompt_en": "small understated bust proportion, balanced adult heroine anatomy",
+        "base": 2
+      },
+      {
+        "id": "balanced",
+        "label": "Proporción media equilibrada",
+        "tags": [
+          "balanced",
+          "natural",
+          "versatile"
+        ],
+        "prompt_en": "balanced medium bust proportion for an adult heroine",
+        "base": 5
+      },
+      {
+        "id": "full",
+        "label": "Voluminoso equilibrado",
+        "tags": [
+          "full",
+          "balanced",
+          "adult"
+        ],
+        "prompt_en": "full bust proportion integrated into balanced adult anatomy",
+        "base": 2
+      },
+      {
+        "id": "voluminous",
+        "label": "Voluminoso",
+        "tags": [
+          "voluminous",
+          "full",
+          "adult"
+        ],
+        "prompt_en": "very full bust proportion integrated into adult anatomy and functional combat clothing",
+        "base": 1
+      }
+    ],
+    "hair_root_color": [
+      {
+        "id": "matching_base",
+        "label": "A juego con el color base",
+        "tags": [
+          "base_match",
+          "neutral"
+        ],
+        "prompt_en": "roots matching the selected base hair color with no visible contrast",
+        "base": 5
+      },
+      {
+        "id": "shadow_obsidian",
+        "label": "Raíces sombreadas",
+        "tags": [
+          "dark",
+          "shadow",
+          "cool"
+        ],
+        "prompt_en": "subtle obsidian shadow roots blending gradually into the selected base hair color",
+        "base": 2,
+        "bias": {
+          "hair:negro_obsidiana": 4,
+          "hair:violeta_profundo": 2,
+          "hair:azul_nocturno": 2
+        }
+      },
+      {
+        "id": "metallic_gold",
+        "label": "Raíces doradas",
+        "tags": [
+          "warm",
+          "metallic",
+          "contrast"
+        ],
+        "prompt_en": "metallic gold roots with a short clean transition into the base hair color",
+        "base": 1,
+        "bias": {
+          "hair:rojo_coral": 2,
+          "hair:naranja_tangerina": 2,
+          "hair:negro_obsidiana": 2
+        }
+      },
+      {
+        "id": "pearl_silver",
+        "label": "Raíces plateadas",
+        "tags": [
+          "cool",
+          "metallic",
+          "contrast"
+        ],
+        "prompt_en": "pearl silver roots transitioning cleanly into the base hair color",
+        "base": 1
+      },
+      {
+        "id": "coral_red",
+        "label": "Raíces coral",
+        "tags": [
+          "warm",
+          "bright"
+        ],
+        "prompt_en": "coral red roots blending naturally into the selected hair base",
+        "base": 1
+      },
+      {
+        "id": "midnight_blue",
+        "label": "Raíces azul nocturno",
+        "tags": [
+          "cool",
+          "dark",
+          "contrast"
+        ],
+        "prompt_en": "midnight blue roots with a controlled transition into the base hair color",
+        "base": 1,
+        "bias": {
+          "hair:azul_nocturno": 3,
+          "hair:negro_obsidiana": 2
+        }
+      }
+    ],
+    "hair_crown_color": [
+      {
+        "id": "matching_base",
+        "label": "A juego con el color base",
+        "tags": [
+          "base_match",
+          "neutral"
+        ],
+        "prompt_en": "crown matching the selected base hair color",
+        "base": 5
+      },
+      {
+        "id": "metallic_gold",
+        "label": "Coronilla dorada",
+        "tags": [
+          "warm",
+          "metallic",
+          "contrast"
+        ],
+        "prompt_en": "metallic gold color concentrated only across the crown of the head",
+        "base": 1
+      },
+      {
+        "id": "pearl_silver",
+        "label": "Coronilla plateada",
+        "tags": [
+          "cool",
+          "metallic",
+          "contrast"
+        ],
+        "prompt_en": "pearl silver color concentrated only across the crown of the head",
+        "base": 1
+      },
+      {
+        "id": "rose_pink",
+        "label": "Coronilla rosa",
+        "tags": [
+          "warm",
+          "pink",
+          "bright"
+        ],
+        "prompt_en": "soft rose pink color concentrated only across the crown of the head",
+        "base": 1
+      },
+      {
+        "id": "ice_blue",
+        "label": "Coronilla azul hielo",
+        "tags": [
+          "cool",
+          "blue",
+          "bright"
+        ],
+        "prompt_en": "ice blue color concentrated only across the crown of the head",
+        "base": 1
+      },
+      {
+        "id": "emerald_green",
+        "label": "Coronilla esmeralda",
+        "tags": [
+          "cool",
+          "green",
+          "bright"
+        ],
+        "prompt_en": "emerald green color concentrated only across the crown of the head",
+        "base": 1
+      }
+    ],
+    "hair_inner_color": [
+      {
+        "id": "matching_base",
+        "label": "A juego con el color base",
+        "tags": [
+          "base_match",
+          "neutral"
+        ],
+        "prompt_en": "inner hair layers matching the selected base hair color",
+        "base": 5
+      },
+      {
+        "id": "metallic_gold",
+        "label": "Interior oro metálico",
+        "tags": [
+          "warm",
+          "metallic",
+          "contrast"
+        ],
+        "prompt_en": "metallic gold color visible only on the inner hair layers",
+        "base": 1
+      },
+      {
+        "id": "pearl_silver",
+        "label": "Interior plata perla",
+        "tags": [
+          "cool",
+          "metallic",
+          "contrast"
+        ],
+        "prompt_en": "pearl silver color visible only on the inner hair layers",
+        "base": 1
+      },
+      {
+        "id": "bubblegum_pink",
+        "label": "Interior rosa chicle",
+        "tags": [
+          "pink",
+          "bright",
+          "playful"
+        ],
+        "prompt_en": "bubblegum pink color visible only on the inner hair layers",
+        "base": 1
+      },
+      {
+        "id": "turquoise",
+        "label": "Interior turquesa",
+        "tags": [
+          "cool",
+          "bright",
+          "technical"
+        ],
+        "prompt_en": "turquoise color visible only on the inner hair layers",
+        "base": 1
+      },
+      {
+        "id": "ruby_red",
+        "label": "Interior rojo rubí",
+        "tags": [
+          "warm",
+          "red",
+          "intense"
+        ],
+        "prompt_en": "ruby red color visible only on the inner hair layers",
+        "base": 1
+      },
+      {
+        "id": "deep_violet",
+        "label": "Interior violeta",
+        "tags": [
+          "cool",
+          "violet",
+          "mysterious"
+        ],
+        "prompt_en": "deep violet color visible only on the inner hair layers",
+        "base": 1
+      }
+    ],
+    "scale_pattern": [
+      {
+        "id": "no_visible_scales",
+        "label": "Sin escamas visibles",
+        "tags": [
+          "neutral",
+          "clean",
+          "no_scales"
+        ],
+        "prompt_en": "no visible scales on the character",
+        "base": 5,
+        "bias": {
+          "species:humana": 3,
+          "species:kemonomimi_gato": 3,
+          "species:kemonomimi_zorro": 3,
+          "species:kemonomimi_lobo": 3,
+          "species:kemonomimi_conejo": 3,
+          "species:elfa": 3,
+          "species:oni": 3,
+          "species:draconica": -4,
+          "species:androide": 3,
+          "species:espiritu": 3
+        }
+      },
+      {
+        "id": "cheek_temple_scales",
+        "label": "Escamas finas en mejillas y sienes",
+        "tags": [
+          "dragon",
+          "scales",
+          "subtle"
+        ],
+        "prompt_en": "subtle fine scales only on cheeks and temples",
+        "base": 1,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "neck_clavicle_scales",
+        "label": "Escamas en cuello y clavículas",
+        "tags": [
+          "dragon",
+          "scales",
+          "armor"
+        ],
+        "prompt_en": "small orderly scales limited to the neck and clavicle region",
+        "base": 1,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "forearm_shin_scales",
+        "label": "Escamas en antebrazos y tibias",
+        "tags": [
+          "dragon",
+          "scales",
+          "combat"
+        ],
+        "prompt_en": "small scale patches limited to forearms and shins",
+        "base": 1,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "shoulder_back_scales",
+        "label": "Escamas en hombros y espalda alta",
+        "tags": [
+          "dragon",
+          "scales",
+          "armor"
+        ],
+        "prompt_en": "coherent scale patches across shoulders and upper back",
+        "base": 1,
+        "bias": {
+          "species:humana": -2,
+          "species:kemonomimi_gato": -2,
+          "species:kemonomimi_zorro": -2,
+          "species:kemonomimi_lobo": -2,
+          "species:kemonomimi_conejo": -2,
+          "species:elfa": -2,
+          "species:oni": -2,
+          "species:draconica": 3,
+          "species:androide": -2,
+          "species:espiritu": -2
+        }
+      },
+      {
+        "id": "dragon_plate_scales",
+        "label": "Placas dracónicas",
+        "tags": [
+          "dragon",
+          "scales",
+          "heavy",
+          "powerful"
+        ],
+        "prompt_en": "small overlapping dragon scales arranged in clear body zones, not full-body armor",
+        "base": 0.8,
+        "bias": {
+          "species:humana": -3,
+          "species:kemonomimi_gato": -3,
+          "species:kemonomimi_zorro": -3,
+          "species:kemonomimi_lobo": -3,
+          "species:kemonomimi_conejo": -3,
+          "species:elfa": -3,
+          "species:oni": -3,
+          "species:draconica": 3,
+          "species:androide": -3,
+          "species:espiritu": -3
+        }
+      },
+      {
+        "id": "glowing_scale_lines",
+        "label": "Líneas de escamas luminosas",
+        "tags": [
+          "dragon",
+          "scales",
+          "energy",
+          "glowing"
+        ],
+        "prompt_en": "fine glowing scale markings arranged in clearly defined zones",
+        "base": 0.8,
+        "bias": {
+          "species:humana": -1,
+          "species:kemonomimi_gato": -1,
+          "species:kemonomimi_zorro": -1,
+          "species:kemonomimi_lobo": -1,
+          "species:kemonomimi_conejo": -1,
+          "species:elfa": -1,
+          "species:oni": -1,
+          "species:draconica": 3,
+          "species:androide": -1,
+          "species:espiritu": -1
+        }
+      }
+    ],
+    "scale_color": [
+      {
+        "id": "metallic_gold",
+        "label": "Oro metálico",
+        "tags": [
+          "dragon",
+          "scales",
+          "warm",
+          "metallic"
+        ],
+        "prompt_en": "metallic gold scale color with controlled highlights",
+        "base": 2,
+        "bias": {
+          "species:draconica": 3
+        }
+      },
+      {
+        "id": "deep_crimson",
+        "label": "Carmesí profundo",
+        "tags": [
+          "dragon",
+          "scales",
+          "warm",
+          "red"
+        ],
+        "prompt_en": "deep crimson scale color with restrained red highlights",
+        "base": 1
+      },
+      {
+        "id": "obsidian_black",
+        "label": "Negro obsidiana",
+        "tags": [
+          "dragon",
+          "scales",
+          "dark",
+          "cool"
+        ],
+        "prompt_en": "obsidian black scales with subtle cool reflections",
+        "base": 1
+      },
+      {
+        "id": "pearl_white",
+        "label": "Blanco perla",
+        "tags": [
+          "dragon",
+          "scales",
+          "cool",
+          "light"
+        ],
+        "prompt_en": "pearl white scales with soft silver reflections",
+        "base": 1
+      },
+      {
+        "id": "emerald_green",
+        "label": "Verde esmeralda",
+        "tags": [
+          "dragon",
+          "scales",
+          "green",
+          "cool"
+        ],
+        "prompt_en": "emerald green scales with clean satin highlights",
+        "base": 1
+      },
+      {
+        "id": "ice_blue",
+        "label": "Azul hielo",
+        "tags": [
+          "dragon",
+          "scales",
+          "blue",
+          "cool"
+        ],
+        "prompt_en": "ice blue scales with cool luminous highlights",
+        "base": 1
+      },
+      {
+        "id": "iridescent_violet",
+        "label": "Violeta iridiscente",
+        "tags": [
+          "dragon",
+          "scales",
+          "violet",
+          "mysterious"
+        ],
+        "prompt_en": "iridescent violet scales with restrained color-shifting highlights",
+        "base": 1
+      },
+      {
+        "id": "bronze_neutral",
+        "label": "Bronce neutro",
+        "tags": [
+          "dragon",
+          "scales",
+          "warm",
+          "neutral"
+        ],
+        "prompt_en": "neutral bronze scales with muted metallic highlights",
+        "base": 2
       }
     ]
   },
