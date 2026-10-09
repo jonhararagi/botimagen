@@ -298,6 +298,7 @@ try {
     assert.ok(option?.compatible_with?.species?.includes("draconica"),
       `AUTO ${category} must respect draconica compatibility; got ${selected}`);
   }
+  await page.getByRole("tab", { name: /Identidad/i }).click();
   assert.equal(await speciesSelect.inputValue(), "draconica",
     "The selected species lock must survive anatomy regeneration");
 
