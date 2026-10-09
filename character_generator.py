@@ -24,6 +24,7 @@ TRAIT_KEYS = {
     "height_cm": "Altura exacta",
     "body_build": "Constitución",
     "body_proportions": "Proporciones corporales",
+    "bust_size": "Tamaño del busto",
     "silhouette": "Silueta",
     "skin_tone": "Tono de piel",
     "expression": "Expresión",
@@ -38,6 +39,8 @@ TRAIT_KEYS = {
     "ear_style": "Orejas",
     "tail_style": "Cola",
     "horn_style": "Cuernos / rasgo craneal",
+    "scale_pattern": "Distribución de escamas",
+    "scale_color": "Color de escamas",
     "hair_length": "Largo del cabello",
     "hair_bangs": "Flequillo",
     "hairstyle": "Corte / forma base",
@@ -48,6 +51,9 @@ TRAIT_KEYS = {
     "hair": "Color base del cabello",
     "hair_color_pattern": "Patrón de color del cabello",
     "hair_secondary_color": "Color secundario del cabello",
+    "hair_root_color": "Color de raíces del cabello",
+    "hair_crown_color": "Color de coronilla del cabello",
+    "hair_inner_color": "Color interior del cabello",
     "outfit": "Vestimenta",
     "outer_layer": "Capa exterior",
     "footwear": "Calzado",
@@ -206,13 +212,14 @@ class CharacterGenerator:
         # Final coherence pass over visual/combat traits. Explicit choices
         # remain hard-locked, AUTO traits are refined with the whole profile.
         refine = (
-            "species", "stature", "height_cm", "body_build", "body_proportions",
+            "species", "stature", "height_cm", "body_build", "body_proportions", "bust_size",
             "silhouette", "skin_tone", "face_shape", "nose_style",
             "eye_shape", "eyes", "pupil_shape", "eyebrow_style", "mouth_style",
-            "facial_detail", "ear_style", "tail_style", "horn_style",
+            "facial_detail", "ear_style", "tail_style", "horn_style", "scale_pattern", "scale_color",
             "hair_length", "hair_bangs", "hairstyle", "hair_arrangement",
             "hair_texture", "side_hair", "back_hair", "hair",
-            "hair_color_pattern", "hair_secondary_color", "outfit", "outer_layer",
+            "hair_color_pattern", "hair_secondary_color", "hair_root_color", "hair_crown_color",
+            "hair_inner_color", "outfit", "outer_layer",
             "footwear", "accessory", "palette_accent", "voice",
             "combat_role", "baseball_prop", "pose", "quirk",
         )
@@ -281,18 +288,20 @@ class CharacterGenerator:
             f"Species/type: {p['species']}. "
             f"Height: {p['height_cm']}; overall stature: {p['stature']}. "
             f"Body: {p['body_build']}, {p['body_proportions']}, {p['silhouette']}, "
-            f"{p['skin_tone']}. "
+            f"{p['bust_size']}, {p['skin_tone']}. "
             f"Face construction: {p['face_shape']}, {p['nose_style']} nose, "
             f"{p['expression']} expression. "
             f"Eyes: {p['eye_shape']} shape, {p['eyes']} iris color, "
             f"{p['pupil_shape']}, {p['eyebrow_style']} eyebrows, "
             f"{p['mouth_style']} mouth, {p['facial_detail']} facial detail. "
             f"Species anatomy: {p['ear_style']}; {p['tail_style']}; {p['horn_style']}. "
+            f"Scale placement: {p['scale_pattern']}; scale color: {p['scale_color']}. "
             f"Hair: {p['hair_length']}, {p['hairstyle']}, {p['hair_arrangement']}, "
             f"{p['hair_texture']}, {p['hair_bangs']} bangs, {p['side_hair']} side hair, "
             f"{p['back_hair']} back hair. "
             f"Hair colors: {p['hair']} base color; {p['hair_color_pattern']} using "
-            f"{p['hair_secondary_color']} as the secondary/accent color. "
+            f"{p['hair_secondary_color']} as the secondary/accent color. Root zone: {p['hair_root_color']}; "
+            f"crown zone: {p['hair_crown_color']}; inner hair zone: {p['hair_inner_color']}. "
             f"Clothing: {p['outfit']}, {p['outer_layer']}, {p['footwear']}, "
             f"accessory {p['accessory']}. "
             f"Color direction: {p['palette_accent']}. "
@@ -307,6 +316,9 @@ class CharacterGenerator:
             "For human characters, do not add animal ears, tails or horns unless explicitly chosen; "
             "for kemonomimi, fantasy species and androids, use the selected species features and avoid "
             "unselected extra anatomy. Explicit manual combinations remain intentional design locks. "
+            "When the scale pattern says no visible scales, do not add scales merely because a color is selected; "
+            "otherwise apply the selected scale color only to the stated body zones. Bust size is a neutral adult "
+            "anatomy proportion and must not become a sexualized focal point. "
             "The main haircut, bangs, side hair, back hair and tied-up arrangement must form one plausible "
             "hairstyle rather than several competing styles. Preserve the selected base hair colour and "
             "secondary-colour treatment; if the pattern specifies coloured tips, make the transition visible "
