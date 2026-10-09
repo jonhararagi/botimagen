@@ -223,8 +223,11 @@ try {
     "Loading a saved profile should restore the AUTO-selected compatible hair length");
   assert.ok(allowedLengthsForArrangement.includes(await lengthSelect.inputValue()),
     "Loaded profile should keep the hair length compatible with its locked arrangement");
-  assert.ok(allowedStyles.includes(await styleSelect.inputValue()),
-    "The generated hairstyle should remain compatible with the earlier locked pixie length check");
+  const allowedStylesForLoadedLength = catalog.categories.hairstyle
+    .filter(option => option.compatible_with?.hair_length?.includes(selectedLengthForArrangement))
+    .map(option => option.id);
+  assert.ok(allowedStylesForLoadedLength.includes(await styleSelect.inputValue()),
+    "Loaded profile should keep the hairstyle compatible with its restored hair length");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
   console.log("PASS_REAL: Chromium verified independent hair-tip prompts, stale-snapshot guards, catalog-driven hair length/hairstyle/arrangement compatibility in both directions, profile save/duplicate/load, and no page errors.");
