@@ -619,6 +619,38 @@ def test_manual_baseball_prop_and_combat_role_locks_are_preserved():
 
 
 
+def test_all_catalog_compatibility_references_are_valid():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    categories = rules["categories"]
+    ids_by_category = {
+        category: {item["id"] for item in items}
+        for category, items in categories.items()
+    }
+
+    for category, items in categories.items():
+        for option in items:
+            context = (category, option["id"])
+            if "color_family" in option:
+                assert isinstance(option["color_family"], str) and option["color_family"].strip(), context
+
+            constraints = option.get("compatible_with")
+            if constraints is None:
+                continue
+            assert isinstance(constraints, dict) and constraints, context
+
+            for related_category, allowed_ids in constraints.items():
+                assert related_category in categories, (context, related_category)
+                assert isinstance(allowed_ids, list) and allowed_ids, (
+                    context, related_category, allowed_ids
+                )
+                assert len(allowed_ids) == len(set(allowed_ids)), (
+                    context, related_category, "duplicate compatibility IDs"
+                )
+                assert set(allowed_ids).issubset(ids_by_category[related_category]), (
+                    context, related_category, allowed_ids
+                )
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -646,3 +678,4 @@ if __name__ == "__main__":
     test_auto_baseball_prop_respects_manually_selected_combat_role()
     test_auto_combat_role_respects_manually_selected_baseball_prop()
     test_manual_baseball_prop_and_combat_role_locks_are_preserved()
+    test_all_catalog_compatibility_references_are_valid()
