@@ -38,6 +38,7 @@ def main() -> None:
     # Seed input must be parsed strictly, not truncated by parseInt (e.g. 12-3 -> 12).
     assert r'if(!/^-?\d+$/.test(normalizedSeed)||!Number.isSafeInteger(Number(normalizedSeed)))' in source
     assert 'const numericSeed=Number(normalizedSeed);' in source
+    assert '.slice(0,17)' in source, "Seed field must admit the full signed safe-integer length"
 
     # Guard against saving/exporting a selection draft with a stale generated prompt.
     assert 'const [draftDirty,setDraftDirty]=useState(false);' in source

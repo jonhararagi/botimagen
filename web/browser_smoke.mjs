@@ -114,6 +114,22 @@ try {
   await page.getByText("La semilla debe ser un número entero válido.", { exact: true }).waitFor();
   assert.equal(await page.locator(".heading-buttons .btn.primary").isDisabled(), true,
     "Invalid seed syntax must leave saving disabled until regeneration succeeds");
+
+  await seedInput.fill("9007199254740991");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("semilla 9007199254740991"),
+    undefined,
+    { timeout: 15000 },
+  );
+  assert.equal(await page.locator(".heading-buttons .btn.primary").isDisabled(), false,
+    "The largest safe JavaScript integer must be accepted as a reproducible seed");
+
+  await seedInput.fill("9007199254740992");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("La semilla debe ser un número entero válido.", { exact: true }).waitFor();
+  assert.equal(await page.locator(".heading-buttons .btn.primary").isDisabled(), true,
+    "Out-of-range seed integers must be rejected instead of rounded");
   await seedInput.fill("314159");
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.waitForFunction(
@@ -280,7 +296,7 @@ try {
     "Loaded profile should retain an outfit compatible with its restored combat role");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified strict seed validation, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility in both directions, combat-role/outfit compatibility, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified malformed/out-of-range seed rejection, max-safe seed acceptance, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility, combat-role/outfit compatibility, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
