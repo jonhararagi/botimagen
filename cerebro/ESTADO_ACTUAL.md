@@ -26,7 +26,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Contrato de estilo bw-modern-gacha-v1 documentado en visual_style_catalog.json.
 - Tests Python en tests/ para manifiesto, motor de personajes y contrato de estilo.
 - CI en .github/workflows/validate.yml valida sintaxis Python, manifiesto, generador y contrato de estilo.
-- Catálogo actual v7: 47 categorías y 11 opciones de patrón/región de escamas. El color de puntas de cabello es independiente del patrón de distribución, del color secundario y de las zonas de raíces/coronilla/interior.
+- Referencia histórica de la migración inicial: catálogo v7, 47 categorías y 11 opciones de patrón/región de escamas. El catálogo vigente es v16. El color de puntas de cabello es independiente del patrón de distribución, del color secundario y de las zonas de raíces/coronilla/interior.
 
 ## Evidencia previa disponible
 

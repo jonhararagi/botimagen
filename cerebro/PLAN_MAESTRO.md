@@ -76,7 +76,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-006 · Ampliar el modelo modular de rasgos
 
-**Estado:** PARTIAL (~70%). El catálogo v15 mantiene 47 categorías y declara compatibilidad en 111 opciones de 11 relaciones: largo/corte/arreglo, outfit/rol, prop/rol, capa exterior/rol, calzado/rol, accesorio/rol y orejas/cola/cuernos/escamas/especie. Son 303 valores permitidos en las listas de compatibilidad. AUTO consulta las reglas en ambas direcciones; las elecciones manuales se preservan aunque contradigan la regla. CI #153 PASS_REAL recorre las 111 opciones declarativas con AUTO; CI #152 comprueba en Chromium que una anatomía manual incompatible sobrevive regeneración y guardar/duplicar/cargar. 
+**Estado:** PARTIAL (~70%). El catálogo v16 mantiene 47 categorías y declara compatibilidad en 111 opciones de 11 relaciones: largo/corte/arreglo, outfit/rol, prop/rol, capa exterior/rol, calzado/rol, accesorio/rol y orejas/cola/cuernos/escamas/especie. Son 303 valores permitidos en las listas de compatibilidad. AUTO consulta las reglas en ambas direcciones; las elecciones manuales se preservan aunque contradigan la regla. Catálogo v16 añade semántica de prompt explícita a `outer_layer=none`; CI #167 PASS_REAL cubre el prompt y el flujo UI, y CI #168 confirma la suite completa.
 **TIMER:** 1–3 días por el primer bloque de mejoras; la ampliación de catálogos será continua.  
 **Prioridad:** cabello, ojos y anatomía/cuerpo.  
 **Trabajo:**
