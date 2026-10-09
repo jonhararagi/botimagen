@@ -26,6 +26,12 @@ def test_rules_have_expected_categories():
         "eyes",
         "voice",
         "combat_role",
+        "bust_size",
+        "hair_root_color",
+        "hair_crown_color",
+        "hair_inner_color",
+        "scale_pattern",
+        "scale_color",
     }
     assert expected.issubset(data.get("categories", {}))
 
@@ -135,10 +141,37 @@ def test_height_selections_are_locked_and_drive_stature():
     assert tall["profile"]["stature"] == "alta"
 
 
+def test_modular_bust_scales_and_hair_zones_are_independent():
+    generator = CharacterGenerator(RULES)
+    selections = {
+        "species": "draconica",
+        "bust_size": "voluminous",
+        "hair": "rojo_coral",
+        "hair_root_color": "metallic_gold",
+        "hair_crown_color": "pearl_silver",
+        "hair_inner_color": "turquoise",
+        "scale_pattern": "forearm_shin_scales",
+        "scale_color": "obsidian_black",
+    }
+    result = generator.generate(selections, seed=2026, coherence=0.95)
+
+    for category, value in selections.items():
+        assert result["profile"][category] == value
+
+    prompt = result["prompt"]
+    assert "very full bust proportion integrated into adult anatomy and functional combat clothing" in prompt
+    assert "metallic gold roots with a short clean transition into the base hair color" in prompt
+    assert "pearl silver color concentrated only across the crown of the head" in prompt
+    assert "turquoise color visible only on the inner hair layers" in prompt
+    assert "small scale patches limited to forearms and shins" in prompt
+    assert "obsidian black scales with subtle cool reflections" in prompt
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
     test_joyful_short_character_prefers_warm_hair()
     test_serious_angry_character_prefers_dark_voice_palette()
     test_height_selections_are_locked_and_drive_stature()
+    test_modular_bust_scales_and_hair_zones_are_independent()
     print("PASS: character generator tests")
