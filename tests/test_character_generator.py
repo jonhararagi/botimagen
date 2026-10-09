@@ -651,6 +651,128 @@ def test_all_catalog_compatibility_references_are_valid():
                 )
 
 
+
+
+def test_catalog_declares_valid_outer_layer_role_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    roles = {item["id"] for item in rules["categories"]["combat_role"]}
+    layers = rules["categories"]["outer_layer"]
+    assert len(layers) == 10
+    covered_roles = set()
+    for layer in layers:
+        allowed = layer.get("compatible_with", {}).get("combat_role")
+        assert allowed, f"{layer['id']} must declare compatible combat roles"
+        assert set(allowed).issubset(roles), (layer["id"], allowed)
+        covered_roles.update(allowed)
+    assert covered_roles == roles
+
+
+def test_auto_outer_layer_respects_manually_selected_combat_role():
+    generator = CharacterGenerator(RULES)
+    for role in ("striker", "support", "tank", "control", "pitcher"):
+        for seed in range(12):
+            result = generator.generate(
+                {"combat_role": role, "outer_layer": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            layer = next(item for item in generator.categories["outer_layer"]
+                         if item["id"] == result["profile"]["outer_layer"])
+            assert role in layer["compatible_with"]["combat_role"], (
+                role, seed, result["profile"]["outer_layer"]
+            )
+
+
+def test_auto_combat_role_respects_manually_selected_outer_layer():
+    generator = CharacterGenerator(RULES)
+    for layer_id in (
+        "long_coat", "utility_cape", "chaleco_tactico",
+        "hombrera_modular", "mangas_desmontables", "none",
+    ):
+        layer = next(item for item in generator.categories["outer_layer"]
+                     if item["id"] == layer_id)
+        allowed = set(layer["compatible_with"]["combat_role"])
+        for seed in range(12):
+            result = generator.generate(
+                {"outer_layer": layer_id, "combat_role": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            assert result["profile"]["combat_role"] in allowed, (
+                layer_id, seed, result["profile"]["combat_role"]
+            )
+
+
+def test_manual_outer_layer_and_combat_role_locks_are_preserved():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"outer_layer": "long_coat", "combat_role": "tank"},
+        seed=9921,
+    )
+    assert result["profile"]["outer_layer"] == "long_coat"
+    assert result["profile"]["combat_role"] == "tank"
+
+
+def test_catalog_declares_valid_footwear_role_compatibility():
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    roles = {item["id"] for item in rules["categories"]["combat_role"]}
+    shoes = rules["categories"]["footwear"]
+    assert len(shoes) == 10
+    covered_roles = set()
+    for shoe in shoes:
+        allowed = shoe.get("compatible_with", {}).get("combat_role")
+        assert allowed, f"{shoe['id']} must declare compatible combat roles"
+        assert set(allowed).issubset(roles), (shoe["id"], allowed)
+        covered_roles.update(allowed)
+    assert covered_roles == roles
+
+
+def test_auto_footwear_respects_manually_selected_combat_role():
+    generator = CharacterGenerator(RULES)
+    for role in ("striker", "support", "tank", "control", "pitcher"):
+        for seed in range(12):
+            result = generator.generate(
+                {"combat_role": role, "footwear": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            shoe = next(item for item in generator.categories["footwear"]
+                        if item["id"] == result["profile"]["footwear"])
+            assert role in shoe["compatible_with"]["combat_role"], (
+                role, seed, result["profile"]["footwear"]
+            )
+
+
+def test_auto_combat_role_respects_manually_selected_footwear():
+    generator = CharacterGenerator(RULES)
+    for shoe_id in (
+        "armored_boots", "sleek_boots", "zapatillas_plataforma",
+        "calzado_ligero_pitcher", "botines_elegantes", "botas_reforzadas",
+    ):
+        shoe = next(item for item in generator.categories["footwear"]
+                    if item["id"] == shoe_id)
+        allowed = set(shoe["compatible_with"]["combat_role"])
+        for seed in range(12):
+            result = generator.generate(
+                {"footwear": shoe_id, "combat_role": "auto"},
+                seed=seed,
+                coherence=0.4,
+            )
+            assert result["profile"]["combat_role"] in allowed, (
+                shoe_id, seed, result["profile"]["combat_role"]
+            )
+
+
+def test_manual_footwear_and_combat_role_locks_are_preserved():
+    generator = CharacterGenerator(RULES)
+    result = generator.generate(
+        {"footwear": "calzado_ligero_pitcher", "combat_role": "striker"},
+        seed=9922,
+    )
+    assert result["profile"]["footwear"] == "calzado_ligero_pitcher"
+    assert result["profile"]["combat_role"] == "striker"
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -678,4 +800,12 @@ if __name__ == "__main__":
     test_auto_baseball_prop_respects_manually_selected_combat_role()
     test_auto_combat_role_respects_manually_selected_baseball_prop()
     test_manual_baseball_prop_and_combat_role_locks_are_preserved()
+    test_catalog_declares_valid_outer_layer_role_compatibility()
+    test_auto_outer_layer_respects_manually_selected_combat_role()
+    test_auto_combat_role_respects_manually_selected_outer_layer()
+    test_manual_outer_layer_and_combat_role_locks_are_preserved()
+    test_catalog_declares_valid_footwear_role_compatibility()
+    test_auto_footwear_respects_manually_selected_combat_role()
+    test_auto_combat_role_respects_manually_selected_footwear()
+    test_manual_footwear_and_combat_role_locks_are_preserved()
     test_all_catalog_compatibility_references_are_valid()

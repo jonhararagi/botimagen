@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "profile": "BaseWarriors Character Generator · Universal Gacha Visual Beta",
   "categories": {
     "personality": [
@@ -1597,7 +1597,16 @@
         "tags": [
           "clean",
           "agile"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "tank",
+            "control",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "short_bomber",
@@ -1606,7 +1615,13 @@
           "street",
           "bold",
           "agile"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control"
+          ]
+        }
       },
       {
         "id": "hooded_jacket",
@@ -1614,7 +1629,14 @@
         "tags": [
           "casual",
           "playful"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "control"
+          ]
+        }
       },
       {
         "id": "long_coat",
@@ -1623,7 +1645,14 @@
           "elegant",
           "dramatic",
           "cool"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "control",
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "utility_cape",
@@ -1631,7 +1660,13 @@
         "tags": [
           "guardian",
           "technical"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "tank",
+            "support"
+          ]
+        }
       },
       {
         "id": "chaleco_tactico",
@@ -1641,7 +1676,14 @@
           "practical",
           "combat"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "tank",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "chaqueta_corta_asimetrica",
@@ -1651,7 +1693,13 @@
           "bold",
           "mobile"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control"
+          ]
+        }
       },
       {
         "id": "capa_corta_energetica",
@@ -1661,7 +1709,14 @@
           "powerful",
           "flowing"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "tank"
+          ]
+        }
       },
       {
         "id": "hombrera_modular",
@@ -1671,7 +1726,13 @@
           "technical",
           "strong"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "tank",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "mangas_desmontables",
@@ -1681,7 +1742,14 @@
           "modern",
           "agile"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "pitcher"
+          ]
+        }
       }
     ],
     "footwear": [
@@ -1691,7 +1759,14 @@
         "tags": [
           "athletic",
           "agile"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "armored_boots",
@@ -1699,7 +1774,13 @@
         "tags": [
           "strong",
           "guardian"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "tank",
+            "support"
+          ]
+        }
       },
       {
         "id": "high_top",
@@ -1708,7 +1789,13 @@
           "street",
           "playful",
           "energetic"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "support"
+          ]
+        }
       },
       {
         "id": "sleek_boots",
@@ -1716,7 +1803,13 @@
         "tags": [
           "elegant",
           "cool"
-        ]
+        ],
+        "compatible_with": {
+          "combat_role": [
+            "control",
+            "support"
+          ]
+        }
       },
       {
         "id": "botas_cortas",
@@ -1726,7 +1819,13 @@
           "combat",
           "practical"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "tank"
+          ]
+        }
       },
       {
         "id": "zapatillas_plataforma",
@@ -1736,7 +1835,13 @@
           "bold",
           "stylish"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "control"
+          ]
+        }
       },
       {
         "id": "botas_asimetricas",
@@ -1746,7 +1851,13 @@
           "distinctive",
           "combat"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "striker",
+            "tank"
+          ]
+        }
       },
       {
         "id": "calzado_ligero_pitcher",
@@ -1756,7 +1867,12 @@
           "athletic",
           "focused"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "botines_elegantes",
@@ -1766,7 +1882,14 @@
           "refined",
           "clean"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "control",
+            "support",
+            "pitcher"
+          ]
+        }
       },
       {
         "id": "botas_reforzadas",
@@ -1776,7 +1899,13 @@
           "strong",
           "durable"
         ],
-        "base": 1
+        "base": 1,
+        "compatible_with": {
+          "combat_role": [
+            "tank",
+            "support"
+          ]
+        }
       }
     ],
     "accessory": [

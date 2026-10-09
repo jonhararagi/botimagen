@@ -233,6 +233,8 @@ try {
   await page.getByRole("tab", { name: /Vestuario/i }).click();
   const outfitLabel = page.locator('label[for="trait-outfit"]');
   const outfitSelect = outfitLabel.locator("xpath=../..").locator("select");
+  const outerLayerSelect = page.locator('label[for="trait-outer_layer"]').locator("xpath=../..").locator("select");
+  const footwearSelect = page.locator('label[for="trait-footwear"]').locator("xpath=../..").locator("select");
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
@@ -241,6 +243,12 @@ try {
   assert.equal(await roleSelect.inputValue(), "tank",
     "A manually locked combat role must survive regeneration");
   const allowedOutfits = catalog.categories.outfit
+    .filter(option => option.compatible_with?.combat_role?.includes("tank"))
+    .map(option => option.id);
+  const allowedOuterLayers = catalog.categories.outer_layer
+    .filter(option => option.compatible_with?.combat_role?.includes("tank"))
+    .map(option => option.id);
+  const allowedFootwear = catalog.categories.footwear
     .filter(option => option.compatible_with?.combat_role?.includes("tank"))
     .map(option => option.id);
   const allowedProps = catalog.categories.baseball_prop
@@ -252,6 +260,10 @@ try {
   await page.getByRole("tab", { name: /Vestuario/i }).click();
   assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
     `AUTO outfit must match the manually locked tank role; got ${await outfitSelect.inputValue()}`);
+  assert.ok(allowedOuterLayers.includes(await outerLayerSelect.inputValue()),
+    `AUTO outer layer must match the manually locked tank role; got ${await outerLayerSelect.inputValue()}`);
+  assert.ok(allowedFootwear.includes(await footwearSelect.inputValue()),
+    `AUTO footwear must match the manually locked tank role; got ${await footwearSelect.inputValue()}`);
   assert.equal(await saveButton.isDisabled(), false,
     "Saving should unlock after role-compatible outfit regeneration");
 
@@ -307,9 +319,13 @@ try {
   await page.getByRole("tab", { name: /Vestuario/i }).click();
   assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
     "Loaded profile should retain an outfit compatible with its restored combat role");
+  assert.ok(allowedOuterLayers.includes(await outerLayerSelect.inputValue()),
+    "Loaded profile should retain an outer layer compatible with its restored combat role");
+  assert.ok(allowedFootwear.includes(await footwearSelect.inputValue()),
+    "Loaded profile should retain footwear compatible with its restored combat role");
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified malformed/out-of-range seed rejection, max-safe seed acceptance, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility, combat-role/outfit/prop compatibility, profile save/duplicate/load, and no page errors.");
+  console.log("PASS_REAL: Chromium verified malformed/out-of-range seed rejection, max-safe seed acceptance, independent hair-tip prompts, stale-snapshot guards, catalog-driven hair compatibility, combat-role/outfit/outer-layer/footwear/prop compatibility, profile save/duplicate/load, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
