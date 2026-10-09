@@ -167,6 +167,25 @@ def test_modular_bust_scales_and_hair_zones_are_independent():
     assert "obsidian black scales with subtle cool reflections" in prompt
 
 
+def test_auto_scale_pattern_respects_species_compatibility():
+    generator = CharacterGenerator(RULES)
+
+    for seed in range(12):
+        human = generator.generate(
+            {"species": "humana", "scale_pattern": "auto"},
+            seed=seed,
+            coherence=0.4,
+        )
+        assert human["profile"]["scale_pattern"] == "no_visible_scales"
+
+        dragon = generator.generate(
+            {"species": "draconica", "scale_pattern": "auto"},
+            seed=seed,
+            coherence=0.4,
+        )
+        assert dragon["profile"]["scale_pattern"] != "no_visible_scales"
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -174,4 +193,5 @@ if __name__ == "__main__":
     test_serious_angry_character_prefers_dark_voice_palette()
     test_height_selections_are_locked_and_drive_stature()
     test_modular_bust_scales_and_hair_zones_are_independent()
+    test_auto_scale_pattern_respects_species_compatibility()
     print("PASS: character generator tests")
