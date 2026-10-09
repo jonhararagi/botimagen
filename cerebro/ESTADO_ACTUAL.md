@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: compatibilidad entre cortes y longitudes de cabello, catálogo v9, 2026-10-09.
+Última actualización de esta ficha: compatibilidad entre cortes, arreglos y longitudes de cabello, catálogo v10, 2026-10-09.
 
 ## Repositorio
 
@@ -63,7 +63,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~70%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #112 prueba generación de cabello, bloqueo por cambios pendientes y ciclo guardar/duplicar/cargar. Faltan recorridos E2E para más campos y revisión visual amplia.
-- BIMG-006: PARTIAL (~45%). Catálogo v9 conserva 47 categorías, incorpora familias cromáticas y metadatos `compatible_with` en los diez cortes. El generador adapta AUTO al largo/corte fijado, pero conserva las combinaciones manuales aun cuando no sean convencionales. CI #122 PASS_REAL verifica los escenarios semánticos, API v9, build y smoke E2E Chromium. La prueba manual en Windows sigue pendiente.
+- BIMG-006: PARTIAL (~50%). Catálogo v10 mantiene 47 categorías y declara `compatible_with.hair_length` en diez cortes y diez arreglos. AUTO adapta largo/corte/arreglo desde cualquiera de las otras elecciones manuales; las selecciones manuales incompatibles se conservan. CI #124 PASS_REAL verifica los escenarios semánticos, API v10, build y smoke E2E Chromium. La prueba manual en Windows sigue pendiente.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -71,7 +71,16 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **55%**, calculado en `cerebro/PROGRESO.md` (**55,35/100** sin redondear).
+- Progreso total ponderado hacia la beta local: **55%**, calculado en `cerebro/PROGRESO.md` (**56,1/100** sin redondear).
+
+## Compatibilidad de peinado extendida · catálogo v10
+
+- Se actualizó `character_rules.json` de v9 a v10; mantiene 47 categorías e IDs estables.
+- Los diez arreglos capilares declaran `compatible_with.hair_length`. La misma función genérica del motor procesa los metadatos, tanto cuando el arreglo es AUTO como cuando lo es el largo.
+- Cobertura añadida: seis largos × doce semillas para arreglos AUTO (72 casos), seis arreglos × doce semillas para largo AUTO (72 casos), validación de todas las referencias del catálogo y conservación de locks manuales deliberadamente incompatibles. Sumados a los escenarios v9, las nuevas pruebas cubren 264 combinaciones con semilla entre largo, corte y arreglo, además de los locks manuales.
+- Se limpió una duplicación accidental de definiciones de prueba que había quedado tras reordenar el runner en la entrega v9.
+- **CI #124 PASS_REAL**: generador, manifiesto, contrato visual, API v10, cobertura UI, `npm ci`, build y smoke E2E Chromium headless. https://github.com/jonhararagi/botimagen/actions/runs/37929316506.
+- TIMER estimado: 1–2 horas. BIMG-006 sube de 45% a 50%; avance ponderado actualizado a **56,1 / 100 → 56%**. QA física de Windows sigue `NOT_RUN`.
 
 ## Última mejora de compatibilidad de peinado · catálogo v9
 
