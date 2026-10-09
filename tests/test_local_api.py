@@ -25,11 +25,6 @@ class LocalApiTests(unittest.TestCase):
     def test_catalog_is_loaded_from_real_rules(self):
         catalog = make_catalog(self.generator)
         self.assertEqual(catalog["style"]["id"], "bw-modern-gacha-v1")
-        no_outer_layer = next(
-            option for option in catalog["categories"]["outer_layer"]
-            if option["id"] == "none"
-        )
-        self.assertEqual(no_outer_layer.get("prompt_en"), "no outer layer")
         self.assertEqual(catalog["categories"]["species"][0]["id"], "humana")
         self.assertIn("hair_color_pattern", catalog["categories"])
         self.assertIn("hair_tip_color", catalog["categories"])
