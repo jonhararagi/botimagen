@@ -58,16 +58,16 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-005 · Migrar el editor de rasgos
 
-**Estado:** PARTIAL (~55%). La interfaz ahora ofrece 40 rasgos del catálogo oficial repartidos en 8 pestañas; faltan duplicación/regeneración más pulida, pruebas de interacción completa y QA real en navegador/Windows.  
+**Estado:** PARTIAL (~60%). El editor ofrece 46 rasgos del catálogo oficial repartidos en 8 pestañas; quedan pendientes duplicación/regeneración más pulida, pruebas de interacción completa y QA real en navegador/Windows.  
 **TIMER:** 1–3 días.  
 **Trabajo:**
-- Implementar las pestañas IDENTIDAD, CUERPO, ANATOMÍA, CARA, CABELLO, VESTUARIO, COMBATE y DETALLE. **Completado:** las ocho pestañas cubren las 40 categorías actuales de `character_rules.json`.
+- Implementar las pestañas IDENTIDAD, CUERPO, ANATOMÍA, CARA, CABELLO, VESTUARIO, COMBATE y DETALLE. **Completado:** las ocho pestañas cubren las 46 categorías actuales de `character_rules.json`, cada una con un único control individual.
 - Mantener la regla: las opciones disponibles provienen del catálogo; las búsquedas no crean rasgos.
 - Mostrar de forma explícita valores fijados y AUTO.
 - Añadir semilla editable, coherencia/variedad, generar, guardar, duplicar, cargar y regenerar desde un favorito.
 - Incluir el perfil inicial bw-modern-gacha-v1.
 
-**Evidencia parcial:** CI #75 valida que cada una de las 40 categorías del catálogo tenga exactamente un control de edición, que no existan campos duplicados y que los 8 grupos y pestañas coincidan; `npm ci` y build también pasan.
+**Evidencia parcial:** CI #82 valida que cada una de las 46 categorías del catálogo tenga exactamente un control de edición, que no existan campos duplicados y que los 8 grupos y pestañas coincidan; `npm ci`, generación de perfiles y build pasan.
 
 **Pendiente para cerrar:** duplicar perfiles desde la UI, reforzar pruebas de combinaciones/locks y realizar smoke test real del navegador/Windows.
 
@@ -75,17 +75,19 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-006 · Ampliar el modelo modular de rasgos
 
-**Estado:** NOT_STARTED.  
+**Estado:** PARTIAL (~20%). Se añadieron seis categorías nuevas e independientes para busto, patrón/color de escamas y color de raíces/coronilla/interior del cabello; se integraron en el prompt y en los ocho grupos de la UI. Falta ampliar zonas y compatibilidad, además de más pruebas con especies y patrones distintos.  
 **TIMER:** 1–3 días por el primer bloque de mejoras; la ampliación de catálogos será continua.  
 **Prioridad:** cabello, ojos y anatomía/cuerpo.  
 **Trabajo:**
-- Añadir campos independientes con IDs estables; no solo nuevos prompts ensamblados a mano.
+- **Completado en este bloque:** añadir campos independientes con IDs estables y conectarlos al catálogo, motor, prompt y UI: `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color`, `hair_inner_color`.
 - Modelar, tras definir vocabulario compatible, color de base, raíz, coronilla, interior, puntas, mechones, patrón/gradiente y acabado del cabello.
 - Añadir opciones de ojos, forma/pupila y heterocromía, y proporciones/categorías de cuerpo, incluido busto.
-- Añadir especie/escamas y sus colores/zonas cuando el catálogo pueda describirlo sin ambigüedad.
+- Primera cobertura implementada para distribución/color de escamas y zonas separadas de cabello; faltan nuevas regiones de escamas/cabello, mejoras de compatibilidad por especie y validaciones semánticas adicionales.
 - Añadir compatibilidad, exclusiones, selección AUTO y pruebas por combinación.
 
-**Aceptación:** ejemplo de dragonkin adulta con cabello rojo, escamas doradas, ojos dorados y busto grande expresable como rasgos independientes, exportable a JSON y prompt. La generación de imagen no está incluida en este criterio.
+**Evidencia parcial:** CI #82 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`: comprueba que las elecciones manuales permanecen fijadas y que busto, patrón/color de escamas, raíces, coronilla e inner hair aparecen como conceptos separados en el prompt. La prueba de cobertura exige un control UI por cada categoría del catálogo.
+
+**Pendiente para cerrar:** probar múltiples familias de especie y los modos AUTO con varias semillas, sumar opciones de zonas/patrones que falten y revisar compatibilidad/exclusiones. La generación de imagen no está incluida en este criterio.
 
 ### BIMG-007 · Biblioteca visual local
 
