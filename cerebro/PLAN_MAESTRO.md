@@ -75,19 +75,19 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-006 · Ampliar el modelo modular de rasgos
 
-**Estado:** PARTIAL (~20%). Se añadieron seis categorías nuevas e independientes para busto, patrón/color de escamas y color de raíces/coronilla/interior del cabello; se integraron en el prompt y en los ocho grupos de la UI. Falta ampliar zonas y compatibilidad, además de más pruebas con especies y patrones distintos.  
+**Estado:** PARTIAL (~24%). El modelo de 46 categorías incluye busto, patrón/color de escamas y color independiente de raíces/coronilla/interior del cabello. Catálogo v6 agrega cuatro regiones nuevas de escamas y compatibilidad AUTO validada para las 10 especies con 12 semillas por especie. Faltan más patrones/zonas de cabello, transiciones y compatibilidades visuales adicionales.  
 **TIMER:** 1–3 días por el primer bloque de mejoras; la ampliación de catálogos será continua.  
 **Prioridad:** cabello, ojos y anatomía/cuerpo.  
 **Trabajo:**
 - **Completado en este bloque:** añadir campos independientes con IDs estables y conectarlos al catálogo, motor, prompt y UI: `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color`, `hair_inner_color`.
 - Modelar, tras definir vocabulario compatible, color de base, raíz, coronilla, interior, puntas, mechones, patrón/gradiente y acabado del cabello.
 - Añadir opciones de ojos, forma/pupila y heterocromía, y proporciones/categorías de cuerpo, incluido busto.
-- Primera cobertura implementada para distribución/color de escamas y zonas separadas de cabello; faltan nuevas regiones de escamas/cabello, mejoras de compatibilidad por especie y validaciones semánticas adicionales.
+- Catálogo v6 añade `dorsal_hand_scales`, `outer_thigh_scales`, `nape_spine_scales` y `jawline_scales`; se conservan como opciones independientes bajo `scale_pattern` para no aumentar innecesariamente el número de categorías. Faltan nuevas regiones/patrones de cabello, transiciones entre zonas y validaciones semánticas adicionales.
 - Añadir compatibilidad, exclusiones, selección AUTO y pruebas por combinación.
 
-**Evidencia parcial:** CI #86 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`, que comprueba elecciones fijadas y la presencia independiente de busto, patrón/color de escamas y raíces/coronilla/interior de cabello en el prompt. `test_auto_scale_pattern_respects_species_compatibility` verifica 12 semillas a coherencia 0,4: las especies humanas no reciben escamas visibles por AUTO y la especie dracónica sí recibe un patrón visible. La prueba de cobertura exige un control UI por cada categoría.
+**Evidencia parcial:** CI #86 ejecuta `test_modular_bust_scales_and_hair_zones_are_independent`, que comprueba elecciones fijadas y la presencia independiente de busto, patrón/color de escamas y raíces/coronilla/interior de cabello en el prompt. `test_auto_scale_pattern_respects_species_compatibility` verifica las 10 especies con 12 semillas a coherencia 0,4: bajo la política actual, la especie dracónica recibe un patrón visible y las otras nueve no. `test_new_scale_regions_are_manual_and_prompted_independently` verifica el prompt de las cuatro nuevas regiones. CI #102: PASS_REAL, https://github.com/jonhararagi/botimagen/actions/runs/37925309773. La prueba de cobertura exige un control UI por cada categoría.
 
-**Pendiente para cerrar:** probar múltiples familias de especie y los modos AUTO con varias semillas, sumar opciones de zonas/patrones que falten y revisar compatibilidad/exclusiones. La generación de imagen no está incluida en este criterio.
+**Pendiente para cerrar:** sumar opciones de zonas/patrones de cabello, revisar gradientes y compatibilidad/exclusiones para más rasgos. La generación de imagen no está incluida en este criterio.
 
 ### BIMG-007 · Biblioteca visual local
 

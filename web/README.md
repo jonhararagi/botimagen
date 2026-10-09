@@ -1,6 +1,6 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 46 categorías en 8 pestañas, incluida una primera ampliación para busto, escamas y zonas independientes de color del cabello. Todavía faltan categorías avanzadas, la biblioteca visual, las pruebas reales de navegador/Windows y una imagen generada.
+La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 46 categorías en 8 pestañas, incluida una primera ampliación para busto, color por zonas del cabello y 11 opciones de patrón/región de escamas (catálogo v6). Todavía faltan categorías avanzadas, la biblioteca visual, las pruebas reales de navegador/Windows y una imagen generada.
 
 ## Requisitos
 
@@ -33,7 +33,7 @@ Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. 
 ## Funciones conectadas
 
 - 46 categorías de identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle servidas desde `character_rules.json`; la UI mantiene solo la estructura de los campos y no duplica sus listas de opciones.
-- Rasgos anatómicos/visuales independientes: tamaño del busto, distribución y color de escamas, raíces, coronilla e interior del cabello.
+- Rasgos anatómicos/visuales independientes: tamaño del busto, patrón y color de escamas (11 opciones de región/patrón), raíces, coronilla e interior del cabello.
 - Generación real de perfiles y prompts mediante `CharacterGenerator`, con elecciones fijadas, campos AUTO, semilla y coherencia.
 - Visualización del prompt y negative prompt oficiales, copia al portapapeles y exportación JSON.
 - Guardado de perfiles mediante `POST /api/profiles` en `generated_characters/web_profiles/`, ignorado por Git por defecto.

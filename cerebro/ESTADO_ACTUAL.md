@@ -26,7 +26,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Contrato de estilo bw-modern-gacha-v1 documentado en visual_style_catalog.json.
 - Tests Python en tests/ para manifiesto, motor de personajes y contrato de estilo.
 - CI en .github/workflows/validate.yml valida sintaxis Python, manifiesto, generador y contrato de estilo.
-- Catálogo actual v5: 46 categorías, incluidos busto, patrón/color de escamas y color de raíces, coronilla e interior del cabello como campos independientes.
+- Catálogo actual v6: 46 categorías y 11 opciones de patrón/región de escamas; incluye busto y zonas independientes de color de raíces, coronilla e interior del cabello.
 
 ## Evidencia previa disponible
 
@@ -63,7 +63,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~90%). UI React/TypeScript y proxy local; `web/package-lock.json` versionado. CI #65 valida `npm ci` y el build. La prueba real de navegador/Windows no se ha ejecutado.
 - BIMG-005: PARTIAL (~70%). Editor expandido a 46 categorías y 8 pestañas; guarda, lista, carga y duplica perfiles de forma independiente. CI #93 prueba API, motor, cobertura del editor, `npm ci` y build. QA real e interacciones visuales completas pendientes.
-- BIMG-006: PARTIAL (~20%). Catálogo v5 añade `bust_size`, `scale_pattern`, `scale_color`, `hair_root_color`, `hair_crown_color` y `hair_inner_color`; motor y prompt conservan elecciones fijadas, los campos se exponen en la UI, y AUTO escala se verifica con 12 semillas para humana/dracónica.
+- BIMG-006: PARTIAL (~24%). Catálogo v6 mantiene 46 categorías y amplía `scale_pattern` con cuatro regiones estables: dorso de manos/nudillos, caderas externas/muslos, nuca/columna alta y línea mandibular. Pruebas manuales verifican que cada opción llega al prompt; AUTO se verifica en las 10 especies y 12 semillas por especie.
 - BIMG-004: PARTIAL (~90%). API de catálogo/generación/perfiles y controles UI para listar/cargar integrados; smoke test físico pendiente.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -73,6 +73,14 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Runtime en navegador/Windows: NOT_RUN.
 - Progreso total ponderado hacia la beta local: 49%, calculado en `cerebro/PROGRESO.md` (49,2/100 sin redondear).
 
+## Última ampliación del catálogo
+
+- `character_rules.json` pasó de versión 5 a 6, manteniendo 46 categorías para no romper el contrato UI.
+- `scale_pattern` ahora tiene 11 opciones totales, incluido `no_visible_scales`, con cuatro regiones nuevas: `dorsal_hand_scales`, `outer_thigh_scales`, `nape_spine_scales` y `jawline_scales`.
+- La compatibilidad AUTO se comprobó para las 10 especies con 12 semillas por especie: dracónica recibe regiones visibles y las demás conservan el patrón sin escamas visibles bajo la política actual.
+- Pruebas manuales fijan cada una de las cuatro nuevas regiones y verifican su fragmento de prompt junto al color elegido.
+- **CI #102: PASS_REAL**: https://github.com/jonhararagi/botimagen/actions/runs/37925309773.
+- TIMER de trabajo estimado: 45–75 minutos. BIMG-006 sube de 20% a 24%; progreso recalculado a **49,8 / 100 → 50%**. QA física de navegador/Windows sigue `NOT_RUN`.
 ## Última mejora de calidad del motor
 
 - Se detectó que el prompt incluía siempre el color de escamas aunque `scale_pattern=no_visible_scales`. La instrucción general de no dibujarlas entraba en conflicto con ese token de color.
@@ -102,7 +110,8 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 
 1. Consultar el HEAD actual y la CI.
 2. Preparar el smoke test real de Chrome/Edge y realizar la prueba física en Windows con el entorno disponible. Mientras no se ejecute, mantener runtime como `NOT_RUN`.
-3. Continuar con BIMG-006: ampliar compatibilidad por especie para más patrones de escamas y cabello, con pruebas AUTO/múltiples semillas.
+3. Continuar con BIMG-006: modelar mejor los patrones/gradientes y colores de cabello como zonas independientes, y ampliar pruebas de compatibilidad de cabellos por especie.
+4. En BIMG-005/BIMG-009: preparar smoke test real de navegador y prueba física en Windows; mantener `NOT_RUN` hasta ejecutar pruebas reales.
 4. En BIMG-005, profundizar en tests de interacción y realizar smoke test real de navegador/Windows. Cerrar BIMG-003/BIMG-004 solo tras sus criterios funcionales y QA pertinentes.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
