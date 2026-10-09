@@ -16,13 +16,13 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-002 · Auditoría de base existente | 8% | 100% · DONE | 8,0 |
 | BIMG-003 · Shell web y build reproducible | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 95% · PARTIAL | 11,4 |
-| BIMG-005 · Editor completo por categorías | 18% | 85% · PARTIAL | 15,3 |
+| BIMG-005 · Editor completo por categorías | 18% | 87% · PARTIAL | 15,66 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 0% · NOT_STARTED | 0,0 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **61,8 / 100 → 62%** |
+| **Total ponderado** | **100%** | | **62,16 / 100 → 62%** |
 
 BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles.
 
@@ -76,3 +76,5 @@ Se añadió el protocolo de investigación comparativa en `cerebro/INSTRUCCIONES
 Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse para aparentar avance; solo revisarlos si cambia de forma aprobada el alcance de la beta, documentando la razón.
 
 - BIMG-RESEARCH-001 (2026-10-09): investigación inicial de dos generadores de avatares documentada con fuentes y límites en `cerebro/INVESTIGACION_COMPARATIVA.md`. Decisión: evitar servicios de nube/cuentas en la beta local-first; mantener el intake y la generación neuronal como módulos separados. **El porcentaje no cambia**: investigación sin cambio funcional no cierra criterios de fase. HEAD de código base consultado: `10773b3ac0336697318df8f14cad2c0aeabe256c`.
+
+- CI #156 PASS_REAL: E2E Chromium simula un 500 transitorio en `/api/generate`, verifica el mensaje de error y confirma recuperación de la generación. https://github.com/jonhararagi/botimagen/actions/runs/38000016639. BIMG-005 sube de 85% a 87%; progreso recalculado **62,16 / 100 → 62%**. QA física Windows sigue NOT_RUN.

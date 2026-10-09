@@ -212,3 +212,14 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 4. Cerrar BIMG-003/BIMG-004 solo después de completar los criterios funcionales y el QA que les corresponda.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
+
+
+## Checkpoint de trabajo continuo · 2026-10-09 · E2E de recuperación API
+
+- **HEAD BEFORE:** `1224e366acd8baa3204fd4e28f596176e1b79649` (documentación de investigación comparativa).
+- **Cambio de código:** commit `c48acb0a1dc7e6a6029411e830d89be14886362e`, archivo `web/browser_smoke.mjs`.
+- **Cambio:** el smoke test intercepta una petición a `/api/generate` y devuelve un 500 de prueba; comprueba que la UI muestra el mensaje recibido, retira la interceptación y verifica una generación posterior exitosa. Esto prueba recuperación de interfaz ante un fallo transitorio, no un fallo real de disco ni una caída del servidor.
+- **CI #156 PASS_REAL:** validación Python, manifiesto, generador, contrato visual, API local, cobertura del editor, `npm ci`, build web y smoke test E2E Chromium. https://github.com/jonhararagi/botimagen/actions/runs/38000016639.
+- **Investigación comparativa:** BIMG-RESEARCH-001 y revisión de issues públicos quedan registradas en `cerebro/INVESTIGACION_COMPARATIVA.md`. Las incidencias externas fueron leídas, no reproducidas; no se afirman causas raíz que los reportes no demuestran.
+- **HEAD AFTER del código probado:** `c48acb0a1dc7e6a6029411e830d89be14886362e`; después se añadió documentación de investigación. Consultar el HEAD actual de `main` antes de otra escritura.
+- **Estado:** E2E de recuperación de error PASS_REAL. Chrome/Edge físico, Windows y métricas de rendimiento siguen NOT_RUN.

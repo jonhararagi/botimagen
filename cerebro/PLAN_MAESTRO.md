@@ -59,7 +59,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-005 · Migrar el editor de rasgos
 
-**Estado:** PARTIAL (~85%). El editor ofrece 47 categorías del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. CI #144 PASS_REAL verifica en Chromium que el rol tank restringe AUTO de vestuario, capa exterior, calzado y prop mediante el catálogo servido por la API, y que el perfil conserva compatibilidad al guardar, duplicar y cargar. Quedan pruebas de otros flujos de error, revisión visual amplia y QA física en Windows.  
+**Estado:** PARTIAL (~87%). El editor ofrece 47 categorías del catálogo oficial en 8 pestañas y permite guardar, listar, cargar y duplicar perfiles con IDs independientes. CI #144 PASS_REAL verifica la compatibilidad de vestuario/capa/calzado/prop; CI #156 PASS_REAL añade un fallo HTTP 500 controlado en generación, verifica el mensaje de error en la UI y comprueba que la generación se recupera tras retirar la interceptación. Quedan pruebas de otros flujos de error, revisión visual amplia y QA física en Windows.  
 **TIMER:** 1–3 días.  
 **Trabajo:**
 - Implementar las pestañas IDENTIDAD, CUERPO, ANATOMÍA, CARA, CABELLO, VESTUARIO, COMBATE y DETALLE. **Completado:** las ocho pestañas cubren las 46 categorías actuales de `character_rules.json`, cada una con un único control individual.
