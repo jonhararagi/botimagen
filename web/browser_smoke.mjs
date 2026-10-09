@@ -202,11 +202,13 @@ try {
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
 
+  await page.getByRole("tab", { name: /Combate/i }).click();
   assert.equal(await roleSelect.inputValue(), "tank",
     "A manually locked combat role must survive regeneration");
   const allowedOutfits = catalog.categories.outfit
     .filter(option => option.compatible_with?.combat_role?.includes("tank"))
     .map(option => option.id);
+  await page.getByRole("tab", { name: /Vestuario/i }).click();
   assert.ok(allowedOutfits.includes(await outfitSelect.inputValue()),
     `AUTO outfit must match the manually locked tank role; got ${await outfitSelect.inputValue()}`);
   assert.equal(await saveButton.isDisabled(), false,
