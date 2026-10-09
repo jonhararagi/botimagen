@@ -39,6 +39,7 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - Mejora de sincronización UI, **CI #100 PASS_REAL**: guardar/copiar/exportar se bloquea con cambios pendientes hasta regenerar; se comparan perfiles antiguos al cargarlos y los controles se bloquean durante generación. `tests/test_web_field_coverage.py` cubre el contrato estático. https://github.com/jonhararagi/botimagen/actions/runs/37925030261.
 - Ambas son correcciones de calidad, no cierre de fases ni evidencia de navegador. Progreso sin cambio: **49,2 / 100 → 49%**.
 - Ampliación de regiones de escamas, **CI #102 PASS_REAL**: catálogo v6, cuatro nuevas regiones y pruebas de prompt manual para cada una; AUTO cubre las 10 especies con 12 semillas (120 combinaciones). https://github.com/jonhararagi/botimagen/actions/runs/37925309773.
+- CI #103: PASS_REAL tras sincronizar la documentación del catálogo v6, el plan maestro, estado de continuidad y contador ponderado: https://github.com/jonhararagi/botimagen/actions/runs/37925495723.
 - Esta ampliación sí aumenta la terminación estimada de BIMG-006 del 20% al 24%. Total actualizado: **49,8 / 100 → 50%**. Navegador físico/Windows sigue **NOT_RUN**.
 
 

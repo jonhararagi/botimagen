@@ -108,10 +108,9 @@ La investigación de aplicaciones y proyectos similares queda integrada al proto
 
 ## Próxima acción exacta
 
-1. Consultar el HEAD actual y la CI.
-2. Preparar el smoke test real de Chrome/Edge y realizar la prueba física en Windows con el entorno disponible. Mientras no se ejecute, mantener runtime como `NOT_RUN`.
-3. Continuar con BIMG-006: modelar mejor los patrones/gradientes y colores de cabello como zonas independientes, y ampliar pruebas de compatibilidad de cabellos por especie.
-4. En BIMG-005/BIMG-009: preparar smoke test real de navegador y prueba física en Windows; mantener `NOT_RUN` hasta ejecutar pruebas reales.
-4. En BIMG-005, profundizar en tests de interacción y realizar smoke test real de navegador/Windows. Cerrar BIMG-003/BIMG-004 solo tras sus criterios funcionales y QA pertinentes.
+1. **BIMG-006 · Cabello modular:** separar y probar mejor puntas, mechones, reflejos y transiciones de color sin multiplicar presets completos.
+2. **BIMG-005 · Interacciones:** ampliar la validación de los estados FIJO/AUTO, generación, guardado, carga y duplicación. El contrato estático actual no sustituye un test de navegador.
+3. **BIMG-009 · QA real:** ejecutar smoke test en Chrome/Edge y una prueba física en Windows cuando el equipo esté disponible. Mantener `NOT_RUN` hasta ejecutar; CI Linux no equivale a prueba en el PC del usuario.
+4. Cerrar BIMG-003/BIMG-004 solo después de completar los criterios funcionales y el QA que les corresponda.
 
 Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, archivos, pruebas y estado por evidencia. No borrar historial útil: mover la información obsoleta a una nota histórica fechada cuando haga falta.
