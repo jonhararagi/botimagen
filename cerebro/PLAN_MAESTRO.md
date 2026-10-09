@@ -67,7 +67,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 - **Completado:** semilla editable, coherencia, generación, guardar, cargar y duplicar perfiles; la acción generar regenera cualquier perfil cargado.
 - Incluir el perfil inicial bw-modern-gacha-v1.
 
-**Evidencia parcial:** CI #86 valida que cada una de las 46 categorías del catálogo tenga exactamente un control de edición, que no existan campos duplicados y que los 8 grupos y pestañas coincidan; `npm ci`, generación de perfiles, compatibilidad de escamas para 12 semillas por especie y build pasan.
+**Evidencia parcial:** CI #93 valida las 46 categorías, los 8 grupos, motor/API, `npm ci` y build. La prueba HTTP de perfiles verifica UUID independiente, copia de datos y que el original no sea alterado. CI #86 también comprueba compatibilidad AUTO de escamas en 12 semillas por especie.
 
 **Pendiente para cerrar:** mejorar pruebas de interacciones completas y errores de UI, y realizar smoke test real del navegador/Windows.
 
