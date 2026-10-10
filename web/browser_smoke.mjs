@@ -376,6 +376,8 @@ try {
     "A manually locked anatomy option must not be silently normalized to the species");
 
   // Exercise the real CyberStreet controls and verify their generated prompt contract.
+  const initialHairColor = await page.locator(".visual-character-svg").getAttribute("data-hair-color");
+  const initialSkinColor = await page.locator(".visual-character-svg").getAttribute("data-skin-color");
   const fabricInputs = page.locator(".style-fields input[type=color]");
   await fabricInputs.nth(0).fill("#234567");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Changing base nanotela color must immediately update the SVG clothing recipe");
@@ -383,6 +385,8 @@ try {
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Changing secondary fabric color must update SVG panels");
   await fabricInputs.nth(2).fill("#55d9cf");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Changing technology accent must update the SVG recipe");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-hair-color"), initialHairColor, "Changing garment colors must not recolor hair");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-skin-color"), initialSkinColor, "Changing garment colors must not recolor skin");
   await page.locator(".style-fields select").nth(0).selectOption("geometric");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "The geometric pattern must be connected to the live SVG");
   assert.ok(await page.locator(".visual-character-svg defs pattern path").count() > 0, "The selected geometric pattern must render actual SVG geometry");
@@ -410,6 +414,12 @@ try {
   const autoPatchColor = await page.locator('.visual-character-svg g[aria-label="Chromapatch"] > g').getAttribute("fill");
   assert.notEqual(autoPatchColor, "#111111", "Auto contrast must derive the emblem color from fabric rather than retain the manual color");
   assert.notEqual(autoPatchColor, "#234567", "The automatic emblem must remain distinguishable from the fabric base");
+  const patchContrast = await page.locator(".visual-character-svg").evaluate((svg, patch) => {
+    const lum = (hex) => { const rgb = [1,3,5].map(i => parseInt(hex.slice(i, i+2),16)/255).map(c => c <= .04045 ? c/12.92 : ((c+.055)/1.055)**2.4); return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]; };
+    const a = lum(svg.getAttribute("data-fabric-base")), b = lum(patch);
+    return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  }, autoPatchColor);
+  assert.ok(patchContrast >= 3, `Automatic Chromapatch contrast should be at least 3:1, got ${patchContrast}`);
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
   prompt = await page.locator(".prompt-panel pre").innerText();
   assert.ok(prompt.includes("Visual recipe CyberStreet v2"), "The official prompt should include the visual recipe");
