@@ -445,6 +445,27 @@ try {
   assert.equal(await seedInput.inputValue(), "314159",
     "Restoring the example must reset the generator seed");
 
+  // Every editor group must render correctly labelled native controls.
+  for (const tabName of [
+    /Identidad/i, /Cuerpo/i, /Anatomía/i, /Cara/i,
+    /Cabello/i, /Vestuario/i, /Combate/i, /Detalle/i,
+  ]) {
+    await page.getByRole("tab", { name: tabName }).click();
+    const audit = await page.evaluate(() => {
+      const fields = Array.from(document.querySelectorAll(".fields .field"));
+      const invalid = fields.filter(field => {
+        const label = field.querySelector("label[for^='trait-']");
+        const control = label ? document.getElementById(label.htmlFor) : null;
+        return !label?.textContent?.trim()
+          || !(control instanceof HTMLSelectElement)
+          || control.id !== label.htmlFor;
+      }).map(field => field.querySelector("label")?.textContent?.trim() ?? "(unlabelled field)");
+      return { fieldCount: fields.length, invalid };
+    });
+    assert.ok(audit.fieldCount > 0, `Tab ${tabName} should render its trait fields`);
+    assert.deepEqual(audit.invalid, [], `Every visible field must have a connected label in tab ${tabName}`);
+  }
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
@@ -465,7 +486,7 @@ try {
   await page.setViewportSize({ width: 1440, height: 1100 });
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified recoverable API errors, strict seeds, catalog compatibility, manual overrides and persistence, restore-example recovery, 320-1024px responsive layouts, and no page errors.");
+  console.log("PASS_REAL: Chromium verified recoverable API errors, strict seeds, catalog compatibility, manual overrides and persistence, restore-example recovery, labelled controls across all eight tabs, 320-1024px responsive layouts, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
