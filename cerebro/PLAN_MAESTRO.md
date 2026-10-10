@@ -103,13 +103,17 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 **Aceptación:** importar, indexar, buscar, abrir y eliminar/retirar una referencia; duplicados detectados por hash; los metadatos desconocidos se marcan como desconocidos, no inventados.
 
-### BIMG-008 · Integrar el flujo de assets existente
+### BIMG-008 · Importador PNG web seguro por contrato
 
-**Estado:** PARTIAL (~10%). El servicio local expone `GET /api/assets/contracts`, que lee los 10 contratos PNG del manifiesto oficial, conserva prompts, formato, límites y destinos relativos, y rechaza destinos absolutos, traversal, duplicados y metadatos inválidos. CI #194 valida HTTP, la lista desde Chromium a través del proxy y el resto del flujo E2E. No se copian imágenes todavía.  
-**TIMER restante:** 1–2 días.  
-**Trabajo pendiente:** adaptar selección de archivo, vista previa, validación de bytes/dimensiones, copiado atómico a destino, manejo de colisiones e historial local; conservar la aplicación anterior mientras la migración no esté completa.
+**Estado:** PARTIAL (implementación en rama; CI y auditoría pendientes). El endpoint `GET /api/assets/contracts` sigue publicando el manifiesto oficial. En la rama `feat/bimg-008-safe-png-import` se añadió `POST /api/assets/import?asset_id=...`: destino solo desde el contrato, límite aplicado al leer en bloques, firma/chunks/CRC/decodificación zlib/filtros/dimensiones validados, temporal controlado y publicación atómica sin sobrescritura. La UI React permite seleccionar contrato y archivo y solo confirma con una respuesta de importación exitosa.
 
-**Aceptación:** importar un archivo válido y rechazar ejemplos inválidos con mensaje útil; no alterar el original; las operaciones de Git se mantienen explícitas y restringidas. La ruta GET de contratos es solo la base y no satisface todavía el criterio de importación.
+**TIMER restante:** 1–3 horas para revisar los resultados de CI, corregir defectos y abrir/validar PR; 30–60 minutos adicionales para QA físico en Windows. Estimación sujeta a resultados de runtime.
+
+**Trabajo realizado en rama:** componente `web/src/AssetImporter.tsx`, integración en `web/src/App.tsx`, estilos, endpoint y validador de PNG sin dependencias nuevas, `tests/test_asset_import.py`, actualización del workflow y prueba Chromium que comprueba rechazo real de bytes falsos por el puente UI/API.
+
+**Pendiente de evidencia:** suite Python, build reproducible y Chromium E2E deben ejecutarse en GitHub Actions. El parser actual rechaza PNG entrelazados; verificar con imágenes exportadas de herramientas habituales durante QA. La prueba manual Chrome/Edge en Windows no se declara hecha.
+
+**Aceptación:** importar un PNG válido con dimensiones del contrato y rechazar ID desconocido, contenido falso/corrupto/truncado, exceso de tamaño, dimensiones incompatibles, traversal, destino existente y métodos incorrectos; ningún archivo oficial se sobrescribe y los temporales se limpian.
 
 ### BIMG-009 · QA real de Windows y rendimiento
 
