@@ -124,10 +124,10 @@ export default function App(){
     const defaults=valuesFromCatalog(data);
     setCatalog(data);setValues(defaults);setLoadingCatalog(false);setStatus("Catálogo oficial conectado. Generando la ficha inicial…");
     const initialSelections=Object.fromEntries(fields.map(field=>[field.id,field.fixed?defaults[field.id]:"auto"]));
-    const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialSelections,seed:314159,coherence:.82,surprise:false}),signal:controller.signal});
+    const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialSelections,seed:314159,coherence:.82,surprise:false,visual_recipe:DEFAULT_VISUAL_RECIPE}),signal:controller.signal});
     const result=await jsonResponse<GeneratedCharacter>(response);
     if(controller.signal.aborted)return;
-    setGenerated({...result,visual_recipe:result.visual_recipe??recipeSnapshot});setVisualRecipe(normalizeVisualRecipe(result.visual_recipe??recipeSnapshot));setDraftDirty(false);
+    setGenerated(result);setVisualRecipe(normalizeVisualRecipe(result.visual_recipe ?? DEFAULT_VISUAL_RECIPE));setDraftDirty(false);
     setValues(previous=>{
      const next={...previous};
      for(const field of fields){if(!field.fixed&&result.profile[field.id])next[field.id]=result.profile[field.id]}
@@ -165,7 +165,7 @@ export default function App(){
   setGenerating(true);setStatus("Generando mediante CharacterGenerator…");
   try{
    const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections,seed:numericSeed,coherence,surprise:false,visual_recipe:recipeSnapshot})});
-   const result=await jsonResponse<GeneratedCharacter>(response);setGenerated(result);setDraftDirty(false);
+   const result=await jsonResponse<GeneratedCharacter>(response);setGenerated({...result,visual_recipe:result.visual_recipe??recipeSnapshot});setVisualRecipe(normalizeVisualRecipe(result.visual_recipe??recipeSnapshot));setDraftDirty(false);
    setValues(previous=>{const next={...previous};for(const field of fields){if(!fixed[field.id]&&result.profile[field.id])next[field.id]=result.profile[field.id]}return next});
    setSaved(false);setStatus("Perfil generado por Python · semilla "+result.seed+" · "+result.style_name);
   }catch(error){setStatus(error instanceof Error?error.message:"El motor local no pudo generar el perfil.")}finally{setGenerating(false)}
