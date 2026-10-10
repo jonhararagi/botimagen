@@ -40,3 +40,7 @@ def test_generation_is_reproducible_for_seed_and_inputs():
                 f"Generation changed for identical inputs: seed={seed}, "
                 f"surprise={surprise}"
             )
+
+
+if __name__ == "__main__":
+    test_generation_is_reproducible_for_seed_and_inputs()
