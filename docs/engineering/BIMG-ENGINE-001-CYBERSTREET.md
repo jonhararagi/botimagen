@@ -109,6 +109,6 @@ La vista trasera continúa siendo una aproximación 2D y no una reconstrucción 
 
 ### BIMG-ENGINE-004 status
 
-PARTIAL until the final CI run passes and the produced screenshot artifact has been inspected. Do not elevate this status solely because SVG attributes or geometry assertions differ.
+PASS_VISUAL_GARMENT_QA: the Chromium smoke suite passed on code HEAD 0148ec8a80b755f7506faf55ea625bc3e25f0fee (CI run 38057689613), and all 14 screenshots in botimagen-visual-garment-qa were inspected. The inspection confirmed visible torso/sleeve changes, distinct outer bomber vs long coat, waist-width change, front/back chest anchor, sleeve anchor, hood fallback and NanoWear state changes. The short-bomber capture revealed an oversized patch at the minimum hem; patch scale now adapts to available garment height and is covered by a regression assertion. WINDOWS_MANUAL_QA: NOT_RUN. This status refers to the declared headless Chromium visual QA scope, not physical Windows testing or a claim of production illustration polish.
 
 - Outer garment bodies and their sleeve surfaces are composed after the selected base outfit, so a short bomber or long coat remains visually above the base garment instead of being painted underneath it.
