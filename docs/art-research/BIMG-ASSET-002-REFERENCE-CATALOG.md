@@ -185,3 +185,76 @@ Cambiar una pieza catalogada debe ser una operación de datos y presentación de
 **Conclusión: PARTIAL.** VRoid Studio es el primer candidato para crear una referencia anime 3D original; Kenney Character Assets es el candidato técnico para modularidad si la muestra lo permite; Tiny RPG es el candidato inicial para ensayar el catálogo pixel art. La incorporación real queda pendiente de verificar condiciones y estructura de archivos concretos.
 
 **TIMER estimado, no medido:** trabajo documental, 1–2 horas. La prueba de viabilidad con archivos permitidos y verificados es una tarea posterior independiente.
+
+
+## J. BIMG-ASSET-004 — Validación técnica de recursos prioritarios
+
+**Estado de esta validación: `PARTIAL`.** Se consultaron páginas oficiales y sus condiciones publicadas. No se pudo inspeccionar el contenido de los archivos descargables: el intento de descargar el ZIP de Tiny RPG falló en el entorno de trabajo y no se descargó el sample de Kenney. Por tanto, no se atribuyen inventarios de archivo, resoluciones ni modularidad a muestras que no se abrieron.
+
+**Alcance de la evidencia:** la revisión web confirma lo que las fuentes declaran en sus páginas. No equivale a ejecutar VRoid Studio, exportar un VRM ni inspeccionar paquetes ZIP/FBX/PNG. El entorno disponible no permite comprobar qué aplicaciones están instaladas en el PC personal del usuario; no se instaló software ni se intentó ejecutar archivos externos.
+
+### J.1 Matriz comparativa
+
+| Recurso | Evidencia | Prueba realizada | Archivos observados | Personalización | Modularidad | Licencia | Uso propuesto | Estado | Pendiente |
+|---|---|---|---|---|---|---|---|---|---|
+| [VRoid Studio](https://vroid.com/en/studio) | [Funciones oficiales](https://vroid.com/en/studio), [directrices de VRoid Studio](https://vroid.com/en/studio/guidelines), [directrices de VRoid Hub](https://hub.vroid.com/en/guidelines) | Lectura documental de las páginas oficiales. No se ejecutó la aplicación ni se creó/exportó un personaje. | Ninguno; no se descargó instalador ni modelo. La página documenta exportación VRM. | La página documenta controles para rostro, cuerpo, cabello, ropa, accesorios, parámetros y texturas; permite dibujar texturas con capas, editar pelo por mechones y superponer plantillas de ropa. | **Parcial para la experiencia de autoría; no demostrada como biblioteca modular integrable.** La propia guía restringe crear herramientas que generen o exporten modelos combinando mallas/texturas creadas con VRoid sin una licencia separada de pixiv. | Documentación oficial: los modelos exportados pueden usarse ampliamente, pero el contenido predeterminado de pixiv no es CC0; se aplican cláusulas especiales y licencias de materiales/terceros. Una aplicación de creación de personajes que combine/exporte esos elementos necesita consultar y obtener licencia separada de pixiv. | Herramienta externa para crear un personaje original y catalogar el VRM resultante, previa revisión de términos del contenido usado. No integrarlo como dependencia ni copiar su interfaz. | **DOCUMENTED** | Prueba práctica de creación/exportación VRM; términos vigentes; inventario y derechos de cada material usado; consulta de licencia de pixiv antes de cualquier editor integrado que combine/exporte sus mallas/texturas. |
+| [Kenney Character Assets](https://kenney.itch.io/kenney-character-assets) | [Ficha oficial de Kenney en itch.io](https://kenney.itch.io/kenney-character-assets), [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Lectura de ficha y disponibilidad publicada. La página anuncia un sample gratuito de 1,3 MB con 1 modelo y 4 skins; también indica que el paquete completo no está disponible actualmente. No se descargó ni abrió el sample. | **Ningún archivo observado directamente.** La ficha enumera para el paquete completo 4 modelos low-poly, 75 skins, 40 accesorios, 17 animaciones, archivos FBX, fuentes Blender, PNG, SVG/AI y paquete Unity. Esos totales no deben atribuirse al sample. | La ficha describe skins compatibles con modelos y accesorios; los archivos del sample no se inspeccionaron, así que no se confirma qué piezas incluye ni cómo están organizadas. | **No demostrada en los archivos disponibles.** La ficha sugiere modularidad a nivel del paquete completo, pero no demuestra que el sample permita combinar base + skin + accesorio en un resultado. | La ficha declara CC0 para los assets. La declaración es documental y no sustituye comprobar el contenido del archivo exacto antes de incorporarlo o redistribuirlo. | Demostrador técnico provisional, solo si el sample oficial puede descargarse e inspeccionarse. Es low-poly y no representa el acabado anime final. | **PARTIAL** | Descargar la muestra oficial en un entorno permitido; listar archivos, extensiones, tamaños y carpetas; comprobar una base, una skin y un accesorio independientes; documentar licencia incluida y formato real. |
+| [Tiny RPG CC0 Characters and Portraits](https://opengameart.org/content/tiny-rpg-cc0-characters-and-portraits) | [Ficha de OpenGameArt](https://opengameart.org/content/tiny-rpg-cc0-characters-and-portraits), [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Lectura de ficha oficial. La ficha identifica al autor como **tiopalada**, declara **CC0** y ofrece `tinyrpgfacencharsdemocc0.zip` de 50,7 KB. El intento de descarga del ZIP en este entorno falló; no se intentó ejecutar nada ni repetir la descarga por otro medio. | **Ningún archivo observado directamente.** El nombre y tamaño corresponden a la ficha, no a una inspección del ZIP. La descripción indica que es una muestra de Tiny RPG Character Workshop I y Tiny RPG Face Workshop I. | No se puede confirmar resolución, formato, número de sprites/personajes/retratos, hojas de sprites ni variantes sin abrir el archivo. | **No demostrada.** La página habla de personajes y retratos de muestra, pero no acredita capas independientes de cabello, ropa o accesorios. Si solo contiene sprites completos, no debe tratarse como sistema de ensamblado. | La página declara CC0 para esta muestra y atribuye la publicación a tiopalada. La revisión práctica del archivo y su documentación no se completó; conservar el enlace a la fuente y verificar cualquier aviso incluido antes de reutilizarlo. | Candidato de bajo peso para una primera prueba de catálogo pixel art y procedencia, condicionado a poder inspeccionar la muestra. El catálogo puede probar metadatos sin prometer modularidad. | **PARTIAL** | Resolver la descarga; inspeccionar inventario, dimensiones, formatos, paleta y estructura; comprobar si hay componentes por capas o únicamente sprites completos; contrastar cualquier aviso del archivo con la ficha. |
+
+### J.2 Hallazgos por pipeline
+
+#### Anime 3D
+
+VRoid Studio documenta un camino práctico para una persona sin experiencia artística: presets editables, controles visuales en tiempo real, personalización de rostro/cuerpo/pelo/ropa, capas de textura y exportación de modelos como VRM. Eso lo convierte en una buena herramienta externa para fabricar un personaje original y registrar su procedencia.
+
+No demuestra que BotImagen pueda reutilizar legalmente las piezas predeterminadas como una biblioteca propia. La restricción más importante está expresada en las [directrices oficiales](https://vroid.com/en/studio/guidelines): una aplicación que genere o exporte modelos formados por mallas y texturas combinadas creadas en VRoid necesita una licencia separada de pixiv, salvo el caso limitado de una herramienta destinada únicamente al uso personal de su propio usuario. Por eso, antes de diseñar un editor integrado hay que consultar a pixiv y aclarar por escrito el caso de uso. Un flujo externo que importe un VRM creado por el usuario es una hipótesis distinta y también requiere validar formatos, términos y materiales concretos. No se ha demostrado en la práctica en esta tarea.
+
+**Conclusión Anime 3D:** avanzar con cautela hacia una prueba externa de creación y catalogación de un VRM propio; no construir todavía un editor que combine/exporte componentes VRoid.
+
+#### Pixel art
+
+La ficha de Tiny RPG presenta un ZIP pequeño de muestra, atribuido a tiopalada y marcado CC0. Eso basta para justificar una **próxima inspección de muestra**, no para afirmar que la aplicación dispone de sprites utilizables, resoluciones conocidas o capas editables. El ZIP no se pudo descargar en este entorno, así que no se comprobó ni siquiera si contiene PNG u hojas de sprites.
+
+**Conclusión Pixel art:** mantener Tiny RPG como candidato para probar catálogo, miniaturas, etiquetas y procedencia cuando se consiga inspeccionar el archivo. La modularidad real sigue sin demostrarse; un catálogo de sprites completos puede ser útil sin ensamblado.
+
+#### Modularidad
+
+Kenney anuncia para su paquete completo modelos, skins, accesorios y animaciones, y una muestra gratuita de un modelo con cuatro skins. El paquete completo figura como no disponible en la página consultada. Como no se inspeccionó la muestra, no hay evidencia directa de que el accesorio esté incluido ni de que las piezas se puedan intercambiar de forma independiente.
+
+**Conclusión de modularidad:** todavía no se ha demostrado la operación **personaje base + skin + accesorio = personaje resultante**. Kenney sigue siendo el candidato técnico más específico, pero solo pasa a una prueba real después de inspeccionar el sample. No implementar ensamblado basándose únicamente en la descripción de la tienda.
+
+### J.3 Estados y decisión
+
+Los estados indican el nivel de evidencia alcanzado, no una aprobación de producción:
+
+- `CONFIRMED`: comprobado directamente mediante una prueba o archivo observado.
+- `DOCUMENTED`: respaldado por documentación/página, sin prueba práctica.
+- `PARTIAL`: hay evidencia útil, pero falta una verificación esencial.
+- `BLOCKED`: la comprobación no pudo realizarse por una limitación de acceso o del entorno.
+- `NOT_SUPPORTED`: la característica examinada no está presente en el recurso efectivamente comprobado.
+
+| Recurso | Decisión | Justificación |
+|---|---|---|
+| VRoid Studio | **CONDITIONAL** | Sí para explorar un flujo externo con personaje original y VRM; no para integrar un generador de mallas/texturas combinadas sin licencia separada de pixiv. La creación/exportación práctica sigue pendiente. |
+| Kenney Character Assets | **CONDITIONAL** | La ficha declara CC0 y una muestra pequeña, pero el archivo no se inspeccionó y el paquete completo figura como no disponible. No se puede aprobar aún la prueba de combinación de piezas. |
+| Tiny RPG CC0 Characters and Portraits | **CONDITIONAL** | La ficha declara CC0 y publica una muestra de 50,7 KB, apropiada en principio para una inspección de bajo coste; la descarga falló y el contenido/modularidad siguen desconocidos. |
+
+**Siguiente prueba recomendada:** intentar, en un entorno con acceso de descarga, inspeccionar primero el ZIP de Tiny RPG por su tamaño publicado y su potencial para un catálogo pixel art. En una prueba separada, abrir el sample oficial de Kenney y comprobar si existen archivos independientes para modelo base, skin y accesorio. Si el usuario ya tiene VRoid Studio disponible, puede crear/exportar manualmente un personaje original para validar el flujo externo, sin instalarlo en el marco de esta tarea. No se recomienda elegir una única tecnología de ensamblado para los tres estilos.
+
+### J.4 Registro de ejecución, límites y preservación
+
+- Páginas oficiales consultadas: VRoid Studio, sus directrices, directrices de VRoid Hub, ficha de Kenney Character Assets y ficha de Tiny RPG en OpenGameArt.
+- Intento de descarga: el ZIP de Tiny RPG (`tinyrpgfacencharsdemocc0.zip`, 50,7 KB según la ficha) no se descargó correctamente en el entorno. No se inspeccionó su contenido. El sample de Kenney (1,3 MB según la ficha) tampoco se descargó.
+- No se comprobó si VRoid Studio está instalado en el PC personal del usuario, porque el entorno de herramientas no permite inspeccionar ese equipo. No se instaló VRoid Studio ni otro software.
+- No se ejecutaron archivos externos, no se aceptaron términos adicionales, no se generaron personajes ni se exportaron VRM.
+- No se incorporaron imágenes, modelos, texturas, sprites, binarios ni programas externos al repositorio.
+- No se modificó código de la beta, perfiles, interfaz, backend, manifiestos ni dependencias.
+- Se preservan las secciones y las incertidumbres registradas en BIMG-ASSET-002-R2 y BIMG-ASSET-003.
+- **Markdown lint:** no se encontró ni ejecutó un linter Markdown mediante esta integración. La edición documental no debe interpretarse como un resultado de lint.
+- **Estado final de BIMG-ASSET-004: `PARTIAL`**, porque las muestras no pudieron inspeccionarse y no hubo prueba práctica de VRoid.
+
+### J.5 TIMER
+
+- **Estimación solicitada:** 2–4 horas para investigación documental e inspección de muestras pequeñas.
+- **Tiempo realmente empleado:** no medido.
+- **Trabajo restante estimado:** 1–3 horas si las dos muestras descargan sin bloqueos; más si hace falta resolver permisos o acceso.
