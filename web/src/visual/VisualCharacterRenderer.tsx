@@ -105,7 +105,7 @@ export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: Rend
     </defs>
     <ellipse cx="170" cy="463" rx="82" ry="10" fill="#070a13" opacity=".5"/>
     {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill="url(#cw-hair)"/>}
-    {rear && <path d="M116 91 Q82 135 101 236 L91 346 Q91 384 122 403 L145 369 L144 265 L196 265 L195 369 L222 403 Q253 380 250 342 L237 235 Q259 132 222 83 Z" fill="url(#cw-hair)"/>}
+    {rear && <path d="M116 91 Q82 135 101 236 L110 263 L138 250 L144 218 L196 218 L202 250 L230 263 L237 235 Q259 132 222 83 Z" fill="url(#cw-hair)"/>}
     <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill="url(#cw-skin)"/>
     <path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 250 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>
     <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>
@@ -144,7 +144,7 @@ export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: Rend
 
 export function VisualStyleLab({ recipe, onChange }: { recipe: VisualRecipe; onChange: (recipe: VisualRecipe) => void }) {
   const r = normalizeVisualRecipe(recipe);
-  const patchBackground = "#273044";
+  const patchBackground = r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? "#202b43" : r.nanowear_state === "nanoweave" || r.material_finish === "nanoweave" ? "#273044" : "#343246";
   const contrast = contrastRatio(patchBackground, r.emblem_contrast === "manual" ? r.emblem_color : bestContrast(patchBackground, r.emblem_color));
   const update = <K extends keyof VisualRecipe>(key: K, value: VisualRecipe[K]) => onChange(normalizeVisualRecipe({ ...r, [key]: value }));
   const range = (key: "anime_influence" | "toon_influence" | "streetwear_cyberpunk" | "detail_level", label: string) =>
