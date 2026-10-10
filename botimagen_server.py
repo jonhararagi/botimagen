@@ -68,10 +68,46 @@ def make_catalog(generator: CharacterGenerator) -> dict[str, Any]:
     }
 
 
+def _validate_visual_recipe(value: Any) -> dict[str, Any]:
+    defaults: dict[str, Any] = {
+        "schema_version": 1, "family": "cyberstreet",
+        "anime_influence": 68, "toon_influence": 56, "streetwear_cyberpunk": 30, "detail_level": 58,
+        "nanowear_state": "everyday", "material_finish": "textile", "emblem_shape": "bunny",
+        "emblem_color": "#f3c96b", "emblem_contrast": "auto", "emblem_position": "chest", "view": "front",
+    }
+    if not isinstance(value, dict):
+        raise ApiInputError("'visual_recipe' debe ser un objeto JSON.")
+    extra = set(value) - set(defaults)
+    if extra:
+        raise ApiInputError("Campos no reconocidos en visual_recipe: " + ", ".join(sorted(map(str, extra))) + ".")
+    result = {**defaults, **value}
+    if result["schema_version"] != 1 or result["family"] != "cyberstreet":
+        raise ApiInputError("La receta visual no tiene una versión o familia compatible.")
+    for key in ("anime_influence", "toon_influence", "streetwear_cyberpunk", "detail_level"):
+        number = result[key]
+        if isinstance(number, bool) or not isinstance(number, int) or not 0 <= number <= 100:
+            raise ApiInputError(f"'{key}' debe ser un entero entre 0 y 100.")
+    enums = {
+        "nanowear_state": {"everyday", "nanoweave", "transformation"},
+        "material_finish": {"textile", "nanoweave", "synthetic"},
+        "emblem_shape": {"bunny", "star", "fox", "skull", "geo"},
+        "emblem_contrast": {"auto", "manual"},
+        "emblem_position": {"chest", "sleeve", "hood"},
+        "view": {"front", "back"},
+    }
+    for key, allowed_values in enums.items():
+        if not isinstance(result[key], str) or result[key] not in allowed_values:
+            raise ApiInputError(f"'{key}' no es una opción válida de visual_recipe.")
+    color = result["emblem_color"]
+    if not isinstance(color, str) or len(color) != 7 or not color.startswith("#") or any(ch not in "0123456789abcdefABCDEF" for ch in color[1:]):
+        raise ApiInputError("'emblem_color' debe ser un color hexadecimal #RRGGBB.")
+    return result
+
+
 def validate_generation_payload(payload: Any, generator: CharacterGenerator) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ApiInputError("El cuerpo JSON debe ser un objeto.")
-    allowed = {"selections", "seed", "coherence", "surprise"}
+    allowed = {"selections", "seed", "coherence", "surprise", "visual_recipe"}
     extra = set(payload) - allowed
     if extra:
         raise ApiInputError("Campos no reconocidos: " + ", ".join(sorted(map(str, extra))) + ".")
@@ -113,7 +149,8 @@ def validate_generation_payload(payload: Any, generator: CharacterGenerator) -> 
     if not isinstance(surprise, bool):
         raise ApiInputError("'surprise' debe ser booleano.")
 
-    return {"selections": clean, "seed": seed, "coherence": float(coherence), "surprise": surprise}
+    visual_recipe = _validate_visual_recipe(payload["visual_recipe"]) if "visual_recipe" in payload else None
+    return {"selections": clean, "seed": seed, "coherence": float(coherence), "surprise": surprise, "visual_recipe": visual_recipe}
 
 
 def generate_from_payload(payload: Any, generator: CharacterGenerator) -> dict[str, Any]:
@@ -124,6 +161,7 @@ def generate_from_payload(payload: Any, generator: CharacterGenerator) -> dict[s
             seed=args["seed"],
             coherence=args["coherence"],
             surprise=args["surprise"],
+            visual_recipe=args["visual_recipe"],
         )
     except ValueError as exc:
         raise ApiInputError(str(exc)) from exc
