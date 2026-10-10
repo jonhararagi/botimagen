@@ -1,16 +1,22 @@
+import { useId } from "react";
 import type { CSSProperties } from "react";
 
 export type NanoWearState = "everyday" | "nanoweave" | "transformation";
 export type MaterialFinish = "textile" | "nanoweave" | "synthetic";
 export type EmblemShape = "bunny" | "star" | "fox" | "skull" | "geo";
 export type EmblemPosition = "chest" | "sleeve" | "hood";
+export type FabricPattern = "plain" | "circuit" | "geometric" | "gradient";
 export type VisualRecipe = {
-  schema_version: 1;
+  schema_version: 2;
   family: "cyberstreet";
   anime_influence: number;
   toon_influence: number;
   streetwear_cyberpunk: number;
   detail_level: number;
+  garment_base_color: string;
+  garment_panel_color: string;
+  garment_accent_color: string;
+  fabric_pattern: FabricPattern;
   nanowear_state: NanoWearState;
   material_finish: MaterialFinish;
   emblem_shape: EmblemShape;
@@ -21,8 +27,9 @@ export type VisualRecipe = {
 };
 
 export const DEFAULT_VISUAL_RECIPE: VisualRecipe = {
-  schema_version: 1, family: "cyberstreet", anime_influence: 68, toon_influence: 56,
-  streetwear_cyberpunk: 30, detail_level: 58, nanowear_state: "everyday",
+  schema_version: 2, family: "cyberstreet", anime_influence: 68, toon_influence: 56,
+  streetwear_cyberpunk: 30, detail_level: 58, garment_base_color: "#343246", garment_panel_color: "#48516a",
+  garment_accent_color: "#5ce4dc", fabric_pattern: "circuit", nanowear_state: "everyday",
   material_finish: "textile", emblem_shape: "bunny", emblem_color: "#f3c96b",
   emblem_contrast: "auto", emblem_position: "chest", view: "front",
 };
@@ -30,16 +37,20 @@ export const DEFAULT_VISUAL_RECIPE: VisualRecipe = {
 const validHex = /^#[0-9a-f]{6}$/i;
 export function normalizeVisualRecipe(value: unknown): VisualRecipe {
   if (!value || typeof value !== "object") return { ...DEFAULT_VISUAL_RECIPE };
-  const input = value as Partial<VisualRecipe>;
+  const input = value as Partial<VisualRecipe> & { schema_version?: number };
   const bounded = (n: unknown, fallback: number) => typeof n === "number" && Number.isFinite(n) ? Math.round(Math.max(0, Math.min(100, n))) : fallback;
   const oneOf = <T extends string>(candidate: unknown, values: readonly T[], fallback: T): T =>
     typeof candidate === "string" && values.includes(candidate as T) ? candidate as T : fallback;
   return {
-    schema_version: 1, family: "cyberstreet",
+    schema_version: 2, family: "cyberstreet",
     anime_influence: bounded(input.anime_influence, DEFAULT_VISUAL_RECIPE.anime_influence),
     toon_influence: bounded(input.toon_influence, DEFAULT_VISUAL_RECIPE.toon_influence),
     streetwear_cyberpunk: bounded(input.streetwear_cyberpunk, DEFAULT_VISUAL_RECIPE.streetwear_cyberpunk),
     detail_level: bounded(input.detail_level, DEFAULT_VISUAL_RECIPE.detail_level),
+    garment_base_color: typeof input.garment_base_color === "string" && validHex.test(input.garment_base_color) ? input.garment_base_color : DEFAULT_VISUAL_RECIPE.garment_base_color,
+    garment_panel_color: typeof input.garment_panel_color === "string" && validHex.test(input.garment_panel_color) ? input.garment_panel_color : DEFAULT_VISUAL_RECIPE.garment_panel_color,
+    garment_accent_color: typeof input.garment_accent_color === "string" && validHex.test(input.garment_accent_color) ? input.garment_accent_color : DEFAULT_VISUAL_RECIPE.garment_accent_color,
+    fabric_pattern: oneOf(input.fabric_pattern, ["plain", "circuit", "geometric", "gradient"] as const, DEFAULT_VISUAL_RECIPE.fabric_pattern),
     nanowear_state: oneOf(input.nanowear_state, ["everyday", "nanoweave", "transformation"] as const, "everyday"),
     material_finish: oneOf(input.material_finish, ["textile", "nanoweave", "synthetic"] as const, "textile"),
     emblem_shape: oneOf(input.emblem_shape, ["bunny", "star", "fox", "skull", "geo"] as const, "bunny"),
@@ -56,6 +67,26 @@ function hexRgb(hex: string) {
 }
 function luminance(hex: string) { const [r, g, b] = hexRgb(hex); return .2126 * r + .7152 * g + .0722 * b; }
 function contrastRatio(a: string, b: string) { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+function hsl(hex: string) {
+  const [r, g, b] = [1, 3, 5].map(i => Number.parseInt(hex.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), delta = max - min;
+  let hue = 0;
+  if (delta) hue = max === r ? 60 * (((g - b) / delta) % 6) : max === g ? 60 * ((b - r) / delta + 2) : 60 * ((r - g) / delta + 4);
+  if (hue < 0) hue += 360;
+  const light = (max + min) / 2;
+  return { h: hue, s: delta === 0 ? 0 : delta / (1 - Math.abs(2 * light - 1)) };
+}
+function fromHsl(h: number, s: number, l: number) {
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+  const rgb = h < 60 ? [c,x,0] : h < 120 ? [x,c,0] : h < 180 ? [0,c,x] : h < 240 ? [0,x,c] : h < 300 ? [x,0,c] : [c,0,x];
+  return "#" + rgb.map(v => Math.round((v + m) * 255).toString(16).padStart(2,"0")).join("");
+}
+export function complementaryEmblemColor(base: string) {
+  const safe = validHex.test(base) ? base : DEFAULT_VISUAL_RECIPE.garment_base_color;
+  const source = hsl(safe), hue = (source.h + 180) % 360;
+  const candidates = [fromHsl(hue, Math.max(.55, source.s), .38), fromHsl(hue, Math.max(.55, source.s), .68), "#ffffff", "#171522"];
+  return candidates.find(color => contrastRatio(safe, color) >= 3) ?? candidates[2];
+}
 function bestContrast(background: string, preferred: string) {
   return contrastRatio(background, preferred) >= 3 ? preferred : luminance(background) > .42 ? "#171522" : "#fff4e8";
 }
@@ -82,31 +113,37 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const anime = r.anime_influence / 100;
   const detail = r.detail_level / 100;
   const rear = r.view === "back";
-  const fabric = r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? "#202b43" : r.nanowear_state === "nanoweave" || r.material_finish === "nanoweave" ? "#273044" : "#343246";
+  const uid = useId().replace(/:/g, "");
+  const fabric = r.garment_base_color;
+  const panel = r.garment_panel_color;
+  const accent = r.garment_accent_color;
   const patchBg = fabric;
-  const patchColor = r.emblem_contrast === "manual" ? r.emblem_color : bestContrast(patchBg, r.emblem_color);
+  const patchColor = r.emblem_contrast === "manual" ? r.emblem_color : complementaryEmblemColor(fabric);
   const stroke = toon > .65 ? "#090d1a" : "#8a91ad";
   const line = 1.1 + toon * 2.1;
-  const patchX = r.emblem_position === "sleeve" ? 113 : r.emblem_position === "hood" ? 168 : 170;
-  const patchY = r.emblem_position === "hood" ? 263 : r.emblem_position === "sleeve" ? 292 : rear ? 292 : 291;
+  const patchX = r.emblem_position === "sleeve" ? (rear ? 222 : 116) : 170;
+  const patchY = r.emblem_position === "hood" ? 246 : r.emblem_position === "sleeve" ? 300 : rear ? 305 : 285;
   const patchTransform = `translate(${patchX} ${patchY}) scale(${r.emblem_position === "sleeve" ? .72 : .85})`;
   const svgStyle = { "--hair": hair, "--skin": skin, "--fabric": fabric, "--accent": accent, "--cyber": street, "--detail": detail } as CSSProperties;
   return <svg className={`silhouette visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish}>
     <defs>
-      <linearGradient id="cw-hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={hair}/><stop offset="76%" stopColor={hair}/><stop offset="100%" stopColor={accent}/></linearGradient>
-      <linearGradient id="cw-fabric" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fabric}/><stop offset="100%" stopColor="#111625"/></linearGradient>
-      <linearGradient id="cw-skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={skin}/><stop offset="100%" stopColor="#b77c8e"/></linearGradient>
-      <linearGradient id="cw-gloss" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#ffffff" stopOpacity=".02"/><stop offset="48%" stopColor="#ffffff" stopOpacity={r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? .58 : .12}/><stop offset="100%" stopColor="#8cecff" stopOpacity=".04"/></linearGradient>
+      <pattern id={`cw-pattern-${uid}`} patternUnits="userSpaceOnUse" width={r.fabric_pattern === "geometric" ? 12 : 18} height={r.fabric_pattern === "geometric" ? 12 : 18}><rect width="100%" height="100%" fill={r.fabric_pattern === "gradient" ? panel : "transparent"}/>{r.fabric_pattern === "circuit" && <path d="M0 4 H7 V10 H15 M7 4 V0 M15 10 V16" fill="none" stroke={accent} strokeWidth="1.1" opacity=".8" />}{r.fabric_pattern === "geometric" && <path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke={panel} strokeWidth="1.3"/>}</pattern>
+      <linearGradient id={`cw-hair-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={hair}/><stop offset="76%" stopColor={hair}/><stop offset="100%" stopColor={accent}/></linearGradient>
+      <linearGradient id={`cw-fabric-${uid}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fabric}/><stop offset="100%" stopColor={r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? "#ffffff" : panel}/></linearGradient>
+      <linearGradient id={`cw-skin-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={skin}/><stop offset="100%" stopColor="#b77c8e"/></linearGradient>
+      <linearGradient id={`cw-gloss-${uid}`} x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#ffffff" stopOpacity=".02"/><stop offset="48%" stopColor="#ffffff" stopOpacity={r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? .58 : .12}/><stop offset="100%" stopColor="#8cecff" stopOpacity=".04"/></linearGradient>
     </defs>
     <ellipse cx="170" cy="463" rx="82" ry="10" fill="#070a13" opacity=".5"/>
-    {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill="url(#cw-hair)"/>}
+    {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill="{`url(#cw-hair-${uid})`}"/>}
     {rear && <path d="M116 91 Q82 135 101 236 L110 263 L138 250 L144 218 L196 218 L202 250 L230 263 L237 235 Q259 132 222 83 Z" fill="url(#cw-hair)"/>}
-    <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill="url(#cw-skin)"/>
-    <path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 250 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>
+    <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill="{`url(#cw-skin-${uid})`}"/>
+    <path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 250 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill="{`url(#cw-fabric-${uid})`}" stroke={stroke} strokeWidth={line}/>
     <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>
+    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill={panel} opacity={r.nanowear_state === "everyday" ? .16 : .28}/>
+    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill={`url(#cw-pattern-${uid})`} opacity={r.fabric_pattern === "plain" ? 0 : r.nanowear_state === "everyday" ? .35 : .82}/>
     {r.nanowear_state !== "everyday" && <path d="M139 270 Q170 282 201 270 L193 345 L170 363 L147 345 Z" fill={accent} opacity={.08 + street * .26}/>}
-    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="url(#cw-gloss)" opacity={r.material_finish === "textile" && r.nanowear_state === "everyday" ? .12 : .88}/>
-    <path d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill="#20263b" stroke={stroke} strokeWidth={line}/>
+    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="{`url(#cw-gloss-${uid})`}" opacity={r.material_finish === "textile" && r.nanowear_state === "everyday" ? .12 : .88}/>
+    <path d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill={panel} stroke={stroke} strokeWidth={line}/>
     <path d="M151 410 L149 456 L170 456 L177 410 Z M185 410 L190 456 L211 456 L202 410 Z" fill="#111727"/>
     <path d="M148 452 L150 471 L181 471 L180 455 Z M190 452 L194 471 L225 471 L215 455 Z" fill={accent}/>
     <ellipse cx="170" cy="143" rx={52 - anime * 3} ry={63 - anime * 4} fill="url(#cw-skin)" stroke="#f5d7ce" strokeWidth={1 + toon * 1.8}/>
@@ -161,6 +198,10 @@ export function VisualStyleLab({ recipe, onChange }: { recipe: VisualRecipe; onC
     <div className="style-lab-head"><div><span className="kicker">STYLE LAB / CYBERSTREET</span><p>La receta cambia la vista vectorial sin IA.</p></div><div className="view-toggle" role="group" aria-label="Vista del personaje"><button type="button" className={r.view === "front" ? "selected" : ""} aria-pressed={r.view === "front"} onClick={() => update("view", "front")}>Frontal</button><button type="button" className={r.view === "back" ? "selected" : ""} aria-pressed={r.view === "back"} onClick={() => update("view", "back")}>Trasera</button></div></div>
     <div className="style-ranges">{range("anime_influence", "Influencia Anime")}{range("toon_influence", "Influencia Toon")}{range("streetwear_cyberpunk", "Streetwear / Cyberpunk")}{range("detail_level", "Nivel de detalle")}</div>
     <div className="style-fields">
+      <label>Color base de nanotela<input aria-label="Color base de nanotela" type="color" value={r.garment_base_color} onChange={e => update("garment_base_color", e.target.value)}/></label>
+      <label>Color de paneles<input aria-label="Color secundario de nanotela" type="color" value={r.garment_panel_color} onChange={e => update("garment_panel_color", e.target.value)}/></label>
+      <label>Acento tecnológico<input aria-label="Color de acento tecnológico" type="color" value={r.garment_accent_color} onChange={e => update("garment_accent_color", e.target.value)}/></label>
+      <label>Patrón de nanotela<select aria-label="Patrón de nanotela" value={r.fabric_pattern} onChange={e => update("fabric_pattern", e.target.value as FabricPattern)}><option value="plain">Liso</option><option value="circuit">Circuitos</option><option value="geometric">Geométrico</option><option value="gradient">Degradado</option></select></label>
       <label>Estado NanoWear<select value={r.nanowear_state} onChange={e => update("nanowear_state", e.target.value as NanoWearState)}><option value="everyday">Everyday · cotidiano</option><option value="nanoweave">Nanoweave · técnico</option><option value="transformation">Transformation · transformado</option></select></label>
       <label>Acabado del material<select value={r.material_finish} onChange={e => update("material_finish", e.target.value as MaterialFinish)}><option value="textile">Textil cotidiano</option><option value="nanoweave">Nanotela técnica</option><option value="synthetic">Sintético brillante</option></select></label>
       <label>Forma Chromapatch<select value={r.emblem_shape} onChange={e => update("emblem_shape", e.target.value as EmblemShape)}><option value="bunny">Conejito</option><option value="star">Estrella</option><option value="fox">Zorro</option><option value="skull">Calavera</option><option value="geo">Geométrico</option></select></label>
