@@ -1,6 +1,6 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ya ofrece 47 categorías en 8 pestañas, incluida una ampliación para busto, color independiente por raíz/coronilla/interior/puntas y reglas de compatibilidad declaradas en el catálogo v16. Todavía faltan categorías avanzadas, la biblioteca visual, la prueba manual de navegador en Windows y una imagen generada. La CI ya ejecuta un smoke test headless de Chromium en Linux.
+La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ofrece 47 categorías en 8 pestañas y ahora incluye el primer motor vectorial CyberStreet, un Style Lab con receta versionada, tres estados NanoWear y un Chromapatch personalizable. La CI ejecuta un smoke test headless de Chromium en Linux; la validación manual de navegador en Windows sigue pendiente.
 
 ## Requisitos
 
@@ -41,6 +41,9 @@ Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botima
 - 47 categorías de identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle servidas desde `character_rules.json`; la UI mantiene solo la estructura de los campos y no duplica sus listas de opciones.
 - Rasgos anatómicos/visuales independientes: tamaño del busto, patrón y color de escamas (11 opciones de región/patrón), raíces, coronilla, interior y puntas del cabello como controles independientes.
 - Generación real de perfiles y prompts mediante `CharacterGenerator`, con elecciones fijadas, campos AUTO, semilla y coherencia.
+- Renderizador SVG original `web/src/visual/VisualCharacterRenderer.tsx`: vista frontal/trasera, geometría 2D estilizada, rasgos representables y paleta derivada de las selecciones existentes.
+- Style Lab con influencia Anime/Toon, equilibrio Streetwear/Cyberpunk, densidad de detalle, estados NanoWear `everyday`/`nanoweave`/`transformation` y acabados textil/técnico/sintético.
+- Chromapatch con cinco formas vectoriales originales, color, posición y contraste automático por luminancia o modo manual con aviso. La receta `visual_recipe` v1 se guarda/carga/duplica junto con el perfil y se incluye en el prompt oficial mediante un contrato API opcional y retrocompatible.
 - Visualización del prompt y negative prompt oficiales, copia al portapapeles y exportación JSON.
 - Guardado de perfiles mediante `POST /api/profiles` en `generated_characters/web_profiles/`, ignorado por Git por defecto.
 - Panel de perfiles locales: permite actualizar la lista, cargar un perfil guardado y duplicarlo como copia independiente. El guardado genera un UUID nuevo y la prueba HTTP confirma que el original permanece intacto.
@@ -49,6 +52,6 @@ Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botima
 
 ## Límites actuales
 
-La silueta SVG es un marcador temporal de la interfaz, no una ilustración generada. No existe todavía generación neuronal de imagen, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración completa del intake de assets. La API ya publica los contratos oficiales en modo de solo lectura; selección, vista previa, validación binaria y copia de la imagen siguen pendientes. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
+El motor visual es una representación SVG 2D estilizada, no un modelo 3D ni una ilustración anime final. Algunas categorías existentes solo reciben una representación neutral porque todavía no tienen geometría dedicada. No existe generación neuronal de imagen, pipeline real de Pixel Art, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración completa del intake de assets. La API ya publica los contratos oficiales en modo de solo lectura; selección, vista previa, validación binaria y copia de la imagen siguen pendientes. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
 
 El smoke test automatizado headless de Chromium en Linux ya pasa en GitHub Actions. Falta probar manualmente en Chrome/Edge en Windows y medir memoria/rendimiento; la prueba de CI no sustituye esa verificación física.
