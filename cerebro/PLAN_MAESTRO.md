@@ -105,7 +105,7 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-008 · Importador PNG web seguro por contrato
 
-**Estado:** PARTIAL (~70%). Endpoint de importación, validación de PNG, temporal controlado, publicación sin sobrescritura, panel React y pruebas HTTP están implementados. CI #198 PASS_REAL cubre la suite Python, instalación npm, build y Chromium E2E del rechazo de un archivo falso. CI #199 valida adicionalmente el recorrido de éxito en UI, con instalación Chromium/E2E en curso al momento de la actualización.
+**Estado:** PARTIAL (~70%). Endpoint de importación, validación de PNG, temporal controlado, publicación sin sobrescritura, panel React y pruebas HTTP están implementados. CI #198 PASS_REAL cubre la suite Python, instalación npm, build y Chromium E2E del rechazo de un archivo falso. CI #199 PASS_REAL valida también el recorrido de éxito UI→API→archivo canónico en Chromium headless.
 
 **TIMER restante:** 30–90 minutos para confirmar el E2E más reciente, revisar el PR y resolver cualquier fallo; 30–60 minutos adicionales de QA físico Chrome/Edge en Windows.
 
