@@ -127,3 +127,61 @@ Estimaciones de planificación, no tiempo medido:
 - **Cambios de alcance:** este registro es la única adición prevista; no se modifican código, assets, manifiestos, dependencias, `main`, PR #8 ni PR #10.
 - **Comprobaciones:** se revisó la coherencia del contenido existente y se compararon las referencias de rama/PR con GitHub. No se ejecutaron tests de software porque el cambio es documentación Markdown; no se afirma que se haya ejecutado un linter Markdown local.
 
+
+
+## J. Primera selección de recursos para el prototipo de Character Studio · BIMG-ASSET-003
+
+**Estado: PARTIAL.** Selección documental basada en las descripciones y metadatos ya registrados y en las fichas facilitadas para esta tarea. No se hicieron nuevas sesiones de navegador, descargas ni pruebas de archivos. Las categorías son recomendaciones para el siguiente paso, no aprobaciones legales ni compatibilidad técnica confirmada.
+
+### Lista corta priorizada
+
+| Recurso / tipo / autor | Aporte y modularidad conocida | Compatibilidad y límites | Estado recomendado y licencia |
+|---|---|---|---|
+| [VRoid Studio](https://vroid.com/en/studio) · [guías oficiales](https://vroid.com/en/studio/guidelines). Herramienta para personajes anime 3D; exportación VRM anunciada. | Permite partir de bases preparadas y personalizar rostro, cuerpo, cabello, ropa y texturas. Es una herramienta de creación, no una biblioteca de piezas redistribuibles. La intercambiabilidad entre piezas exportadas no está verificada. | Es la ruta más accesible para producir un personaje anime original sin modelar todo desde cero. No demuestra que el modelo final sea modular ni que materiales predefinidos puedan redistribuirse con BotImagen. | **PROTOTYPE_CANDIDATE**. Revisar los términos oficiales y las condiciones de cada material. Separar las partes originales del usuario de las de terceros. |
+| [Kenney Character Assets](https://kenney.itch.io/kenney-character-assets). Paquete 3D low-poly; la ficha facilitada declara 4 modelos base, 75 skins, 40 accesorios y 17 animaciones. | Candidato técnico para explorar combinaciones de base, apariencia, accesorios y animación. La muestra gratuita debe distinguirse del paquete completo, cuya disponibilidad indicada es limitada. | Potencialmente útil para probar modularidad, pero no representa el acabado anime premium. No está confirmado que la muestra disponible incluya todas las piezas necesarias ni que cada skin sea un componente geométrico separado. | **TECHNICAL_PLACEHOLDER**. La ficha declara CC0; verificar que aplica al paquete/archivo exacto y qué contiene la muestra antes de una prueba. |
+| [Tiny RPG CC0 Characters and Portraits](https://opengameart.org/content/tiny-rpg-cc0-characters-and-portraits) · autor indicado: tiopalada. Muestra 2D de personajes y retratos. | Puede iniciar una prueba del flujo de catálogo, ficha, miniatura y procedencia pixel art. No hay evidencia suficiente de capas intercambiables de ropa/cabello ni de personalización avanzada. | Útil para validar catálogo, no para afirmar que ya existe un editor modular ni que su estilo coincide con los sprites finales. Los formatos exactos de los archivos no se han verificado en esta tarea. | **PROTOTYPE_CANDIDATE** para una futura prueba de catálogo, condicionada a confirmar CC0 en el recurso individual y revisar el contenido exacto. |
+| [Kenney Modular Characters](https://kenney.nl/assets/modular-characters). Biblioteca 2D; la ficha facilitada declara 425 archivos y CC0. | Puede servir para estudiar organización de piezas 2D y combinaciones. Deben revisarse cuadrícula, escala, pivotes, nombres y compatibilidad entre piezas. | No es anime 3D ni representa NIKKE-inspired. El ensamblado real no se ha probado. | **TECHNICAL_PLACEHOLDER**. Confirmar que CC0 cubre el paquete concreto y revisar su estructura en una tarea posterior. |
+| [Stylized Anime Girl · Futuristic 3D Character](https://sketchfab.com/3d-models/stylized-anime-girl-futuristic-3d-character-9f739a6984b641a49d476af342f84b5d). Personaje 3D completo; ficha previamente registrada declara 71.400 triángulos, 36.000 vértices, Blender con asistencia de IA y CC BY. Autor exacto no reproducido en la evidencia disponible aquí. | Referencia de silueta sci-fi, materiales y acabado. No hay evidencia de que rostro, cabello, ropa o accesorios estén separados o sean intercambiables. | Un personaje completo puede requerir separación de mallas, materiales, rigging o reconstrucción antes de permitir cambios independientes. | **VISUAL_REFERENCE_ONLY**; **BLOCKED_LICENSE** para incorporación hasta confirmar versión CC BY, autor/atribución, avisos, derechos de componentes asistidos por IA y permisos del archivo descargable. |
+| [a-teddy-a Toon Style LoRA](https://pixai.art/es/model/2064199521616992635) · autor indicado en el catálogo: Teddy. LoRA de generación. | Referencia para lineart coloreado, cel shading, gradientes y reflejos expresivos. No es un modelo 3D ni una biblioteca de piezas. | Requiere una base compatible y un flujo de generación. No debe ser necesaria para cambiar una pieza ya catalogada. Base exacta y permisos de peso/salidas siguen sin resolverse. | **FUTURE_AI_MODULE** y **VISUAL_REFERENCE_ONLY**. Mantener **LICENSE_UNKNOWN** para base/peso; no descargar. |
+| [Cartoony Anime Style LoRA](https://pixai.art/es/model/1821163402555657503) · autor indicado: Lioan. LoRA de estilo. | El catálogo existente recoge la declaración de 85 imágenes creadas por el autor con Midjourney y recomendación de bases Illustrious. Sirve para investigar consistencia cartoon-anime, no para aportar piezas editables. | Depende de una base y un flujo de generación. No debe ser requisito para abrir, editar o guardar perfiles. | **FUTURE_AI_MODULE**; **VISUAL_REFERENCE_ONLY** hasta revisar condiciones vigentes de base, peso, entradas y salidas. |
+| [AziibPixelMix](https://civitai.com/models/195730/aziibpixelmix) · autor indicado: aziib. Checkpoint merge para Stable Diffusion 1.5 según el catálogo existente. | Candidato futuro para conceptos pixel art generados por IA. No es una biblioteca de sprites ni un editor. | No se necesita para probar el catálogo ni las combinaciones de piezas 2D. | **FUTURE_AI_MODULE**. Revisar la licencia declarada Open RAIL-M Addendum para el uso concreto. No descargar ni versionar pesos. |
+
+### Candidatos no prioritarios y límites de permiso
+
+- Los modelos de VRoid Hub, BOOTH y CGTrader siguen como **VISUAL_REFERENCE_ONLY** o **BLOCKED_LICENSE** hasta revisar cada modelo/producto. Gratis, visible o comprado no significa que se permita modificarlo, usarlo comercialmente o redistribuirlo.
+- Para CC BY hay que registrar la versión exacta, autor, atribución, avisos y condiciones del archivo. Para CC0 hay que confirmar que la declaración cubre el recurso individual elegido, no asumir que se extiende a una colección relacionada.
+- Si no se puede confirmar un permiso, conservar **LICENSE_UNKNOWN** y no incorporar el recurso.
+- No se ha abierto ni probado ningún archivo. Formatos exactos, rigs, separación de mallas, capas, resolución de sprites, pivotes y consistencia de nombres siguen siendo desconocidos cuando la ficha no los especifica.
+- No se afirma que se hayan descargado, importado o probado modelos, pesos, texturas o sprites.
+
+### Respuestas arquitectónicas
+
+1. **Anime 3D sin modelar desde cero:** empezar con un personaje original creado en VRoid Studio. Es la vía más accesible para obtener una referencia propia con una base y controles preparados; no prueba que el resultado sea un conjunto de piezas intercambiables.
+2. **Probar combinaciones modulares:** Kenney Character Assets es el candidato técnico inicial, si la muestra accesible contiene una base, skin y accesorio suficientes. Si no alcanza, registrar el bloqueo; no asumir que hace falta adquirir el paquete completo.
+3. **Iniciar pixel art:** Tiny RPG CC0 Characters and Portraits puede probar catálogo, ficha y procedencia. Kenney Modular Characters puede ayudar a estudiar la organización de piezas 2D, pero no representa el estilo anime objetivo.
+4. **Definir apariencia:** el modelo futurista de Sketchfab puede servir como referencia visual 3D; las LoRAs Toon ayudan a investigar una futura línea visual neuronal. Ninguna demuestra modularidad ni queda aprobada para incorporación.
+5. **Límite de un personaje completo:** si rostro, cabello, ropa y accesorios están fusionados en malla o textura, cambiarlos independientemente puede exigir edición, separación de materiales, rigging o reconstrucción. El coste no se puede estimar sin inspeccionar la estructura real.
+6. **Dependencias desconocidas:** inventario real de la muestra Kenney; separación/rig del modelo Sketchfab; capas y formatos de Tiny RPG; límites de exportación de VRoid; licencias individuales, bases de LoRAs/checkpoints y derechos de terceros.
+7. **Experimento de mayor valor por esfuerzo:** crear en VRoid Studio un personaje original sencillo y registrar su procedencia, condiciones y capturas creadas por el usuario. En paralelo, definir una ficha de prueba para componentes: ID, estilo, base, pieza/capa, variante de color, accesorio, pose, fuente y estado de licencia. Solo si la muestra Kenney es accesible y suficiente, probar base + skin + accesorio. Para pixel art, confirmar primero la ficha y el inventario exacto de Tiny RPG.
+
+### Contrato arquitectónico recomendado, sin implementación
+
+Mantener comunes el catálogo, la interfaz de selección, los metadatos de procedencia y los perfiles guardados, pero no asumir un renderizador universal:
+
+- **character_profile:** identidad, campos elegidos, seed opcional, fuentes y permisos.
+- **style_package:** nikke_inspired_3d, pixel_art_2d o toon_style, con versión y estado del esquema.
+- **components:** IDs de base y piezas que realmente existan, puntos de anclaje/capas y variantes compatibles.
+- **provenance:** página original, autor, licencia exacta, fecha de verificación, restricciones y estado; usar **LICENSE_UNKNOWN** si falta evidencia.
+
+Cambiar una pieza catalogada debe ser una operación de datos y presentación del paquete correspondiente, no una llamada obligatoria a IA. Perfiles y catálogo pueden ser comunes; un modelo 3D riggeado y un sprite 2D por capas necesitan ensamblado, validadores y renderizado específicos. Esta tarea no elige tecnología ni propone implementar un visor.
+
+### Registro de alcance BIMG-ASSET-003
+
+- Solo se añade esta sección al documento de investigación existente. No se modifican código, manifiestos, dependencias, assets, main, PR #8 ni PR #10.
+- No se hicieron nuevas búsquedas ni sesiones de navegador. Se usaron el catálogo existente y la información facilitada para esta tarea.
+- No se descargaron, probaron, importaron ni subieron archivos externos; no se generaron imágenes ni se aceptaron términos.
+- No se ejecutaron pruebas de software ni linter Markdown local; no son afirmados como realizados.
+
+**Conclusión: PARTIAL.** VRoid Studio es el primer candidato para crear una referencia anime 3D original; Kenney Character Assets es el candidato técnico para modularidad si la muestra lo permite; Tiny RPG es el candidato inicial para ensayar el catálogo pixel art. La incorporación real queda pendiente de verificar condiciones y estructura de archivos concretos.
+
+**TIMER estimado, no medido:** trabajo documental, 1–2 horas. La prueba de viabilidad con archivos permitidos y verificados es una tarea posterior independiente.
