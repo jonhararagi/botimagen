@@ -484,15 +484,19 @@ class CharacterGenerator:
             "synthetic": "glossy synthetic finish",
         }.get(str(recipe.get("material_finish")), "matte everyday textile")
         return (
-            "Visual recipe CyberStreet v1: "
+            "Visual recipe CyberStreet v2: "
             f"{recipe.get('anime_influence', 68)}% anime influence, "
             f"{recipe.get('toon_influence', 56)}% toon influence, "
             f"{recipe.get('streetwear_cyberpunk', 30)}% streetwear-to-cyberpunk detailing, "
             f"{recipe.get('detail_level', 58)}% decorative detail. "
+            f"NanoWear fabric base {recipe.get('garment_base_color', '#343246')}, panels "
+            f"{recipe.get('garment_panel_color', '#48516a')}, technology accent "
+            f"{recipe.get('garment_accent_color', '#5ce4dc')}, pattern {recipe.get('fabric_pattern', 'circuit')}. "
             f"NanoWear state: {state}; material finish: {finish}. "
             f"Original personal Chromapatch emblem: {recipe.get('emblem_shape', 'bunny')}, "
             f"color {recipe.get('emblem_color', '#f3c96b')}, position {recipe.get('emblem_position', 'chest')}, "
             f"contrast mode {recipe.get('emblem_contrast', 'auto')}. "
+            "Preserve the selected fabric palette across NanoWear states and keep the chosen personal emblem stable. "
             "Keep the selected outfit recognizable as wearable clothing; technology accents must remain "
             "proportional to the cyberpunk balance and never replace every garment with armor."
         )
