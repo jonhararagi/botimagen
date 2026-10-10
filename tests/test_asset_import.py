@@ -154,5 +154,40 @@ class AssetImportTests(unittest.TestCase):
             self.assertEqual(response.status, 200)
 
 
+    def test_png_color_depth_matrix_and_indexed_palette_requirements(self):
+        valid = make_png_structure(color_type=3, bit_depth=1,
+                                   before_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00\\xff\\xff\\xff"),))
+        self.assertEqual(api.validate_png_bytes(valid, {"width": 2, "height": 1}), (2, 1))
+
+        invalid_cases = [
+            ("indexed PNG missing PLTE", make_png_structure(color_type=3, bit_depth=1)),
+            ("invalid grayscale bit depth", make_png_structure(color_type=2, bit_depth=4)),
+            ("PLTE length not divisible by three", make_png_structure(before_idat=(png_chunk(b"PLTE", b"\\x00\\x00"),))),
+            ("PLTE has too many indexed colors", make_png_structure(color_type=3, bit_depth=1,
+                before_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00\\x11\\x11\\x11\\x22\\x22\\x22"),))),
+            ("duplicate PLTE", make_png_structure(before_idat=(
+                png_chunk(b"PLTE", b"\\x00\\x00\\x00"), png_chunk(b"PLTE", b"\\x11\\x11\\x11")))),
+            ("PLTE after IDAT", make_png_structure(after_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00"),))),
+            ("PLTE forbidden for grayscale", make_png_structure(color_type=0,
+                before_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00"),))),
+            ("unknown critical chunk", make_png_structure(before_idat=(png_chunk(b"ABCD", b"x"),))),
+            ("invalid reserved chunk-type bit", make_png_structure(before_idat=(png_chunk(b"abca", b"x"),))),
+            ("non-consecutive IDAT", make_png_structure(between_idat=(png_chunk(b"tEXt", b"k\\x00v"),), split_idat=True)),
+        ]
+        for label, body in invalid_cases:
+            with self.subTest(label=label):
+                with self.assertRaises(api.ApiInputError):
+                    api.validate_png_bytes(body, {})
+
+    def test_png_rejects_duplicate_ihdr_and_trailing_data(self):
+        valid = make_png_structure()
+        ihdr = png_chunk(b"IHDR", struct.pack(">IIBBBBB", 2, 1, 8, 6, 0, 0, 0))
+        duplicate_ihdr = api.PNG_SIGNATURE + ihdr + ihdr + valid[len(api.PNG_SIGNATURE) + len(ihdr):]
+        for label, body in (("duplicate IHDR", duplicate_ihdr), ("trailing bytes", valid + b"junk")):
+            with self.subTest(label=label):
+                with self.assertRaises(api.ApiInputError):
+                    api.validate_png_bytes(body, {})
+
+
 if __name__ == "__main__":
     unittest.main()
