@@ -929,6 +929,70 @@ def test_explicit_none_outer_layer_has_clear_prompt_semantics():
     assert "vincha deportiva" in result["prompt"].lower()
     assert "tactical baseball combat suit" in result["prompt"].lower()
 
+
+def test_face_and_body_manual_selections_remain_locked_across_seed_matrix():
+    """Face/body choices are independent manual inputs, not AUTO candidates."""
+    generator = CharacterGenerator(RULES)
+    selections = {
+        "species": "humana",
+        "body_build": "atletica_potente",
+        "body_proportions": "piernas_largas",
+        "bust_size": "balanced",
+        "skin_tone": "oliva_suave",
+        "face_shape": "diamante",
+        "eye_shape": "felinos",
+        "pupil_shape": "anillo_concentrico",
+        "eyebrow_style": "anguladas",
+        "mouth_style": "sonrisa_ladeada",
+        "nose_style": "puente_recto",
+        "facial_detail": "pecas_sutiles",
+        "height_cm": "h175",
+    }
+
+    for seed in (0, 1, 42, 2026, 65535):
+        result = generator.generate(selections, seed=seed, coherence=0.35)
+        for category, value in selections.items():
+            assert result["profile"][category] == value, (
+                f"{category} manual choice changed at seed {seed}: "
+                f"expected {value!r}, got {result['profile'][category]!r}"
+            )
+
+
+
+def test_auto_face_and_body_choices_stay_inside_catalog_across_seed_matrix():
+    """AUTO may vary by seed but must only emit declared face/body option IDs."""
+    rules = json.loads(RULES.read_text(encoding="utf-8"))
+    generator = CharacterGenerator(RULES)
+    categories = (
+        "body_build",
+        "body_proportions",
+        "bust_size",
+        "skin_tone",
+        "face_shape",
+        "eye_shape",
+        "pupil_shape",
+        "eyebrow_style",
+        "mouth_style",
+        "nose_style",
+        "facial_detail",
+        "height_cm",
+    )
+    allowed = {
+        category: {option["id"] for option in rules["categories"][category]}
+        for category in categories
+    }
+    selections = {"species": "humana", **{category: "auto" for category in categories}}
+
+    for seed in (0, 1, 42, 2026, 65535):
+        result = generator.generate(selections, seed=seed, coherence=0.35)
+        assert result["profile"]["species"] == "humana"
+        for category in categories:
+            assert result["profile"][category] in allowed[category], (
+                f"AUTO emitted an unknown {category} option at seed {seed}: "
+                f"{result['profile'][category]!r}"
+            )
+
+
 if __name__ == "__main__":
     test_rules_have_expected_categories()
     test_generator_locks_user_choices_and_fills_auto()
@@ -974,3 +1038,5 @@ if __name__ == "__main__":
     test_all_catalog_compatibility_references_are_valid()
     test_every_catalog_compatibility_option_is_honored_with_auto_target()
     test_explicit_none_outer_layer_has_clear_prompt_semantics()
+    test_face_and_body_manual_selections_remain_locked_across_seed_matrix()
+    test_auto_face_and_body_choices_stay_inside_catalog_across_seed_matrix()

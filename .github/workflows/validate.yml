@@ -20,7 +20,8 @@ jobs:
         run: python tests/validate_manifest.py
 
       - name: Validate character generator
-        run: python tests/test_character_generator.py
+        run: |
+          python tests/test_character_generator.py
 
       - name: Validate universal visual style contract
         run: python tests/test_visual_style_contract.py
