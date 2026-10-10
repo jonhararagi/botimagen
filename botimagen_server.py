@@ -395,6 +395,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._send_json(HTTPStatus.OK, asset_contract_catalog)
                 return
+            if path == "/api/assets/import":
+                self._method_not_allowed()
+                return
             if path == "/api/profiles":
                 self._list_profiles()
                 return
