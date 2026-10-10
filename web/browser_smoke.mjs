@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -430,6 +431,12 @@ try {
   prompt = await page.locator(".prompt-panel pre").innerText();
   assert.ok(prompt.includes("Visual recipe CyberStreet v2"), "The official prompt should include the visual recipe");
   assert.ok(prompt.includes("transformed synthetic textile sheen"), "The selected NanoWear state should reach the prompt");
+  const [profileDownload] = await Promise.all([page.waitForEvent("download"), page.locator(".prompt-actions button").nth(2).click()]);
+  const exportedProfile = JSON.parse(await readFile(await profileDownload.path(), "utf8"));
+  assert.equal(exportedProfile.visual_recipe.garment_base_color, "#234567", "Export must preserve the NanoWear base color");
+  assert.equal(exportedProfile.visual_recipe.garment_panel_color, "#456789", "Export must preserve the NanoWear panel color");
+  assert.equal(exportedProfile.visual_recipe.garment_accent_color, "#55d9cf", "Export must preserve the technology accent");
+  assert.equal(exportedProfile.visual_recipe.fabric_pattern, "geometric", "Export must preserve the fabric pattern");
   assert.equal(await saveButton.isDisabled(), false, "A synchronized visual recipe should be saveable");
 
   await page.getByRole("tab", { name: /Cabello/i }).click();
