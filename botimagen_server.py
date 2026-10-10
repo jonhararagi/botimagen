@@ -81,7 +81,7 @@ def _validate_visual_recipe(value: Any) -> dict[str, Any]:
     if extra:
         raise ApiInputError("Campos no reconocidos en visual_recipe: " + ", ".join(sorted(map(str, extra))) + ".")
     result = {**defaults, **value}
-    if result["schema_version"] != 1 or result["family"] != "cyberstreet":
+    if isinstance(result["schema_version"], bool) or not isinstance(result["schema_version"], int) or result["schema_version"] != 1 or result["family"] != "cyberstreet":
         raise ApiInputError("La receta visual no tiene una versión o familia compatible.")
     for key in ("anime_influence", "toon_influence", "streetwear_cyberpunk", "detail_level"):
         number = result[key]
