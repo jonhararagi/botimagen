@@ -399,6 +399,7 @@ try {
   assert.ok(await page.locator(".visual-character-svg defs pattern path").count() > 0, "The selected geometric pattern must render actual SVG geometry");
   // Exercise actual SVG geometry, not only recipe attributes.
   await page.getByRole("tab", { name: /Vestuario/i }).click();
+  const originalOutfit = await page.locator("#trait-outfit").inputValue();
   const outfitField = page.locator(".field").filter({ has: page.locator("#trait-outfit") });
   if (await page.locator("#trait-outfit").isDisabled()) await outfitField.locator("button.lock").click();
   await page.locator("#trait-outfit").selectOption("combat_jacket");
@@ -438,6 +439,7 @@ try {
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-torso-length"), "24");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-sleeve-length"), "92");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-waist-fit"), "76");
+  await page.locator("#trait-outfit").selectOption(originalOutfit);
   await page.locator(".style-fields select").nth(1).selectOption("transformation");
   await page.locator(".view-toggle button").nth(1).click();
   await page.locator(".style-fields select").nth(3).selectOption("fox");
