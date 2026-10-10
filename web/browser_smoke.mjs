@@ -385,6 +385,7 @@ try {
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Changing technology accent must update the SVG recipe");
   await page.locator(".style-fields select").nth(0).selectOption("geometric");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "The geometric pattern must be connected to the live SVG");
+  assert.ok(await page.locator(".visual-character-svg defs pattern path").count() > 0, "The selected geometric pattern must render actual SVG geometry");
   await page.locator(".style-fields select").nth(1).selectOption("transformation");
   await page.locator(".view-toggle button").nth(1).click();
   await page.locator(".style-fields select").nth(3).selectOption("fox");
