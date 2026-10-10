@@ -4,6 +4,7 @@ import json
 import struct
 import tempfile
 import threading
+import sys
 import unittest
 import zlib
 from http.server import ThreadingHTTPServer
@@ -11,6 +12,8 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 import binascii
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import botimagen_server as api
 from character_generator import CharacterGenerator
