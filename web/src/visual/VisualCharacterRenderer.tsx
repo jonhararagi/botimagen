@@ -145,7 +145,16 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill={`url(#cw-gloss-${uid})`} opacity={r.material_finish === "textile" && r.nanowear_state === "everyday" ? .12 : .88}/>
     <path d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill={panel} stroke={stroke} strokeWidth={line}/>
     <path d="M151 410 L149 456 L170 456 L177 410 Z M185 410 L190 456 L211 456 L202 410 Z" fill="#111727"/>
-    <path d="M148 452 L150 471 L181 471 L180 455 Z M190 452 L194 471 L225 471 L215 455 Z" fill={accent}/>
+    <path d="M148 452 L150 471 L181 471 L180 455 Z M190 452 L194 471 L225 471 L215 455 Z" fill={panel} stroke={accent} strokeWidth=".8"/>
+    {values.footwear === "armored_boots" && <path d="M148 432 L171 432 L181 475 L146 475 Z M190 432 L212 432 L227 475 L194 475 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
+    {values.footwear === "high_top" && <path d="M149 438 L174 438 L181 469 L150 469 Z M190 438 L207 438 L222 469 L194 469 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.footwear === "sleek_boots" && <path d="M151 428 L172 428 L178 469 L149 469 Z M190 428 L209 428 L222 469 L195 469 Z" fill={fabric} stroke={accent} strokeWidth={line}/>}
+    {values.footwear === "botas_cortas" && <path d="M150 442 L172 442 L179 468 L149 468 Z M191 442 L210 442 L223 468 L195 468 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.footwear === "zapatillas_plataforma" && <path d="M148 451 L180 451 L181 478 L146 478 Z M190 451 L221 451 L226 478 L194 478 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
+    {values.footwear === "botas_asimetricas" && <path d="M150 429 L172 429 L179 469 L148 469 Z M190 444 L211 444 L225 469 L194 469 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
+    {values.footwear === "calzado_ligero_pitcher" && <path d="M148 452 L181 452 L180 468 L148 468 Z M190 452 L219 452 L224 468 L194 468 Z" fill={fabric} stroke={accent} strokeWidth={line}/>}
+    {values.footwear === "botines_elegantes" && <path d="M151 442 L172 442 L179 467 L150 467 Z M191 442 L210 442 L222 467 L195 467 Z" fill={fabric} stroke={stroke} strokeWidth={line}/>}
+    {values.footwear === "botas_reforzadas" && <path d="M149 429 L173 429 L180 470 L147 470 Z M190 429 L212 429 L226 470 L194 470 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
     <ellipse cx="170" cy="143" rx={52 - anime * 3} ry={63 - anime * 4} fill={`url(#cw-skin-${uid})`} stroke="#f5d7ce" strokeWidth={1 + toon * 1.8}/>
     {!rear && <>
       <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>
@@ -167,11 +176,21 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
 
     {values.outer_layer === "long_coat" && <g fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}><path d="M126 265 L111 285 L119 397 L145 414 L144 333 Z"/><path d="M214 265 L229 285 L221 397 L195 414 L196 333 Z"/></g>}
     {values.outer_layer === "hooded_jacket" && <path d="M137 240 Q137 217 151 222 L170 242 L189 222 Q203 217 203 240 L194 264 L146 264 Z" fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>}
-    {values.outer_layer === "short_bomber" && <path d="M125 263 Q170 245 216 263 L211 305 L129 305 Z" fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "short_bomber" && <path d="M125 263 Q170 245 216 263 L211 305 L129 305 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "utility_cape" && <path d="M128 262 L105 282 L120 347 L145 365 L153 287 L187 287 L195 365 L220 347 L235 282 L212 262 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "chaqueta_corta_asimetrica" && <path d="M125 263 L145 252 L170 274 L195 252 L216 263 L206 320 L177 331 L170 307 L153 337 L134 320 Z" fill={fabric} stroke={accent} strokeWidth={line}/>}
+    {values.outer_layer === "capa_corta_energetica" && <path d="M130 262 L106 279 L120 340 L145 356 L154 284 L186 284 L195 356 L220 340 L234 279 L210 262 Z" fill={accent} opacity=".22" stroke={accent} strokeWidth={line}/>}
+    {values.outer_layer === "mangas_desmontables" && <path d="M112 260 L98 282 L105 352 L126 355 L138 286 Z M228 260 L242 282 L235 352 L214 355 L202 286 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "chaleco_tactico" && <path d="M140 267 L158 282 L170 274 L182 282 L200 267 L195 337 L181 352 L170 344 L159 352 L145 337 Z" fill="#202b3e" stroke={accent} strokeWidth={line}/>}
     {values.outfit === "street_bomber" && <path d="M137 387 L203 387 L198 399 L142 399 Z" fill={accent} opacity=".72"/>}
     {(values.outfit === "light_armor" || values.outfit === "armadura_asimetrica") && <path d="M143 280 L168 294 L194 279 L188 322 L170 334 L148 321 Z" fill={accent} opacity={.12 + street * .25} stroke={accent} strokeWidth={.8 + street}/>}
     {values.outfit === "techwear_sport" && <path d="M128 318 L145 329 M212 318 L195 329" stroke={accent} strokeWidth={2 + street * 2} fill="none"/>}
+    {values.outfit === "tactical_baseball" && <path d="M138 269 L153 281 L170 274 L187 281 L203 269 L198 333 L187 351 L153 351 L142 333 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.outfit === "combat_jacket" && <path d="M126 264 L145 253 L160 279 L170 289 L180 279 L195 253 L214 264 L205 337 L188 352 L152 352 L135 337 Z" fill={fabric} stroke={stroke} strokeWidth={line}/>}
+    {values.outfit === "idol_combat" && <path d="M139 268 L160 280 L170 274 L180 280 L201 268 L196 331 L170 347 L144 331 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
+    {values.outfit === "elegant_command" && <path d="M151 269 L170 282 L189 269 L181 345 L170 359 L159 345 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.outfit === "support_coat" && <path d="M130 264 L112 286 L122 393 L145 411 L151 330 L170 347 L189 330 L195 411 L218 393 L228 286 L210 264 Z" fill={fabric} stroke={stroke} strokeWidth={line}/>}
+    {values.outfit === "baseball_tech_suit" && <path d="M135 269 L170 280 L205 269 L198 340 L186 352 L154 352 L142 340 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "hombrera_modular" && <path d="M124 265 L141 260 L151 280 L132 292 Z M216 265 L199 260 L189 280 L208 292 Z" fill={accent} opacity=".65" stroke={stroke} strokeWidth={line}/>}
     {r.nanowear_state !== "everyday" && <g fill="none" stroke={accent} strokeWidth={.7 + street} opacity={.35 + street * .55}><path d="M131 300 L145 315 L140 333 M209 300 L195 315 L200 333"/><path d="M141 353 L151 360 L148 377 M199 353 L189 360 L192 377"/></g>}
     <g transform={patchTransform} aria-label="Chromapatch">
