@@ -974,3 +974,32 @@ if __name__ == "__main__":
     test_all_catalog_compatibility_references_are_valid()
     test_every_catalog_compatibility_option_is_honored_with_auto_target()
     test_explicit_none_outer_layer_has_clear_prompt_semantics()
+
+
+
+def test_face_and_body_manual_selections_remain_locked_across_seed_matrix():
+    """Face/body choices are independent manual inputs, not AUTO candidates."""
+    generator = CharacterGenerator(RULES)
+    selections = {
+        "species": "humana",
+        "body_build": "atletica_potente",
+        "body_proportions": "piernas_largas",
+        "bust_size": "balanced",
+        "skin_tone": "oliva_suave",
+        "face_shape": "diamante",
+        "eye_shape": "felinos",
+        "pupil_shape": "anillo_concentrico",
+        "eyebrow_style": "anguladas",
+        "mouth_style": "sonrisa_ladeada",
+        "nose_style": "puente_recto",
+        "facial_detail": "pecas_sutiles",
+        "height_cm": "h175",
+    }
+
+    for seed in (0, 1, 42, 2026, 65535):
+        result = generator.generate(selections, seed=seed, coherence=0.35)
+        for category, value in selections.items():
+            assert result["profile"][category] == value, (
+                f"{category} manual choice changed at seed {seed}: "
+                f"expected {value!r}, got {result['profile'][category]!r}"
+            )
