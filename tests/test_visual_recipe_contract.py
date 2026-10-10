@@ -55,3 +55,10 @@ def test_visual_recipe_rejects_invalid_ranges_enums_and_colors():
         except ApiInputError:
             continue
         raise AssertionError(f"Invalid visual recipe was accepted: {invalid!r}")
+
+
+if __name__ == "__main__":
+    test_legacy_generation_payload_remains_valid_without_visual_recipe()
+    test_visual_recipe_is_validated_and_included_in_prompt()
+    test_visual_recipe_rejects_invalid_ranges_enums_and_colors()
+    print("PASS: CyberStreet visual recipe contract")
