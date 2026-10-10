@@ -156,7 +156,9 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const patchY = effectiveEmblemPosition === "hood" ? 246
     : effectiveEmblemPosition === "sleeve" ? Math.max(285, Math.min(sleeveEnd - 12, 335))
     : Math.min(rear ? 305 : 285, emblemHem - 17);
-  const patchTransform = `translate(${patchX} ${patchY}) scale(${effectiveEmblemPosition === "sleeve" ? .72 : .85})`;
+  const patchScale = effectiveEmblemPosition === "sleeve" || effectiveEmblemPosition === "hood"
+    ? .72 : Math.max(.5, Math.min(.85, (emblemHem - 267) / 30));
+  const patchTransform = `translate(${patchX} ${patchY}) scale(${patchScale})`;
   const svgStyle = { "--hair": hair, "--skin": skin, "--fabric": fabric, "--accent": accent, "--cyber": street, "--detail": detail } as CSSProperties;
   return <svg className={`silhouette visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish} data-fabric-pattern={r.fabric_pattern} data-fabric-base={r.garment_base_color} data-fabric-panel={r.garment_panel_color} data-fabric-accent={r.garment_accent_color} data-hair-color={hair} data-skin-color={skin} data-outfit={values.outfit ?? ""} data-outer-layer={values.outer_layer ?? ""} data-footwear={values.footwear ?? ""} data-torso-length={r.torso_length} data-sleeve-length={r.sleeve_length} data-waist-fit={r.waist_fit}>
     <defs>
@@ -237,7 +239,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     </g>}
     {values.outer_layer === "hombrera_modular" && <path d="M124 265 L141 260 L151 280 L132 292 Z M216 265 L199 260 L189 280 L208 292 Z" fill={accent} opacity=".65" stroke={stroke} strokeWidth={line}/>}
     {r.nanowear_state !== "everyday" && <g fill="none" stroke={accent} strokeWidth={.7 + street} opacity={.35 + street * .55}><path d="M131 300 L145 315 L140 333 M209 300 L195 315 L200 333"/><path d="M141 353 L151 360 L148 377 M199 353 L189 360 L192 377"/></g>}
-    <g className="chromapatch-anchor" data-qa-surface="chromapatch" data-requested-position={r.emblem_position} data-effective-position={effectiveEmblemPosition} data-anchor-x={patchX} data-anchor-y={patchY} transform={patchTransform} aria-label="Chromapatch">
+    <g className="chromapatch-anchor" data-qa-surface="chromapatch" data-requested-position={r.emblem_position} data-effective-position={effectiveEmblemPosition} data-anchor-x={patchX} data-anchor-y={patchY} data-anchor-scale={patchScale} transform={patchTransform} aria-label="Chromapatch">
       <circle r="13" fill={patchBg} stroke={accent} strokeWidth={1 + detail}/>
       <g transform="scale(.52)" fill={patchColor} stroke={patchColor} strokeWidth="2" strokeLinejoin="round">
         {r.emblem_shape === "bunny" && <><path d="M-8 -4 Q-18 -28 -11 -34 Q-1 -32 0 -8 Q5 -32 14 -34 Q21 -26 9 -3 Q19 5 11 17 Q0 27 -12 17 Q-20 7 -8 -4Z"/><circle cx="4" cy="5" r="2" fill={patchBg} stroke="none"/></>}
