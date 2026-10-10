@@ -389,7 +389,7 @@ try {
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-nanowear"), "transformation");
-  assert.equal(await page.locator(".visual-character-svg g[aria-label="Chromapatch"] g path").getAttribute("fill"), "#fff4e8", "Auto contrast should switch a low-luminance manual preference to a contrasting mark");
+  assert.equal(await page.locator(".visual-character-svg g[aria-label="Chromapatch"] > g").getAttribute("fill"), "#fff4e8", "Auto contrast should switch a low-luminance manual preference to a contrasting mark");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
   prompt = await page.locator(".prompt-panel pre").innerText();
   assert.ok(prompt.includes("Visual recipe CyberStreet v1"), "The official prompt should include the visual recipe");
