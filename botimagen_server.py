@@ -208,7 +208,8 @@ def make_asset_contract_catalog(manifest_path: Path | None = None) -> dict[str, 
 
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-MAX_PNG_PIXELS = 64_000_000
+MAX_PNG_PIXELS = 16_000_000
+MAX_PNG_DECODED_BYTES = 128 * 1024 * 1024
 
 
 def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]:
@@ -268,7 +269,7 @@ def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]
     channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[color_type]
     row_bytes = (width * channels * bit_depth + 7) // 8
     decoded_size = (row_bytes + 1) * height
-    if decoded_size > MAX_PNG_PIXELS * 8 + height:
+    if decoded_size > MAX_PNG_DECODED_BYTES:
         raise ApiInputError("La imagen excede el límite de decodificación.", HTTPStatus.UNPROCESSABLE_ENTITY)
     decoder = zlib.decompressobj()
     try:
@@ -288,6 +289,7 @@ def _safe_asset_destination(root: Path, relative_destination: str) -> Path:
     parts = PurePosixPath(relative_destination).parts
     if not parts or PurePosixPath(relative_destination).is_absolute() or any(part in {"", ".", ".."} for part in parts):
         raise ApiInputError("El destino del contrato no es seguro.", HTTPStatus.INTERNAL_SERVER_ERROR)
+    root.mkdir(parents=True, exist_ok=True)
     root = root.resolve()
     current = root
     for part in parts[:-1]:
