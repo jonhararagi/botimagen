@@ -397,6 +397,46 @@ try {
   await page.locator(".style-fields select").nth(0).selectOption("geometric");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "The geometric pattern must be connected to the live SVG");
   assert.ok(await page.locator(".visual-character-svg defs pattern path").count() > 0, "The selected geometric pattern must render actual SVG geometry");
+  // Exercise actual SVG geometry, not only recipe attributes.
+  const outfitField = page.locator(".field").filter({ has: page.locator("#trait-outfit") });
+  if (await page.locator("#trait-outfit").isDisabled()) await outfitField.locator("button.lock").click();
+  await page.locator("#trait-outfit").selectOption("combat_jacket");
+  const torsoSlider = page.getByRole("slider", { name: "Largo del torso" });
+  const sleeveSlider = page.getByRole("slider", { name: "Largo de mangas" });
+  const waistSlider = page.getByRole("slider", { name: "Ajuste de cintura" });
+  assert.equal(await torsoSlider.isDisabled(), false, "Combat jacket should expose torso length");
+  assert.equal(await sleeveSlider.isDisabled(), false, "Combat jacket should expose sleeve length");
+  assert.equal(await waistSlider.isDisabled(), false, "Combat jacket should expose waist fit");
+  const torsoPath = page.locator(".garment-torso-main");
+  await torsoSlider.focus(); await torsoSlider.press("Home");
+  const shortTorsoD = await torsoPath.getAttribute("d");
+  await torsoSlider.press("End");
+  const longTorsoD = await torsoPath.getAttribute("d");
+  assert.notEqual(shortTorsoD, longTorsoD, "Torso slider endpoints must change actual SVG path geometry");
+  const sleevePath = page.locator(".garment-sleeves path").first();
+  await sleeveSlider.focus(); await sleeveSlider.press("Home");
+  const shortSleeveD = await sleevePath.getAttribute("d");
+  await sleeveSlider.press("End");
+  const longSleeveD = await sleevePath.getAttribute("d");
+  assert.notEqual(shortSleeveD, longSleeveD, "Sleeve slider endpoints must change actual sleeve geometry");
+  await waistSlider.focus(); await waistSlider.press("Home");
+  const fittedTorsoTransform = await torsoPath.getAttribute("transform");
+  const fittedTorsoD = await torsoPath.getAttribute("d");
+  await waistSlider.press("End");
+  assert.notEqual(await torsoPath.getAttribute("d"), fittedTorsoD, "Waist fit must change actual torso path geometry");
+  assert.notEqual(await torsoPath.getAttribute("transform"), fittedTorsoTransform, "Waist fit must alter the garment-only transform");
+  const setRangeValue = async (locator, value) => locator.evaluate((el, next) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    setter?.call(el, String(next));
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+  await setRangeValue(torsoSlider, 24);
+  await setRangeValue(sleeveSlider, 92);
+  await setRangeValue(waistSlider, 76);
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-torso-length"), "24");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-sleeve-length"), "92");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-waist-fit"), "76");
   await page.locator(".style-fields select").nth(1).selectOption("transformation");
   await page.locator(".view-toggle button").nth(1).click();
   await page.locator(".style-fields select").nth(3).selectOption("fox");
@@ -429,7 +469,10 @@ try {
   assert.ok(patchContrast >= 3, `Automatic Chromapatch contrast should be at least 3:1, got ${patchContrast}`);
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
   prompt = await page.locator(".prompt-panel pre").innerText();
-  assert.ok(prompt.includes("Visual recipe CyberStreet v2"), "The official prompt should include the visual recipe");
+  assert.ok(prompt.includes("Visual recipe CyberStreet v3"), "The official prompt should include the visual recipe v3");
+  assert.ok(prompt.includes("torso length 24/100"), "The official prompt should include parametric torso length");
+  assert.ok(prompt.includes("sleeve length 92/100"), "The official prompt should include parametric sleeve length");
+  assert.ok(prompt.includes("waist fit 76/100"), "The official prompt should include parametric waist fit");
   assert.ok(prompt.includes("transformed synthetic textile sheen"), "The selected NanoWear state should reach the prompt");
   const [profileDownload] = await Promise.all([page.waitForEvent("download"), page.locator(".prompt-actions button").nth(2).click()]);
   const exportedProfile = JSON.parse(await readFile(await profileDownload.path(), "utf8"));
@@ -437,6 +480,9 @@ try {
   assert.equal(exportedProfile.visual_recipe.garment_panel_color, "#456789", "Export must preserve the NanoWear panel color");
   assert.equal(exportedProfile.visual_recipe.garment_accent_color, "#55d9cf", "Export must preserve the technology accent");
   assert.equal(exportedProfile.visual_recipe.fabric_pattern, "geometric", "Export must preserve the fabric pattern");
+  assert.equal(exportedProfile.visual_recipe.torso_length, 24, "Export must preserve torso length");
+  assert.equal(exportedProfile.visual_recipe.sleeve_length, 92, "Export must preserve sleeve length");
+  assert.equal(exportedProfile.visual_recipe.waist_fit, 76, "Export must preserve waist fit");
   assert.equal(await saveButton.isDisabled(), false, "A synchronized visual recipe should be saveable");
 
   await page.getByRole("tab", { name: /Cabello/i }).click();
@@ -477,6 +523,9 @@ try {
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Loading a saved profile must restore the NanoWear panel color");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Loading a saved profile must restore the technology accent");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "Loading a saved profile must restore the fabric pattern");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-torso-length"), "24", "Loading a saved profile must restore torso length");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-sleeve-length"), "92", "Loading a saved profile must restore sleeve length");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-waist-fit"), "76", "Loading a saved profile must restore waist fit");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i,
     "Loading a saved profile should restore the selected presentation view");
   assert.equal(await page.locator(".style-fields select").nth(3).inputValue(), "fox", "Loading a saved profile should restore its Chromapatch shape");
