@@ -380,7 +380,13 @@ try {
   await page.locator(".view-toggle button").nth(1).click();
   await page.locator(".style-fields select").nth(2).selectOption("fox");
   await page.locator(".style-fields select").nth(4).selectOption("auto");
-  await page.locator(".style-fields input[type=color]").fill("#111111");
+  await page.locator(".style-fields input[type=color]").evaluate(el => {
+    const input = el;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    setter?.call(input, "#111111");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   const animeSlider = page.locator(".style-range input").nth(0);
   await animeSlider.focus();
   await animeSlider.press("End");
