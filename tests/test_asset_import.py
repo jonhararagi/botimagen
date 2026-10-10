@@ -33,6 +33,26 @@ def make_png(width: int = 2, height: int = 1) -> bytes:
             + png_chunk(b"IEND", b""))
 
 
+def make_png_structure(width=2, height=1, bit_depth=8, color_type=6,
+                       before_idat=(), between_idat=(), after_idat=(), split_idat=False):
+    channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[color_type]
+    row_bytes = (width * channels * bit_depth + 7) // 8
+    scanlines = b"".join(b"\x00" + bytes(row_bytes) for _ in range(height))
+    compressed = zlib.compress(scanlines)
+    chunks = [png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, bit_depth, color_type, 0, 0, 0))]
+    chunks.extend(before_idat)
+    if split_idat:
+        midpoint = max(1, len(compressed) // 2)
+        chunks.append(png_chunk(b"IDAT", compressed[:midpoint]))
+        chunks.extend(between_idat)
+        chunks.append(png_chunk(b"IDAT", compressed[midpoint:]))
+    else:
+        chunks.append(png_chunk(b"IDAT", compressed))
+    chunks.extend(after_idat)
+    chunks.append(png_chunk(b"IEND", b""))
+    return api.PNG_SIGNATURE + b"".join(chunks)
+
+
 class AssetImportTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
