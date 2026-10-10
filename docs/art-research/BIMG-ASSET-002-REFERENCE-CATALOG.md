@@ -115,3 +115,15 @@ Estimaciones de planificación, no tiempo medido:
 - **Tiempo estimado para preparar una primera colección lista para evaluación:** 1,5–3 horas tras elegir candidatos y confirmar permisos.
 
 **Conclusión:** RESEARCH_PARTIAL. Siguiente paso: revisión humana y decisión explícita sobre qué candidatos pasan a un experimento controlado.
+
+## I. Registro de cierre documental BIMG-ASSET-002-R2
+
+- **Resultado de la inspección adicional del navegador:** sin hallazgos nuevos ni fuentes verificables devueltas. La tarea terminó al alcanzar su límite de coste; no produjo evidencia visual utilizable para actualizar el catálogo.
+- Este resultado es **neutral** respecto de los candidatos: no confirma ni refuta sus estilos, metadatos, procedencia o licencias. No se infiere evidencia positiva o negativa del intento fallido.
+- No se inició otra sesión de navegador ni se realizaron búsquedas externas para este cierre.
+- La inspección visual comparativa de muestras reales sigue incompleta. Las descripciones y metadatos anotados en este documento no equivalen a una comparación visual independiente en resolución completa.
+- La revisión individual de licencias, modelos base, derechos de terceros y permisos de uso local, modificación y redistribución sigue pendiente donde se indica `LICENSE_UNKNOWN` o una condición por verificar. Los permisos declarados por una plataforma no se consideran autorización universal para pesos, bases, referencias o resultados.
+- **Decisión documental:** el catálogo permanece en `RESEARCH_PARTIAL`. No se aprueba ningún estilo ni recurso para producción y no se declara BIMG-ASSET-002 completamente terminado.
+- **Cambios de alcance:** este registro es la única adición prevista; no se modifican código, assets, manifiestos, dependencias, `main`, PR #8 ni PR #10.
+- **Comprobaciones:** se revisó la coherencia del contenido existente y se compararon las referencias de rama/PR con GitHub. No se ejecutaron tests de software porque el cambio es documentación Markdown; no se afirma que se haya ejecutado un linter Markdown local.
+
