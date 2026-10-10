@@ -68,13 +68,6 @@ function optionColor(id: string, fallback: string) {
   return map[id] ?? fallback;
 }
 
-export function buildVisualPrompt(value: unknown): string {
-  const r = normalizeVisualRecipe(value);
-  const state = { everyday: "ordinary wearable street clothing, subtle seams", nanoweave: "technical programmable nanofabric, restrained luminous seam channels", transformation: "transformed synthetic textile sheen and controlled cybernetic panel accents" }[r.nanowear_state];
-  const finish = { textile: "matte everyday textile", nanoweave: "fine technical nanoweave surface", synthetic: "glossy synthetic finish" }[r.material_finish];
-  return `Visual recipe CyberStreet v${r.schema_version}: ${r.anime_influence}% anime influence, ${r.toon_influence}% toon influence, ${r.streetwear_cyberpunk}% streetwear-to-cyberpunk detailing, ${r.detail_level}% decorative detail. NanoWear state: ${state}; material finish: ${finish}. Personal original Chromapatch emblem: ${r.emblem_shape}, ${r.emblem_color}, position ${r.emblem_position}, contrast mode ${r.emblem_contrast}. Keep the selected outfit recognizable as wearable clothing; technology accents must remain proportional to the cyberpunk balance and never replace every garment with armor.`;
-}
-
 type RendererProps = { values: Record<string, string>; recipe: VisualRecipe; onRecipeChange: (recipe: VisualRecipe) => void };
 export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: RendererProps) {
   const r = normalizeVisualRecipe(recipe);
