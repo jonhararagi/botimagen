@@ -96,3 +96,13 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 
 - BIMG-008: CI #198 PASS_REAL valida pruebas Python/API, `npm ci`, build y Chromium E2E de rechazo de PNG inválido: https://github.com/jonhararagi/botimagen/actions/runs/38025915939. CI #199 PASS_REAL añade el recorrido de éxito UI→API→archivo canónico y valida toda la suite Python, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38026040558. BIMG-008 se estima al 70% por evidencia real; cierre y QA Windows aún pendientes. Progreso recalculado: **67,76 / 100 → 68%**.
+
+
+## BIMG-008-R1 · revisión de seguridad PNG · 2026-10-10
+
+- Revisión estática del validador detectó que se aceptaban PNG indexados sin PLTE, paletas mal formadas o fuera de posición y bloques críticos desconocidos. Se corrigió la validación de tipo de bloque, bit reservado, PLTE obligatorio/único/ubicación/longitud y máximo de entradas según profundidad; se mantiene la validación de IHDR, IDAT consecutivos, IEND final, CRC, dimensiones, límite de bytes/píxeles/scanlines y filtros.
+- Regresiones añadidas para profundidad de bits inválida, PLTE ausente/duplicado/mal formado/demasiado grande/fuera de lugar, PLTE prohibido en escala de grises, bloque crítico desconocido, bit reservado inválido, IDAT no consecutivos, IHDR duplicado, datos sobrantes, symlink en el destino y dos importaciones concurrentes.
+- CI #198/#199 son evidencia válida de la implementación anterior, pero no se atribuyen al nuevo código R1. CI #202 validó el HEAD documental previo. La validación de esta revisión queda pendiente hasta que una ejecución cubra el HEAD final.
+- El porcentaje global permanece en **67,76 / 100 → 68%**: esta tarea refuerza seguridad y regresiones, no completa por sí sola una fase beta ni integra el PR en main. BIMG-008 sigue PARTIAL (~70%); PR #8 sigue abierto hasta nueva comprobación. QA física Chrome/Edge en Windows: **NOT_RUN**.
+- Limitaciones documentadas: validador estructural con zlib/scanlines, no decodificador semántico completo; PNG entrelazados rechazados deliberadamente; protección contra procesos locales maliciosos con los mismos permisos no es absoluta.
+- TIMER real de esta revisión hasta la actualización documental: trabajo ejecutado por iteraciones durante la sesión; no hay cronómetro de pared fiable disponible. TIMER restante estimado: 30–90 minutos para CI final y revisión del PR, más 30–60 minutos si se realiza QA física en Windows.
