@@ -90,3 +90,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Investigación comparativa BIMG-RESEARCH-002 sobre intake local: MDN/W3C (validación de archivos y ciclo de vida de object URLs) y reportes públicos de Filerobot Image Editor. Decisiones y casos de prueba propuestos para BIMG-008 quedan en `cerebro/INVESTIGACION_COMPARATIVA.md`; no se ejecutó un benchmark ni cambió el progreso: **62,16 / 100 → 62%**.
 
 - CI #179 PASS_REAL: PR #2 fusiona la regresión de reproducibilidad de semilla. El payload completo se repite exactamente con cinco semillas y ambos modos `surprise`; también pasan generador, API, build web y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38013431814. Es cobertura de calidad, no cierre de fase: progreso ponderado sin cambio, **62,16 / 100 → 62%**. QA física Windows sigue NOT_RUN.
+
+
+- BIMG-ENGINE-005 CyberStreet visual slice, first implementation: CI #294 PASS_REAL for Python/API/recipe checks, React/TypeScript build, Chromium smoke and 81-file visual QA artifact: https://github.com/jonhararagi/botimagen/actions/runs/38061347842. Inspection of real screenshots found two visual issues (bomber pockets at fit 0 and long-coat length); follow-up corrections are in progress. This is incremental renderer QA, not phase completion. Global beta progress remains **63%**; WINDOWS_MANUAL_QA: NOT_RUN.

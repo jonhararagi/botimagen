@@ -144,7 +144,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   // The skin arm remains below fabric; 0..100 maps to a visible 300..362 hem.
   const sleeveEnd = 300 + r.sleeve_length * .62;
   const bomberHem = 285 + r.torso_length * .55;
-  const coatHem = 335 + r.torso_length * .75;
+  const coatHem = 350 + r.torso_length * .85;
   const fitTransform = `translate(170 0) scale(${.9 + r.waist_fit / 500} 1) translate(-170 0)`;
   const capabilities = getGarmentCapabilities(values);
   const hasHood = values.outer_layer === "hooded_jacket";
@@ -219,7 +219,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
       <path d={`M125 263 Q143 272 145 294 L142 ${bomberHem - 7} L156 ${bomberHem} L154 286 L170 292 L186 286 L184 ${bomberHem} L198 ${bomberHem - 7} L195 294 Q197 272 216 263`} fill={fabric} stroke={stroke} strokeWidth={line}/>
       <path d={`M170 289 L170 ${bomberHem - 9}`} stroke={accent} strokeWidth={2.2} fill="none"/>
       <path d={`M163 296 L163 ${bomberHem - 13} M177 296 L177 ${bomberHem - 13}`} stroke={stroke} strokeWidth={.8} fill="none" opacity=".8"/>
-      <path d={`M139 307 L160 314 L160 ${Math.min(bomberHem - 20, 342)} L139 ${Math.min(bomberHem - 25, 337)} Z M201 307 L180 314 L180 ${Math.min(bomberHem - 20, 342)} L201 ${Math.min(bomberHem - 25, 337)} Z`} fill={fabric} stroke={accent} strokeWidth={.9}/>
+      {bomberHem > 310 && <path d={`M139 ${bomberHem - 42} L160 ${bomberHem - 35} L160 ${bomberHem - 15} L139 ${bomberHem - 22} Z M201 ${bomberHem - 42} L180 ${bomberHem - 35} L180 ${bomberHem - 15} L201 ${bomberHem - 22} Z`} fill={fabric} stroke={accent} strokeWidth={.9}/>}
       <path d={`M137 ${bomberHem - 13} Q170 ${bomberHem - 7} 203 ${bomberHem - 13} L198 ${bomberHem} Q170 ${bomberHem + 4} 142 ${bomberHem} Z`} className="street-bomber-hem" fill={accent} stroke={stroke} strokeWidth={.8}/>
       <path d={`M131 270 Q140 280 143 298 M209 270 Q200 280 197 298`} stroke={accent} strokeWidth={1.4} fill="none"/>
       {rear && <><path d={`M139 279 Q170 291 201 279 L198 ${bomberHem - 10} Q170 ${bomberHem - 3} 142 ${bomberHem - 10} Z`} fill={fabric} stroke={accent} strokeWidth={1}/><path d={`M170 282 L170 ${bomberHem - 12}`} stroke={accent} strokeWidth={1.2}/></>}

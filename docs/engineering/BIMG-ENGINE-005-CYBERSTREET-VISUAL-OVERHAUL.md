@@ -33,3 +33,12 @@ Planned estimate: 6–10 hours. Actual elapsed time is not measured.
 ## Captures added
 
 The existing CI artifact now includes visual-slice-manifest.json plus real Chromium screenshots for street_bomber, tactical_baseball, and long_coat, front and rear, torso fit 0/50/100, plus NanoWear nanoweave and transformation examples. Artifact generation is not equivalent to visual acceptance; inspect the exact run artifact.
+
+
+## First exact-head artifact inspection
+
+CI run 38061347842 succeeded and uploaded 81 files, including the 20 new visual-slice captures. The first inspection found two genuine presentation defects that are being corrected in a follow-up: bomber patch pockets became malformed at torso fit 0 because the crop left no room for them, and the long coat read too much like a mid-length jacket at the default fit. The low-fit bomber now suppresses pockets when there is insufficient garment height, and the coat hem range is extended. Because the initial artifact exposed these issues, the acceptance state remains PARTIAL until the follow-up run is inspected.
+
+- Initial implementation CI: https://github.com/jonhararagi/botimagen/actions/runs/38061347842
+- Initial artifact: https://github.com/jonhararagi/botimagen/actions/runs/38061347842/artifacts/11673321986
+- WINDOWS_MANUAL_QA: NOT_RUN.
