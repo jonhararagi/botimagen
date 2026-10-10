@@ -705,10 +705,22 @@ try {
   await outerLayerSelect.selectOption("short_bomber");
   await captureVisual("03-outer-short-bomber");
   const shortLayerBox = await page.locator(".garment-layer.short-bomber").evaluate(node => node.getBBox().height);
+  const shortOuterSleeveCount = await page.locator(".garment-layer.outer-layer-sleeves").count();
+  assert.equal(shortOuterSleeveCount, 1, "A short bomber outer layer must render its own sleeves above the base sleeves");
+  const shortSleevePaintOrder = await page.locator(".garment-sleeves").evaluate(baseSleeves => {
+    const outerSleeves = document.querySelector(".garment-layer.outer-layer-sleeves");
+    return !!outerSleeves && !!(baseSleeves.compareDocumentPosition(outerSleeves) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  assert.equal(shortSleevePaintOrder, true, "Outer-layer sleeves must paint after base sleeves");
   await outerLayerSelect.selectOption("long_coat");
   await captureVisual("04-outer-long-coat");
   const longLayerBox = await page.locator(".garment-layer.long-coat path").first().evaluate(node => node.getBBox().height);
   assert.ok(longLayerBox > shortLayerBox, "The long coat must extend farther than the short bomber outer layer");
+  assert.equal(await page.locator(".garment-layer.outer-layer-sleeves").count(), 1,
+    "A long coat must retain its own visible outer sleeves");
+  await outerLayerSelect.selectOption("none");
+  assert.equal(await page.locator(".garment-layer.outer-layer-sleeves").count(), 0,
+    "The none outer-layer ID must not draw an extra sleeve layer");
 
   await outerLayerSelect.selectOption("none");
   await setVisualRange("Largo de mangas", 0);
