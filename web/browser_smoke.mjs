@@ -519,6 +519,41 @@ try {
     assert.deepEqual(audit.invalid, [], `Every visible field must have a connected label in tab ${tabName}`);
   }
 
+  // Legacy profiles without a visual recipe must still load with safe defaults.
+  const legacyProfile = await page.evaluate(async () => {
+    const response = await fetch("/api/profiles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Legacy profile without visual recipe",
+        profile: { schema_version: 1, mode: "local-engine", style_id: "bw-modern-gacha-v1", seed: 11, selections: { species: "humana" } },
+      }),
+    });
+    if (!response.ok) throw new Error("Unable to create a legacy profile fixture");
+    return response.json();
+  });
+  assert.ok(legacyProfile.id, "The API should save the legacy fixture independently");
+  const profileDetails = page.locator(".saved-profile-panel");
+  if (!(await profileDetails.evaluate(element => element.open))) await profileDetails.locator("summary").click();
+  await page.locator(".refresh-profiles").click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("Lista de perfiles locales actualizada"),
+    undefined,
+    { timeout: 10000 },
+  );
+  await page.locator(".saved-profile-item").filter({ hasText: "Legacy profile without visual recipe" }).click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("Perfil cargado con cambios no sincronizados"),
+    undefined,
+    { timeout: 10000 },
+  );
+  assert.equal(await page.locator(".style-fields select").nth(0).inputValue(), "everyday",
+    "A legacy profile without visual_recipe should receive the safe NanoWear default");
+  assert.equal(await page.locator(".style-fields select").nth(2).inputValue(), "bunny",
+    "A legacy profile without visual_recipe should receive the safe Chromapatch default");
+  assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /frontal/i,
+    "A legacy profile without visual_recipe should default to the front presentation");
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
