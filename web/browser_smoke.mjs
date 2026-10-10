@@ -902,6 +902,42 @@ try {
   };
   await writeFile(resolve(visualQaDir, "matrix-manifest.json"), JSON.stringify(matrixManifest, null, 2));
 
+  // BIMG-ENGINE-005 visual slice: same character/camera, distinct garment structures.
+  const sliceCaptures = [];
+  const captureSliceGarment = async (kind, id, view, fit, state = "everyday") => {
+    if (kind === "outfit") {
+      await outerLayerSelect.selectOption("none");
+      await outfitSelect.selectOption(id);
+    } else {
+      await outfitSelect.selectOption("street_bomber");
+      await outerLayerSelect.selectOption(id);
+    }
+    await page.getByRole("button", { name: view === "front" ? "Frontal" : "Trasera" }).click();
+    await setVisualRange("Largo del torso", fit);
+    await page.getByLabel("Estado NanoWear").selectOption(state);
+    const name = "visual-slice-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + view + "-fit-" + fit + "-" + state;
+    await captureVisual(name);
+    sliceCaptures.push(name + ".png");
+  };
+  for (const [kind, id] of [["outfit", "street_bomber"], ["outfit", "tactical_baseball"], ["outer", "long_coat"]]) {
+    for (const view of ["front", "back"]) {
+      for (const fit of [0, 50, 100]) await captureSliceGarment(kind, id, view, fit);
+    }
+  }
+  await captureSliceGarment("outfit", "street_bomber", "front", 50, "transformation");
+  await captureSliceGarment("outfit", "tactical_baseball", "front", 50, "nanoweave");
+  const sliceManifest = {
+    source: "unmodified BotImagen app rendered in Chromium",
+    sameCharacterAndViewport: true,
+    garments: ["street_bomber", "tactical_baseball", "long_coat"],
+    views: ["front", "back"],
+    torsoFitValues: [0, 50, 100],
+    nanowearStates: ["everyday", "nanoweave", "transformation"],
+    captures: sliceCaptures,
+    note: "Real application screenshots; capture and geometry assertions do not constitute independent aesthetic approval.",
+  };
+  await writeFile(resolve(visualQaDir, "visual-slice-manifest.json"), JSON.stringify(sliceManifest, null, 2));
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
