@@ -42,3 +42,24 @@ CI run 38061347842 succeeded and uploaded 81 files, including the 20 new visual-
 - Initial implementation CI: https://github.com/jonhararagi/botimagen/actions/runs/38061347842
 - Initial artifact: https://github.com/jonhararagi/botimagen/actions/runs/38061347842/artifacts/11673321986
 - WINDOWS_MANUAL_QA: NOT_RUN.
+
+
+## Follow-up exact-head visual review
+
+- Follow-up code commit: 808ad1f67969d5fbd499d84a7f34874dd0037115.
+- Exact-head CI: https://github.com/jonhararagi/botimagen/actions/runs/38061573243 — success. Python syntax, asset manifest, generator/reproducibility/style/API/editor/recipe tests, React+TypeScript build, and Chromium smoke passed. The workflow uploaded artifact https://github.com/jonhararagi/botimagen/actions/runs/38061573243/artifacts/11673715909 (81 files; 20 visual-slice captures plus existing matrix captures/manifests).
+- I inspected the final artifact's 20 visual-slice captures as a contact sheet and at full size. The low-fit bomber no longer draws pockets in a space too short for them. The long coat has a visibly longer front and rear silhouette with a center opening and panel seams. No screenshot was edited or composited to fake the result.
+
+### Before/after comparison
+
+- **street_bomber:** baseline capture 01 showed a short torso shell with a broad hem and few construction cues. The new sample has a separate shell, center closure, side pocket panels, ribbed hem and shoulder seams. At fit 0 the pockets are intentionally omitted because the crop cannot fit them; at fit 50/100 they are present.
+- **tactical_baseball:** baseline matrix geometry used a simple angular torso panel. The new sample adds shoulder/side color-block panels, a vertical placket, seam lines, pocket panels and rear-view yoke/center seam. It is now structurally distinct from the bomber, although both still share the underlying arm/anatomy model.
+- **long_coat:** baseline capture 04 read more like a long jacket ending around the upper thigh. The new sample extends the coat hem further down the legs, with front lapel/opening geometry, vertical seams and a separate rear panel treatment. The length difference is visible at the same character and viewport.
+
+### Acceptance
+
+**Status: PARTIAL.** The targeted garment slice and real screenshot pipeline work, and the three garments now have more distinguishable construction. However, the character anatomy and sleeve base remain generic SVG geometry, the tactical jacket still shares the same basic arm/body rig, folds and fabric physics are absent, and the overall figure is still a stylized prototype rather than a commercial-grade character creator. This is an honest incremental improvement, not a claim that the full visual-quality goal is complete.
+
+**WINDOWS_MANUAL_QA: NOT_RUN.** Headless Linux Chromium is not physical Windows Chrome/Edge validation.
+
+**TIMER:** planned 6–10 hours; actual elapsed time not measured.
