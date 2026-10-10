@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
+import AssetImporter from "./AssetImporter";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
 type FieldId = string;
@@ -261,6 +262,7 @@ export default function App(){
   <main className="main">
    <header className="topbar"><div className="crumb">WORKSPACE <span>/</span> <b>CHARACTER DESIGN</b></div><div className="top-actions"><span className="local-pill"><i/> {catalog?"LOCAL · CONECTADO":"LOCAL · DESCONECTADO"}</span><span className="avatar">BW</span></div></header>
    <section className="heading"><div><div className="eyebrow"><i/> ESTUDIO DE PERSONAJES <span>BIMG-004</span></div><h1>Diseña una nueva <em>waifu.</em></h1><p>Selecciona rasgos del catálogo real y deja que el motor complete los campos AUTO.</p></div><div className="heading-buttons"><button className="btn muted" onClick={reset} type="button" disabled={generating}>Restaurar ejemplo</button><button className="btn primary" onClick={() => void saveProfile()} type="button" disabled={!generated||draftDirty||generating}>＋ {draftDirty?"Genera para guardar":saved?"Perfil guardado":"Guardar perfil local"}</button></div></section>
+   <AssetImporter />
    <div className="workspace">
     <section className="preview-area">
      <div className="kicker"><span><i>01</i> LIENZO DEL PERSONAJE</span><small>PREVIEW <i/></small></div>

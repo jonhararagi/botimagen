@@ -33,3 +33,27 @@
 .saved-profile-copy{flex:0 0 auto;min-width:62px;padding:7px 8px;border:1px solid #453854;border-radius:7px;color:#d9c0e3;background:#221b2e;font-size:9px;font-weight:600}
 .saved-profile-copy:hover:not(:disabled){border-color:#b18bc0;background:#30213a}
 .saved-profile-copy:disabled{opacity:.55;cursor:wait}
+
+
+.asset-importer{margin:0 0 18px;padding:18px;border:1px solid #353047;border-radius:12px;background:linear-gradient(135deg,#191827,#111624);color:#dfe2ed}
+.asset-import-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:15px}
+.asset-import-heading h2{margin:12px 0 5px;font-size:17px;font-weight:650;letter-spacing:-.025em}
+.asset-import-heading p{max-width:660px;margin:0;color:#8f98ae;font-size:11px;line-height:1.6}
+.asset-local-tag{flex-shrink:0;padding:6px 8px;border:1px solid #77c59b40;border-radius:5px;color:#9fd9b7;background:#4b9b7212;font:8px Consolas,monospace;letter-spacing:.08em}
+.asset-label{display:block;margin:12px 0 7px;color:#c8cddd;font-size:10px;font-weight:650}
+.asset-importer select,.asset-importer input[type=file]{box-sizing:border-box;width:100%;min-height:38px;padding:9px;border:1px solid #373e54;border-radius:6px;color:#e0e4ef;background:#101522;font:11px inherit}
+.asset-importer input[type=file]{padding:7px}
+.asset-contract-card{margin:10px 0 14px;padding:12px;border:1px solid #2c3348;border-radius:8px;background:#0e1320}
+.asset-contract-card>strong{font-size:11px;color:#e9d8ef}
+.asset-contract-card>p{margin:5px 0 10px;color:#8892a9;font-size:10px;line-height:1.5}
+.asset-contract-card dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.asset-contract-card dl div{min-width:0}
+.asset-contract-card dt{color:#7e879e;font-size:9px;margin-bottom:5px}
+.asset-contract-card dd{margin:0;overflow-wrap:anywhere;color:#c9cee0;font-size:10px}
+.asset-file-selected{color:#aeb7cb;font-size:10px;line-height:1.5;overflow-wrap:anywhere}
+.asset-file-selected strong{color:#e8d9ee}
+.asset-import-button{margin-top:12px}
+.asset-feedback{margin:12px 0 0;padding:10px 12px;border-radius:7px;font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+.asset-error{border:1px solid #e17c7c45;background:#9f454515;color:#ffb5b5}
+.asset-success{border:1px solid #78c99c45;background:#39845a15;color:#a5e0ba}
+@media(max-width:700px){.asset-importer{padding:13px}.asset-import-heading{gap:8px}.asset-import-heading p{font-size:10px}.asset-contract-card dl{grid-template-columns:1fr;gap:9px}.asset-local-tag{font-size:7px}}

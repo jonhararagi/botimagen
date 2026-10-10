@@ -2,7 +2,7 @@
 
 **Último cálculo:** 2026-10-10  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 63%**
+**Progreso global actual: 68%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -19,12 +19,12 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-005 · Editor completo por categorías | 18% | 87% · PARTIAL | 15,66 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
-| BIMG-008 · Intake de assets en la interfaz web | 8% | 10% · PARTIAL | 0,8 |
+| BIMG-008 · Intake de assets en la interfaz web | 8% | 70% · PARTIAL | 5,6 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **62,96 / 100 → 63%** |
+| **Total ponderado** | **100%** | | **67,76 / 100 → 68%** |
 
-BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **62,96 / 100 (63%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
+BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **67,76 / 100 (68%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
 
 ## Evidencia más reciente
 
@@ -90,3 +90,19 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Investigación comparativa BIMG-RESEARCH-002 sobre intake local: MDN/W3C (validación de archivos y ciclo de vida de object URLs) y reportes públicos de Filerobot Image Editor. Decisiones y casos de prueba propuestos para BIMG-008 quedan en `cerebro/INVESTIGACION_COMPARATIVA.md`; no se ejecutó un benchmark ni cambió el progreso: **62,16 / 100 → 62%**.
 
 - CI #179 PASS_REAL: PR #2 fusiona la regresión de reproducibilidad de semilla. El payload completo se repite exactamente con cinco semillas y ambos modos `surprise`; también pasan generador, API, build web y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38013431814. Es cobertura de calidad, no cierre de fase: progreso ponderado sin cambio, **62,16 / 100 → 62%**. QA física Windows sigue NOT_RUN.
+
+
+- BIMG-008, rama `feat/bimg-008-safe-png-import`: se añadió endpoint de importación por ID de contrato, validación estructural PNG, escritura temporal sin sobrescritura, UI React y pruebas HTTP/E2E. **El porcentaje ponderado se mantiene en 63% (62,96/100)** hasta que CI valide la implementación; los archivos escritos por sí solos no justifican elevar el contador. Resultado de CI y PR pendiente al momento de esta nota. QA físico Windows continúa NOT_RUN.
+
+
+- BIMG-008: CI #198 PASS_REAL valida pruebas Python/API, `npm ci`, build y Chromium E2E de rechazo de PNG inválido: https://github.com/jonhararagi/botimagen/actions/runs/38025915939. CI #199 PASS_REAL añade el recorrido de éxito UI→API→archivo canónico y valida toda la suite Python, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38026040558. BIMG-008 se estima al 70% por evidencia real; cierre y QA Windows aún pendientes. Progreso recalculado: **67,76 / 100 → 68%**.
+
+
+## BIMG-008-R1 · revisión de seguridad PNG · 2026-10-10
+
+- Revisión estática del validador detectó que se aceptaban PNG indexados sin PLTE, paletas mal formadas o fuera de posición y bloques críticos desconocidos. Se corrigió la validación de tipo de bloque, bit reservado, PLTE obligatorio/único/ubicación/longitud y máximo de entradas según profundidad; se mantiene la validación de IHDR, IDAT consecutivos, IEND final, CRC, dimensiones, límite de bytes/píxeles/scanlines y filtros.
+- Regresiones añadidas para profundidad de bits inválida, PLTE ausente/duplicado/mal formado/demasiado grande/fuera de lugar, PLTE prohibido en escala de grises, bloque crítico desconocido, bit reservado inválido, IDAT no consecutivos, IHDR duplicado, datos sobrantes, symlink en el destino y dos importaciones concurrentes. La revisión de interfaz encontró que un HTTP 201 sin dimensiones podía confundirse con éxito; ahora la UI valida bytes/dimensiones y el E2E simula la respuesta incompleta.
+- CI #198/#199 son evidencia de la implementación inicial, no del código R1. CI #213 detectó el error de formato TypeScript de la guarda de respuesta; se corrigió y CI #215 PASS_REAL validó el HEAD de código `2628fd49b0062063655e799d2b5217d318921664`. CI #217 PASS_REAL validó el HEAD documental `fe4ffa47842e589ec570c6745355fc6a121be505`, incluida batería Python/API, `npm ci`, build de producción y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38030182466. El HEAD final de cierre documental que se genere ahora debe pasar su propia CI. PR #8 sigue abierto, no integrado; QA física Windows `NOT_RUN`.
+- El porcentaje global permanece en **67,76 / 100 → 68%**: esta tarea refuerza seguridad y regresiones, no completa por sí sola una fase beta ni integra el PR en main. BIMG-008 sigue PARTIAL (~70%); PR #8 sigue abierto hasta nueva comprobación. QA física Chrome/Edge en Windows: **NOT_RUN**.
+- Limitaciones documentadas: validador estructural con zlib/scanlines, no decodificador semántico completo; PNG entrelazados rechazados deliberadamente; protección contra procesos locales maliciosos con los mismos permisos no es absoluta.
+- TIMER real consumido: no medido con cronómetro de pared durante las iteraciones, por lo que no se informa una duración exacta inventada. TIMER restante desde este checkpoint: 15–30 minutos para verificar CI del HEAD documental final y entregar/revisar el PR; 30–60 minutos adicionales si se realiza QA física Chrome/Edge en Windows. La estimación no incluye espera de revisores humanos.

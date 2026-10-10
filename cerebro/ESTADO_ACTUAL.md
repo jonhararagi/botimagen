@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: endpoint del manifiesto de assets y cobertura Chromium, 2026-10-10.
+Última actualización de esta ficha: cierre de revisión BIMG-008-R1, 2026-10-10. PR #8 permanece abierto, no fusionado y sin conflictos declarados; main sigue en `46bc7e702ae5d608927345991b5c4f0a661318a9`. HEAD de código revisado `2628fd49b0062063655e799d2b5217d318921664` pasó CI #215; HEAD documentado anterior `fe4ffa47842e589ec570c6745355fc6a121be505` pasó CI #217. Los commits documentales de cierre que se creen a continuación requieren su propia CI antes de dar por cerrada la verificación.
 
 ## Repositorio
 
@@ -52,7 +52,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Prueba manual en Chrome/Edge sobre Windows y prueba física en el PC. El smoke test headless Chromium en Linux ya pasa en CI.
 - Biblioteca de referencias avanzada con SQLite, miniaturas, filtros y metadatos.
 - Comparación lado a lado de variantes.
-- Intake de assets migrado a la web.
+- Importación web de assets implementada por contrato en la rama del PR #8; integración en main pendiente y QA física Windows NOT_RUN.
 - Integración de generación de imágenes local.
 - Interfaz remota con acceso desde otras máquinas.
 - Empaquetado de escritorio con Tauri/Electron.
@@ -64,7 +64,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~87%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #144 valida rol tank y prendas/prop; CI #152 PASS_REAL comprueba que una anatomía fijada manualmente se conserva aunque contradiga especie; CI #190 PASS_REAL añade restauración de ejemplo, estado de guardado pendiente, etiquetas conectadas de las ocho pestañas y responsive sin overflow en 320/390/768/1024 px. Faltan otros flujos de error, revisión visual amplia y QA física en Windows.
 - BIMG-006: PARTIAL (~70%). Catálogo v16 mantiene 47 categorías; `compatible_with` contiene 111 opciones y 303 valores permitidos en 11 relaciones. Incluye largo/corte/arreglo, outfit/rol, prop/rol, capa/calzado/accesorio por rol y anatomía por especie. v16 añade semántica explícita para `outer_layer=none`. CI #167/#168 PASS_REAL cubre prompt y flujo UI; CI #153 recorre todas las opciones declaradas con AUTO, #151 valida paridad del catálogo público y #152 prueba persistencia del override anatómico manual. QA física en Windows sigue pendiente.
-- BIMG-008: PARTIAL (~10%). `GET /api/assets/contracts` expone los 10 contratos PNG oficiales y valida las rutas relativas. **CI #194 PASS_REAL** verifica contrato, método `Allow: GET`, respuesta por proxy desde Chromium, pruebas de API, build y E2E existente: https://github.com/jonhararagi/botimagen/actions/runs/38024212437. La carga/validación/copia real de imágenes y su historial web aún no están implementados.
+- BIMG-008: PARTIAL (~70%) en `feat/bimg-008-safe-png-import`; el importador React/API valida y publica PNG por contrato. R1 añade validación de PLTE/bloques críticos/secuencia IDAT, regresiones de concurrencia y symlinks, y rechazo UI de HTTP 201 incompleto. CI #215 PASS_REAL valida el HEAD de código `2628fd49b0062063655e799d2b5217d318921664`; CI #217 PASS_REAL valida el HEAD documental `fe4ffa47842e589ec570c6745355fc6a121be505`: https://github.com/jonhararagi/botimagen/actions/runs/38030182466. En la comprobación actual, PR #8 está OPEN, `mergeable=true`, 37 commits ahead de `main`, 0 behind; no hay reviews ni threads de revisión registrados. No está integrada. QA física Chrome/Edge en Windows: NOT_RUN.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -74,15 +74,10 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
 - Progreso total ponderado hacia la beta local: **63%**, calculado en `cerebro/PROGRESO.md` (**62,96/100** sin redondear). HEAD funcional con el endpoint probado: `e08d3de4a40e0003893447a3011199b32fa8e7b3`; CI #194 PASS_REAL. El navegador físico Windows continúa `NOT_RUN`.
 
-## BIMG-008 · Catálogo de contratos de assets en la API local
+## BIMG-008 · Catálogo de contratos de assets en la API local (histórico)
 
-- La ruta `GET /api/assets/contracts` publica la lista del `assets_manifest.json` oficial sin permitir lectura/escritura arbitraria de rutas.
-- Cada entrada expone únicamente ID, título, descripción, prompt positivo/negative prompt, versión de prompt, destino relativo y contrato esperado (PNG, dimensiones cuando aplican y bytes máximos). Los campos privados/de generación no se copian desde otros catálogos.
-- Validación de servidor: manifiesto versión 1, campos requeridos, IDs/destinos únicos, destino PNG relativo, rechazo de separadores de Windows y `..`, dimensiones en pareja y límites positivos.
-- `GET` es el único método permitido; `PUT` recibe 405 con `Allow: GET`. No existe todavía endpoint de escritura o importación.
-- CI #193 detectó un NameError en una prueba por usar un helper de rutas sin importarlo. Se corrigió en CI #194: **PASS_REAL**, test HTTP, build y Chromium E2E pasan. https://github.com/jonhararagi/botimagen/actions/runs/38024212437.
-- TIMER de esta tanda: 5–10 minutos. BIMG-008 pasa de 0% a 10%; total ponderado de **62,16 / 100 → 62,96 / 100 → 63%**.
-- Siguiente paso: seleccionar archivo PNG desde la web y validarlo contra el contrato antes de implementar la copia atómica.
+- GET /api/assets/contracts publicó inicialmente los 10 contratos oficiales y fue validado en CI #194: https://github.com/jonhararagi/botimagen/actions/runs/38024212437.
+- Nota histórica: en aquella iteración aún no existía escritura web. La implementación posterior del importador está documentada en la sección BIMG-008 de esta ficha y en el PR #8. No usar este checkpoint como descripción del estado actual.
 
 ## Catálogo v15 · matriz de compatibilidad y persistencia de locks · 2026-10-09
 
@@ -291,3 +286,14 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **CI #190 PASS_REAL** añade la auditoría de etiquetas en ocho pestañas. Generador, API local, cobertura del editor, npm ci, build web y Chromium E2E completados: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
 - **TIMER:** 5–10 minutos de trabajo incremental y verificación. La cobertura E2E se amplió, pero no se cierra una fase de producto por pruebas solas. Progreso ponderado mantenido en **62,16 / 100 → 62%**. QA física en Windows, Chrome/Edge instalado y medidas de rendimiento continúan NOT_RUN.
 
+
+
+## BIMG-008 · Importador PNG web (implementación en rama, verificación pendiente)
+
+- Rama de trabajo: `feat/bimg-008-safe-png-import`. HEAD base inspeccionado: `46bc7e702ae5d608927345991b5c4f0a661318a9`.
+- Implementación añadida en rama: `POST /api/assets/import?asset_id=...`, con destino derivado únicamente de `assets_manifest.json`; lectura en bloques limitada por `max_bytes`; verificación de firma, estructura de chunks, CRC, dimensiones, zlib, filas/filtros y PNG no entrelazado; temporal dentro del directorio permitido; publicación atómica sin sobrescritura mediante hard link.
+- UI React `AssetImporter.tsx`: carga contratos, permite elegir archivo local y presenta estados de selección, error y confirmación solo tras una respuesta HTTP válida con status, asset_id, destino, bytes y dimensiones coherentes. Chromium también simula un HTTP 201 incompleto y comprueba que se muestre error, no éxito.
+- Tests añadidos: `tests/test_asset_import.py`; el workflow ejecuta esta batería y el smoke Chromium cubre el rechazo real de un archivo falso a través de la UI y el proxy.
+- **Evidencia CI:** run #198 PASS_REAL para sintaxis, manifiesto, suite Python (incluidos tests de importación), `npm ci`, build y Chromium E2E del rechazo de bytes falsos: https://github.com/jonhararagi/botimagen/actions/runs/38025915939. Run #199 valida además el nuevo recorrido E2E de importación válida; al actualizar esta ficha, la suite Python, build y Chromium E2E de importación válida y rechazo de bytes falsos están PASS_REAL: https://github.com/jonhararagi/botimagen/actions/runs/38026040558. Una ejecución previa (#197) falló solo por falta de la raíz del repo en `sys.path` de la nueva prueba; corregido en el commit `3d1b7466343d34ddaf90a94b7b59ac5992688f49` y validado por #198. La prueba manual Chrome/Edge físico en Windows sigue NOT_RUN.
+- **Limitación deliberada:** la validación usa la biblioteca estándar (zlib + validación estructural PNG) y rechaza PNG entrelazados; no se añade dependencia externa. Revisar compatibilidad con exportadores reales en QA manual.
+- Próximo paso dentro de BIMG-008: esperar CI, corregir fallos, comprobar HEAD de rama y abrir PR si la batería está verde.

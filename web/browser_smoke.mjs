@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { existsSync, unlinkSync } from "node:fs";
+import { deflateSync } from "node:zlib";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -12,6 +14,40 @@ const playwrightModule = process.env.BOTIMAGEN_PLAYWRIGHT_MODULE
   ?? resolve(webRoot, "node_modules", "playwright", "index.mjs");
 
 const { chromium } = await import(pathToFileURL(playwrightModule).href);
+
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function pngChunk(typeText, payload) {
+  const type = Buffer.from(typeText, "ascii");
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(payload.length);
+  const checksum = Buffer.alloc(4);
+  checksum.writeUInt32BE(crc32(Buffer.concat([type, payload])));
+  return Buffer.concat([length, type, payload, checksum]);
+}
+
+function makePngFixture(width, height) {
+  const scanlines = Buffer.alloc((width * 4 + 1) * height);
+  const compressed = deflateSync(scanlines);
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8; ihdr[9] = 6;
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    pngChunk("IHDR", ihdr),
+    pngChunk("IDAT", compressed),
+    pngChunk("IEND", Buffer.alloc(0)),
+  ]);
+}
+
 const children = [];
 const logs = { api: "", vite: "" };
 let browser;
@@ -105,6 +141,63 @@ try {
     ),
     "The public asset contract catalog must expose safe relative PNG destinations",
   );
+
+  // Exercise the real UI -> Vite proxy -> Python importer rejection path.
+  await page.locator("#asset-png-file").setInputFiles({
+    name: "invalid.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("not a PNG image"),
+  });
+  await page.getByRole("button", { name: /Importar PNG validado/i }).click();
+  await page.getByRole("alert").filter({ hasText: "firma PNG válida" }).waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await page.getByText(/Importación confirmada por el servidor/i).count(), 0,
+    "The UI must not claim import success when the API rejects invalid PNG bytes");
+
+  // Then verify a valid contract-sized PNG travels through the same UI/API path and is really written.
+  const importContract = assetContracts.contracts.find(item => !existsSync(resolve(root, item.destination)));
+  assert.ok(importContract, "At least one canonical asset destination must be free for an isolated import fixture");
+  await page.locator("#asset-contract").selectOption(importContract.id);
+  const importWidth = importContract.expected.width ?? 2;
+  const importHeight = importContract.expected.height ?? 1;
+  const fixture = makePngFixture(importWidth, importHeight);
+  assert.ok(fixture.length <= (importContract.expected.max_bytes ?? 12 * 1024 * 1024),
+    "The generated PNG fixture must fit the selected contract byte limit");
+  const importPath = resolve(root, importContract.destination);
+  await page.locator("#asset-png-file").setInputFiles({
+    name: "valid-fixture.png", mimeType: "image/png", buffer: fixture,
+  });
+
+  // A nominal HTTP 201 is not success unless the complete server contract is present.
+  const importRouteMatcher = url => url.pathname === "/api/assets/import";
+  const malformedImportRoute = async route => {
+    const requestUrl = new URL(route.request().url());
+    if (requestUrl.searchParams.get("asset_id") !== importContract.id) return route.continue();
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        status: "imported", asset_id: importContract.id,
+        destination: importContract.destination, bytes: fixture.length,
+      }),
+    });
+  };
+  await page.route(importRouteMatcher, malformedImportRoute);
+  await page.getByRole("button", { name: /Importar PNG validado/i }).click();
+  await page.getByRole("alert").filter({ hasText: "confirmación de importación inesperada" }).waitFor({
+    state: "visible", timeout: 10000,
+  });
+  assert.equal(await page.getByText(/Importación confirmada por el servidor/i).count(), 0,
+    "An incomplete HTTP 201 response must not be shown as a successful import");
+  await page.unroute(importRouteMatcher, malformedImportRoute);
+
+  await page.getByRole("button", { name: /Importar PNG validado/i }).click();
+  await page.getByRole("status").filter({ hasText: "Importación confirmada por el servidor" }).waitFor({
+    state: "visible", timeout: 10000,
+  });
+  assert.equal(existsSync(importPath), true, "Successful UI confirmation must correspond to a real destination file");
+  assert.deepEqual(await (await import("node:fs/promises")).readFile(importPath), fixture,
+    "The canonical destination must contain the exact validated PNG bytes");
+  unlinkSync(importPath);
 
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const tipLabel = page.locator('label[for="trait-hair_tip_color"]');

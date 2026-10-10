@@ -103,13 +103,17 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 **Aceptación:** importar, indexar, buscar, abrir y eliminar/retirar una referencia; duplicados detectados por hash; los metadatos desconocidos se marcan como desconocidos, no inventados.
 
-### BIMG-008 · Integrar el flujo de assets existente
+### BIMG-008 · Importador PNG web seguro por contrato
 
-**Estado:** PARTIAL (~10%). El servicio local expone `GET /api/assets/contracts`, que lee los 10 contratos PNG del manifiesto oficial, conserva prompts, formato, límites y destinos relativos, y rechaza destinos absolutos, traversal, duplicados y metadatos inválidos. CI #194 valida HTTP, la lista desde Chromium a través del proxy y el resto del flujo E2E. No se copian imágenes todavía.  
-**TIMER restante:** 1–2 días.  
-**Trabajo pendiente:** adaptar selección de archivo, vista previa, validación de bytes/dimensiones, copiado atómico a destino, manejo de colisiones e historial local; conservar la aplicación anterior mientras la migración no esté completa.
+**Estado:** PARTIAL (~70%). El importador React/API, las pruebas HTTP y el E2E Chromium de éxito y rechazo ya existían en la rama del PR #8. La revisión BIMG-008-R1 confirmó defectos del validador: no exigía PLTE para PNG indexado, no validaba su longitud/posición/cantidad, aceptaba bloques críticos desconocidos y carecía de regresiones específicas para esos casos. Se corrigió el validador y se añadieron pruebas de paleta, profundidad de bits, bloques críticos, IDAT no consecutivos, IHDR duplicado, datos sobrantes, symlink de destino y concurrencia. También se detectó y corrigió un hueco de UI: un HTTP 201 con campos de confirmación incompletos podía llegar a presentarse como éxito; el E2E Chromium simula esa respuesta y exige un error recuperable.
 
-**Aceptación:** importar un archivo válido y rechazar ejemplos inválidos con mensaje útil; no alterar el original; las operaciones de Git se mantienen explícitas y restringidas. La ruta GET de contratos es solo la base y no satisface todavía el criterio de importación.
+**Evidencia:** CI #198 PASS_REAL (https://github.com/jonhararagi/botimagen/actions/runs/38025915939) y #199 PASS_REAL (https://github.com/jonhararagi/botimagen/actions/runs/38026040558) son antecedentes de la implementación inicial. CI #213 falló por un error de formato TypeScript en la guarda de respuesta, corregido inmediatamente. CI #215 PASS_REAL valida el HEAD de código `2628fd49b0062063655e799d2b5217d318921664`; CI #217 PASS_REAL valida el HEAD documental `fe4ffa47842e589ec570c6745355fc6a121be505`, con pruebas Python/API, `npm ci`, build de producción y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38030182466. Cualquier commit documental adicional debe verificarse en su propia CI.
+
+**TIMER restante:** 15–30 minutos para confirmar CI del HEAD documental final y entregar/revisar el PR; 30–60 minutos adicionales de QA física Chrome/Edge en Windows.
+
+**Limitaciones:** el validador inspecciona estructura, CRC, flujo zlib, longitud de scanlines y bytes de filtro; no decodifica por completo ni valida semánticamente cada píxel. Rechaza PNG entrelazados. La defensa frente a carreras con procesos locales maliciosos que comparten permisos no es absoluta. No se añaden dependencias runtime.
+
+**Estado de cierre al HEAD documentado `fe4ffa47842e589ec570c6745355fc6a121be505`:** CI #217 verde y PR #8 abierto/mergeable, sin reviews ni hilos de revisión registrados. Pendientes: confirmar CI del commit documental final de cierre, revisión/decisión humana, integración explícita en main y QA física Windows en tarea separada. No declarar BIMG-008 integrada mientras el PR siga abierto.
 
 ### BIMG-009 · QA real de Windows y rendimiento
 
