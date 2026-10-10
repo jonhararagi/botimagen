@@ -683,6 +683,12 @@ try {
   await setVisualRange("Largo del torso", 0);
   const bomberShortD = await page.locator(".street-bomber-shell").getAttribute("d");
   const bomberShortBox = await page.locator(".street-bomber-shell").evaluate(node => node.getBBox().height);
+  const bomberPatchYShort = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
+  const lowerBodyPaintOrder = await page.locator(".character-lower-body").evaluate((lowerBody) => {
+    const shell = document.querySelector(".street-bomber-shell");
+    return !!shell && !!(lowerBody.compareDocumentPosition(shell) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  assert.equal(lowerBodyPaintOrder, true, "The final bomber shell must paint above the lower-body surface it overlaps");
   await captureVisual("01-street-bomber-torso-short");
   await setVisualRange("Largo del torso", 50);
   const bomberMidD = await page.locator(".street-bomber-shell").getAttribute("d");
@@ -690,8 +696,10 @@ try {
   await setVisualRange("Largo del torso", 100);
   const bomberLongD = await page.locator(".street-bomber-shell").getAttribute("d");
   const bomberLongBox = await page.locator(".street-bomber-shell").evaluate(node => node.getBBox().height);
+  const bomberPatchYLong = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
   assert.notEqual(bomberLongD, bomberShortD, "The visible bomber shell must change at torso_length=100");
   assert.ok(bomberLongBox > bomberShortBox, "The long bomber shell must have a greater visible hem extent");
+  assert.ok(bomberPatchYLong > bomberPatchYShort, "The chest Chromapatch must follow the bomber hem as its length changes");
   await captureVisual("02-street-bomber-torso-long");
 
   await outerLayerSelect.selectOption("short_bomber");
@@ -729,16 +737,16 @@ try {
   await setVisualRange("Ajuste de cintura", 50);
   await page.locator(".style-fields select").nth(4).selectOption("chest");
   await captureVisual("09-chromapatch-chest-front");
+  await page.getByRole("button", { name: "Trasera", exact: true }).click();
+  await captureVisual("10-chromapatch-chest-back");
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
   await page.locator(".style-fields select").nth(4).selectOption("sleeve");
   assert.equal(await page.locator(".chromapatch-anchor").getAttribute("data-effective-position"), "sleeve",
     "Sleeve Chromapatch must anchor to an available sleeve");
   const sleeveAnchorY = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
   assert.ok(sleeveAnchorY >= 285 && sleeveAnchorY <= 335,
     "Sleeve Chromapatch anchor must track the current sleeve length");
-  await captureVisual("10-chromapatch-sleeve");
-  await page.getByRole("button", { name: "Trasera", exact: true }).click();
-  await captureVisual("11-chromapatch-back");
-  await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  await captureVisual("11-chromapatch-sleeve");
 
   await outerLayerSelect.selectOption("none");
   await page.locator(".style-fields select").nth(4).selectOption("hood");
@@ -765,8 +773,8 @@ try {
       "03-outer-short-bomber.png", "04-outer-long-coat.png",
       "05-sleeves-short.png", "06-sleeves-long.png",
       "07-waist-fitted.png", "08-waist-loose.png",
-      "09-chromapatch-chest-front.png", "10-chromapatch-sleeve.png",
-      "11-chromapatch-back.png", "12-chromapatch-hood.png",
+      "09-chromapatch-chest-front.png", "10-chromapatch-chest-back.png",
+      "11-chromapatch-sleeve.png", "12-chromapatch-hood.png",
       "13-nanowear-everyday.png", "14-nanowear-transformation.png",
     ],
     note: "CI artifact only, not product artwork. Capture generation does not constitute independent artistic sign-off.",
