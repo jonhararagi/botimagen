@@ -206,9 +206,109 @@ def make_asset_contract_catalog(manifest_path: Path | None = None) -> dict[str, 
     return {"manifest_version": manifest["version"], "count": len(contracts), "contracts": contracts}
 
 
-def make_handler(generator: CharacterGenerator, profiles_path: Path | None = None):
+
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+MAX_PNG_PIXELS = 64_000_000
+
+
+def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]:
+    """Validate PNG chunks, CRCs and bounded non-interlaced decoding using stdlib zlib."""
+    import binascii
+    import struct
+    import zlib
+
+    if not isinstance(data, bytes) or len(data) < 33 or not data.startswith(PNG_SIGNATURE):
+        raise ApiInputError("El archivo no contiene una firma PNG válida.", HTTPStatus.UNPROCESSABLE_ENTITY)
+    offset = len(PNG_SIGNATURE)
+    width = height = bit_depth = color_type = interlace = None
+    seen_ihdr = seen_iend = seen_idat = idat_closed = False
+    compressed_parts: list[bytes] = []
+    while offset + 12 <= len(data):
+        length = struct.unpack(">I", data[offset:offset + 4])[0]
+        chunk_type = data[offset + 4:offset + 8]
+        end = offset + 12 + length
+        if length > len(data) or end > len(data):
+            raise ApiInputError("El PNG está truncado o contiene un bloque inválido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+        chunk_data = data[offset + 8:offset + 8 + length]
+        supplied_crc = struct.unpack(">I", data[offset + 8 + length:end])[0]
+        if (binascii.crc32(chunk_type + chunk_data) & 0xFFFFFFFF) != supplied_crc:
+            raise ApiInputError("El PNG contiene un bloque dañado (CRC incorrecto).", HTTPStatus.UNPROCESSABLE_ENTITY)
+        if not seen_ihdr:
+            if chunk_type != b"IHDR" or length != 13:
+                raise ApiInputError("El PNG no comienza con un encabezado IHDR válido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            width, height, bit_depth, color_type, compression, filtering, interlace = struct.unpack(">IIBBBBB", chunk_data)
+            valid_depths = {0: (1, 2, 4, 8, 16), 2: (8, 16), 3: (1, 2, 4, 8), 4: (8, 16), 6: (8, 16)}
+            if not width or not height or width * height > MAX_PNG_PIXELS:
+                raise ApiInputError("Las dimensiones PNG son inválidas o exceden el límite de píxeles.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            if color_type not in valid_depths or bit_depth not in valid_depths[color_type] or compression != 0 or filtering != 0:
+                raise ApiInputError("El PNG usa parámetros de codificación no válidos.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            if interlace != 0:
+                raise ApiInputError("Los PNG entrelazados no son compatibles; exporta como PNG no entrelazado.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            if expected.get("width") is not None and (width != expected["width"] or height != expected["height"]):
+                raise ApiInputError(f"Dimensiones incompatibles: el contrato requiere {expected['width']}×{expected['height']} píxeles.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            seen_ihdr = True
+        elif chunk_type == b"IHDR":
+            raise ApiInputError("El PNG contiene un IHDR duplicado.", HTTPStatus.UNPROCESSABLE_ENTITY)
+        if chunk_type == b"IDAT":
+            if idat_closed or seen_iend:
+                raise ApiInputError("La secuencia IDAT del PNG no es válida.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            seen_idat = True
+            compressed_parts.append(chunk_data)
+        elif seen_idat and chunk_type != b"IEND":
+            idat_closed = True
+        if chunk_type == b"IEND":
+            if length != 0 or seen_iend or not seen_idat:
+                raise ApiInputError("El PNG no contiene un IEND válido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            seen_iend = True
+            offset = end
+            break
+        offset = end
+    if not seen_ihdr or not seen_idat or not seen_iend or offset != len(data):
+        raise ApiInputError("El PNG está incompleto o contiene datos sobrantes.", HTTPStatus.UNPROCESSABLE_ENTITY)
+    channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[color_type]
+    row_bytes = (width * channels * bit_depth + 7) // 8
+    decoded_size = (row_bytes + 1) * height
+    if decoded_size > MAX_PNG_PIXELS * 8 + height:
+        raise ApiInputError("La imagen excede el límite de decodificación.", HTTPStatus.UNPROCESSABLE_ENTITY)
+    decoder = zlib.decompressobj()
+    try:
+        decoded = decoder.decompress(b"".join(compressed_parts), decoded_size + 1)
+        if len(decoded) != decoded_size or not decoder.eof or decoder.unused_data or decoder.unconsumed_tail:
+            raise ApiInputError("Los píxeles del PNG están truncados o corruptos.", HTTPStatus.UNPROCESSABLE_ENTITY)
+    except zlib.error as exc:
+        raise ApiInputError("No se pudo decodificar el contenido PNG.", HTTPStatus.UNPROCESSABLE_ENTITY) from exc
+    stride = row_bytes + 1
+    if any(decoded[row * stride] > 4 for row in range(height)):
+        raise ApiInputError("El PNG contiene un filtro de fila inválido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+    return width, height
+
+
+def _safe_asset_destination(root: Path, relative_destination: str) -> Path:
+    """Resolve only a manifest-relative path and refuse symlink components."""
+    parts = PurePosixPath(relative_destination).parts
+    if not parts or PurePosixPath(relative_destination).is_absolute() or any(part in {"", ".", ".."} for part in parts):
+        raise ApiInputError("El destino del contrato no es seguro.", HTTPStatus.INTERNAL_SERVER_ERROR)
+    root = root.resolve()
+    current = root
+    for part in parts[:-1]:
+        current = current / part
+        if current.exists() and current.is_symlink():
+            raise ApiInputError("El directorio de destino contiene un enlace no permitido.", HTTPStatus.CONFLICT)
+        current.mkdir(exist_ok=True)
+        if current.is_symlink() or not current.resolve().is_relative_to(root):
+            raise ApiInputError("El destino del contrato sale del directorio autorizado.", HTTPStatus.CONFLICT)
+    destination = current / parts[-1]
+    if destination.is_symlink():
+        raise ApiInputError("El destino ya existe como enlace; no se modificó.", HTTPStatus.CONFLICT)
+    if not destination.resolve(strict=False).is_relative_to(root):
+        raise ApiInputError("El destino del contrato sale del directorio autorizado.", HTTPStatus.CONFLICT)
+    return destination
+
+
+def make_handler(generator: CharacterGenerator, profiles_path: Path | None = None, assets_root: Path | None = None, asset_manifest_path: Path | None = None):
     catalog = make_catalog(generator)
-    asset_contract_catalog = make_asset_contract_catalog()
+    asset_contract_catalog = make_asset_contract_catalog(asset_manifest_path)
+    asset_root = Path(assets_root) if assets_root else ROOT
     profile_root = Path(profiles_path) if profiles_path else ROOT / "generated_characters" / "web_profiles"
 
     class BotImagenHandler(BaseHTTPRequestHandler):
@@ -258,6 +358,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/health": ("GET",),
                 "/api/catalog": ("GET",),
                 "/api/assets/contracts": ("GET",),
+                "/api/assets/import": ("POST",),
                 "/api/profiles": ("GET", "POST"),
                 "/api/generate": ("POST",),
             }
@@ -342,6 +443,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
+            if path == "/api/assets/import":
+                self._import_asset()
+                return
             if path not in {"/api/generate", "/api/profiles"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
@@ -359,6 +463,83 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "No se pudo guardar el perfil en el disco local."})
             except Exception:
                 self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "El motor local no pudo completar la solicitud."})
+
+
+        def _import_asset(self) -> None:
+            import tempfile
+            from urllib.parse import parse_qs
+            parsed = urlsplit(self.path)
+            try:
+                query = parse_qs(parsed.query, keep_blank_values=True, strict_parsing=True)
+            except ValueError:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Parámetros de importación inválidos."})
+                return
+            if set(query) != {"asset_id"} or len(query["asset_id"]) != 1 or not query["asset_id"][0]:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Se requiere un único asset_id de contrato."})
+                return
+            asset_id = query["asset_id"][0]
+            contract = next((item for item in asset_contract_catalog["contracts"] if item["id"] == asset_id), None)
+            if contract is None:
+                self._send_json(HTTPStatus.NOT_FOUND, {"error": "El asset_id no existe en el manifiesto."})
+                return
+            expected = contract["expected"]
+            limit = expected.get("max_bytes", 12 * 1024 * 1024)
+            content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+            if content_type != "image/png":
+                self._send_json(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, {"error": "Selecciona un archivo PNG real."})
+                return
+            try:
+                length = int(self.headers.get("Content-Length", ""))
+            except ValueError:
+                self._send_json(HTTPStatus.LENGTH_REQUIRED, {"error": "Se requiere Content-Length válido."})
+                return
+            if length <= 0:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "El archivo está vacío."})
+                return
+            if length > limit:
+                self._send_json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": f"El PNG supera el límite del contrato ({limit} bytes)."})
+                return
+            temporary = None
+            try:
+                destination = _safe_asset_destination(asset_root, contract["destination"])
+                if destination.exists():
+                    self._send_json(HTTPStatus.CONFLICT, {"error": "El asset ya existe. No se sobrescribió ningún archivo."})
+                    return
+                fd, temporary_name = tempfile.mkstemp(prefix=".botimagen-import-", suffix=".tmp", dir=destination.parent)
+                temporary = Path(temporary_name)
+                count = 0
+                with os.fdopen(fd, "wb") as handle:
+                    while count < length:
+                        chunk = self.rfile.read(min(64 * 1024, length - count))
+                        if not chunk:
+                            raise ApiInputError("La petición se interrumpió antes de completar el archivo.", HTTPStatus.BAD_REQUEST)
+                        count += len(chunk)
+                        if count > limit:
+                            raise ApiInputError("El PNG supera el límite del contrato.", HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+                        handle.write(chunk)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                data = temporary.read_bytes()
+                width, height = validate_png_bytes(data, expected)
+                try:
+                    os.link(temporary, destination)
+                except FileExistsError as exc:
+                    raise ApiInputError("El asset ya existe. No se sobrescribió ningún archivo.", HTTPStatus.CONFLICT) from exc
+                self._send_json(HTTPStatus.CREATED, {
+                    "status": "imported", "asset_id": asset_id,
+                    "destination": contract["destination"], "bytes": len(data),
+                    "width": width, "height": height,
+                })
+            except ApiInputError as exc:
+                self._send_json(exc.status, {"error": str(exc)})
+            except OSError:
+                self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "No se pudo preparar el PNG en el destino local."})
+            finally:
+                if temporary is not None:
+                    try:
+                        temporary.unlink(missing_ok=True)
+                    except OSError:
+                        pass
 
         def _save_profile(self, payload: Any) -> dict[str, Any]:
             if not isinstance(payload, dict):
