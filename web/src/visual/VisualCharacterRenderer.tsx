@@ -138,17 +138,25 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const patchColor = r.emblem_contrast === "manual" ? r.emblem_color : complementaryEmblemColor(fabric);
   const stroke = toon > .65 ? "#090d1a" : "#8a91ad";
   const line = 1.1 + toon * 2.1;
-  const patchX = r.emblem_position === "sleeve" ? (rear ? 222 : 116) : 170;
-  const patchY = r.emblem_position === "hood" ? 246 : r.emblem_position === "sleeve" ? 300 : rear ? 305 : 285;
-  const patchTransform = `translate(${patchX} ${patchY}) scale(${r.emblem_position === "sleeve" ? .72 : .85})`;
   const hemY = 340 + r.torso_length * .7;
   const waistHalf = 25 + r.waist_fit * .18;
   const torsoPath = `M125 263 Q170 238 216 263 L${170 + waistHalf} ${hemY - 57} L${170 + waistHalf * .72} ${hemY} L${170 - waistHalf * .72} ${hemY} L${170 - waistHalf} ${hemY - 57} Z`;
-  const sleeveEnd = 282 + r.sleeve_length * .78;
+  // The skin arm remains below fabric; 0..100 maps to a visible 300..362 hem.
+  const sleeveEnd = 300 + r.sleeve_length * .62;
   const bomberHem = 285 + r.torso_length * .55;
   const coatHem = 335 + r.torso_length * .75;
   const fitTransform = `translate(170 0) scale(${.9 + r.waist_fit / 500} 1) translate(-170 0)`;
   const capabilities = getGarmentCapabilities(values);
+  const hasHood = values.outer_layer === "hooded_jacket";
+  const effectiveEmblemPosition = (r.emblem_position === "hood" && !hasHood)
+    || (r.emblem_position === "sleeve" && !capabilities.sleeveLength) ? "chest" : r.emblem_position;
+  const emblemHem = values.outfit === "street_bomber" || values.outer_layer === "short_bomber"
+    ? bomberHem : values.outer_layer === "long_coat" ? coatHem : hemY;
+  const patchX = effectiveEmblemPosition === "sleeve" ? (rear ? 224 : 116) : 170;
+  const patchY = effectiveEmblemPosition === "hood" ? 246
+    : effectiveEmblemPosition === "sleeve" ? Math.max(292, Math.min(sleeveEnd - 15, 335))
+    : Math.min(rear ? 305 : 285, emblemHem - 17);
+  const patchTransform = `translate(${patchX} ${patchY}) scale(${effectiveEmblemPosition === "sleeve" ? .72 : .85})`;
   const svgStyle = { "--hair": hair, "--skin": skin, "--fabric": fabric, "--accent": accent, "--cyber": street, "--detail": detail } as CSSProperties;
   return <svg className={`silhouette visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish} data-fabric-pattern={r.fabric_pattern} data-fabric-base={r.garment_base_color} data-fabric-panel={r.garment_panel_color} data-fabric-accent={r.garment_accent_color} data-hair-color={hair} data-skin-color={skin} data-outfit={values.outfit ?? ""} data-outer-layer={values.outer_layer ?? ""} data-footwear={values.footwear ?? ""} data-torso-length={r.torso_length} data-sleeve-length={r.sleeve_length} data-waist-fit={r.waist_fit}>
     <defs>
@@ -163,12 +171,12 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill={`url(#cw-hair-${uid})`}/>}
     {rear && <path d="M116 91 Q82 135 101 236 L110 263 L138 250 L144 218 L196 218 L202 250 L230 263 L237 235 Q259 132 222 83 Z" fill={`url(#cw-hair-${uid})`}/>}
     <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill={`url(#cw-skin-${uid})`}/>
-    <path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 249 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill={`url(#cw-skin-${uid})`} stroke={stroke} strokeWidth={line}/>
-    {capabilities.sleeveLength && <g className="garment-sleeves" data-sleeve-end={sleeveEnd}>
+    <path className="character-arm-skin" data-qa-surface="arm-skin" d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 249 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill={`url(#cw-skin-${uid})`} stroke={stroke} strokeWidth={line}/>
+    {capabilities.sleeveLength && <g className="garment-sleeves" data-qa-surface="base-sleeves" data-sleeve-end={sleeveEnd}>
       <path d={`M113 243 Q88 249 89 309 L${Math.max(92, 89 + (sleeveEnd - 309) * .12)} ${sleeveEnd} L125 ${sleeveEnd - 2} L133 301 L151 278 Z M226 243 Q252 249 251 309 L${Math.min(248, 251 - (sleeveEnd - 309) * .12)} ${sleeveEnd} L218 ${sleeveEnd - 2} L213 301 L194 278 Z`} fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>
       <path d={`M${Math.max(92, 89 + (sleeveEnd - 309) * .12)} ${sleeveEnd} L125 ${sleeveEnd - 2} M${Math.min(248, 251 - (sleeveEnd - 309) * .12)} ${sleeveEnd} L218 ${sleeveEnd - 2}`} stroke={accent} strokeWidth={r.nanowear_state === "everyday" ? .6 : 1.4} fill="none" opacity={r.nanowear_state === "everyday" ? .35 : .9}/>
     </g>}
-    <path className="garment-torso-main" d={torsoPath} transform={fitTransform} fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>
+    <path className="garment-torso-main" data-qa-surface="base-torso" d={torsoPath} transform={fitTransform} fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>
     <path className="garment-torso-panels" d={torsoPath} transform={fitTransform} fill={panel} opacity={r.nanowear_state === "everyday" ? .16 : .28}/>
     <path d={torsoPath} transform={fitTransform} fill={`url(#cw-pattern-${uid})`} opacity={r.fabric_pattern === "plain" ? 0 : r.nanowear_state === "everyday" ? .35 : .82}/>
     {r.nanowear_state !== "everyday" && <path d={`M${170 - waistHalf * .65} 270 Q170 282 ${170 + waistHalf * .65} 270 L${170 + waistHalf * .5} ${hemY - 50} L170 ${hemY - 30} L${170 - waistHalf * .5} ${hemY - 50} Z`} fill={accent} opacity={.08 + street * .26}/>}
@@ -204,15 +212,15 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {rear && <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>}
     {Array.from({ length: Math.round(2 + detail * 7) }, (_, i) => <path key={i} d={`M${139 + i * 4} 275 l${(i % 2 ? 4 : -3) + street * 2} ${30 + detail * 16}`} stroke={accent} strokeWidth={.45 + detail * .8} opacity={r.nanowear_state === "everyday" ? .12 + street * .2 : .25 + street * .65} fill="none"/>)}
 
-    {values.outer_layer === "long_coat" && <g className="garment-layer long-coat" transform={fitTransform} fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}><path d={`M126 265 L111 285 L119 ${coatHem} L145 ${coatHem + 17} L144 333 Z`}/><path d={`M214 265 L229 285 L221 ${coatHem} L195 ${coatHem + 17} L196 333 Z`}/></g>}
+    {values.outer_layer === "long_coat" && <g className="garment-layer long-coat" data-qa-surface="outer-layer" transform={fitTransform} fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}><path d={`M126 265 L111 285 L119 ${coatHem} L145 ${coatHem + 17} L144 333 Z`}/><path d={`M214 265 L229 285 L221 ${coatHem} L195 ${coatHem + 17} L196 333 Z`}/></g>}
     {values.outer_layer === "hooded_jacket" && <path d="M137 240 Q137 217 151 222 L170 242 L189 222 Q203 217 203 240 L194 264 L146 264 Z" fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>}
-    {values.outer_layer === "short_bomber" && <path className="garment-layer short-bomber" d={`M125 263 Q170 245 216 263 L211 ${bomberHem} L129 ${bomberHem} Z`} transform={fitTransform} fill={panel} stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "short_bomber" && <path className="garment-layer short-bomber" data-qa-surface="outer-layer" d={`M125 263 Q170 245 216 263 L211 ${bomberHem} L129 ${bomberHem} Z`} transform={fitTransform} fill={panel} stroke={stroke} strokeWidth={line}/>}
     {values.outer_layer === "utility_cape" && <path d="M128 262 L105 282 L120 347 L145 365 L153 287 L187 287 L195 365 L220 347 L235 282 L212 262 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
     {values.outer_layer === "chaqueta_corta_asimetrica" && <path d="M125 263 L145 252 L170 274 L195 252 L216 263 L206 320 L177 331 L170 307 L153 337 L134 320 Z" fill={fabric} stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "capa_corta_energetica" && <path d="M130 262 L106 279 L120 340 L145 356 L154 284 L186 284 L195 356 L220 340 L234 279 L210 262 Z" fill={accent} opacity=".22" stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "mangas_desmontables" && <path d="M112 260 L98 282 L105 352 L126 355 L138 286 Z M228 260 L242 282 L235 352 L214 355 L202 286 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "chaleco_tactico" && <path d="M140 267 L158 282 L170 274 L182 282 L200 267 L195 337 L181 352 L170 344 L159 352 L145 337 Z" fill="#202b3e" stroke={accent} strokeWidth={line}/>}
-    {values.outfit === "street_bomber" && <g className="garment-layer street-bomber" transform={fitTransform}><path d={`M125 263 Q170 245 216 263 L211 ${Math.min(hemY, 340)} L129 ${Math.min(hemY, 340)} Z`} fill={panel} stroke={stroke} strokeWidth={line}/><path d={`M137 ${Math.min(hemY, 340) - 14} L203 ${Math.min(hemY, 340) - 14} L198 ${Math.min(hemY, 340)} L142 ${Math.min(hemY, 340)} Z`} fill={accent} opacity=".72"/></g>}
+    {values.outfit === "street_bomber" && <g className="garment-layer street-bomber" transform={fitTransform}><path d={`M125 263 Q170 245 216 263 L211 ${bomberHem} L129 ${bomberHem} Z`} fill={panel} stroke={stroke} strokeWidth={line}/><path d={`M137 ${bomberHem - 14} L203 ${bomberHem - 14} L198 ${bomberHem} L142 ${bomberHem} Z`} fill={accent} opacity=".72"/></g>}
     {values.outfit === "light_armor" && <path d="M143 280 L168 294 L194 279 L188 322 L170 334 L148 321 Z" fill={panel} opacity=".96" stroke={accent} strokeWidth={1 + street}/>}
     {values.outfit === "armadura_asimetrica" && <path d="M141 278 L169 291 L196 280 L185 315 L174 331 L146 324 Z M173 291 L197 296 L190 326 L175 333 Z" fill={panel} opacity=".96" stroke={accent} strokeWidth={1 + street}/>}
     {values.outfit === "techwear_sport" && <path d="M128 318 L145 329 M212 318 L195 329" stroke={accent} strokeWidth={2 + street * 2} fill="none"/>}
@@ -224,7 +232,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {values.outfit === "baseball_tech_suit" && <path d="M135 269 L170 280 L205 269 L198 340 L186 352 L154 352 L142 340 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "hombrera_modular" && <path d="M124 265 L141 260 L151 280 L132 292 Z M216 265 L199 260 L189 280 L208 292 Z" fill={accent} opacity=".65" stroke={stroke} strokeWidth={line}/>}
     {r.nanowear_state !== "everyday" && <g fill="none" stroke={accent} strokeWidth={.7 + street} opacity={.35 + street * .55}><path d="M131 300 L145 315 L140 333 M209 300 L195 315 L200 333"/><path d="M141 353 L151 360 L148 377 M199 353 L189 360 L192 377"/></g>}
-    <g transform={patchTransform} aria-label="Chromapatch">
+    <g className="chromapatch-anchor" data-qa-surface="chromapatch" data-requested-position={r.emblem_position} data-effective-position={effectiveEmblemPosition} data-anchor-x={patchX} data-anchor-y={patchY} transform={patchTransform} aria-label="Chromapatch">
       <circle r="13" fill={patchBg} stroke={accent} strokeWidth={1 + detail}/>
       <g transform="scale(.52)" fill={patchColor} stroke={patchColor} strokeWidth="2" strokeLinejoin="round">
         {r.emblem_shape === "bunny" && <><path d="M-8 -4 Q-18 -28 -11 -34 Q-1 -32 0 -8 Q5 -32 14 -34 Q21 -26 9 -3 Q19 5 11 17 Q0 27 -12 17 Q-20 7 -8 -4Z"/><circle cx="4" cy="5" r="2" fill={patchBg} stroke="none"/></>}
@@ -259,6 +267,8 @@ export function VisualStyleLab({ recipe, values, onChange }: { recipe: VisualRec
       <label>Acabado del material<select value={r.material_finish} onChange={e => update("material_finish", e.target.value as MaterialFinish)}><option value="textile">Textil cotidiano</option><option value="nanoweave">Nanotela técnica</option><option value="synthetic">Sintético brillante</option></select></label>
       <label>Forma Chromapatch<select value={r.emblem_shape} onChange={e => update("emblem_shape", e.target.value as EmblemShape)}><option value="bunny">Conejito</option><option value="star">Estrella</option><option value="fox">Zorro</option><option value="skull">Calavera</option><option value="geo">Geométrico</option></select></label>
       <label>Ubicación Chromapatch<select value={r.emblem_position} onChange={e => update("emblem_position", e.target.value as EmblemPosition)}><option value="chest">Pecho</option><option value="sleeve">Manga</option><option value="hood">Capucha / cuello</option></select></label>
+      {r.emblem_position === "hood" && values.outer_layer !== "hooded_jacket" && <p className="patch-anchor-note" role="status">La prenda actual no tiene capucha; el Chromapatch se ancla temporalmente al pecho. Selecciona una chaqueta con capucha para usar esa ubicación.</p>}
+      {r.emblem_position === "sleeve" && !capabilities.sleeveLength && <p className="patch-anchor-note" role="status">La combinación actual no tiene mangas compatibles; el Chromapatch se ancla temporalmente al pecho.</p>}
       <label>Contraste del emblema<select value={r.emblem_contrast} onChange={e => update("emblem_contrast", e.target.value as "auto" | "manual")}><option value="auto">Automático por luminancia</option><option value="manual">Manual</option></select></label>
       <label>Color del emblema<input type="color" value={r.emblem_color} onChange={e => update("emblem_color", e.target.value)}/></label>
     </div>
