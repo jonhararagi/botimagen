@@ -1,6 +1,6 @@
 # BIMG-ENGINE-001 · Motor visual CyberStreet
 
-**Estado de implementación:** `IMPLEMENTATION_IN_PROGRESS` hasta que la CI ejecute el build y los smoke tests del commit de esta rama. La implementación usa geometría SVG original; no incorpora recursos binarios externos ni dependencias npm.
+**Estado de implementación:** `PASS_CI_VALIDATION` para la compilación, las pruebas Python y el smoke test Chromium headless de la ejecución CI indicada abajo. La implementación usa geometría SVG original; no incorpora recursos binarios externos ni dependencias npm. La validación física en Windows sigue pendiente.
 
 ## Arquitectura
 
@@ -53,7 +53,7 @@ Las pruebas previstas para CI son:
 3. `npm ci --no-audit --no-fund` y `npm run build` dentro de `web/`.
 4. Smoke test de Chromium headless mediante `web/browser_smoke.mjs`, ampliado para los controles CyberStreet y la persistencia.
 
-En el momento de crear este documento, no se ha ejecutado una compilación local: el entorno de trabajo no pudo resolver `github.com` para clonar el repositorio. La prueba de CI del PR será la evidencia de compilación automatizada. Las pruebas físicas en Windows no se afirman ni se sustituyen por CI Linux.
+**Resultado verificado:** GitHub Actions `Validate BotImagen` [run 38051068349](https://github.com/jonhararagi/botimagen/actions/runs/38051068349) — `success`. Completó `py_compile`, pruebas del generador, reproducibilidad, contrato visual, API local, cobertura del editor, nuevo contrato de receta, `npm ci`, `npm run build` y smoke test de Chromium. No se ejecutó una compilación local porque el entorno de trabajo no pudo resolver `github.com` para clonar el repositorio. Las pruebas físicas en Windows no se afirman ni se sustituyen por CI Linux.
 
 ## Próximos pasos
 
