@@ -105,7 +105,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const hair = optionColor(values.hair ?? "", "#ef646b");
   const skinMap: Record<string, string> = { porcelana_neutra: "#f2d2c6", marfil_calido: "#f1d4b0", beige_claro: "#e5c3a0", durazno: "#e9b6a1", beige_dorado: "#d7ad82", oliva_suave: "#c89b73", canela: "#ad7656", bronce_calido: "#986344", marron_profundo: "#754b40", fantasia_azul_suave: "#a4c9df" };
   const skin = skinMap[values.skin_tone] ?? "#edc3b8";
-  const accent = optionColor(values.palette_accent ?? values.hair_secondary_color ?? "", "#5ce4dc");
+  const hairAccent = optionColor(values.palette_accent ?? values.hair_secondary_color ?? "", "#5ce4dc");
   const eyeMap: Record<string, string> = { ambar: "#d7a64f", rojo_rubi: "#c64256", violeta: "#9b72e8", azul_hielo: "#a6e8fa", verde_esmeralda: "#2da987", gris_grafito: "#778296", azul_profundo: "#3655b9", celeste: "#68c6ec", verde_lima: "#9acb45", rosa_opalina: "#e88bc2" };
   const eyeColor = eyeMap[values.eyes] ?? "#d7a64f";
   const street = r.streetwear_cyberpunk / 100;
@@ -128,27 +128,27 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   return <svg className={`silhouette visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish}>
     <defs>
       <pattern id={`cw-pattern-${uid}`} patternUnits="userSpaceOnUse" width={r.fabric_pattern === "geometric" ? 12 : 18} height={r.fabric_pattern === "geometric" ? 12 : 18}><rect width="100%" height="100%" fill={r.fabric_pattern === "gradient" ? panel : "transparent"}/>{r.fabric_pattern === "circuit" && <path d="M0 4 H7 V10 H15 M7 4 V0 M15 10 V16" fill="none" stroke={accent} strokeWidth="1.1" opacity=".8" />}{r.fabric_pattern === "geometric" && <path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke={panel} strokeWidth="1.3"/>}</pattern>
-      <linearGradient id={`cw-hair-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={hair}/><stop offset="76%" stopColor={hair}/><stop offset="100%" stopColor={accent}/></linearGradient>
+      <linearGradient id={`cw-hair-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={hair}/><stop offset="76%" stopColor={hair}/><stop offset="100%" stopColor={hairAccent}/></linearGradient>
       <linearGradient id={`cw-fabric-${uid}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fabric}/><stop offset="100%" stopColor={r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? "#ffffff" : panel}/></linearGradient>
       <linearGradient id={`cw-skin-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={skin}/><stop offset="100%" stopColor="#b77c8e"/></linearGradient>
       <linearGradient id={`cw-gloss-${uid}`} x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#ffffff" stopOpacity=".02"/><stop offset="48%" stopColor="#ffffff" stopOpacity={r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? .58 : .12}/><stop offset="100%" stopColor="#8cecff" stopOpacity=".04"/></linearGradient>
     </defs>
     <ellipse cx="170" cy="463" rx="82" ry="10" fill="#070a13" opacity=".5"/>
-    {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill="{`url(#cw-hair-${uid})`}"/>}
-    {rear && <path d="M116 91 Q82 135 101 236 L110 263 L138 250 L144 218 L196 218 L202 250 L230 263 L237 235 Q259 132 222 83 Z" fill="url(#cw-hair)"/>}
-    <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill="{`url(#cw-skin-${uid})`}"/>
-    <path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 250 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill="{`url(#cw-fabric-${uid})`}" stroke={stroke} strokeWidth={line}/>
-    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>
+    {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill={`url(#cw-hair-${uid})`}/>}
+    {rear && <path d="M116 91 Q82 135 101 236 L110 263 L138 250 L144 218 L196 218 L202 250 L230 263 L237 235 Q259 132 222 83 Z" fill="{`url(#cw-hair-${uid})`}"/>}
+    <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill={`url(#cw-skin-${uid})`}/>
+    <path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 250 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>
+    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="{`url(#cw-fabric-${uid})`}" stroke={stroke} strokeWidth={line}/>
     <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill={panel} opacity={r.nanowear_state === "everyday" ? .16 : .28}/>
     <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill={`url(#cw-pattern-${uid})`} opacity={r.fabric_pattern === "plain" ? 0 : r.nanowear_state === "everyday" ? .35 : .82}/>
     {r.nanowear_state !== "everyday" && <path d="M139 270 Q170 282 201 270 L193 345 L170 363 L147 345 Z" fill={accent} opacity={.08 + street * .26}/>}
-    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="{`url(#cw-gloss-${uid})`}" opacity={r.material_finish === "textile" && r.nanowear_state === "everyday" ? .12 : .88}/>
+    <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill={`url(#cw-gloss-${uid})`} opacity={r.material_finish === "textile" && r.nanowear_state === "everyday" ? .12 : .88}/>
     <path d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill={panel} stroke={stroke} strokeWidth={line}/>
     <path d="M151 410 L149 456 L170 456 L177 410 Z M185 410 L190 456 L211 456 L202 410 Z" fill="#111727"/>
     <path d="M148 452 L150 471 L181 471 L180 455 Z M190 452 L194 471 L225 471 L215 455 Z" fill={accent}/>
-    <ellipse cx="170" cy="143" rx={52 - anime * 3} ry={63 - anime * 4} fill="url(#cw-skin)" stroke="#f5d7ce" strokeWidth={1 + toon * 1.8}/>
+    <ellipse cx="170" cy="143" rx={52 - anime * 3} ry={63 - anime * 4} fill="{`url(#cw-skin-${uid})`}" stroke="#f5d7ce" strokeWidth={1 + toon * 1.8}/>
     {!rear && <>
-      <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="url(#cw-hair)" stroke={stroke} strokeWidth={line}/>
+      <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="{`url(#cw-hair-${uid})`}" stroke={stroke} strokeWidth={line}/>
       <path d="M128 120 L101 83 L129 94 M219 118 L250 81 L229 97" fill="none" stroke={accent} strokeWidth={4 + street * 5} strokeLinecap="round"/>
       <path d="M143 148 Q156 140 165 148 M185 148 Q196 140 205 148" fill="none" stroke="#664253" strokeWidth={1.5 + toon * 2.5} strokeLinecap="round"/>
       <ellipse cx="155" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={eyeColor}/>
@@ -162,12 +162,12 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
       {values.horn_style && !values.horn_style.includes("sin_") && <path d="M137 98 L126 64 L151 86 M202 86 L226 62 L216 102" fill={accent} stroke={stroke} strokeWidth={line}/>}
       {values.facial_detail && !values.facial_detail.includes("sin_") && <g fill={accent}><circle cx="145" cy="166" r="2"/><circle cx="149" cy="169" r="1.4"/></g>}
     </>}
-    {rear && <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="url(#cw-hair)" stroke={stroke} strokeWidth={line}/>}
+    {rear && <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="{`url(#cw-hair-${uid})`}" stroke={stroke} strokeWidth={line}/>}
     {Array.from({ length: Math.round(2 + detail * 7) }, (_, i) => <path key={i} d={`M${139 + i * 4} 275 l${(i % 2 ? 4 : -3) + street * 2} ${30 + detail * 16}`} stroke={accent} strokeWidth={.45 + detail * .8} opacity={r.nanowear_state === "everyday" ? .12 + street * .2 : .25 + street * .65} fill="none"/>)}
 
-    {values.outer_layer === "long_coat" && <g fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}><path d="M126 265 L111 285 L119 397 L145 414 L144 333 Z"/><path d="M214 265 L229 285 L221 397 L195 414 L196 333 Z"/></g>}
-    {values.outer_layer === "hooded_jacket" && <path d="M137 240 Q137 217 151 222 L170 242 L189 222 Q203 217 203 240 L194 264 L146 264 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>}
-    {values.outer_layer === "short_bomber" && <path d="M125 263 Q170 245 216 263 L211 305 L129 305 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "long_coat" && <g fill="{`url(#cw-fabric-${uid})`}" stroke={stroke} strokeWidth={line}><path d="M126 265 L111 285 L119 397 L145 414 L144 333 Z"/><path d="M214 265 L229 285 L221 397 L195 414 L196 333 Z"/></g>}
+    {values.outer_layer === "hooded_jacket" && <path d="M137 240 Q137 217 151 222 L170 242 L189 222 Q203 217 203 240 L194 264 L146 264 Z" fill="{`url(#cw-fabric-${uid})`}" stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "short_bomber" && <path d="M125 263 Q170 245 216 263 L211 305 L129 305 Z" fill="{`url(#cw-fabric-${uid})`}" stroke={stroke} strokeWidth={line}/>}
     {values.outer_layer === "chaleco_tactico" && <path d="M140 267 L158 282 L170 274 L182 282 L200 267 L195 337 L181 352 L170 344 L159 352 L145 337 Z" fill="#202b3e" stroke={accent} strokeWidth={line}/>}
     {values.outfit === "street_bomber" && <path d="M137 387 L203 387 L198 399 L142 399 Z" fill={accent} opacity=".72"/>}
     {(values.outfit === "light_armor" || values.outfit === "armadura_asimetrica") && <path d="M143 280 L168 294 L194 279 L188 322 L170 334 L148 321 Z" fill={accent} opacity={.12 + street * .25} stroke={accent} strokeWidth={.8 + street}/>}
