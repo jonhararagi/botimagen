@@ -105,15 +105,13 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-008 · Importador PNG web seguro por contrato
 
-**Estado:** PARTIAL (implementación en rama; CI y auditoría pendientes). El endpoint `GET /api/assets/contracts` sigue publicando el manifiesto oficial. En la rama `feat/bimg-008-safe-png-import` se añadió `POST /api/assets/import?asset_id=...`: destino solo desde el contrato, límite aplicado al leer en bloques, firma/chunks/CRC/decodificación zlib/filtros/dimensiones validados, temporal controlado y publicación atómica sin sobrescritura. La UI React permite seleccionar contrato y archivo y solo confirma con una respuesta de importación exitosa.
+**Estado:** PARTIAL (~70%). Endpoint de importación, validación de PNG, temporal controlado, publicación sin sobrescritura, panel React y pruebas HTTP están implementados. CI #198 PASS_REAL cubre la suite Python, instalación npm, build y Chromium E2E del rechazo de un archivo falso. CI #199 valida adicionalmente el recorrido de éxito en UI, con instalación Chromium/E2E en curso al momento de la actualización.
 
-**TIMER restante:** 1–3 horas para revisar los resultados de CI, corregir defectos y abrir/validar PR; 30–60 minutos adicionales para QA físico en Windows. Estimación sujeta a resultados de runtime.
+**TIMER restante:** 30–90 minutos para confirmar el E2E más reciente, revisar el PR y resolver cualquier fallo; 30–60 minutos adicionales de QA físico Chrome/Edge en Windows.
 
-**Trabajo realizado en rama:** componente `web/src/AssetImporter.tsx`, integración en `web/src/App.tsx`, estilos, endpoint y validador de PNG sin dependencias nuevas, `tests/test_asset_import.py`, actualización del workflow y prueba Chromium que comprueba rechazo real de bytes falsos por el puente UI/API.
+**Limitaciones:** el validador estándar rechaza PNG entrelazados; verificar exportadores reales en QA. No se importan assets de terceros ni se añade dependencia externa.
 
-**Pendiente de evidencia:** suite Python, build reproducible y Chromium E2E deben ejecutarse en GitHub Actions. El parser actual rechaza PNG entrelazados; verificar con imágenes exportadas de herramientas habituales durante QA. La prueba manual Chrome/Edge en Windows no se declara hecha.
-
-**Aceptación:** importar un PNG válido con dimensiones del contrato y rechazar ID desconocido, contenido falso/corrupto/truncado, exceso de tamaño, dimensiones incompatibles, traversal, destino existente y métodos incorrectos; ningún archivo oficial se sobrescribe y los temporales se limpian.
+**Pendiente para cierre:** CI final verde en el HEAD más reciente, revisión del PR, y prueba manual en Windows registrada como tarea QA separada.
 
 ### BIMG-009 · QA real de Windows y rendimiento
 
