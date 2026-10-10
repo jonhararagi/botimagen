@@ -181,7 +181,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     <path d={torsoPath} transform={fitTransform} fill={`url(#cw-pattern-${uid})`} opacity={r.fabric_pattern === "plain" ? 0 : r.nanowear_state === "everyday" ? .35 : .82}/>
     {r.nanowear_state !== "everyday" && <path d={`M${170 - waistHalf * .65} 270 Q170 282 ${170 + waistHalf * .65} 270 L${170 + waistHalf * .5} ${hemY - 50} L170 ${hemY - 30} L${170 - waistHalf * .5} ${hemY - 50} Z`} fill={accent} opacity={.08 + street * .26}/>}
     <path d={torsoPath} transform={fitTransform} fill={`url(#cw-gloss-${uid})`} opacity={r.material_finish === "textile" && r.nanowear_state === "everyday" ? .12 : .88}/>
-    <path d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill={panel} stroke={stroke} strokeWidth={line}/>
+    <path className="character-lower-body" data-qa-surface="lower-body" d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill={panel} stroke={stroke} strokeWidth={line}/>
     <path d="M151 410 L149 456 L170 456 L177 410 Z M185 410 L190 456 L211 456 L202 410 Z" fill="#111727"/>
     <path d="M148 452 L150 471 L181 471 L180 455 Z M190 452 L194 471 L225 471 L215 455 Z" fill={panel} stroke={accent} strokeWidth=".8"/>
     {values.footwear === "armored_boots" && <path d="M148 432 L171 432 L181 475 L146 475 Z M190 432 L212 432 L227 475 L194 475 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
