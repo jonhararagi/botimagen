@@ -112,3 +112,10 @@ La vista trasera continúa siendo una aproximación 2D y no una reconstrucción 
 PASS_VISUAL_GARMENT_QA: the Chromium smoke suite passed on code HEAD 0148ec8a80b755f7506faf55ea625bc3e25f0fee (CI run 38057689613), and all 14 screenshots in botimagen-visual-garment-qa were inspected. The inspection confirmed visible torso/sleeve changes, distinct outer bomber vs long coat, waist-width change, front/back chest anchor, sleeve anchor, hood fallback and NanoWear state changes. The short-bomber capture revealed an oversized patch at the minimum hem; patch scale now adapts to available garment height and is covered by a regression assertion. WINDOWS_MANUAL_QA: NOT_RUN. This status refers to the declared headless Chromium visual QA scope, not physical Windows testing or a claim of production illustration polish.
 
 - Outer garment bodies and their sleeve surfaces are composed after the selected base outfit, so a short bomber or long coat remains visually above the base garment instead of being painted underneath it.
+
+
+## BIMG-ENGINE-005 · Capability-to-geometry contract
+
+The canonical capability sets are now exercised against the corresponding selected SVG garment surfaces rather than relying on recipe attributes or the always-present base torso alone. Torso/waist surfaces for tactical baseball, combat jacket, techwear sport, street bomber, support coat, baseball tech suit, elegant command, short bomber, hooded jacket, long coat and asymmetric short jacket expose parameter-dependent geometry. Sleeve surfaces for the six canonical base outfits/layers and detachable sleeves are checked at 0/50/100. The existing elegant_command sleeveless semantics are preserved.
+
+The browser smoke suite writes endpoint captures and matrix-manifest.json to the CI-only artifacts/visual-qa/ directory. No screenshots are product assets; no API/schema, catalog IDs, dependencies or generator compatibility rules were changed.
