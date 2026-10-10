@@ -213,32 +213,43 @@ MAX_PNG_DECODED_BYTES = 128 * 1024 * 1024
 
 
 def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]:
-    """Validate PNG chunks, CRCs and bounded non-interlaced decoding using stdlib zlib."""
+    """Validate PNG chunk structure and bounded non-interlaced scanline stream.
+
+    This is not a full pixel decoder: it checks container rules, CRCs, zlib output
+    length and row filter bytes. Interlaced PNGs are deliberately unsupported.
+    """
     import binascii
     import struct
     import zlib
 
     if not isinstance(data, bytes) or len(data) < 33 or not data.startswith(PNG_SIGNATURE):
         raise ApiInputError("El archivo no contiene una firma PNG válida.", HTTPStatus.UNPROCESSABLE_ENTITY)
+
     offset = len(PNG_SIGNATURE)
     width = height = bit_depth = color_type = interlace = None
-    seen_ihdr = seen_iend = seen_idat = idat_closed = False
+    seen_ihdr = seen_plte = seen_iend = seen_idat = idat_closed = False
     compressed_parts: list[bytes] = []
+    valid_depths = {0: (1, 2, 4, 8, 16), 2: (8, 16), 3: (1, 2, 4, 8), 4: (8, 16), 6: (8, 16)}
+    known_critical = {b"IHDR", b"PLTE", b"IDAT", b"IEND"}
+
     while offset + 12 <= len(data):
         length = struct.unpack(">I", data[offset:offset + 4])[0]
         chunk_type = data[offset + 4:offset + 8]
         end = offset + 12 + length
         if length > len(data) or end > len(data):
             raise ApiInputError("El PNG está truncado o contiene un bloque inválido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+        if any(not (65 <= byte <= 90 or 97 <= byte <= 122) for byte in chunk_type) or not (65 <= chunk_type[2] <= 90):
+            raise ApiInputError("El PNG contiene un tipo de bloque inválido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+
         chunk_data = data[offset + 8:offset + 8 + length]
         supplied_crc = struct.unpack(">I", data[offset + 8 + length:end])[0]
         if (binascii.crc32(chunk_type + chunk_data) & 0xFFFFFFFF) != supplied_crc:
             raise ApiInputError("El PNG contiene un bloque dañado (CRC incorrecto).", HTTPStatus.UNPROCESSABLE_ENTITY)
+
         if not seen_ihdr:
             if chunk_type != b"IHDR" or length != 13:
                 raise ApiInputError("El PNG no comienza con un encabezado IHDR válido.", HTTPStatus.UNPROCESSABLE_ENTITY)
             width, height, bit_depth, color_type, compression, filtering, interlace = struct.unpack(">IIBBBBB", chunk_data)
-            valid_depths = {0: (1, 2, 4, 8, 16), 2: (8, 16), 3: (1, 2, 4, 8), 4: (8, 16), 6: (8, 16)}
             if not width or not height or width * height > MAX_PNG_PIXELS:
                 raise ApiInputError("Las dimensiones PNG son inválidas o exceden el límite de píxeles.", HTTPStatus.UNPROCESSABLE_ENTITY)
             if color_type not in valid_depths or bit_depth not in valid_depths[color_type] or compression != 0 or filtering != 0:
@@ -250,13 +261,30 @@ def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]
             seen_ihdr = True
         elif chunk_type == b"IHDR":
             raise ApiInputError("El PNG contiene un IHDR duplicado.", HTTPStatus.UNPROCESSABLE_ENTITY)
+
+        if chunk_type not in known_critical and 65 <= chunk_type[0] <= 90:
+            raise ApiInputError("El PNG contiene un bloque crítico desconocido.", HTTPStatus.UNPROCESSABLE_ENTITY)
+
+        if chunk_type == b"PLTE":
+            if seen_plte or seen_idat or length == 0 or length > 768 or length % 3 != 0:
+                raise ApiInputError("La paleta PLTE del PNG está duplicada, mal formada o fuera de posición.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            if color_type in (0, 4):
+                raise ApiInputError("PLTE no está permitido para este tipo de color PNG.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            entries = length // 3
+            if color_type == 3 and entries > (1 << bit_depth):
+                raise ApiInputError("La paleta PLTE excede los colores permitidos por la profundidad de bits.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            seen_plte = True
+
         if chunk_type == b"IDAT":
             if idat_closed or seen_iend:
                 raise ApiInputError("La secuencia IDAT del PNG no es válida.", HTTPStatus.UNPROCESSABLE_ENTITY)
+            if color_type == 3 and not seen_plte:
+                raise ApiInputError("El PNG indexado requiere PLTE antes de IDAT.", HTTPStatus.UNPROCESSABLE_ENTITY)
             seen_idat = True
             compressed_parts.append(chunk_data)
         elif seen_idat and chunk_type != b"IEND":
             idat_closed = True
+
         if chunk_type == b"IEND":
             if length != 0 or seen_iend or not seen_idat:
                 raise ApiInputError("El PNG no contiene un IEND válido.", HTTPStatus.UNPROCESSABLE_ENTITY)
@@ -264,8 +292,12 @@ def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]
             offset = end
             break
         offset = end
+
     if not seen_ihdr or not seen_idat or not seen_iend or offset != len(data):
         raise ApiInputError("El PNG está incompleto o contiene datos sobrantes.", HTTPStatus.UNPROCESSABLE_ENTITY)
+    if color_type == 3 and not seen_plte:
+        raise ApiInputError("El PNG indexado requiere una paleta PLTE.", HTTPStatus.UNPROCESSABLE_ENTITY)
+
     channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[color_type]
     row_bytes = (width * channels * bit_depth + 7) // 8
     decoded_size = (row_bytes + 1) * height
@@ -282,7 +314,6 @@ def validate_png_bytes(data: bytes, expected: dict[str, Any]) -> tuple[int, int]
     if any(decoded[row * stride] > 4 for row in range(height)):
         raise ApiInputError("El PNG contiene un filtro de fila inválido.", HTTPStatus.UNPROCESSABLE_ENTITY)
     return width, height
-
 
 def _safe_asset_destination(root: Path, relative_destination: str) -> Path:
     """Resolve only a manifest-relative path and refuse symlink components."""
