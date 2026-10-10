@@ -95,3 +95,18 @@ Las pruebas previstas para CI son:
 | Próximas categorías | Pantalones, faldas, vestidos y calzado | Requieren parámetros y capacidades propios: largo/ancho/tiro, vuelo, altura de caña y volumen; no están incluidos en v3. |
 
 La vista trasera continúa siendo una aproximación 2D y no una reconstrucción tridimensional. Las pruebas de ruta verifican cambio geométrico, no sustituyen la inspección estética física de todas las prendas.
+
+ 
+## BIMG-ENGINE-004 · Visual QA, garment layering and Chromapatch anchors
+
+- Fixed the street_bomber shell/hem to use the garment-specific bomberHem derived from torso_length, instead of Math.min(hemY, 340), which clamped the shell to a constant boundary for normal recipe values.
+- Sleeve length maps to a bounded 300–362 SVG endpoint range. The existing arm-skin surface remains underneath the sleeves so shorter sleeves reveal skin rather than leaving a transparent gap.
+- Added semantic QA markers to the base torso, base sleeves, outer-layer surfaces and Chromapatch. They identify composed SVG surfaces without changing official catalog IDs or generator compatibility rules.
+- Chromapatch anchors resolve from the requested position and current piece: chest/back anchors stay within the selected garment hem; sleeve anchors track the current sleeve endpoint; hood anchors are used only for hooded_jacket. Unsupported sleeve/hood placements fall back deterministically to the chest and the Style Lab explains why.
+- web/browser_smoke.mjs produces 14 named screenshots from the real Chromium-rendered application and checks final garment shell geometry, short-vs-long outer layers, sleeve bounds, waist width, anchor availability and NanoWear state. GitHub Actions uploads artifacts/visual-qa/ as botimagen-visual-garment-qa for 14 days.
+- The captures and geometry assertions are reproducible technical evidence, not a substitute for independent artistic review. Windows Chrome/Edge manual QA remains WINDOWS_MANUAL_QA: NOT_RUN until physically executed.
+- No catalog expansion, dependency, external asset, or generator compatibility change was introduced.
+
+### BIMG-ENGINE-004 status
+
+PARTIAL until the final CI run passes and the produced screenshot artifact has been inspected. Do not elevate this status solely because SVG attributes or geometry assertions differ.
