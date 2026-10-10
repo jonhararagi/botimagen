@@ -110,3 +110,5 @@ La vista trasera continúa siendo una aproximación 2D y no una reconstrucción 
 ### BIMG-ENGINE-004 status
 
 PARTIAL until the final CI run passes and the produced screenshot artifact has been inspected. Do not elevate this status solely because SVG attributes or geometry assertions differ.
+
+- Outer garment bodies and their sleeve surfaces are composed after the selected base outfit, so a short bomber or long coat remains visually above the base garment instead of being painted underneath it.
