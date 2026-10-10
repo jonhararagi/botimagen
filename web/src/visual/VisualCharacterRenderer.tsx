@@ -138,7 +138,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const patchColor = r.emblem_contrast === "manual" ? r.emblem_color : complementaryEmblemColor(fabric);
   const stroke = toon > .65 ? "#090d1a" : "#8a91ad";
   const line = 1.1 + toon * 2.1;
-  const hemY = 340 + r.torso_length * .7;
+  const hemY = 315 + r.torso_length * .35;
   const waistHalf = 25 + r.waist_fit * .18;
   const torsoPath = `M125 263 Q170 238 216 263 L${170 + waistHalf} ${hemY - 57} L${170 + waistHalf * .72} ${hemY} L${170 - waistHalf * .72} ${hemY} L${170 - waistHalf} ${hemY - 57} Z`;
   // The skin arm remains below fabric; 0..100 maps to a visible 300..362 hem.
