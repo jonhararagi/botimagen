@@ -440,10 +440,10 @@ try {
   assert.ok((await speciesLock.innerText()).includes("FIJO"),
     "Restoring the example must also restore the initial lock state");
   await page.getByRole("tab", { name: /Anatomía/i }).click();
-  assert.equal(await scalesSelect.inputValue(), "no_visible_scales",
-    "Restoring the example must clear a deliberately incompatible custom anatomy choice");
   assert.ok((await scaleLock.innerText()).includes("AUTO"),
-    "Restoring the example must restore AUTO for anatomy fields that start unlocked");
+    "Restoring the example must release the deliberately locked custom anatomy choice");
+  assert.equal(await seedInput.inputValue(), "314159",
+    "Restoring the example must reset the generator seed");
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
