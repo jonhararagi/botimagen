@@ -651,6 +651,7 @@ try {
   // Captures are CI artifacts, never committed as product assets.
   const visualQaDir = resolve(root, "artifacts", "visual-qa");
   await mkdir(visualQaDir, { recursive: true });
+  const visualSvg = page.locator(".visual-character-svg");
   const captureVisual = async name => page.locator(".canvas").screenshot({
     path: resolve(visualQaDir, name + ".png"),
   });
@@ -669,6 +670,10 @@ try {
   };
 
   await page.getByRole("tab", { name: /Vestuario/i }).click();
+  const qaOutfitLock = page.locator('label[for="trait-outfit"]').locator("xpath=../..").locator("button.lock");
+  const qaOuterLayerLock = page.locator('label[for="trait-outer_layer"]').locator("xpath=../..").locator("button.lock");
+  if (await outfitSelect.isDisabled()) await qaOutfitLock.click();
+  if (await outerLayerSelect.isDisabled()) await qaOuterLayerLock.click();
   await outfitSelect.selectOption("street_bomber");
   await outerLayerSelect.selectOption("none");
   await page.getByRole("button", { name: "Frontal", exact: true }).click();
