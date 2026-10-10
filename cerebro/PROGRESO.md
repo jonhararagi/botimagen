@@ -2,7 +2,7 @@
 
 **Último cálculo:** 2026-10-10  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 63%**
+**Progreso global actual: 68%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -19,12 +19,12 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-005 · Editor completo por categorías | 18% | 87% · PARTIAL | 15,66 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
-| BIMG-008 · Intake de assets en la interfaz web | 8% | 10% · PARTIAL | 0,8 |
+| BIMG-008 · Intake de assets en la interfaz web | 8% | 70% · PARTIAL | 5,6 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **62,96 / 100 → 63%** |
+| **Total ponderado** | **100%** | | **67,76 / 100 → 68%** |
 
-BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **62,96 / 100 (63%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
+BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **67,76 / 100 (68%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
 
 ## Evidencia más reciente
 
@@ -93,3 +93,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 
 - BIMG-008, rama `feat/bimg-008-safe-png-import`: se añadió endpoint de importación por ID de contrato, validación estructural PNG, escritura temporal sin sobrescritura, UI React y pruebas HTTP/E2E. **El porcentaje ponderado se mantiene en 63% (62,96/100)** hasta que CI valide la implementación; los archivos escritos por sí solos no justifican elevar el contador. Resultado de CI y PR pendiente al momento de esta nota. QA físico Windows continúa NOT_RUN.
+
+
+- BIMG-008: CI #198 PASS_REAL valida pruebas Python/API, `npm ci`, build y Chromium E2E de rechazo de PNG inválido: https://github.com/jonhararagi/botimagen/actions/runs/38025915939. CI #199, que añade el recorrido de éxito UI→API→archivo canónico, ya pasó suite Python y build; instalación de Chromium/E2E seguía en curso al actualizar esta línea: https://github.com/jonhararagi/botimagen/actions/runs/38026040558. BIMG-008 se estima al 70% por evidencia real; cierre y QA Windows aún pendientes. Progreso recalculado: **67,76 / 100 → 68%**.
