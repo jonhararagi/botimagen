@@ -156,23 +156,23 @@ class AssetImportTests(unittest.TestCase):
 
     def test_png_color_depth_matrix_and_indexed_palette_requirements(self):
         valid = make_png_structure(color_type=3, bit_depth=1,
-                                   before_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00\\xff\\xff\\xff"),))
+                                   before_idat=(png_chunk(b"PLTE", b"\x00\x00\x00\xff\xff\xff"),))
         self.assertEqual(api.validate_png_bytes(valid, {"width": 2, "height": 1}), (2, 1))
 
         invalid_cases = [
             ("indexed PNG missing PLTE", make_png_structure(color_type=3, bit_depth=1)),
             ("invalid grayscale bit depth", make_png_structure(color_type=2, bit_depth=4)),
-            ("PLTE length not divisible by three", make_png_structure(before_idat=(png_chunk(b"PLTE", b"\\x00\\x00"),))),
+            ("PLTE length not divisible by three", make_png_structure(before_idat=(png_chunk(b"PLTE", b"\x00\x00"),))),
             ("PLTE has too many indexed colors", make_png_structure(color_type=3, bit_depth=1,
-                before_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00\\x11\\x11\\x11\\x22\\x22\\x22"),))),
+                before_idat=(png_chunk(b"PLTE", b"\x00\x00\x00\x11\x11\x11\x22\x22\x22"),))),
             ("duplicate PLTE", make_png_structure(before_idat=(
-                png_chunk(b"PLTE", b"\\x00\\x00\\x00"), png_chunk(b"PLTE", b"\\x11\\x11\\x11")))),
-            ("PLTE after IDAT", make_png_structure(after_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00"),))),
+                png_chunk(b"PLTE", b"\x00\x00\x00"), png_chunk(b"PLTE", b"\x11\x11\x11")))),
+            ("PLTE after IDAT", make_png_structure(after_idat=(png_chunk(b"PLTE", b"\x00\x00\x00"),))),
             ("PLTE forbidden for grayscale", make_png_structure(color_type=0,
-                before_idat=(png_chunk(b"PLTE", b"\\x00\\x00\\x00"),))),
+                before_idat=(png_chunk(b"PLTE", b"\x00\x00\x00"),))),
             ("unknown critical chunk", make_png_structure(before_idat=(png_chunk(b"ABCD", b"x"),))),
             ("invalid reserved chunk-type bit", make_png_structure(before_idat=(png_chunk(b"abca", b"x"),))),
-            ("non-consecutive IDAT", make_png_structure(between_idat=(png_chunk(b"tEXt", b"k\\x00v"),), split_idat=True)),
+            ("non-consecutive IDAT", make_png_structure(between_idat=(png_chunk(b"tEXt", b"k\x00v"),), split_idat=True)),
         ]
         for label, body in invalid_cases:
             with self.subTest(label=label):
@@ -187,6 +187,43 @@ class AssetImportTests(unittest.TestCase):
             with self.subTest(label=label):
                 with self.assertRaises(api.ApiInputError):
                     api.validate_png_bytes(body, {})
+
+
+    def test_symlink_destination_parent_is_rejected_without_writing_outside(self):
+        outside = self.root / "outside"
+        outside.mkdir()
+        output_assets = self.root / "output" / "assets"
+        output_assets.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            output_assets.symlink_to(outside, target_is_directory=True)
+        except (OSError, NotImplementedError) as exc:
+            self.skipTest("Symlink creation is unavailable in this environment: " + str(exc))
+        status, payload = self.post(make_png())
+        self.assertEqual(status, 409)
+        self.assertNotIn(str(outside), json.dumps(payload))
+        self.assertEqual(list(outside.iterdir()), [])
+
+    def test_concurrent_imports_publish_exactly_one_file(self):
+        body = make_png()
+        results = []
+        failures = []
+
+        def worker():
+            try:
+                results.append(self.post(body)[0])
+            except Exception as exc:
+                failures.append(exc)
+
+        threads = [threading.Thread(target=worker) for _ in range(2)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=5)
+        self.assertEqual(failures, [])
+        self.assertEqual(sorted(results), [201, 409])
+        target = self.root / "output" / self.destination
+        self.assertEqual(target.read_bytes(), body)
+        self.assertEqual(list(target.parent.glob(".botimagen-import-*.tmp")), [])
 
 
 if __name__ == "__main__":
