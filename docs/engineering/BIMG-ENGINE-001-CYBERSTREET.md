@@ -74,3 +74,24 @@ Las pruebas previstas para CI son:
 - El prompt de generación incluye los colores y el patrón cuando recibe receta, pero la vista SVG es la representación interactiva inmediata y no depende de generación.
 - Los mapeos oficiales se conservan: `outfit`: `tactical_baseball`, `combat_jacket`, `techwear_sport`, `light_armor`, `idol_combat`, `elegant_command`, `support_coat`, `street_bomber`, `baseball_tech_suit`, `armadura_asimetrica`; `outer_layer`: `none`, `short_bomber`, `hooded_jacket`, `long_coat`, `utility_cape`, `chaleco_tactico`, `chaqueta_corta_asimetrica`, `capa_corta_energetica`, `hombrera_modular`, `mangas_desmontables`; `footwear`: `combat_sneakers`, `armored_boots`, `high_top`, `sleek_boots`, `botas_cortas`, `zapatillas_plataforma`, `botas_asimetricas`, `calzado_ligero_pitcher`, `botines_elegantes`, `botas_reforzadas`.
 - Limitación: los mapeos siguen siendo SVG 2D con perspectiva simplificada; no equivalen a una ilustración final ni a una malla 3D. Validación manual Chrome/Edge en Windows pendiente.
+
+
+## BIMG-ENGINE-003 · Parametric Garment Design
+
+- La receta visual vigente evoluciona a `schema_version: 3` e incorpora `torso_length`, `sleeve_length` y `waist_fit`, cada uno normalizado entre 0 y 100. Los valores predeterminados son 80, 60 y 50 respectivamente para aproximar la silueta previa.
+- Los controles se encuentran dentro del Style Lab existente, bajo **Corte y ajuste de la ropa**. Cada control muestra valor porcentual y etiquetas de extremos. Las capacidades se calculan por ID oficial de `outfit` y `outer_layer`; las piezas sin capacidad no habilitan el control correspondiente.
+- `getGarmentCapabilities(values)` declara las capacidades por pieza. La geometría de torso se calcula desde `torso_length` y `waist_fit`; las mangas SVG usan un extremo interpolado por `sleeve_length`. Las siluetas de bomber, chaqueta y abrigo aplican sus propios límites para conservar el reconocimiento de la prenda.
+- Los parámetros son independientes de los colores base/panel/acento, patrón, NanoWear, acabado y Chromapatch. El cambio de corte no sustituye los IDs oficiales de catálogo ni genera una petición Python para actualizar la vista.
+- Migración API: v1 recibe colores/patrón y parámetros de corte por defaults; v2 conserva los colores/patrón guardados y recibe parámetros de corte por defaults; v3 conserva los tres parámetros validados. Los valores deben ser enteros de 0 a 100. La normalización de cliente usa los mismos defaults deterministas. Perfiles históricos no se escriben solo por leerlos.
+- El prompt Python incluye los tres parámetros cuando se recibe receta; las solicitudes antiguas sin `visual_recipe` conservan el flujo anterior.
+- QA de Chromium verifica los atributos geométricos reales `d` de la ruta del torso y de las mangas en ambos extremos, el cambio de silueta por cintura, el payload de exportación y la restauración al cargar un perfil. La CI valida compilación y contrato de API; la prueba manual en Windows continúa pendiente hasta ejecutarse realmente.
+
+### Capacidades representadas actualmente
+
+| Capacidad | IDs compatibles actuales | Límites |
+|---|---|---|
+| Largo del torso y ajuste de cintura | `tactical_baseball`, `combat_jacket`, `techwear_sport`, `street_bomber`, `support_coat`, `baseball_tech_suit`, `elegant_command`; `short_bomber`, `hooded_jacket`, `long_coat`, `chaqueta_corta_asimetrica` | La silueta base y las capas son geometría SVG 2D; algunas piezas comparten el contorno base. |
+| Largo de manga | `tactical_baseball`, `combat_jacket`, `techwear_sport`, `street_bomber`, `support_coat`, `baseball_tech_suit`; capas con mangas como `short_bomber`, `hooded_jacket`, `long_coat`, `chaqueta_corta_asimetrica`, `mangas_desmontables` | Cambia el extremo de la manga dibujada, sin rigging ni simulación de tela. Los chalecos y armaduras sin mangas no reciben mangas nuevas por el control. |
+| Próximas categorías | Pantalones, faldas, vestidos y calzado | Requieren parámetros y capacidades propios: largo/ancho/tiro, vuelo, altura de caña y volumen; no están incluidos en v3. |
+
+La vista trasera continúa siendo una aproximación 2D y no una reconstrucción tridimensional. Las pruebas de ruta verifican cambio geométrico, no sustituyen la inspección estética física de todas las prendas.
