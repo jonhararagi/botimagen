@@ -79,9 +79,11 @@ type RendererProps = { values: Record<string, string>; recipe: VisualRecipe; onR
 export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: RendererProps) {
   const r = normalizeVisualRecipe(recipe);
   const hair = optionColor(values.hair ?? "", "#ef646b");
-  const skinMap: Record<string, string> = { porcelana_neutra: "#f2d2c6", morena_calida: "#b97858", piel_oliva: "#c89b73", piel_oscura: "#754b40" };
+  const skinMap: Record<string, string> = { porcelana_neutra: "#f2d2c6", marfil_calido: "#f1d4b0", beige_claro: "#e5c3a0", durazno: "#e9b6a1", beige_dorado: "#d7ad82", oliva_suave: "#c89b73", canela: "#ad7656", bronce_calido: "#986344", marron_profundo: "#754b40", fantasia_azul_suave: "#a4c9df" };
   const skin = skinMap[values.skin_tone] ?? "#edc3b8";
   const accent = optionColor(values.palette_accent ?? values.hair_secondary_color ?? "", "#5ce4dc");
+  const eyeMap: Record<string, string> = { ambar: "#d7a64f", rojo_rubi: "#c64256", violeta: "#9b72e8", azul_hielo: "#a6e8fa", verde_esmeralda: "#2da987", gris_grafito: "#778296", azul_profundo: "#3655b9", celeste: "#68c6ec", verde_lima: "#9acb45", rosa_opalina: "#e88bc2" };
+  const eyeColor = eyeMap[values.eyes] ?? "#d7a64f";
   const street = r.streetwear_cyberpunk / 100;
   const toon = r.toon_influence / 100;
   const anime = r.anime_influence / 100;
@@ -119,15 +121,28 @@ export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: Rend
       <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="url(#cw-hair)" stroke={stroke} strokeWidth={line}/>
       <path d="M128 120 L101 83 L129 94 M219 118 L250 81 L229 97" fill="none" stroke={accent} strokeWidth={4 + street * 5} strokeLinecap="round"/>
       <path d="M143 148 Q156 140 165 148 M185 148 Q196 140 205 148" fill="none" stroke="#664253" strokeWidth={1.5 + toon * 2.5} strokeLinecap="round"/>
-      <ellipse cx="155" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={optionColor(values.eyes ?? "", "#d7a64f")}/>
+      <ellipse cx="155" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={eyeColor}/>
       <ellipse cx="195" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={optionColor(values.eyes ?? "", "#d7a64f")}/>
       <path d={values.expression?.includes("sonrisa") ? "M160 176 Q170 188 181 176" : "M160 179 L180 179"} fill="none" stroke="#9c526a" strokeWidth={2 + toon} strokeLinecap="round"/>
-      {values.ear_style?.includes("gato") && <path d="M126 121 L111 82 L143 103 M214 121 L230 82 L199 103" fill={skin} stroke={stroke} strokeWidth={line}/>}
+      {values.ear_style === "orejas_gato" && <path d="M126 121 L111 82 L143 103 M214 121 L230 82 L199 103" fill={skin} stroke={stroke} strokeWidth={line}/>}
+      {values.ear_style === "orejas_zorro" && <path d="M126 120 L105 70 L146 100 M214 120 L235 70 L194 100" fill={skin} stroke={stroke} strokeWidth={line}/>}
+      {values.ear_style === "orejas_lobo" && <path d="M126 121 L115 75 L145 101 M214 121 L225 75 L195 101" fill={skin} stroke={stroke} strokeWidth={line}/>}
+      {values.ear_style === "orejas_conejo" && <path d="M143 115 Q123 44 137 42 Q151 43 155 113 M185 113 Q188 43 202 42 Q218 45 197 116" fill={skin} stroke={stroke} strokeWidth={line}/>}
+      {values.ear_style === "orejas_elficas" && <path d="M127 131 L88 111 L133 145 M213 131 L252 111 L207 145" fill={skin} stroke={stroke} strokeWidth={line}/>} 
       {values.horn_style && !values.horn_style.includes("sin_") && <path d="M137 98 L126 64 L151 86 M202 86 L226 62 L216 102" fill={accent} stroke={stroke} strokeWidth={line}/>}
       {values.facial_detail && !values.facial_detail.includes("sin_") && <g fill={accent}><circle cx="145" cy="166" r="2"/><circle cx="149" cy="169" r="1.4"/></g>}
     </>}
     {rear && <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="url(#cw-hair)" stroke={stroke} strokeWidth={line}/>}
     {Array.from({ length: Math.round(2 + detail * 7) }, (_, i) => <path key={i} d={`M${139 + i * 4} 275 l${(i % 2 ? 4 : -3) + street * 2} ${30 + detail * 16}`} stroke={accent} strokeWidth={.45 + detail * .8} opacity={r.nanowear_state === "everyday" ? .12 + street * .2 : .25 + street * .65} fill="none"/>)}
+
+    {values.outer_layer === "long_coat" && <g fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}><path d="M126 265 L111 285 L119 397 L145 414 L144 333 Z"/><path d="M214 265 L229 285 L221 397 L195 414 L196 333 Z"/></g>}
+    {values.outer_layer === "hooded_jacket" && <path d="M137 240 Q137 217 151 222 L170 242 L189 222 Q203 217 203 240 L194 264 L146 264 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "short_bomber" && <path d="M125 263 Q170 245 216 263 L211 305 L129 305 Z" fill="url(#cw-fabric)" stroke={stroke} strokeWidth={line}/>}
+    {values.outer_layer === "chaleco_tactico" && <path d="M140 267 L158 282 L170 274 L182 282 L200 267 L195 337 L181 352 L170 344 L159 352 L145 337 Z" fill="#202b3e" stroke={accent} strokeWidth={line}/>}
+    {values.outfit === "street_bomber" && <path d="M137 387 L203 387 L198 399 L142 399 Z" fill={accent} opacity=".72"/>}
+    {(values.outfit === "light_armor" || values.outfit === "armadura_asimetrica") && <path d="M143 280 L168 294 L194 279 L188 322 L170 334 L148 321 Z" fill={accent} opacity={.12 + street * .25} stroke={accent} strokeWidth={.8 + street}/>}
+    {values.outfit === "techwear_sport" && <path d="M128 318 L145 329 M212 318 L195 329" stroke={accent} strokeWidth={2 + street * 2} fill="none"/>}
+    {values.outer_layer === "hombrera_modular" && <path d="M124 265 L141 260 L151 280 L132 292 Z M216 265 L199 260 L189 280 L208 292 Z" fill={accent} opacity=".65" stroke={stroke} strokeWidth={line}/>}
     {r.nanowear_state !== "everyday" && <g fill="none" stroke={accent} strokeWidth={.7 + street} opacity={.35 + street * .55}><path d="M131 300 L145 315 L140 333 M209 300 L195 315 L200 333"/><path d="M141 353 L151 360 L148 377 M199 353 L189 360 L192 377"/></g>}
     <g transform={patchTransform} aria-label="Chromapatch">
       <circle r="13" fill={patchBg} stroke={accent} strokeWidth={1 + detail}/>
