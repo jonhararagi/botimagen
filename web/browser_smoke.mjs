@@ -378,6 +378,9 @@ try {
   // Exercise the real CyberStreet controls and verify their generated prompt contract.
   await page.locator(".style-fields select").nth(0).selectOption("transformation");
   await page.locator(".view-toggle button").nth(1).click();
+  await page.locator(".style-fields select").nth(2).selectOption("fox");
+  await page.locator(".style-fields select").nth(4).selectOption("auto");
+  await page.locator(".style-fields input[type=color]").fill("#111111");
   const animeSlider = page.locator(".style-range input").nth(0);
   await animeSlider.focus();
   await animeSlider.press("End");
@@ -386,6 +389,7 @@ try {
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-nanowear"), "transformation");
+  assert.equal(await page.locator(".visual-character-svg g[aria-label="Chromapatch"] g path").getAttribute("fill"), "#fff4e8", "Auto contrast should switch a low-luminance manual preference to a contrasting mark");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
   prompt = await page.locator(".prompt-panel pre").innerText();
   assert.ok(prompt.includes("Visual recipe CyberStreet v1"), "The official prompt should include the visual recipe");
@@ -428,6 +432,8 @@ try {
     "Loading a saved profile should restore its NanoWear state");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i,
     "Loading a saved profile should restore the selected presentation view");
+  assert.equal(await page.locator(".style-fields select").nth(2).inputValue(), "fox", "Loading a saved profile should restore its Chromapatch shape");
+  assert.equal(await page.locator(".style-fields input[type=color]").inputValue(), "#111111", "Loading a saved profile should restore the selected emblem color");
   assert.equal(await page.locator(".style-range input").nth(0).inputValue(), "100",
     "Loading a saved profile should restore the saved Style Lab recipe");
   assert.equal(await arrangementSelect.inputValue(), "coleta_trenzada",
