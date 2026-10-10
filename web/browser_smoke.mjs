@@ -422,9 +422,50 @@ try {
   await page.getByRole("tab", { name: /Anatomía/i }).click();
   assert.equal(await scalesSelect.inputValue(), "cheek_temple_scales",
     "Loading a saved profile must retain deliberately incompatible manual anatomy");
+
+  // Restoring the example must reset selections/locks and require a fresh generation.
+  await page.getByRole("button", { name: "Restaurar ejemplo", exact: true }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
+  assert.equal(await saveButton.isDisabled(), true,
+    "Saving must stay blocked after restoring an example with no matching generated snapshot");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("Perfil generado por Python"),
+    undefined,
+    { timeout: 15000 },
+  );
+  await page.getByRole("tab", { name: /Identidad/i }).click();
+  assert.equal(await speciesSelect.inputValue(), "draconica",
+    "Restoring the example must return to the catalog-defined starting species");
+  assert.ok((await speciesLock.innerText()).includes("FIJO"),
+    "Restoring the example must also restore the initial lock state");
+  await page.getByRole("tab", { name: /Anatomía/i }).click();
+  assert.equal(await scalesSelect.inputValue(), "no_visible_scales",
+    "Restoring the example must clear a deliberately incompatible custom anatomy choice");
+  assert.ok((await scaleLock.innerText()).includes("AUTO"),
+    "Restoring the example must restore AUTO for anatomy fields that start unlocked");
+
+  // Smoke the responsive breakpoints used by the local browser UI.
+  for (const width of [1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    const layout = await page.evaluate(() => ({
+      viewportWidth: window.innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      mainWidth: document.querySelector(".main")?.getBoundingClientRect().width ?? 0,
+    }));
+    assert.ok(
+      layout.documentWidth <= layout.viewportWidth,
+      `Horizontal overflow at viewport ${width}px: document=${layout.documentWidth}, main=${layout.mainWidth}`,
+    );
+    assert.ok(
+      await page.getByRole("button", { name: /Generar perfil con motor local/i }).isVisible(),
+      `The generate action should remain visible at viewport ${width}px`,
+    );
+  }
+  await page.setViewportSize({ width: 1440, height: 1100 });
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified recoverable API generation failure, strict seeds, catalog compatibility, explicit none prompt semantics, manual overrides across save/load, stale-snapshot guards, and no page errors.");
+  console.log("PASS_REAL: Chromium verified recoverable API errors, strict seeds, catalog compatibility, manual overrides and persistence, restore-example recovery, 320-1024px responsive layouts, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
