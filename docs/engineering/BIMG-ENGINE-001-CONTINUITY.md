@@ -58,7 +58,7 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - The renderer exposes semantic markers for the final base torso, sleeve, outer-layer and Chromapatch surfaces. These are QA hooks, not new catalog IDs or product mechanics.
 - The browser smoke suite captures 14 reproducible .canvas screenshots into artifacts/visual-qa/ and asserts the bomber shell at torso lengths 0/50/100, short-vs-long outer-layer extents, sleeves at 0/50/100, waist silhouette width, sleeve/hood fallback, front/back placement and everyday/transformation states.
 - GitHub Actions uploads the screenshot set as botimagen-visual-garment-qa for 14 days. Generated screenshots are CI evidence only and must not be committed as product artwork.
-- Status remains PARTIAL until CI is green and captures are inspected. WINDOWS_MANUAL_QA: NOT_RUN; Linux headless Chromium is not represented as physical Windows validation or independent art direction approval.
+- Status: PASS_VISUAL_GARMENT_QA for the headless Chromium scope. CI run 38057689613 passed on code HEAD 0148ec8a80b755f7506faf55ea625bc3e25f0fee; all 14 captures were inspected. The review found and corrected an oversized Chromapatch on the minimum-length bomber, with a regression assertion for hem-aware scaling. WINDOWS_MANUAL_QA: NOT_RUN; headless Chromium is not represented as physical Windows validation or an assertion of production illustration polish.
 - Preserve PR #11 as open/unmerged, leave main and PR #8/#9/#10 untouched, and do not expand the garment catalog during this task.
 - TIMER: 3–5 hours estimated; actual elapsed time not measured.
 
