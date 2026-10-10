@@ -484,7 +484,7 @@ class CharacterGenerator:
             "synthetic": "glossy synthetic finish",
         }.get(str(recipe.get("material_finish")), "matte everyday textile")
         return (
-            "Visual recipe CyberStreet v2: "
+            "Visual recipe CyberStreet v3: "
             f"{recipe.get('anime_influence', 68)}% anime influence, "
             f"{recipe.get('toon_influence', 56)}% toon influence, "
             f"{recipe.get('streetwear_cyberpunk', 30)}% streetwear-to-cyberpunk detailing, "
@@ -493,6 +493,9 @@ class CharacterGenerator:
             f"{recipe.get('garment_panel_color', '#48516a')}, technology accent "
             f"{recipe.get('garment_accent_color', '#5ce4dc')}, pattern {recipe.get('fabric_pattern', 'circuit')}. "
             f"NanoWear state: {state}; material finish: {finish}. "
+            f"Garment fit parameters: torso length {recipe.get('torso_length', 80)}/100, "
+            f"sleeve length {recipe.get('sleeve_length', 60)}/100, waist fit {recipe.get('waist_fit', 50)}/100. "
+            "These parameters adjust the selected garment silhouette without replacing its catalog identity or fabric palette. "
             f"Original personal Chromapatch emblem: {recipe.get('emblem_shape', 'bunny')}, "
             f"color {recipe.get('emblem_color', '#f3c96b')}, position {recipe.get('emblem_position', 'chest')}, "
             f"contrast mode {recipe.get('emblem_contrast', 'auto')}. "
