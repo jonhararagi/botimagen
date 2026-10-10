@@ -376,11 +376,20 @@ try {
     "A manually locked anatomy option must not be silently normalized to the species");
 
   // Exercise the real CyberStreet controls and verify their generated prompt contract.
-  await page.locator(".style-fields select").nth(0).selectOption("transformation");
+  const fabricInputs = page.locator(".style-fields input[type=color]");
+  await fabricInputs.nth(0).fill("#234567");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Changing base nanotela color must immediately update the SVG clothing recipe");
+  await fabricInputs.nth(1).fill("#456789");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Changing secondary fabric color must update SVG panels");
+  await fabricInputs.nth(2).fill("#55d9cf");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Changing technology accent must update the SVG recipe");
+  await page.locator(".style-fields select").nth(0).selectOption("geometric");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "The geometric pattern must be connected to the live SVG");
+  await page.locator(".style-fields select").nth(1).selectOption("transformation");
   await page.locator(".view-toggle button").nth(1).click();
-  await page.locator(".style-fields select").nth(2).selectOption("fox");
-  await page.locator(".style-fields select").nth(4).selectOption("auto");
-  await page.locator(".style-fields input[type=color]").evaluate(el => {
+  await page.locator(".style-fields select").nth(3).selectOption("fox");
+  await page.locator(".style-fields select").nth(5).selectOption("auto");
+  await page.locator(".style-fields input[type=color]").nth(3).evaluate(el => {
     const input = el;
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
     setter?.call(input, "#111111");
@@ -395,10 +404,14 @@ try {
   await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-nanowear"), "transformation");
-  assert.equal(await page.locator('.visual-character-svg g[aria-label="Chromapatch"] > g').getAttribute("fill"), "#fff4e8", "Auto contrast should switch a low-luminance manual preference to a contrasting mark");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Transformation must preserve the selected fabric base color");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "Transformation must preserve the selected fabric pattern");
+  const autoPatchColor = await page.locator('.visual-character-svg g[aria-label="Chromapatch"] > g').getAttribute("fill");
+  assert.notEqual(autoPatchColor, "#111111", "Auto contrast must derive the emblem color from fabric rather than retain the manual color");
+  assert.notEqual(autoPatchColor, "#234567", "The automatic emblem must remain distinguishable from the fabric base");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
   prompt = await page.locator(".prompt-panel pre").innerText();
-  assert.ok(prompt.includes("Visual recipe CyberStreet v1"), "The official prompt should include the visual recipe");
+  assert.ok(prompt.includes("Visual recipe CyberStreet v2"), "The official prompt should include the visual recipe");
   assert.ok(prompt.includes("transformed synthetic textile sheen"), "The selected NanoWear state should reach the prompt");
   assert.equal(await saveButton.isDisabled(), false, "A synchronized visual recipe should be saveable");
 
@@ -434,12 +447,12 @@ try {
   );
   assert.equal(await tipSelect.inputValue(), "metallic_gold",
     "Loading a saved profile should restore the tip color selection");
-  assert.equal(await page.locator(".style-fields select").nth(0).inputValue(), "transformation",
+  assert.equal(await page.locator(".style-fields select").nth(1).inputValue(), "transformation",
     "Loading a saved profile should restore its NanoWear state");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i,
     "Loading a saved profile should restore the selected presentation view");
-  assert.equal(await page.locator(".style-fields select").nth(2).inputValue(), "fox", "Loading a saved profile should restore its Chromapatch shape");
-  assert.equal(await page.locator(".style-fields input[type=color]").inputValue(), "#111111", "Loading a saved profile should restore the selected emblem color");
+  assert.equal(await page.locator(".style-fields select").nth(3).inputValue(), "fox", "Loading a saved profile should restore its Chromapatch shape");
+  assert.equal(await page.locator(".style-fields input[type=color]").nth(3).inputValue(), "#111111", "Loading a saved profile should restore the selected emblem color");
   assert.equal(await page.locator(".style-range input").nth(0).inputValue(), "100",
     "Loading a saved profile should restore the saved Style Lab recipe");
   assert.equal(await arrangementSelect.inputValue(), "coleta_trenzada",
@@ -547,9 +560,9 @@ try {
     undefined,
     { timeout: 10000 },
   );
-  assert.equal(await page.locator(".style-fields select").nth(0).inputValue(), "everyday",
+  assert.equal(await page.locator(".style-fields select").nth(1).inputValue(), "everyday",
     "A legacy profile without visual_recipe should receive the safe NanoWear default");
-  assert.equal(await page.locator(".style-fields select").nth(2).inputValue(), "bunny",
+  assert.equal(await page.locator(".style-fields select").nth(3).inputValue(), "bunny",
     "A legacy profile without visual_recipe should receive the safe Chromapatch default");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /frontal/i,
     "A legacy profile without visual_recipe should default to the front presentation");
