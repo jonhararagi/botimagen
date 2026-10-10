@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Python syntax
-        run: python -m py_compile app.py doctor.py character_generator.py botimagen_server.py tests/test_character_generator.py tests/test_seed_reproducibility.py tests/test_visual_style_contract.py tests/test_local_api.py tests/test_web_field_coverage.py
+        run: python -m py_compile app.py doctor.py character_generator.py botimagen_server.py tests/test_character_generator.py tests/test_seed_reproducibility.py tests/test_visual_style_contract.py tests/test_local_api.py tests/test_web_field_coverage.py tests/test_visual_recipe_contract.py
 
       - name: Validate asset manifest
         run: python tests/validate_manifest.py
@@ -34,6 +34,9 @@ jobs:
 
       - name: Validate web editor field coverage
         run: python tests/test_web_field_coverage.py
+
+      - name: Validate CyberStreet visual recipe contract
+        run: python tests/test_visual_recipe_contract.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
