@@ -50,3 +50,14 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - Próxima revisión visual: contrastar bomber corto vs abrigo largo, mangas cortas vs largas y cintura entallada vs holgada; revisar que la ubicación del Chromapatch siga siendo legible tras el ajuste.
 - No añadir dependencias, assets externos ni pipelines 3D. Mantener PR #11 abierto y sin fusionar; no tocar `main` ni PR #8/#9/#10.
 - TIMER de BIMG-ENGINE-003: 4–7 horas estimadas; tiempo real no medido.
+
+ 
+## BIMG-ENGINE-004 · Visual garment QA
+
+- Current scope: fix the street bomber hem clamp, make sleeve endpoints visually legible, add piece-aware Chromapatch fallback/anchors, and exercise the real editor in Chromium.
+- The renderer exposes semantic markers for the final base torso, sleeve, outer-layer and Chromapatch surfaces. These are QA hooks, not new catalog IDs or product mechanics.
+- The browser smoke suite captures 14 reproducible .canvas screenshots into artifacts/visual-qa/ and asserts the bomber shell at torso lengths 0/50/100, short-vs-long outer-layer extents, sleeves at 0/50/100, waist silhouette width, sleeve/hood fallback, front/back placement and everyday/transformation states.
+- GitHub Actions uploads the screenshot set as botimagen-visual-garment-qa for 14 days. Generated screenshots are CI evidence only and must not be committed as product artwork.
+- Status remains PARTIAL until CI is green and captures are inspected. WINDOWS_MANUAL_QA: NOT_RUN; Linux headless Chromium is not represented as physical Windows validation or independent art direction approval.
+- Preserve PR #11 as open/unmerged, leave main and PR #8/#9/#10 untouched, and do not expand the garment catalog during this task.
+- TIMER: 3–5 hours estimated; actual elapsed time not measured.
