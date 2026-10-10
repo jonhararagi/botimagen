@@ -6,13 +6,14 @@ import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
 
 ROOT = Path(__file__).resolve().parent
+ASSET_MANIFEST_PATH = ROOT / "assets_manifest.json"
 MAX_BODY_BYTES = 64 * 1024
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -138,8 +139,76 @@ def _profile_summary(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def make_asset_contract_catalog(manifest_path: Path | None = None) -> dict[str, Any]:
+    """Expose stable public fields from the canonical asset manifest."""
+    path = Path(manifest_path) if manifest_path else ASSET_MANIFEST_PATH
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("No se pudo leer el manifiesto local de assets.") from exc
+
+    if not isinstance(manifest, dict) or manifest.get("version") != 1:
+        raise ValueError("La versión del manifiesto de assets no es compatible.")
+    assets = manifest.get("assets")
+    if not isinstance(assets, list):
+        raise ValueError("El manifiesto de assets debe contener una lista.")
+
+    contracts: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    seen_destinations: set[str] = set()
+    text_fields = ("id", "title", "description", "prompt", "negative_prompt", "prompt_version")
+
+    for asset in assets:
+        if not isinstance(asset, dict):
+            raise ValueError("Cada contrato de asset debe ser un objeto.")
+        contract: dict[str, Any] = {}
+        for key in text_fields:
+            value = asset.get(key)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"Campo '{key}' inválido en contrato de asset.")
+            contract[key] = value
+
+        asset_id = contract["id"]
+        destination = asset.get("destination")
+        expected = asset.get("expected")
+        if asset_id in seen_ids:
+            raise ValueError(f"ID de asset duplicado: {asset_id}.")
+        if not isinstance(destination, str) or not destination or "\\" in destination:
+            raise ValueError(f"Destino de asset inválido: {asset_id}.")
+
+        relative_destination = PurePosixPath(destination)
+        normalized_destination = relative_destination.as_posix()
+        if relative_destination.is_absolute() or ".." in relative_destination.parts:
+            raise ValueError(f"Destino de asset fuera de la raíz permitida: {asset_id}.")
+        if relative_destination.suffix.lower() != ".png" or not relative_destination.parts:
+            raise ValueError(f"El destino debe ser un PNG relativo: {asset_id}.")
+        if normalized_destination in seen_destinations:
+            raise ValueError(f"Destino de asset duplicado: {normalized_destination}.")
+        if not isinstance(expected, dict) or str(expected.get("format", "PNG")).upper() != "PNG":
+            raise ValueError(f"Contrato PNG esperado inválido: {asset_id}.")
+
+        safe_expected: dict[str, Any] = {"format": "PNG"}
+        for key in ("width", "height", "max_bytes"):
+            value = expected.get(key)
+            if value is not None:
+                if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+                    raise ValueError(f"Campo '{key}' inválido: {asset_id}.")
+                safe_expected[key] = value
+        if ("width" in safe_expected) != ("height" in safe_expected):
+            raise ValueError(f"Ancho y alto deben declararse juntos: {asset_id}.")
+
+        contract["destination"] = normalized_destination
+        contract["expected"] = safe_expected
+        seen_ids.add(asset_id)
+        seen_destinations.add(normalized_destination)
+        contracts.append(contract)
+
+    return {"manifest_version": manifest["version"], "count": len(contracts), "contracts": contracts}
+
+
 def make_handler(generator: CharacterGenerator, profiles_path: Path | None = None):
     catalog = make_catalog(generator)
+    asset_contract_catalog = make_asset_contract_catalog()
     profile_root = Path(profiles_path) if profiles_path else ROOT / "generated_characters" / "web_profiles"
 
     class BotImagenHandler(BaseHTTPRequestHandler):
@@ -188,6 +257,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             allowed_by_path = {
                 "/api/health": ("GET",),
                 "/api/catalog": ("GET",),
+                "/api/assets/contracts": ("GET",),
                 "/api/profiles": ("GET", "POST"),
                 "/api/generate": ("POST",),
             }
@@ -220,6 +290,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 return
             if path == "/api/catalog":
                 self._send_json(HTTPStatus.OK, catalog)
+                return
+            if path == "/api/assets/contracts":
+                self._send_json(HTTPStatus.OK, asset_contract_catalog)
                 return
             if path == "/api/profiles":
                 self._list_profiles()
@@ -266,6 +339,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
 
         def do_POST(self) -> None:
             path = urlsplit(self.path).path
+            if path == "/api/assets/contracts":
+                self._method_not_allowed()
+                return
             if path not in {"/api/generate", "/api/profiles"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return

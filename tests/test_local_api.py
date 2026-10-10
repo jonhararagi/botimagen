@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from character_generator import CharacterGenerator
-from botimagen_server import ApiInputError, generate_from_payload, make_catalog, make_handler
+from botimagen_server import ApiInputError, generate_from_payload, make_asset_contract_catalog, make_catalog, make_handler
 
 
 class LocalApiTests(unittest.TestCase):
@@ -365,6 +365,81 @@ class LocalApiTests(unittest.TestCase):
                         "application/json; charset=utf-8",
                     )
                     self.assertEqual(response.getheader("Allow"), "POST")
+                    self.assertIn("Método HTTP", payload["error"])
+                finally:
+                    connection.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
+    def test_asset_contract_catalog_is_manifest_backed_and_path_safe(self):
+        catalog = make_asset_contract_catalog(ROOT / "assets_manifest.json")
+        manifest = json.loads((ROOT / "assets_manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(catalog["manifest_version"], manifest["version"])
+        self.assertEqual(catalog["count"], len(manifest["assets"]))
+        self.assertEqual(
+            [item["id"] for item in catalog["contracts"]],
+            [item["id"] for item in manifest["assets"]],
+        )
+        for contract in catalog["contracts"]:
+            self.assertTrue(contract["destination"].endswith(".png"))
+            self.assertFalse(contract["destination"].startswith("/"))
+            self.assertNotIn("..", PurePosixPath(contract["destination"]).parts)
+            self.assertIn("format", contract["expected"])
+            self.assertNotIn("source_url", contract)
+            self.assertNotIn("creator", contract)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            unsafe_manifest = {
+                "version": 1,
+                "assets": [{
+                    "id": "asset.unsafe",
+                    "title": "Unsafe destination",
+                    "description": "Should fail closed.",
+                    "prompt": "test prompt",
+                    "negative_prompt": "test negative prompt",
+                    "prompt_version": "production-v2",
+                    "destination": "../outside.png",
+                    "expected": {"format": "PNG"},
+                }],
+            }
+            unsafe_path = Path(temp_dir) / "manifest.json"
+            unsafe_path.write_text(json.dumps(unsafe_manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "fuera de la raíz"):
+                make_asset_contract_catalog(unsafe_path)
+
+    def test_http_asset_contract_endpoint_and_method_allowlist(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(self.generator, Path(temp_dir)),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=3)
+                try:
+                    connection.request("GET", "/api/assets/contracts")
+                    response = connection.getresponse()
+                    payload = json.loads(response.read().decode("utf-8"))
+                    self.assertEqual(response.status, 200)
+                    self.assertEqual(payload["count"], 10)
+                    self.assertEqual(payload["manifest_version"], 1)
+                    self.assertIn("stage.background.far", [item["id"] for item in payload["contracts"]])
+                    self.assertTrue(payload["contracts"][0]["prompt"])
+                finally:
+                    connection.close()
+
+                connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=3)
+                try:
+                    connection.request("PUT", "/api/assets/contracts")
+                    response = connection.getresponse()
+                    payload = json.loads(response.read().decode("utf-8"))
+                    self.assertEqual(response.status, 405)
+                    self.assertEqual(response.getheader("Allow"), "GET")
                     self.assertIn("Método HTTP", payload["error"])
                 finally:
                     connection.close()
