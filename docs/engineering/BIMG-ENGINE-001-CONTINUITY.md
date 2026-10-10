@@ -38,3 +38,15 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - El renderizador usa `useId` para evitar colisiones de IDs SVG entre instancias.
 - Pendiente hasta completar CI: validar resultado del smoke Chromium sobre el HEAD final, comprobar la migración/persistencia real y actualizar la descripción del PR #11.
 - Windows Chrome/Edge manual: pendiente, no sustituido por CI Linux.
+
+
+## BIMG-ENGINE-003 · Estado incremental
+
+- Estado de trabajo: controles paramétricos de torso, mangas y cintura añadidos al Style Lab y conectados a geometría SVG real en piezas compatibles.
+- Receta actual: v3. Defaults de migración desde v1/v2: `torso_length=80`, `sleeve_length=60`, `waist_fit=50`. El API rechaza valores que no sean enteros de 0 a 100 y rechaza campos desconocidos por versión.
+- Mantener independientes los IDs oficiales de catálogo, los parámetros de geometría y la receta NanoWear/Chromapatch. No convertir un largo ajustado en otro ID de prenda ni perder paleta/material.
+- Validación automatizada requerida en la CI asociada al HEAD final: Python compile + pruebas del generador/API, migraciones v1/v2, `npm ci`, `npm run build` y Chromium. El smoke test compara los atributos `d` de las rutas SVG y verifica exportación/carga de la receta completa.
+- Revisión manual de Chrome/Edge en Windows: PENDIENTE hasta ejecución física. No declarar aceptación completa solo con CI Linux.
+- Próxima revisión visual: contrastar bomber corto vs abrigo largo, mangas cortas vs largas y cintura entallada vs holgada; revisar que la ubicación del Chromapatch siga siendo legible tras el ajuste.
+- No añadir dependencias, assets externos ni pipelines 3D. Mantener PR #11 abierto y sin fusionar; no tocar `main` ni PR #8/#9/#10.
+- TIMER de BIMG-ENGINE-003: 4–7 horas estimadas; tiempo real no medido.
