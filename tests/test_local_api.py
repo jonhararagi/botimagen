@@ -268,7 +268,7 @@ class LocalApiTests(unittest.TestCase):
             try:
                 cases = (
                     (b"{", "JSON inválido."),
-                    (b"\\xff", "UTF-8"),
+                    (b"\xff", "UTF-8"),
                 )
                 for body, expected_error in cases:
                     connection = HTTPConnection(
