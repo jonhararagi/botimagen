@@ -74,3 +74,11 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - elegant_command intentionally does not enable sleeve length; the test confirms that the control remains disabled for this sleeveless catalog ID. none retains its existing meaning and no IDs were added.
 - The geometry matrix is automated evidence, not a claim of independent art-direction approval. WINDOWS_MANUAL_QA: NOT_RUN unless a physical Windows review is separately performed.
 - TIMER: 4–6 hours estimated; actual elapsed time not measured.
+
+
+### BIMG-ENGINE-005 · Validation result
+
+- Matrix result: PASS_MATRIX for the declared capability contract. Chromium tested all 11 torso/waist-capable IDs and all 11 sleeve-capable IDs at 0, 50 and 100 on selected garment surfaces; the disabled sleeve control for elegant_command is also asserted.
+- Successful Chromium run before this documentation-only status entry: https://github.com/jonhararagi/botimagen/actions/runs/38059452763. Its capture artifact contains 58 PNGs plus the base and matrix manifests: https://github.com/jonhararagi/botimagen/actions/runs/38059452763/artifacts/11672242529.
+- The 22 endpoint capture pairs (11 torso/waist IDs, 11 sleeve IDs) were compared as rendered PNGs. Every pair differed in 5,040–15,028 pixels, confirming a rendered-output difference in addition to the geometry assertions. Representative captures were visually inspected; no obvious detached sleeves or floating Chromapatch appeared in the reviewed contact sheet and selected full-size captures.
+- The matrix confirms parameter response, not full artistic polish for every combination. WINDOWS_MANUAL_QA: NOT_RUN. Re-run CI after this documentation commit to bind final validation to the final PR head.
