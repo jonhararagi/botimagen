@@ -466,6 +466,10 @@ try {
     "Loading a saved profile should restore the tip color selection");
   assert.equal(await page.locator(".style-fields select").nth(1).inputValue(), "transformation",
     "Loading a saved profile should restore its NanoWear state");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Loading a saved profile must restore the NanoWear base color");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Loading a saved profile must restore the NanoWear panel color");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Loading a saved profile must restore the technology accent");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "Loading a saved profile must restore the fabric pattern");
   assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i,
     "Loading a saved profile should restore the selected presentation view");
   assert.equal(await page.locator(".style-fields select").nth(3).inputValue(), "fox", "Loading a saved profile should restore its Chromapatch shape");
