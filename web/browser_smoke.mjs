@@ -106,6 +106,17 @@ try {
     "The public asset contract catalog must expose safe relative PNG destinations",
   );
 
+  // Exercise the real UI -> Vite proxy -> Python importer rejection path.
+  await page.locator("#asset-png-file").setInputFiles({
+    name: "invalid.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("not a PNG image"),
+  });
+  await page.getByRole("button", { name: /Importar PNG validado/i }).click();
+  await page.getByRole("alert").filter({ hasText: "firma PNG válida" }).waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await page.getByText(/Importación confirmada por el servidor/i).count(), 0,
+    "The UI must not claim import success when the API rejects invalid PNG bytes");
+
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const tipLabel = page.locator('label[for="trait-hair_tip_color"]');
   const tipField = tipLabel.locator("xpath=../..");
