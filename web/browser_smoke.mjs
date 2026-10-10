@@ -804,6 +804,104 @@ try {
   assert.equal(await visualSvg.getAttribute("data-nanowear"), "transformation",
     "The final QA capture should preserve the selected transformation NanoWear state");
 
+
+  // BIMG-ENGINE-005: cross-validate every currently declared garment capability.
+  // Each value is checked on the selected garment surface, not only on the generic torso.
+  const matrixCaptureNames = [];
+  const torsoMatrix = [
+    ["outfit", "tactical_baseball", ".tactical-baseball"],
+    ["outfit", "combat_jacket", ".combat-jacket"],
+    ["outfit", "techwear_sport", ".techwear-sport"],
+    ["outfit", "street_bomber", ".street-bomber-shell"],
+    ["outfit", "support_coat", ".support-coat"],
+    ["outfit", "baseball_tech_suit", ".baseball-tech-suit"],
+    ["outfit", "elegant_command", ".elegant-command"],
+    ["outer", "short_bomber", ".short-bomber"],
+    ["outer", "hooded_jacket", ".hooded-jacket"],
+    ["outer", "long_coat", ".long-coat"],
+    ["outer", "chaqueta_corta_asimetrica", ".asymmetric-short-jacket"],
+  ];
+  const sleeveMatrix = [
+    ["outfit", "tactical_baseball", ".garment-sleeves path"],
+    ["outfit", "combat_jacket", ".garment-sleeves path"],
+    ["outfit", "techwear_sport", ".garment-sleeves path"],
+    ["outfit", "street_bomber", ".garment-sleeves path"],
+    ["outfit", "support_coat", ".garment-sleeves path"],
+    ["outfit", "baseball_tech_suit", ".garment-sleeves path"],
+    ["outer", "short_bomber", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "hooded_jacket", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "long_coat", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "chaqueta_corta_asimetrica", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "mangas_desmontables", ".detachable-sleeves"],
+  ];
+  const selectMatrixGarment = async (kind, id) => {
+    if (kind === "outfit") {
+      await outerLayerSelect.selectOption("none");
+      await outfitSelect.selectOption(id);
+    } else {
+      await outfitSelect.selectOption("street_bomber");
+      await outerLayerSelect.selectOption(id);
+    }
+  };
+  const boxMetrics = async selector => page.locator(selector).first().evaluate(node => {
+    const b = node.getBBox();
+    return { x: b.x, y: b.y, width: b.width, height: b.height, area: b.width * b.height };
+  });
+  const sliderEnabled = async label => page.locator('input[type="range"][aria-label="' + label + '"]').isEnabled();
+
+  for (const [kind, id, selector] of torsoMatrix) {
+    await selectMatrixGarment(kind, id);
+    assert.equal(await sliderEnabled("Largo del torso"), true, id + " must enable torso length");
+    assert.equal(await sliderEnabled("Ajuste de cintura"), true, id + " must enable waist fit");
+    const torsoBoxes = [];
+    for (const value of [0, 50, 100]) {
+      await setVisualRange("Largo del torso", value);
+      torsoBoxes.push(await boxMetrics(selector));
+      if (value === 0 || value === 100) {
+        const name = "matrix-torso-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + value;
+        await captureVisual(name);
+        matrixCaptureNames.push(name + ".png");
+      }
+    }
+    assert.ok(torsoBoxes[0].height < torsoBoxes[1].height && torsoBoxes[1].height < torsoBoxes[2].height,
+      id + " selected garment surface must grow monotonically at torso_length 0/50/100");
+    const waistBoxes = [];
+    for (const value of [0, 50, 100]) {
+      await setVisualRange("Ajuste de cintura", value);
+      waistBoxes.push(await boxMetrics(selector));
+    }
+    assert.ok(waistBoxes[0].width < waistBoxes[1].width && waistBoxes[1].width < waistBoxes[2].width,
+      id + " selected garment surface must widen monotonically at waist_fit 0/50/100");
+  }
+
+  for (const [kind, id, selector] of sleeveMatrix) {
+    await selectMatrixGarment(kind, id);
+    assert.equal(await sliderEnabled("Largo de mangas"), true, id + " must enable sleeve length");
+    const sleeveBoxes = [];
+    for (const value of [0, 50, 100]) {
+      await setVisualRange("Largo de mangas", value);
+      sleeveBoxes.push(await boxMetrics(selector));
+      if (value === 0 || value === 100) {
+        const name = "matrix-sleeves-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + value;
+        await captureVisual(name);
+        matrixCaptureNames.push(name + ".png");
+      }
+    }
+    assert.ok(sleeveBoxes[0].height < sleeveBoxes[1].height && sleeveBoxes[1].height < sleeveBoxes[2].height,
+      id + " selected sleeve surface must grow monotonically at sleeve_length 0/50/100");
+  }
+  await selectMatrixGarment("outfit", "elegant_command");
+  assert.equal(await sliderEnabled("Largo de mangas"), false,
+    "elegant_command must not promise sleeve length because it is not in the canonical sleeve capability set");
+  const matrixManifest = {
+    source: "real BotImagen web app rendered in Chromium",
+    seed: "314159",
+    checks: "All declared torso, waist and sleeve capabilities at 0/50/100 on selected garment surfaces",
+    captures: matrixCaptureNames,
+    note: "CI QA artifact only. Bounding-box checks are geometry evidence, not independent artistic sign-off.",
+  };
+  await writeFile(resolve(visualQaDir, "matrix-manifest.json"), JSON.stringify(matrixManifest, null, 2));
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
