@@ -166,6 +166,30 @@ try {
   await page.locator("#asset-png-file").setInputFiles({
     name: "valid-fixture.png", mimeType: "image/png", buffer: fixture,
   });
+
+  // A nominal HTTP 201 is not success unless the complete server contract is present.
+  const importRouteMatcher = url => url.pathname === "/api/assets/import";
+  const malformedImportRoute = async route => {
+    const requestUrl = new URL(route.request().url());
+    if (requestUrl.searchParams.get("asset_id") !== importContract.id) return route.continue();
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        status: "imported", asset_id: importContract.id,
+        destination: importContract.destination, bytes: fixture.length,
+      }),
+    });
+  };
+  await page.route(importRouteMatcher, malformedImportRoute);
+  await page.getByRole("button", { name: /Importar PNG validado/i }).click();
+  await page.getByRole("alert").filter({ hasText: "confirmación de importación inesperada" }).waitFor({
+    state: "visible", timeout: 10000,
+  });
+  assert.equal(await page.getByText(/Importación confirmada por el servidor/i).count(), 0,
+    "An incomplete HTTP 201 response must not be shown as a successful import");
+  await page.unroute(importRouteMatcher, malformedImportRoute);
+
   await page.getByRole("button", { name: /Importar PNG validado/i }).click();
   await page.getByRole("status").filter({ hasText: "Importación confirmada por el servidor" }).waitFor({
     state: "visible", timeout: 10000,
