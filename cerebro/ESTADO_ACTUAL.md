@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: importador PNG por contrato, suite Python/build validados y E2E de importación completa en curso, 2026-10-10.
+Última actualización de esta ficha: revisión de seguridad PNG y pruebas de regresión BIMG-008, 2026-10-10. La rama del PR #8 contiene correcciones de estructura PNG; comprobar CI del HEAD actual antes de declarar la revisión validada.
 
 ## Repositorio
 
@@ -52,7 +52,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Prueba manual en Chrome/Edge sobre Windows y prueba física en el PC. El smoke test headless Chromium en Linux ya pasa en CI.
 - Biblioteca de referencias avanzada con SQLite, miniaturas, filtros y metadatos.
 - Comparación lado a lado de variantes.
-- Intake de assets migrado a la web.
+- Importación web de assets implementada por contrato en la rama del PR #8; integración en main pendiente y QA física Windows NOT_RUN.
 - Integración de generación de imágenes local.
 - Interfaz remota con acceso desde otras máquinas.
 - Empaquetado de escritorio con Tauri/Electron.
@@ -64,7 +64,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~87%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #144 valida rol tank y prendas/prop; CI #152 PASS_REAL comprueba que una anatomía fijada manualmente se conserva aunque contradiga especie; CI #190 PASS_REAL añade restauración de ejemplo, estado de guardado pendiente, etiquetas conectadas de las ocho pestañas y responsive sin overflow en 320/390/768/1024 px. Faltan otros flujos de error, revisión visual amplia y QA física en Windows.
 - BIMG-006: PARTIAL (~70%). Catálogo v16 mantiene 47 categorías; `compatible_with` contiene 111 opciones y 303 valores permitidos en 11 relaciones. Incluye largo/corte/arreglo, outfit/rol, prop/rol, capa/calzado/accesorio por rol y anatomía por especie. v16 añade semántica explícita para `outer_layer=none`. CI #167/#168 PASS_REAL cubre prompt y flujo UI; CI #153 recorre todas las opciones declaradas con AUTO, #151 valida paridad del catálogo público y #152 prueba persistencia del override anatómico manual. QA física en Windows sigue pendiente.
-- BIMG-008: PARTIAL (~10%). `GET /api/assets/contracts` expone los 10 contratos PNG oficiales y valida las rutas relativas. **CI #194 PASS_REAL** verifica contrato, método `Allow: GET`, respuesta por proxy desde Chromium, pruebas de API, build y E2E existente: https://github.com/jonhararagi/botimagen/actions/runs/38024212437. La carga/validación/copia real de imágenes y su historial web aún no están implementados.
+- BIMG-008: PARTIAL (~70%) en la rama feat/bimg-008-safe-png-import; el importador React/API ya valida y publica PNG por contrato, con CI #198/#199 PASS_REAL. Esta rama aún no está integrada en main. La revisión BIMG-008-R1 añadió validaciones de PLTE, bloques críticos y secuencia IDAT, además de regresiones de concurrencia y symlinks; la CI del HEAD nuevo debe confirmarlo. QA física Chrome/Edge en Windows: NOT_RUN.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -74,15 +74,10 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
 - Progreso total ponderado hacia la beta local: **63%**, calculado en `cerebro/PROGRESO.md` (**62,96/100** sin redondear). HEAD funcional con el endpoint probado: `e08d3de4a40e0003893447a3011199b32fa8e7b3`; CI #194 PASS_REAL. El navegador físico Windows continúa `NOT_RUN`.
 
-## BIMG-008 · Catálogo de contratos de assets en la API local
+## BIMG-008 · Catálogo de contratos de assets en la API local (histórico)
 
-- La ruta `GET /api/assets/contracts` publica la lista del `assets_manifest.json` oficial sin permitir lectura/escritura arbitraria de rutas.
-- Cada entrada expone únicamente ID, título, descripción, prompt positivo/negative prompt, versión de prompt, destino relativo y contrato esperado (PNG, dimensiones cuando aplican y bytes máximos). Los campos privados/de generación no se copian desde otros catálogos.
-- Validación de servidor: manifiesto versión 1, campos requeridos, IDs/destinos únicos, destino PNG relativo, rechazo de separadores de Windows y `..`, dimensiones en pareja y límites positivos.
-- `GET` es el único método permitido; `PUT` recibe 405 con `Allow: GET`. No existe todavía endpoint de escritura o importación.
-- CI #193 detectó un NameError en una prueba por usar un helper de rutas sin importarlo. Se corrigió en CI #194: **PASS_REAL**, test HTTP, build y Chromium E2E pasan. https://github.com/jonhararagi/botimagen/actions/runs/38024212437.
-- TIMER de esta tanda: 5–10 minutos. BIMG-008 pasa de 0% a 10%; total ponderado de **62,16 / 100 → 62,96 / 100 → 63%**.
-- Siguiente paso: seleccionar archivo PNG desde la web y validarlo contra el contrato antes de implementar la copia atómica.
+- GET /api/assets/contracts publicó inicialmente los 10 contratos oficiales y fue validado en CI #194: https://github.com/jonhararagi/botimagen/actions/runs/38024212437.
+- Nota histórica: en aquella iteración aún no existía escritura web. La implementación posterior del importador está documentada en la sección BIMG-008 de esta ficha y en el PR #8. No usar este checkpoint como descripción del estado actual.
 
 ## Catálogo v15 · matriz de compatibilidad y persistencia de locks · 2026-10-09
 
