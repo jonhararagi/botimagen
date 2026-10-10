@@ -398,6 +398,7 @@ try {
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "The geometric pattern must be connected to the live SVG");
   assert.ok(await page.locator(".visual-character-svg defs pattern path").count() > 0, "The selected geometric pattern must render actual SVG geometry");
   // Exercise actual SVG geometry, not only recipe attributes.
+  await page.getByRole("tab", { name: /Vestuario/i }).click();
   const outfitField = page.locator(".field").filter({ has: page.locator("#trait-outfit") });
   if (await page.locator("#trait-outfit").isDisabled()) await outfitField.locator("button.lock").click();
   await page.locator("#trait-outfit").selectOption("combat_jacket");
