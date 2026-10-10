@@ -70,19 +70,26 @@ def make_catalog(generator: CharacterGenerator) -> dict[str, Any]:
 
 def _validate_visual_recipe(value: Any) -> dict[str, Any]:
     defaults: dict[str, Any] = {
-        "schema_version": 1, "family": "cyberstreet",
+        "schema_version": 2, "family": "cyberstreet",
         "anime_influence": 68, "toon_influence": 56, "streetwear_cyberpunk": 30, "detail_level": 58,
+        "garment_base_color": "#343246", "garment_panel_color": "#48516a",
+        "garment_accent_color": "#5ce4dc", "fabric_pattern": "circuit",
         "nanowear_state": "everyday", "material_finish": "textile", "emblem_shape": "bunny",
         "emblem_color": "#f3c96b", "emblem_contrast": "auto", "emblem_position": "chest", "view": "front",
     }
     if not isinstance(value, dict):
         raise ApiInputError("'visual_recipe' debe ser un objeto JSON.")
-    extra = set(value) - set(defaults)
+    version = value.get("schema_version", 1)
+    if isinstance(version, bool) or not isinstance(version, int) or version not in {1, 2}:
+        raise ApiInputError("La receta visual debe usar schema_version 1 o 2.")
+    allowed_v1 = set(defaults) - {"garment_base_color", "garment_panel_color", "garment_accent_color", "fabric_pattern"}
+    allowed = allowed_v1 if version == 1 else set(defaults)
+    extra = set(value) - allowed
     if extra:
         raise ApiInputError("Campos no reconocidos en visual_recipe: " + ", ".join(sorted(map(str, extra))) + ".")
-    result = {**defaults, **value}
-    if isinstance(result["schema_version"], bool) or not isinstance(result["schema_version"], int) or result["schema_version"] != 1 or result["family"] != "cyberstreet":
-        raise ApiInputError("La receta visual no tiene una versión o familia compatible.")
+    result = {**defaults, **value, "schema_version": 2}
+    if result["family"] != "cyberstreet":
+        raise ApiInputError("La receta visual no tiene una familia compatible.")
     for key in ("anime_influence", "toon_influence", "streetwear_cyberpunk", "detail_level"):
         number = result[key]
         if isinstance(number, bool) or not isinstance(number, int) or not 0 <= number <= 100:
@@ -94,15 +101,16 @@ def _validate_visual_recipe(value: Any) -> dict[str, Any]:
         "emblem_contrast": {"auto", "manual"},
         "emblem_position": {"chest", "sleeve", "hood"},
         "view": {"front", "back"},
+        "fabric_pattern": {"plain", "circuit", "geometric", "gradient"},
     }
     for key, allowed_values in enums.items():
         if not isinstance(result[key], str) or result[key] not in allowed_values:
             raise ApiInputError(f"'{key}' no es una opción válida de visual_recipe.")
-    color = result["emblem_color"]
-    if not isinstance(color, str) or len(color) != 7 or not color.startswith("#") or any(ch not in "0123456789abcdefABCDEF" for ch in color[1:]):
-        raise ApiInputError("'emblem_color' debe ser un color hexadecimal #RRGGBB.")
+    for key in ("emblem_color", "garment_base_color", "garment_panel_color", "garment_accent_color"):
+        color = result[key]
+        if not isinstance(color, str) or len(color) != 7 or not color.startswith("#") or any(ch not in "0123456789abcdefABCDEF" for ch in color[1:]):
+            raise ApiInputError(f"'{key}' debe ser un color hexadecimal #RRGGBB.")
     return result
-
 
 def validate_generation_payload(payload: Any, generator: CharacterGenerator) -> dict[str, Any]:
     if not isinstance(payload, dict):
