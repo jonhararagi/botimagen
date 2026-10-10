@@ -63,3 +63,14 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - TIMER: 3–5 hours estimated; actual elapsed time not measured.
 
 - The outer-layer composition block now follows the base outfit block; outer jacket sleeves are drawn after base sleeves, while outer_layer=none emits no extra sleeve surface.
+
+
+## BIMG-ENGINE-005 · Garment capability matrix
+
+- Cross-checked the current canonical capability sets against the actual SVG surfaces used by the Style Lab controls. Kept existing outfit/layer IDs and the v3 recipe contract unchanged.
+- Parameterized the previously fixed tactical_baseball, elegant_command, and baseball_tech_suit overlay hems; gave techwear_sport an explicit fitted garment surface; made hooded_jacket render a torso shell as well as its hood; parameterized chaqueta_corta_asimetrica; and tied mangas_desmontables hem endpoints to sleeve_length.
+- Reduced the base garment hem mapping to 315 + torso_length * 0.35 so the selected garment stays within the visible character silhouette while retaining monotonic 0/50/100 variation. Long-coat length remains independently driven by coatHem.
+- Added Chromium matrix checks for all 11 IDs that declare torso/waist fit and all 11 IDs that declare sleeve length. Each applicable control is checked at 0, 50 and 100 against the selected garment's transformed bounding rectangle. Matrix captures are generated for endpoint values and written to artifacts/visual-qa/ with matrix-manifest.json.
+- elegant_command intentionally does not enable sleeve length; the test confirms that the control remains disabled for this sleeveless catalog ID. none retains its existing meaning and no IDs were added.
+- The geometry matrix is automated evidence, not a claim of independent art-direction approval. WINDOWS_MANUAL_QA: NOT_RUN unless a physical Windows review is separately performed.
+- TIMER: 4–6 hours estimated; actual elapsed time not measured.
