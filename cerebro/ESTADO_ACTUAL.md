@@ -256,3 +256,13 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **Hallazgo técnico aplicado al plan, no al producto:** `accept` es una ayuda del selector, no validación; las object URLs deben revocarse cuando la preview deja de ser accesible, sin revocarlas antes de tiempo. El original debe conservarse y cualquier exportación debe tener contrato explícito.
 - **TIMER:** 5–10 minutos para revisión documental y exploración comparativa. No se implementó el intake ni se ejecutó un benchmark de memoria.
 - **HEAD AFTER de esta entrega:** se consultará tras el commit. **Progreso ponderado sin cambio: 62,16 / 100 → 62%**; investigación y limpieza documental no cierran una fase. QA física Windows y métricas de rendimiento siguen `NOT_RUN`.
+
+
+## Reproducibilidad de semilla · BIMG-006 · 2026-10-10
+
+- PR #2 fusionada: https://github.com/jonhararagi/botimagen/pull/2.
+- Merge SHA: `3b360fca4f5ac84120f7a03b39ada8f3ec5950b5`.
+- Se añadió `tests/test_seed_reproducibility.py`: compara el payload completo para inputs idénticos, cinco semillas (`0, 1, 42, 2026, 65535`) y ambos modos `surprise`. Se crean instancias nuevas del generador en cada comparación para detectar estado mutable oculto.
+- `.github/workflows/validate.yml` compila y ejecuta explícitamente la regresión.
+- CI #179 PASS_REAL sobre el head final de la PR: sintaxis Python, manifiesto, batería del generador, nueva prueba de reproducibilidad, contrato visual, API local, cobertura de campos, `npm ci`, build web y smoke test Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38013431814.
+- La corrección añade cobertura, no funcionalidad de producto; el progreso ponderado permanece en 62%. La QA física Windows sigue NOT_RUN.
