@@ -10,12 +10,13 @@
 
 ## Trabajo incorporado en esta rama
 
-- Renderizador SVG original y receta visual versionada.
+- Renderizador SVG original y receta visual v2 con migración v1 determinista.
 - Style Lab para Anime, Toon, equilibrio Streetwear/Cyberpunk y densidad de detalle.
-- NanoWear: `everyday`, `nanoweave`, `transformation`; acabados textil, técnico y sintético.
+- NanoWear: `everyday`, `nanoweave`, `transformation`; acabados textil, técnico y sintético, colores base/panel/acento y patrones `plain`, `circuit`, `geometric`, `gradient`.
 - Chromapatch con cinco símbolos, color, ubicación, modo de contraste y vista frontal/trasera.
 - Integración de la receta con generación Python y contrato API opcional retrocompatible.
-- Pruebas Python nuevas y smoke test Chromium ampliado.
+- Pruebas Python nuevas y smoke test Chromium ampliado para paleta, patrón, transformación y persistencia v2.
+- Mapeos SVG diferenciados para los diez IDs oficiales de `outfit`, `outer_layer` y `footwear`; `none` no añade capa exterior.
 - Documentación técnica y README web actualizados.
 
 ## Evidencia verificada y pendiente
@@ -28,3 +29,12 @@
 ## Preservación
 
 No añadir recursos de terceros ni dependencias npm. No modificar el catálogo de rasgos, reglas de afinidad, semilla ni campos manuales/AUTO salvo que un fallo concreto lo exija. Mantener la API local loopback. No fusionar el PR automáticamente. Los próximos estilos Pixel Art y Anime 3D deben conservar pipelines separados del renderizador CyberStreet.
+
+
+## BIMG-ENGINE-002 · Estado de la ampliación
+
+- Receta normalizada `schema_version: 2`; API acepta v1 y v2 y migra v1 en memoria con defaults deterministas.
+- Chromapatch auto calcula tono complementario desde el color base real de nanotela, busca contraste ≥3:1 y mantiene el color manual cuando corresponde.
+- El renderizador usa `useId` para evitar colisiones de IDs SVG entre instancias.
+- Pendiente hasta completar CI: validar resultado del smoke Chromium sobre el HEAD final, comprobar la migración/persistencia real y actualizar la descripción del PR #11.
+- Windows Chrome/Edge manual: pendiente, no sustituido por CI Linux.
