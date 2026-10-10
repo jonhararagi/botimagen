@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: catálogo v16, recuperación de UI/API y contrato público del catálogo, 2026-10-09.
+Última actualización de esta ficha: E2E de restauración, responsividad y etiquetas del editor, 2026-10-10.
 
 ## Repositorio
 
@@ -62,7 +62,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-001: DONE. Dirección inicial persistida en GitHub.
 - BIMG-002: DONE. Auditoría de la base y CI completadas; prueba física Windows NOT_RUN.
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
-- BIMG-005: PARTIAL (~85%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #144 valida rol tank y prendas/prop; CI #152 PASS_REAL comprueba además que una anatomía fijada manualmente se conserva aunque contradiga especie, incluyendo regeneración y roundtrip guardar/duplicar/cargar. Faltan otros flujos de error, revisión visual amplia y QA física en Windows.
+- BIMG-005: PARTIAL (~87%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #144 valida rol tank y prendas/prop; CI #152 PASS_REAL comprueba que una anatomía fijada manualmente se conserva aunque contradiga especie; CI #190 PASS_REAL añade restauración de ejemplo, estado de guardado pendiente, etiquetas conectadas de las ocho pestañas y responsive sin overflow en 320/390/768/1024 px. Faltan otros flujos de error, revisión visual amplia y QA física en Windows.
 - BIMG-006: PARTIAL (~70%). Catálogo v16 mantiene 47 categorías; `compatible_with` contiene 111 opciones y 303 valores permitidos en 11 relaciones. Incluye largo/corte/arreglo, outfit/rol, prop/rol, capa/calzado/accesorio por rol y anatomía por especie. v16 añade semántica explícita para `outer_layer=none`. CI #167/#168 PASS_REAL cubre prompt y flujo UI; CI #153 recorre todas las opciones declaradas con AUTO, #151 valida paridad del catálogo público y #152 prueba persistencia del override anatómico manual. QA física en Windows sigue pendiente.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
@@ -71,7 +71,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **62%**, calculado en `cerebro/PROGRESO.md` (**61,8/100** sin redondear). Último HEAD funcional probado: `7d975618db57ad03b4b727a5912b43b638cab64c`; CI #153 PASS_REAL.
+- Progreso total ponderado hacia la beta local: **62%**, calculado en `cerebro/PROGRESO.md` (**62,16/100** sin redondear). HEAD funcional más reciente verificado: `6b6bee298cf6e40cc732aeb34cba8a03cd1b21ab`; CI #190 PASS_REAL.
 
 ## Catálogo v15 · matriz de compatibilidad y persistencia de locks · 2026-10-09
 
@@ -266,3 +266,17 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - `.github/workflows/validate.yml` compila y ejecuta explícitamente la regresión.
 - CI #179 PASS_REAL sobre el head final de la PR: sintaxis Python, manifiesto, batería del generador, nueva prueba de reproducibilidad, contrato visual, API local, cobertura de campos, `npm ci`, build web y smoke test Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38013431814.
 - La corrección añade cobertura, no funcionalidad de producto; el progreso ponderado permanece en 62%. La QA física Windows sigue NOT_RUN.
+
+
+## Checkpoint E2E de restauración, responsividad y accesibilidad básica · 2026-10-10
+
+- **HEAD BEFORE del bloque:** 6dfc88ba80d3616cb5671ffc600e1bfa03024219.
+- **HEAD AFTER de código verificado:** 6b6bee298cf6e40cc732aeb34cba8a03cd1b21ab.
+- **Archivo de prueba:** web/browser_smoke.mjs.
+- El recorrido Chromium verifica que Restaurar ejemplo deje el borrador pendiente, bloquee el guardado hasta regenerar, recupere la especie/locks del ejemplo, suelte el lock anatómico personalizado y restablezca la semilla 314159.
+- E2E revisa ausencia de overflow horizontal y visibilidad del botón Generar a 1024, 768, 390 y 320 píxeles, además de comprobar que todos los controles visibles tienen etiquetas conectadas en cada una de las ocho pestañas del editor.
+- CI #188 detectó una expectativa de prueba demasiado estricta: se esperaba no_visible_scales después de generar un rasgo AUTO. El motor puede resolverlo válidamente a una región de escamas por especie. La prueba se corrigió para verificar el contrato correcto: vuelve a AUTO, se desbloquea la elección anterior y la semilla se restablece.
+- **CI #189 PASS_REAL** valida la corrección de la restauración y las cuatro anchuras: https://github.com/jonhararagi/botimagen/actions/runs/38022092458.
+- **CI #190 PASS_REAL** añade la auditoría de etiquetas en ocho pestañas. Generador, API local, cobertura del editor, npm ci, build web y Chromium E2E completados: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
+- **TIMER:** 5–10 minutos de trabajo incremental y verificación. La cobertura E2E se amplió, pero no se cierra una fase de producto por pruebas solas. Progreso ponderado mantenido en **62,16 / 100 → 62%**. QA física en Windows, Chrome/Edge instalado y medidas de rendimiento continúan NOT_RUN.
+

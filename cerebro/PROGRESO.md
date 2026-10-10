@@ -1,6 +1,6 @@
 # Progreso global de BotImagen
 
-**Último cálculo:** 2026-10-09  
+**Último cálculo:** 2026-10-10  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
 **Progreso global actual: 62%**
 
@@ -61,6 +61,9 @@ BIMG-011, la investigación de generación neuronal local, es opcional y posteri
 - CI #118 detectó una aserción de versión antigua en `tests/test_local_api.py` (`catalog_version == 7` después del cambio a v8). Corregida a v8; CI #119 PASS_REAL ejecuta toda la batería, `npm ci`, build y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/37928453343.
 - BIMG-006 sube de 50% a 55% por compatibilidad outfit/rol; BIMG-005 de 75% a 80% por el recorrido E2E ampliado entre pestañas y perfil persistido. Total ponderado: **58,65 / 100 → 59%**. La prueba física Windows y las mediciones de rendimiento continúan **NOT_RUN**.
 - CI #136/#137 mejora la validación del campo de semilla. Chromium confirma rechazo de formato malformado y fuera de rango, aceptación del máximo entero seguro y recuperación con semilla válida. El porcentaje no cambia porque es una corrección de calidad: **58,65 / 100 → 59%**. https://github.com/jonhararagi/botimagen/actions/runs/37950307373.
+- CI #189 PASS_REAL: restaurar ejemplo restablece locks/semilla, el guardado permanece bloqueado hasta regeneración y Chromium no detecta overflow horizontal en 320/390/768/1024 px: https://github.com/jonhararagi/botimagen/actions/runs/38022092458.
+- CI #190 PASS_REAL: además de la batería Python, API, npm ci y build, Chromium audita que cada selector visible tenga etiqueta conectada en las ocho pestañas: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
+- Estas son mejoras de cobertura E2E, no una fase funcional cerrada. El total ponderado permanece **62,16 / 100 → 62%**. La validación física Windows y las mediciones de rendimiento siguen NOT_RUN.
 
 
 ## Nota de continuidad · 2026-10-09
