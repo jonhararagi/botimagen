@@ -278,7 +278,7 @@ export default function App(){
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>ILUSTRACIÓN NO GENERADA</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <VisualStyleLab recipe={visualRecipe} onChange={updateVisualRecipe}/><div className="roadmap"><b>✦ Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. La geometría es 2D estilizada, no un modelo 3D ni una ilustración final generada.</span></div>
+     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><div className="roadmap"><b>✦ Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. La geometría es 2D estilizada, no un modelo 3D ni una ilustración final generada.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">
