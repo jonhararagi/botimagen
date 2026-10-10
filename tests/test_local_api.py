@@ -256,6 +256,43 @@ class LocalApiTests(unittest.TestCase):
                 thread.join(timeout=2)
 
 
+    def test_http_rejects_malformed_json_and_non_utf8_body(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(self.generator, Path(temp_dir)),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                cases = (
+                    (b"{", "JSON inválido."),
+                    (b"\xff", "UTF-8"),
+                )
+                for body, expected_error in cases:
+                    connection = HTTPConnection(
+                        "127.0.0.1", server.server_address[1], timeout=3
+                    )
+                    try:
+                        connection.request(
+                            "POST",
+                            "/api/generate",
+                            body=body,
+                            headers={"Content-Type": "application/json"},
+                        )
+                        response = connection.getresponse()
+                        payload = json.loads(response.read().decode("utf-8"))
+                        self.assertEqual(response.status, 400)
+                        self.assertIn(expected_error, payload["error"])
+                    finally:
+                        connection.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
     def test_http_rejects_unsupported_content_type_and_oversized_body(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             server = ThreadingHTTPServer(
