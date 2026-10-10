@@ -60,3 +60,12 @@ jobs:
         env:
           BOTIMAGEN_PLAYWRIGHT_MODULE: /tmp/botimagen-playwright/node_modules/playwright/index.mjs
         run: node web/browser_smoke.mjs
+
+      - name: Upload visual garment QA captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: botimagen-visual-garment-qa
+          path: artifacts/visual-qa/
+          if-no-files-found: warn
+          retention-days: 14
