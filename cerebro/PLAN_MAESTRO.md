@@ -105,13 +105,15 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-008 · Importador PNG web seguro por contrato
 
-**Estado:** PARTIAL (~70%). Endpoint de importación, validación de PNG, temporal controlado, publicación sin sobrescritura, panel React y pruebas HTTP están implementados. CI #198 PASS_REAL cubre la suite Python, instalación npm, build y Chromium E2E del rechazo de un archivo falso. CI #199 PASS_REAL valida también el recorrido de éxito UI→API→archivo canónico en Chromium headless.
+**Estado:** PARTIAL (~70%). El importador React/API, las pruebas HTTP y el E2E Chromium de éxito y rechazo ya existían en la rama del PR #8. La revisión BIMG-008-R1 confirmó defectos del validador: no exigía PLTE para PNG indexado, no validaba su longitud/posición/cantidad, aceptaba bloques críticos desconocidos y carecía de regresiones específicas para esos casos. Se corrigió el validador y se añadieron pruebas de paleta, profundidad de bits, bloques críticos, IDAT no consecutivos, IHDR duplicado, datos sobrantes, symlink de destino y concurrencia.
 
-**TIMER restante:** 30–90 minutos para confirmar el E2E más reciente, revisar el PR y resolver cualquier fallo; 30–60 minutos adicionales de QA físico Chrome/Edge en Windows.
+**Evidencia anterior:** CI #198 PASS_REAL (https://github.com/jonhararagi/botimagen/actions/runs/38025915939) y #199 PASS_REAL (https://github.com/jonhararagi/botimagen/actions/runs/38026040558) corresponden a commits anteriores a esta revisión. No sirven como validación del nuevo HEAD. CI #202 validó el HEAD documental anterior, no las correcciones R1.
 
-**Limitaciones:** el validador estándar rechaza PNG entrelazados; verificar exportadores reales en QA. No se importan assets de terceros ni se añade dependencia externa.
+**TIMER restante:** 30–90 minutos para confirmar la CI del nuevo HEAD y revisar el PR; 30–60 minutos adicionales de QA físico Chrome/Edge en Windows.
 
-**Pendiente para cierre:** CI final verde en el HEAD más reciente, revisión del PR, y prueba manual en Windows registrada como tarea QA separada.
+**Limitaciones:** el validador inspecciona estructura, CRC, flujo zlib, longitud de scanlines y bytes de filtro; no decodifica por completo ni valida semánticamente cada píxel. Rechaza PNG entrelazados. La defensa frente a carreras con procesos locales maliciosos que comparten permisos no es absoluta. No se añaden dependencias runtime.
+
+**Pendiente para cierre:** CI verde en el HEAD R1, revisión humana del PR #8, integración explícita en main y QA física en Windows registrada como tarea separada. No declarar BIMG-008 integrada mientras el PR siga abierto.
 
 ### BIMG-009 · QA real de Windows y rendimiento
 
