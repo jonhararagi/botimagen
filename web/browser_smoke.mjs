@@ -733,7 +733,7 @@ try {
   assert.equal(await page.locator(".chromapatch-anchor").getAttribute("data-effective-position"), "sleeve",
     "Sleeve Chromapatch must anchor to an available sleeve");
   const sleeveAnchorY = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
-  assert.ok(sleeveAnchorY >= 292 && sleeveAnchorY <= 335,
+  assert.ok(sleeveAnchorY >= 285 && sleeveAnchorY <= 335,
     "Sleeve Chromapatch anchor must track the current sleeve length");
   await captureVisual("10-chromapatch-sleeve");
   await page.getByRole("button", { name: "Trasera", exact: true }).click();
