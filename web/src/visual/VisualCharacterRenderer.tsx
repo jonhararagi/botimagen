@@ -96,7 +96,7 @@ export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: Rend
   const patchY = r.emblem_position === "hood" ? 263 : r.emblem_position === "sleeve" ? 292 : rear ? 292 : 291;
   const patchTransform = `translate(${patchX} ${patchY}) scale(${r.emblem_position === "sleeve" ? .72 : .85})`;
   const svgStyle = { "--hair": hair, "--skin": skin, "--fabric": fabric, "--accent": accent, "--cyber": street, "--detail": detail } as CSSProperties;
-  return <svg className={`visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish}>
+  return <svg className={`silhouette visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish}>
     <defs>
       <linearGradient id="cw-hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={hair}/><stop offset="76%" stopColor={hair}/><stop offset="100%" stopColor={accent}/></linearGradient>
       <linearGradient id="cw-fabric" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fabric}/><stop offset="100%" stopColor="#111625"/></linearGradient>
