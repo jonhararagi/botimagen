@@ -386,7 +386,7 @@ class LocalApiTests(unittest.TestCase):
         for contract in catalog["contracts"]:
             self.assertTrue(contract["destination"].endswith(".png"))
             self.assertFalse(contract["destination"].startswith("/"))
-            self.assertNotIn("..", PurePosixPath(contract["destination"]).parts)
+            self.assertNotIn("..", Path(contract["destination"]).parts)
             self.assertIn("format", contract["expected"])
             self.assertNotIn("source_url", contract)
             self.assertNotIn("creator", contract)

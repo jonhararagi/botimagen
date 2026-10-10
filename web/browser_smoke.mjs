@@ -88,6 +88,24 @@ try {
     { timeout: 20000 },
   );
 
+  const assetContracts = await page.evaluate(async () => {
+    const response = await fetch("/api/assets/contracts");
+    if (!response.ok) throw new Error("The asset contract catalog endpoint is unavailable through the web proxy");
+    return response.json();
+  });
+  assert.equal(assetContracts.count, 10, "The web app should receive all canonical asset contracts");
+  assert.equal(assetContracts.contracts.length, assetContracts.count);
+  assert.ok(
+    assetContracts.contracts.every(contract =>
+      typeof contract.id === "string"
+      && contract.destination.endsWith(".png")
+      && !contract.destination.startsWith("/")
+      && !contract.destination.split("/").includes("..")
+      && contract.expected.format === "PNG"
+    ),
+    "The public asset contract catalog must expose safe relative PNG destinations",
+  );
+
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const tipLabel = page.locator('label[for="trait-hair_tip_color"]');
   const tipField = tipLabel.locator("xpath=../..");
@@ -486,7 +504,7 @@ try {
   await page.setViewportSize({ width: 1440, height: 1100 });
   assert.deepEqual(pageErrors, [], "The page should not raise uncaught JavaScript errors");
 
-  console.log("PASS_REAL: Chromium verified recoverable API errors, strict seeds, catalog compatibility, manual overrides and persistence, restore-example recovery, labelled controls across all eight tabs, 320-1024px responsive layouts, and no page errors.");
+  console.log("PASS_REAL: Chromium verified the manifest-backed asset contract endpoint, recoverable API errors, strict seeds, catalog compatibility, manual overrides and persistence, restore-example recovery, labelled controls across all eight tabs, 320-1024px responsive layouts, and no page errors.");
 } catch (error) {
   console.error("FAIL_REAL: BotImagen browser smoke test failed.", error);
   console.error("--- API logs ---\n" + logs.api);
