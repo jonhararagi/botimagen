@@ -20,7 +20,9 @@ jobs:
         run: python tests/validate_manifest.py
 
       - name: Validate character generator
-        run: python tests/test_character_generator.py
+        run: |
+          python tests/test_character_generator.py
+          python -c 'import runpy; t = runpy.run_path("tests/test_character_generator.py"); t["test_face_and_body_manual_selections_remain_locked_across_seed_matrix"](); t["test_auto_face_and_body_choices_stay_inside_catalog_across_seed_matrix"](); print("PASS: face/body lock and AUTO catalog tests")'
 
       - name: Validate universal visual style contract
         run: python tests/test_visual_style_contract.py
