@@ -844,7 +844,7 @@ try {
     }
   };
   const boxMetrics = async selector => page.locator(selector).first().evaluate(node => {
-    const b = node.getBBox();
+    const b = node.getBoundingClientRect();
     return { x: b.x, y: b.y, width: b.width, height: b.height, area: b.width * b.height };
   });
   const sliderEnabled = async label => page.locator('input[type="range"][aria-label="' + label + '"]').isEnabled();
