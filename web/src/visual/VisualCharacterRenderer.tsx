@@ -183,8 +183,9 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {values.outer_layer === "capa_corta_energetica" && <path d="M130 262 L106 279 L120 340 L145 356 L154 284 L186 284 L195 356 L220 340 L234 279 L210 262 Z" fill={accent} opacity=".22" stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "mangas_desmontables" && <path d="M112 260 L98 282 L105 352 L126 355 L138 286 Z M228 260 L242 282 L235 352 L214 355 L202 286 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
     {values.outer_layer === "chaleco_tactico" && <path d="M140 267 L158 282 L170 274 L182 282 L200 267 L195 337 L181 352 L170 344 L159 352 L145 337 Z" fill="#202b3e" stroke={accent} strokeWidth={line}/>}
-    {values.outfit === "street_bomber" && <path d="M137 387 L203 387 L198 399 L142 399 Z" fill={accent} opacity=".72"/>}
-    {(values.outfit === "light_armor" || values.outfit === "armadura_asimetrica") && <path d="M143 280 L168 294 L194 279 L188 322 L170 334 L148 321 Z" fill={accent} opacity={.12 + street * .25} stroke={accent} strokeWidth={.8 + street}/>}
+    {values.outfit === "street_bomber" && <><path d="M125 263 Q170 245 216 263 L211 318 L129 318 Z" fill={panel} stroke={stroke} strokeWidth={line}/><path d="M137 304 L203 304 L198 318 L142 318 Z" fill={accent} opacity=".72"/></>}
+    {values.outfit === "light_armor" && <path d="M143 280 L168 294 L194 279 L188 322 L170 334 L148 321 Z" fill={panel} opacity=".96" stroke={accent} strokeWidth={1 + street}/>
+    {values.outfit === "armadura_asimetrica" && <path d="M141 278 L169 291 L196 280 L185 315 L174 331 L146 324 Z M173 291 L197 296 L190 326 L175 333 Z" fill={panel} opacity=".96" stroke={accent} strokeWidth={1 + street}/>
     {values.outfit === "techwear_sport" && <path d="M128 318 L145 329 M212 318 L195 329" stroke={accent} strokeWidth={2 + street * 2} fill="none"/>}
     {values.outfit === "tactical_baseball" && <path d="M138 269 L153 281 L170 274 L187 281 L203 269 L198 333 L187 351 L153 351 L142 333 Z" fill={panel} stroke={stroke} strokeWidth={line}/>}
     {values.outfit === "combat_jacket" && <path d="M126 264 L145 253 L160 279 L170 289 L180 279 L195 253 L214 264 L205 337 L188 352 L152 352 L135 337 Z" fill={fabric} stroke={stroke} strokeWidth={line}/>}
