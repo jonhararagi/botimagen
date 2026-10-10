@@ -379,11 +379,17 @@ try {
   const initialHairColor = await page.locator(".visual-character-svg").getAttribute("data-hair-color");
   const initialSkinColor = await page.locator(".visual-character-svg").getAttribute("data-skin-color");
   const fabricInputs = page.locator(".style-fields input[type=color]");
-  await fabricInputs.nth(0).fill("#234567");
+  const setColor = async (input, color) => input.evaluate((el, value) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    setter?.call(el, value);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, color);
+  await setColor(fabricInputs.nth(0), "#234567");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Changing base nanotela color must immediately update the SVG clothing recipe");
-  await fabricInputs.nth(1).fill("#456789");
+  await setColor(fabricInputs.nth(1), "#456789");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Changing secondary fabric color must update SVG panels");
-  await fabricInputs.nth(2).fill("#55d9cf");
+  await setColor(fabricInputs.nth(2), "#55d9cf");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Changing technology accent must update the SVG recipe");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-hair-color"), initialHairColor, "Changing garment colors must not recolor hair");
   assert.equal(await page.locator(".visual-character-svg").getAttribute("data-skin-color"), initialSkinColor, "Changing garment colors must not recolor skin");
