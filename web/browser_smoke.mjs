@@ -375,6 +375,23 @@ try {
   assert.equal(await scalesSelect.inputValue(), "cheek_temple_scales",
     "A manually locked anatomy option must not be silently normalized to the species");
 
+  // Exercise the real CyberStreet controls and verify their generated prompt contract.
+  await page.locator(".style-fields select").nth(0).selectOption("transformation");
+  await page.locator(".view-toggle button").nth(1).click();
+  const animeSlider = page.locator(".style-range input").nth(0);
+  await animeSlider.focus();
+  await animeSlider.press("End");
+  assert.equal(await animeSlider.inputValue(), "100", "The Anime influence slider should be interactive");
+  assert.equal(await saveButton.isDisabled(), true, "Changing the visual recipe must invalidate the generated snapshot");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-nanowear"), "transformation");
+  assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
+  prompt = await page.locator(".prompt-panel pre").innerText();
+  assert.ok(prompt.includes("Visual recipe CyberStreet v1"), "The official prompt should include the visual recipe");
+  assert.ok(prompt.includes("transformed synthetic textile sheen"), "The selected NanoWear state should reach the prompt");
+  assert.equal(await saveButton.isDisabled(), false, "A synchronized visual recipe should be saveable");
+
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const profileSummary = page.locator(".saved-profile-panel summary");
   await profileSummary.waitFor({ state: "visible" });
@@ -407,6 +424,12 @@ try {
   );
   assert.equal(await tipSelect.inputValue(), "metallic_gold",
     "Loading a saved profile should restore the tip color selection");
+  assert.equal(await page.locator(".style-fields select").nth(0).inputValue(), "transformation",
+    "Loading a saved profile should restore its NanoWear state");
+  assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i,
+    "Loading a saved profile should restore the selected presentation view");
+  assert.equal(await page.locator(".style-range input").nth(0).inputValue(), "100",
+    "Loading a saved profile should restore the saved Style Lab recipe");
   assert.equal(await arrangementSelect.inputValue(), "coleta_trenzada",
     "Loading a saved profile should restore the manually locked braided ponytail");
   assert.equal(await lengthSelect.inputValue(), selectedLengthForArrangement,
