@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
+import { DEFAULT_VISUAL_RECIPE, normalizeVisualRecipe, VisualCharacterRenderer, VisualStyleLab } from "./visual/VisualCharacterRenderer";
+import type { VisualRecipe } from "./visual/VisualCharacterRenderer";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
 type FieldId = string;
 type CatalogOption = { id:string; label:string; tags:string[]; color_family?:string; compatible_with?:Record<string,string[]> };
 type Catalog = { schema_version:number; catalog_version:number; style:{id:string;name:string;version:number}; categories:Record<string,CatalogOption[]>; trait_labels:Record<string,string>; auto_value:"auto" };
 type Field = { id:FieldId; group:Group; label:string; initial:string; fixed:boolean; note:string };
-type GeneratedCharacter = { version:number; style_id:string; style_name:string; profile:Record<string,string>; labels:Record<string,string>; rationale:string; style_direction:string; prompt:string; negative_prompt:string; seed:number|null; coherence:number; surprise:boolean };
+type GeneratedCharacter = { version:number; style_id:string; style_name:string; profile:Record<string,string>; labels:Record<string,string>; rationale:string; style_direction:string; prompt:string; negative_prompt:string; seed:number|null; coherence:number; surprise:boolean; visual_recipe?:VisualRecipe };
 type SavedProfileSummary = { id:string; name:string; saved_at:string; style_id:string; seed:number|null };
-type SavedProfileRecord = { id:string; name:string; saved_at:string; style_id:string; seed:number|null; profile:{ selections?:Record<string,string>; generated?:GeneratedCharacter; seed?:number|null; coherence?:number; style_id?:string } };
+type SavedProfileRecord = { id:string; name:string; saved_at:string; style_id:string; seed:number|null; profile:{ selections?:Record<string,string>; generated?:GeneratedCharacter; seed?:number|null; coherence?:number; style_id?:string; visual_recipe?:VisualRecipe } };
 
 const fields:Field[]=[
  {id:"personality",group:"identity",label:"Personalidad",initial:"alegre",fixed:false,note:"Preferencia de carácter que orienta las afinidades del motor."},
@@ -101,6 +103,7 @@ export default function App(){
  const [seed,setSeed]=useState("314159");
  const [coherence,setCoherence]=useState(.82);
  const [generated,setGenerated]=useState<GeneratedCharacter|null>(null);
+ const [visualRecipe,setVisualRecipe]=useState<VisualRecipe>({...DEFAULT_VISUAL_RECIPE});
  const [status,setStatus]=useState("Conectando con el motor local de BotImagen…");
  const [showNegative,setShowNegative]=useState(false);
  const [saved,setSaved]=useState(false);
@@ -124,7 +127,7 @@ export default function App(){
     const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections:initialSelections,seed:314159,coherence:.82,surprise:false}),signal:controller.signal});
     const result=await jsonResponse<GeneratedCharacter>(response);
     if(controller.signal.aborted)return;
-    setGenerated(result);setDraftDirty(false);
+    setGenerated({...result,visual_recipe:result.visual_recipe??recipeSnapshot});setVisualRecipe(normalizeVisualRecipe(result.visual_recipe??recipeSnapshot));setDraftDirty(false);
     setValues(previous=>{
      const next={...previous};
      for(const field of fields){if(!field.fixed&&result.profile[field.id])next[field.id]=result.profile[field.id]}
@@ -148,6 +151,7 @@ export default function App(){
  const prompt=generated?.prompt??"Esperando el resultado del motor Python…";
  const negative=generated?.negative_prompt??"El negative prompt se cargará desde el motor oficial.";
  const stageVars={"--hair-color":colorFor(values.hair)} as CSSProperties;
+ function updateVisualRecipe(next:VisualRecipe){setVisualRecipe(normalizeVisualRecipe(next));setDraftDirty(true);setSaved(false);setStatus("Receta visual editada. Genera el perfil para sincronizar receta y prompt antes de guardar.");}
 
  function setValue(id:FieldId,value:string){setValues(p=>({...p,[id]:value}));setDraftDirty(true);setSaved(false);setStatus("Diseño editado. Pulsa «Generar perfil» para actualizar el resultado oficial.")}
  function toggleFixed(id:FieldId){const willFix=!fixed[id];setFixed(p=>({...p,[id]:willFix}));setDraftDirty(true);setSaved(false);setStatus(willFix?"Campo fijado manualmente.":"Campo marcado AUTO; el motor elegirá una opción oficial al generar.")}
@@ -157,9 +161,10 @@ export default function App(){
   if(!/^-?\d+$/.test(normalizedSeed)||!Number.isSafeInteger(Number(normalizedSeed))){setStatus("La semilla debe ser un número entero válido.");return}
   const numericSeed=Number(normalizedSeed);
   const selections=Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"]));
+  const recipeSnapshot=normalizeVisualRecipe(visualRecipe);
   setGenerating(true);setStatus("Generando mediante CharacterGenerator…");
   try{
-   const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections,seed:numericSeed,coherence,surprise:false})});
+   const response=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({selections,seed:numericSeed,coherence,surprise:false,visual_recipe:recipeSnapshot})});
    const result=await jsonResponse<GeneratedCharacter>(response);setGenerated(result);setDraftDirty(false);
    setValues(previous=>{const next={...previous};for(const field of fields){if(!fixed[field.id]&&result.profile[field.id])next[field.id]=result.profile[field.id]}return next});
    setSaved(false);setStatus("Perfil generado por Python · semilla "+result.seed+" · "+result.style_name);
@@ -199,6 +204,7 @@ export default function App(){
     }
    }
    setValues(nextValues);setFixed(nextFixed);
+   setVisualRecipe(normalizeVisualRecipe(record.profile.visual_recipe ?? profileResult?.visual_recipe ?? DEFAULT_VISUAL_RECIPE));
    setGenerated(profileResult);
    setSeed(String(profileResult?.seed??record.profile.seed??314159));
    setCoherence(profileResult?.coherence??record.profile.coherence??.82);
@@ -226,12 +232,12 @@ export default function App(){
   const defaults=catalog?valuesFromCatalog(catalog):initialValues;
   const next={...defaults};
   if(generated){for(const field of fields){if(!initialFixed[field.id]&&generated.profile[field.id])next[field.id]=generated.profile[field.id]}}
-  setValues(next);setFixed(initialFixed);setSeed("314159");setCoherence(.82);setDraftDirty(true);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")
+  setValues(next);setFixed(initialFixed);setVisualRecipe({...DEFAULT_VISUAL_RECIPE});setSeed("314159");setCoherence(.82);setDraftDirty(true);setSaved(false);setStatus("Ejemplo restaurado. Pulsa Generar perfil para actualizar el motor.")
  }
  async function saveProfile(){
   if(!generated){setStatus("Genera un perfil antes de guardarlo.");return}
   if(draftDirty){setStatus("Hay cambios pendientes. Genera el diseño actualizado antes de guardarlo para mantener rasgos y prompt sincronizados.");return}
-  const profile={schema_version:1,mode:"local-engine",style_id:generated.style_id,seed:generated.seed,coherence:generated.coherence,selections:Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"])),generated};
+  const profile={schema_version:1,mode:"local-engine",style_id:generated.style_id,seed:generated.seed,coherence:generated.coherence,selections:Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"])),visual_recipe:normalizeVisualRecipe(visualRecipe),generated:{...generated,visual_recipe:normalizeVisualRecipe(visualRecipe)}};
   const name=[labelFor(catalog,"species",values.species),labelFor(catalog,"hair",values.hair),labelFor(catalog,"eyes",values.eyes)].join(" · ");
   try{
    const response=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,profile})});
@@ -242,7 +248,7 @@ export default function App(){
  }
  async function copyPrompt(){try{await navigator.clipboard.writeText(showNegative?prompt+"\n\nNEGATIVE PROMPT:\n"+negative:prompt);setStatus("Texto oficial copiado al portapapeles.")}catch{setStatus("No se pudo acceder al portapapeles; selecciona y copia el texto manualmente.")}}
  function exportJson(){
-  const data={schema_version:1,mode:"local-engine",style_id:generated?.style_id??catalog?.style.id??"bw-modern-gacha-v1",seed:Number.parseInt(seed,10),coherence,selections:Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"])),generated};
+  const data={schema_version:1,mode:"local-engine",style_id:generated?.style_id??catalog?.style.id??"bw-modern-gacha-v1",seed:Number.parseInt(seed,10),coherence,selections:Object.fromEntries(fields.map(f=>[f.id,fixed[f.id]?values[f.id]:"auto"])),visual_recipe:normalizeVisualRecipe(visualRecipe),generated};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="botimagen-profile.json";link.click();URL.revokeObjectURL(url);setStatus("Perfil exportado como JSON.");
  }
 
@@ -267,21 +273,12 @@ export default function App(){
      <div className="canvas" style={stageVars}>
       <div className="grid-bg"/><div className="halo halo-a"/><div className="halo halo-b"/>
       <div className="canvas-labels"><span>BW / DESIGN STUDY</span><span>#{(Number.parseInt(seed,10)||314159).toString().padStart(6,"0").slice(-6)}</span></div><div className="watermark">CHARACTER<br/>PROTOTYPE</div>
-      <svg className="silhouette" viewBox="0 0 340 490" role="img" aria-label="Silueta vectorial temporal, no es una ilustración generada">
-       <defs><linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="var(--hair-color)"/><stop offset="76%" stopColor="var(--hair-color)"/><stop offset="100%" stopColor="#e9bd69"/></linearGradient><linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#34334d"/><stop offset="100%" stopColor="#121727"/></linearGradient><linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#f6c8c2"/><stop offset="100%" stopColor="#bd8198"/></linearGradient></defs>
-       <ellipse cx="170" cy="463" rx="82" ry="10" fill="#070a13" opacity=".5"/><path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill="url(#hair)"/>
-       <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill="url(#skin)"/><path d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 250 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill="url(#cloth)" stroke="#767b9c" strokeWidth="2"/>
-       <path d="M125 263 Q170 238 216 263 L209 340 L196 397 L145 397 L131 338 Z" fill="url(#cloth)" stroke="#858aaa" strokeWidth="2"/><path d="M142 280 L170 305 L199 280 L195 349 L170 369 L145 349 Z" fill="#e8bd6a"/><path d="M145 349 L170 369 L195 349 L204 414 L187 440 L153 440 L136 414 Z" fill="#20263b" stroke="#9b9fba" strokeWidth="2"/>
-       <path d="M151 410 L149 456 L170 456 L177 410 Z M185 410 L190 456 L211 456 L202 410 Z" fill="#111727"/><path d="M148 452 L150 471 L181 471 L180 455 Z M190 452 L194 471 L225 471 L215 455 Z" fill="#dbb15e"/>
-       <ellipse cx="170" cy="143" rx="52" ry="63" fill="url(#skin)" stroke="#f5d7ce" strokeWidth="2"/><path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill="url(#hair)" stroke="#f0a6ad" strokeWidth="1.5"/>
-       <path d="M128 120 L101 83 L129 94 M219 118 L250 81 L229 97" fill="none" stroke="#e3ba66" strokeWidth="8" strokeLinecap="round"/><path d="M143 148 Q156 140 165 148 M185 148 Q196 140 205 148" fill="none" stroke="#664253" strokeWidth="4" strokeLinecap="round"/>
-       <ellipse cx="155" cy="151" rx="6" ry="7" fill={values.eyes==="ambar"?"#d7a64f":"#5e8cd2"}/><ellipse cx="195" cy="151" rx="6" ry="7" fill={values.eyes==="ambar"?"#d7a64f":"#5e8cd2"}/><path d="M161 177 Q170 183 180 177" fill="none" stroke="#9c526a" strokeWidth="2.5" strokeLinecap="round"/><path d="M144 195 L119 228 L137 250 L161 220 Z M196 195 L222 228 L203 250 L179 220 Z" fill="#e7bd69" stroke="#f7d992" strokeWidth="2"/>
-      </svg>
+      <VisualCharacterRenderer values={generated?.profile ?? values} recipe={visualRecipe} onRecipeChange={updateVisualRecipe}/>
       <div className="side-mark left"><span>01</span>IDENTITY</div><div className="side-mark right"><span>02</span>SILHOUETTE</div>
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>ILUSTRACIÓN NO GENERADA</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <div className="roadmap"><b>✦ Diseño modular</b><span>Busto, patrón/color de escamas y raíces, coronilla e interior del cabello se controlan como rasgos separados. La silueta SVG sigue siendo provisional.</span></div>
+     <VisualStyleLab recipe={visualRecipe} onChange={updateVisualRecipe}/><div className="roadmap"><b>✦ Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. La geometría es 2D estilizada, no un modelo 3D ni una ilustración final generada.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">
