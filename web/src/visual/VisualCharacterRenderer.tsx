@@ -127,7 +127,8 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const svgStyle = { "--hair": hair, "--skin": skin, "--fabric": fabric, "--accent": accent, "--cyber": street, "--detail": detail } as CSSProperties;
   return <svg className={`silhouette visual-character-svg ${rear ? "is-back" : "is-front"}`} viewBox="0 0 340 490" role="img" aria-label={`Vista ${rear ? "trasera" : "frontal"} del personaje CyberStreet, receta vectorial`} style={svgStyle} data-nanowear={r.nanowear_state} data-finish={r.material_finish} data-fabric-pattern={r.fabric_pattern} data-fabric-base={r.garment_base_color} data-fabric-panel={r.garment_panel_color} data-fabric-accent={r.garment_accent_color}>
     <defs>
-      <pattern id={`cw-pattern-${uid}`} patternUnits="userSpaceOnUse" width={r.fabric_pattern === "geometric" ? 12 : 18} height={r.fabric_pattern === "geometric" ? 12 : 18}><rect width="100%" height="100%" fill={r.fabric_pattern === "gradient" ? panel : "transparent"}/>{r.fabric_pattern === "circuit" && <path d="M0 4 H7 V10 H15 M7 4 V0 M15 10 V16" fill="none" stroke={accent} strokeWidth="1.1" opacity=".8" />}{r.fabric_pattern === "geometric" && <path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke={panel} strokeWidth="1.3"/>}</pattern>
+      <linearGradient id={`cw-pattern-gradient-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={fabric}/><stop offset="100%" stopColor={panel}/></linearGradient>
+      <pattern id={`cw-pattern-${uid}`} patternUnits="userSpaceOnUse" width={r.fabric_pattern === "geometric" ? 12 : 18} height={r.fabric_pattern === "geometric" ? 12 : 18}><rect width="100%" height="100%" fill={r.fabric_pattern === "gradient" ? `url(#cw-pattern-gradient-${uid})` : "transparent"}/>{r.fabric_pattern === "circuit" && <path d="M0 4 H7 V10 H15 M7 4 V0 M15 10 V16" fill="none" stroke={accent} strokeWidth="1.1" opacity=".8" />}{r.fabric_pattern === "geometric" && <path d="M6 0 L12 6 L6 12 L0 6 Z" fill="none" stroke={panel} strokeWidth="1.3"/>}</pattern>
       <linearGradient id={`cw-hair-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={hair}/><stop offset="76%" stopColor={hair}/><stop offset="100%" stopColor={hairAccent}/></linearGradient>
       <linearGradient id={`cw-fabric-${uid}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fabric}/><stop offset="100%" stopColor={r.nanowear_state === "transformation" || r.material_finish === "synthetic" ? "#ffffff" : panel}/></linearGradient>
       <linearGradient id={`cw-skin-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={skin}/><stop offset="100%" stopColor="#b77c8e"/></linearGradient>
@@ -158,7 +159,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     <ellipse cx="170" cy="143" rx={52 - anime * 3} ry={63 - anime * 4} fill={`url(#cw-skin-${uid})`} stroke="#f5d7ce" strokeWidth={1 + toon * 1.8}/>
     {!rear && <>
       <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>
-      <path d="M128 120 L101 83 L129 94 M219 118 L250 81 L229 97" fill="none" stroke={accent} strokeWidth={4 + street * 5} strokeLinecap="round"/>
+      <path d="M128 120 L101 83 L129 94 M219 118 L250 81 L229 97" fill="none" stroke={hairAccent} strokeWidth={4 + street * 5} strokeLinecap="round"/>
       <path d="M143 148 Q156 140 165 148 M185 148 Q196 140 205 148" fill="none" stroke="#664253" strokeWidth={1.5 + toon * 2.5} strokeLinecap="round"/>
       <ellipse cx="155" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={eyeColor}/>
       <ellipse cx="195" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={optionColor(values.eyes ?? "", "#d7a64f")}/>
@@ -168,8 +169,8 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
       {values.ear_style === "orejas_lobo" && <path d="M126 121 L115 75 L145 101 M214 121 L225 75 L195 101" fill={skin} stroke={stroke} strokeWidth={line}/>}
       {values.ear_style === "orejas_conejo" && <path d="M143 115 Q123 44 137 42 Q151 43 155 113 M185 113 Q188 43 202 42 Q218 45 197 116" fill={skin} stroke={stroke} strokeWidth={line}/>}
       {values.ear_style === "orejas_elficas" && <path d="M127 131 L88 111 L133 145 M213 131 L252 111 L207 145" fill={skin} stroke={stroke} strokeWidth={line}/>} 
-      {values.horn_style && !values.horn_style.includes("sin_") && <path d="M137 98 L126 64 L151 86 M202 86 L226 62 L216 102" fill={accent} stroke={stroke} strokeWidth={line}/>}
-      {values.facial_detail && !values.facial_detail.includes("sin_") && <g fill={accent}><circle cx="145" cy="166" r="2"/><circle cx="149" cy="169" r="1.4"/></g>}
+      {values.horn_style && !values.horn_style.includes("sin_") && <path d="M137 98 L126 64 L151 86 M202 86 L226 62 L216 102" fill={hairAccent} stroke={stroke} strokeWidth={line}/>}
+      {values.facial_detail && !values.facial_detail.includes("sin_") && <g fill={hairAccent}><circle cx="145" cy="166" r="2"/><circle cx="149" cy="169" r="1.4"/></g>}
     </>}
     {rear && <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>}
     {Array.from({ length: Math.round(2 + detail * 7) }, (_, i) => <path key={i} d={`M${139 + i * 4} 275 l${(i % 2 ? 4 : -3) + street * 2} ${30 + detail * 16}`} stroke={accent} strokeWidth={.45 + detail * .8} opacity={r.nanowear_state === "everyday" ? .12 + street * .2 : .25 + street * .65} fill="none"/>)}
