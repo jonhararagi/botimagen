@@ -61,3 +61,5 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - Status remains PARTIAL until CI is green and captures are inspected. WINDOWS_MANUAL_QA: NOT_RUN; Linux headless Chromium is not represented as physical Windows validation or independent art direction approval.
 - Preserve PR #11 as open/unmerged, leave main and PR #8/#9/#10 untouched, and do not expand the garment catalog during this task.
 - TIMER: 3–5 hours estimated; actual elapsed time not measured.
+
+- The outer-layer composition block now follows the base outfit block; outer jacket sleeves are drawn after base sleeves, while outer_layer=none emits no extra sleeve surface.
