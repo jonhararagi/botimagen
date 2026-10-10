@@ -18,9 +18,12 @@
 - Pruebas Python nuevas y smoke test Chromium ampliado.
 - Documentación técnica y README web actualizados.
 
-## Evidencia pendiente
+## Evidencia verificada y pendiente
 
-No se pudo clonar el repositorio desde el entorno local por fallo de resolución DNS hacia GitHub, así que no se ejecutaron pruebas locales. Se debe usar el resultado de GitHub Actions de este PR para decidir si la compilación, tests Python y Chromium pasan. Hasta obtenerlo, no declarar `PASS_ENGINE_MVP`.
+- GitHub Actions `Validate BotImagen` [run 38051068349](https://github.com/jonhararagi/botimagen/actions/runs/38051068349): **SUCCESS**.
+- Pasaron `py_compile`, las pruebas Python existentes, el nuevo contrato `visual_recipe`, `npm ci`, `npm run build` y el smoke test de Chromium headless que cubre Style Lab, NanoWear, Chromapatch, contraste automático, vista trasera y persistencia de receta.
+- No se ejecutaron pruebas locales porque el entorno no pudo resolver `github.com` al clonar el repositorio.
+- La prueba física de Chrome/Edge en Windows sigue pendiente. El resultado CI permite registrar la validación automatizada, pero no afirma una verificación física ni completa de la calidad artística.
 
 ## Preservación
 
