@@ -273,7 +273,7 @@ export default function App(){
      <div className="canvas" style={stageVars}>
       <div className="grid-bg"/><div className="halo halo-a"/><div className="halo halo-b"/>
       <div className="canvas-labels"><span>BW / DESIGN STUDY</span><span>#{(Number.parseInt(seed,10)||314159).toString().padStart(6,"0").slice(-6)}</span></div><div className="watermark">CHARACTER<br/>PROTOTYPE</div>
-      <VisualCharacterRenderer values={generated?.profile ?? values} recipe={visualRecipe} onRecipeChange={updateVisualRecipe}/>
+      <VisualCharacterRenderer values={values} recipe={visualRecipe} onRecipeChange={updateVisualRecipe}/>
       <div className="side-mark left"><span>01</span>IDENTITY</div><div className="side-mark right"><span>02</span>SILHOUETTE</div>
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>ILUSTRACIÓN NO GENERADA</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
