@@ -684,6 +684,8 @@ try {
   const bomberShortD = await page.locator(".street-bomber-shell").getAttribute("d");
   const bomberShortBox = await page.locator(".street-bomber-shell").evaluate(node => node.getBBox().height);
   const bomberPatchYShort = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
+  const bomberPatchScaleShort = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-scale"));
+  assert.ok(bomberPatchScaleShort <= .65, "Chromapatch must shrink deterministically when the bomber hem is very short");
   const lowerBodyPaintOrder = await page.locator(".character-lower-body").evaluate((lowerBody) => {
     const shell = document.querySelector(".street-bomber-shell");
     return !!shell && !!(lowerBody.compareDocumentPosition(shell) & Node.DOCUMENT_POSITION_FOLLOWING);
@@ -697,9 +699,11 @@ try {
   const bomberLongD = await page.locator(".street-bomber-shell").getAttribute("d");
   const bomberLongBox = await page.locator(".street-bomber-shell").evaluate(node => node.getBBox().height);
   const bomberPatchYLong = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
+  const bomberPatchScaleLong = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-scale"));
   assert.notEqual(bomberLongD, bomberShortD, "The visible bomber shell must change at torso_length=100");
   assert.ok(bomberLongBox > bomberShortBox, "The long bomber shell must have a greater visible hem extent");
   assert.ok(bomberPatchYLong > bomberPatchYShort, "The chest Chromapatch must follow the bomber hem as its length changes");
+  assert.ok(bomberPatchScaleLong > bomberPatchScaleShort, "Chromapatch size must recover as the garment gains enough chest area");
   await captureVisual("02-street-bomber-torso-long");
 
   await outerLayerSelect.selectOption("short_bomber");
