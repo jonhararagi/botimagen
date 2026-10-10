@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: endpoint del manifiesto de assets y cobertura Chromium, 2026-10-10.
+Última actualización de esta ficha: implementación inicial del importador PNG por contrato, pendiente de CI, 2026-10-10.
 
 ## Repositorio
 
@@ -291,3 +291,14 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **CI #190 PASS_REAL** añade la auditoría de etiquetas en ocho pestañas. Generador, API local, cobertura del editor, npm ci, build web y Chromium E2E completados: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
 - **TIMER:** 5–10 minutos de trabajo incremental y verificación. La cobertura E2E se amplió, pero no se cierra una fase de producto por pruebas solas. Progreso ponderado mantenido en **62,16 / 100 → 62%**. QA física en Windows, Chrome/Edge instalado y medidas de rendimiento continúan NOT_RUN.
 
+
+
+## BIMG-008 · Importador PNG web (implementación en rama, verificación pendiente)
+
+- Rama de trabajo: `feat/bimg-008-safe-png-import`. HEAD base inspeccionado: `46bc7e702ae5d608927345991b5c4f0a661318a9`.
+- Implementación añadida en rama: `POST /api/assets/import?asset_id=...`, con destino derivado únicamente de `assets_manifest.json`; lectura en bloques limitada por `max_bytes`; verificación de firma, estructura de chunks, CRC, dimensiones, zlib, filas/filtros y PNG no entrelazado; temporal dentro del directorio permitido; publicación atómica sin sobrescritura mediante hard link.
+- UI React `AssetImporter.tsx`: carga contratos, permite elegir archivo local y presenta estados de selección, error y confirmación solo tras respuesta del servidor.
+- Tests añadidos: `tests/test_asset_import.py`; el workflow ejecuta esta batería y el smoke Chromium cubre el rechazo real de un archivo falso a través de la UI y el proxy.
+- **Estado de evidencia al redactar:** cambios persistidos en rama GitHub; no declarar PASS_REAL hasta que CI ejecute la suite y build. La prueba manual Chrome/Edge físico en Windows sigue NOT_RUN.
+- **Limitación deliberada:** la validación usa la biblioteca estándar (zlib + validación estructural PNG) y rechaza PNG entrelazados; no se añade dependencia externa. Revisar compatibilidad con exportadores reales en QA manual.
+- Próximo paso dentro de BIMG-008: esperar CI, corregir fallos, comprobar HEAD de rama y abrir PR si la batería está verde.
