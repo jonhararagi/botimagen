@@ -49,7 +49,8 @@ export default function AssetImporter() {
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || ("La importación falló (HTTP " + response.status + ")."));
-      if (body.status !== "imported" || body.asset_id !== contract.id || body.destination !== contract.destination\n          || !Number.isSafeInteger(body.bytes) || body.bytes <= 0\n          || !Number.isSafeInteger(body.width) || body.width <= 0\n          || !Number.isSafeInteger(body.height) || body.height <= 0) {
+      if (body.status !== "imported" || body.asset_id !== contract.id || body.destination !== contract.destination
+          || !Number.isSafeInteger(body.bytes) || body.bytes <= 0\n          || !Number.isSafeInteger(body.width) || body.width <= 0\n          || !Number.isSafeInteger(body.height) || body.height <= 0) {
         throw new Error("El servidor devolvió una confirmación de importación inesperada.");
       }
       setConfirmation(body as ImportResponse); setFile(null);
