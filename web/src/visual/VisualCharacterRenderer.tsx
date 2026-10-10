@@ -154,7 +154,7 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     ? bomberHem : values.outer_layer === "long_coat" ? coatHem : hemY;
   const patchX = effectiveEmblemPosition === "sleeve" ? (rear ? 224 : 116) : 170;
   const patchY = effectiveEmblemPosition === "hood" ? 246
-    : effectiveEmblemPosition === "sleeve" ? Math.max(292, Math.min(sleeveEnd - 15, 335))
+    : effectiveEmblemPosition === "sleeve" ? Math.max(285, Math.min(sleeveEnd - 12, 335))
     : Math.min(rear ? 305 : 285, emblemHem - 17);
   const patchTransform = `translate(${patchX} ${patchY}) scale(${effectiveEmblemPosition === "sleeve" ? .72 : .85})`;
   const svgStyle = { "--hair": hair, "--skin": skin, "--fabric": fabric, "--accent": accent, "--cyber": street, "--detail": detail } as CSSProperties;
