@@ -19,16 +19,18 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-005 · Editor completo por categorías | 18% | 87% · PARTIAL | 15,66 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
 | BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
-| BIMG-008 · Intake de assets en la interfaz web | 8% | 0% · NOT_STARTED | 0,0 |
+| BIMG-008 · Intake de assets en la interfaz web | 8% | 10% · PARTIAL | 0,8 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **62,16 / 100 → 62%** |
+| **Total ponderado** | **100%** | | **62,96 / 100 → 63%** |
 
-BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles.
+BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **62,96 / 100 (63%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
 
 ## Evidencia más reciente
 
 - Lockfile generado por npm y versionado en `web/package-lock.json` (lockfileVersion 3).
+- BIMG-008: `GET /api/assets/contracts` publica los 10 contratos PNG con destinos relativos validados. CI #194 **PASS_REAL**: prueba HTTP, método permitido, validación del manifiesto, proxy web y Chromium E2E. https://github.com/jonhararagi/botimagen/actions/runs/38024212437.
+- CI #193 detectó un NameError de prueba, corregido antes de CI #194; el resultado validado es el commit `e08d3de4a40e0003893447a3011199b32fa8e7b3`.
 - CI #65: PASS_REAL en `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; instalación reproducible con `npm ci`, build React/TypeScript y validaciones Python pasan.
 - Ejecución npm reproducible: https://github.com/jonhararagi/botimagen/actions/runs/37920504103
 - Editor web: 46 campos para 46 categorías y 8 pestañas. CI #82 prueba cobertura exacta, motor, prompts, `npm ci` y build: https://github.com/jonhararagi/botimagen/actions/runs/37921734995

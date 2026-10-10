@@ -1,6 +1,6 @@
 # Estado de continuidad · BotImagen
 
-Última actualización de esta ficha: E2E de restauración, responsividad y etiquetas del editor, 2026-10-10.
+Última actualización de esta ficha: endpoint del manifiesto de assets y cobertura Chromium, 2026-10-10.
 
 ## Repositorio
 
@@ -64,6 +64,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - BIMG-003: PARTIAL (~95%). UI React/TypeScript, proxy local y `web/package-lock.json` versionado. CI #112 prueba el flujo E2E headless Chromium además de `npm ci` y build; falta la ejecución manual en Chrome/Edge sobre Windows.
 - BIMG-005: PARTIAL (~87%). Editor con 47 categorías en 8 pestañas; guarda, lista, carga y duplica perfiles. CI #144 valida rol tank y prendas/prop; CI #152 PASS_REAL comprueba que una anatomía fijada manualmente se conserva aunque contradiga especie; CI #190 PASS_REAL añade restauración de ejemplo, estado de guardado pendiente, etiquetas conectadas de las ocho pestañas y responsive sin overflow en 320/390/768/1024 px. Faltan otros flujos de error, revisión visual amplia y QA física en Windows.
 - BIMG-006: PARTIAL (~70%). Catálogo v16 mantiene 47 categorías; `compatible_with` contiene 111 opciones y 303 valores permitidos en 11 relaciones. Incluye largo/corte/arreglo, outfit/rol, prop/rol, capa/calzado/accesorio por rol y anatomía por especie. v16 añade semántica explícita para `outer_layer=none`. CI #167/#168 PASS_REAL cubre prompt y flujo UI; CI #153 recorre todas las opciones declaradas con AUTO, #151 valida paridad del catálogo público y #152 prueba persistencia del override anatómico manual. QA física en Windows sigue pendiente.
+- BIMG-008: PARTIAL (~10%). `GET /api/assets/contracts` expone los 10 contratos PNG oficiales y valida las rutas relativas. **CI #194 PASS_REAL** verifica contrato, método `Allow: GET`, respuesta por proxy desde Chromium, pruebas de API, build y E2E existente: https://github.com/jonhararagi/botimagen/actions/runs/38024212437. La carga/validación/copia real de imágenes y su historial web aún no están implementados.
 - BIMG-004: PARTIAL (~95%). API de catálogo/generación/perfiles y UI están conectadas. CI #112 ejecuta un recorrido real desde Chromium headless hasta el motor local para generar, guardar, duplicar y cargar; falta QA física en Windows.
 - Evidencia CI #65: PASS_REAL en commit `ee2eb8a2db0c72b969aadc8e9cfc116b74c4a48b`; `npm ci` y `npm run build` pasan: https://github.com/jonhararagi/botimagen/actions/runs/37920504103.
 - Evidencia CI #75: PASS_REAL para la UI previa de 40 campos y cobertura de categorías: https://github.com/jonhararagi/botimagen/actions/runs/37921018803.
@@ -71,7 +72,17 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - Evidencia CI #86: PASS_REAL en commit `6e2a0c64b239cb12ba07a0a42b534d898afeb327`; se prueban 12 semillas con AUTO para especie humana y dracónica: https://github.com/jonhararagi/botimagen/actions/runs/37921964365.
 - Evidencia CI #93: PASS_REAL en commit `f8f214cab17a1b3dbca1cfd67434b5e033a12b5d`; duplicación API con UUID independiente, original intacto, cobertura del editor, pruebas del motor, `npm ci` y compilación: https://github.com/jonhararagi/botimagen/actions/runs/37922321639.
 - Runtime E2E en Chromium headless de GitHub Actions: **PASS_REAL**, CI #112. Navegador físico en Windows: **NOT_RUN**.
-- Progreso total ponderado hacia la beta local: **62%**, calculado en `cerebro/PROGRESO.md` (**62,16/100** sin redondear). HEAD funcional más reciente verificado: `6b6bee298cf6e40cc732aeb34cba8a03cd1b21ab`; CI #190 PASS_REAL.
+- Progreso total ponderado hacia la beta local: **63%**, calculado en `cerebro/PROGRESO.md` (**62,96/100** sin redondear). HEAD funcional con el endpoint probado: `e08d3de4a40e0003893447a3011199b32fa8e7b3`; CI #194 PASS_REAL. El navegador físico Windows continúa `NOT_RUN`.
+
+## BIMG-008 · Catálogo de contratos de assets en la API local
+
+- La ruta `GET /api/assets/contracts` publica la lista del `assets_manifest.json` oficial sin permitir lectura/escritura arbitraria de rutas.
+- Cada entrada expone únicamente ID, título, descripción, prompt positivo/negative prompt, versión de prompt, destino relativo y contrato esperado (PNG, dimensiones cuando aplican y bytes máximos). Los campos privados/de generación no se copian desde otros catálogos.
+- Validación de servidor: manifiesto versión 1, campos requeridos, IDs/destinos únicos, destino PNG relativo, rechazo de separadores de Windows y `..`, dimensiones en pareja y límites positivos.
+- `GET` es el único método permitido; `PUT` recibe 405 con `Allow: GET`. No existe todavía endpoint de escritura o importación.
+- CI #193 detectó un NameError en una prueba por usar un helper de rutas sin importarlo. Se corrigió en CI #194: **PASS_REAL**, test HTTP, build y Chromium E2E pasan. https://github.com/jonhararagi/botimagen/actions/runs/38024212437.
+- TIMER de esta tanda: 5–10 minutos. BIMG-008 pasa de 0% a 10%; total ponderado de **62,16 / 100 → 62,96 / 100 → 63%**.
+- Siguiente paso: seleccionar archivo PNG desde la web y validarlo contra el contrato antes de implementar la copia atómica.
 
 ## Catálogo v15 · matriz de compatibilidad y persistencia de locks · 2026-10-09
 

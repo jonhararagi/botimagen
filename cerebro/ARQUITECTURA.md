@@ -23,7 +23,7 @@ La migración está en curso, no terminada. La shell React/TypeScript vive en `w
 - Python reutiliza el generador y lógica de dominio existentes.
 - El primer puente, `botimagen_server.py`, usa `http.server` de la biblioteca estándar de Python. Se eligió después de la auditoría para evitar nuevas dependencias Python en un servicio pequeño y local; ofrece JSON/HTTP con validación explícita. FastAPI puede reconsiderarse si el contrato crece y lo justifica.
 - El servicio escucha exclusivamente en `127.0.0.1:8765`; Vite redirige `/api` en desarrollo. El servidor actual atiende la API, no sirve aún el frontend compilado para distribución.
-- Endpoints actuales: `GET /api/health`, `GET /api/catalog`, `POST /api/generate`, `GET /api/profiles`, `GET /api/profiles/{uuid}` y `POST /api/profiles`. Biblioteca de imágenes e importación de assets son endpoints futuros.
+- Endpoints actuales: `GET /api/health`, `GET /api/catalog`, `GET /api/assets/contracts`, `POST /api/generate`, `GET /api/profiles`, `GET /api/profiles/{uuid}` y `POST /api/profiles`. `GET /api/assets/contracts` publica en modo solo lectura los diez contratos PNG del manifiesto, incluidos prompt, destino relativo y límites esperados. No escribe archivos ni acepta rutas arbitrarias; el endpoint de importación y la biblioteca visual siguen pendientes.
 - Validación estricta de argumentos, rutas dentro de las carpetas configuradas, límites de tamaño, errores legibles y ningún endpoint para ejecutar comandos arbitrarios.
 - La UI muestra errores y no informa éxito antes de que el servicio confirme la operación.
 

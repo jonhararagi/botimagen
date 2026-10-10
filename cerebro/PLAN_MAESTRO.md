@@ -105,11 +105,11 @@ Todos los TIMER indican esfuerzo técnico estimado. No son fechas prometidas y p
 
 ### BIMG-008 · Integrar el flujo de assets existente
 
-**Estado:** NOT_STARTED.  
-**TIMER:** 1–2 días.  
-**Trabajo:** adaptar selección de archivo, vista previa, validación, copiado a destino, historial local y manifiesto para usar la nueva interfaz; conservar la posibilidad de usar la aplicación anterior mientras la migración no esté completa.
+**Estado:** PARTIAL (~10%). El servicio local expone `GET /api/assets/contracts`, que lee los 10 contratos PNG del manifiesto oficial, conserva prompts, formato, límites y destinos relativos, y rechaza destinos absolutos, traversal, duplicados y metadatos inválidos. CI #194 valida HTTP, la lista desde Chromium a través del proxy y el resto del flujo E2E. No se copian imágenes todavía.  
+**TIMER restante:** 1–2 días.  
+**Trabajo pendiente:** adaptar selección de archivo, vista previa, validación de bytes/dimensiones, copiado atómico a destino, manejo de colisiones e historial local; conservar la aplicación anterior mientras la migración no esté completa.
 
-**Aceptación:** importar un archivo válido y rechazar ejemplos inválidos con mensaje útil; no alterar el original; las operaciones de Git se mantienen explícitas y restringidas.
+**Aceptación:** importar un archivo válido y rechazar ejemplos inválidos con mensaje útil; no alterar el original; las operaciones de Git se mantienen explícitas y restringidas. La ruta GET de contratos es solo la base y no satisface todavía el criterio de importación.
 
 ### BIMG-009 · QA real de Windows y rendimiento
 

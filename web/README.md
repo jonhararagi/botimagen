@@ -44,10 +44,11 @@ Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botima
 - Visualización del prompt y negative prompt oficiales, copia al portapapeles y exportación JSON.
 - Guardado de perfiles mediante `POST /api/profiles` en `generated_characters/web_profiles/`, ignorado por Git por defecto.
 - Panel de perfiles locales: permite actualizar la lista, cargar un perfil guardado y duplicarlo como copia independiente. El guardado genera un UUID nuevo y la prueba HTTP confirma que el original permanece intacto.
+- `GET /api/assets/contracts` expone los diez contratos PNG del manifiesto oficial con prompt, destino relativo y límites esperados. Es una ruta de solo lectura; no importa ni escribe archivos.
 - Pruebas HTTP del servicio y validación de selecciones para que una opción inventada no se acepte.
 
 ## Límites actuales
 
-La silueta SVG es un marcador temporal de la interfaz, no una ilustración generada. No existe todavía generación neuronal de imagen, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración del intake de assets. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
+La silueta SVG es un marcador temporal de la interfaz, no una ilustración generada. No existe todavía generación neuronal de imagen, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración completa del intake de assets. La API ya publica los contratos oficiales en modo de solo lectura; selección, vista previa, validación binaria y copia de la imagen siguen pendientes. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
 
 El smoke test automatizado headless de Chromium en Linux ya pasa en GitHub Actions. Falta probar manualmente en Chrome/Edge en Windows y medir memoria/rendimiento; la prueba de CI no sustituye esa verificación física.
