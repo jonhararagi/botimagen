@@ -68,8 +68,8 @@ function optionColor(id: string, fallback: string) {
   return map[id] ?? fallback;
 }
 
-type RendererProps = { values: Record<string, string>; recipe: VisualRecipe; onRecipeChange: (recipe: VisualRecipe) => void };
-export function VisualCharacterRenderer({ values, recipe, onRecipeChange }: RendererProps) {
+type RendererProps = { values: Record<string, string>; recipe: VisualRecipe };
+export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
   const r = normalizeVisualRecipe(recipe);
   const hair = optionColor(values.hair ?? "", "#ef646b");
   const skinMap: Record<string, string> = { porcelana_neutra: "#f2d2c6", marfil_calido: "#f1d4b0", beige_claro: "#e5c3a0", durazno: "#e9b6a1", beige_dorado: "#d7ad82", oliva_suave: "#c89b73", canela: "#ad7656", bronce_calido: "#986344", marron_profundo: "#754b40", fantasia_azul_suave: "#a4c9df" };
