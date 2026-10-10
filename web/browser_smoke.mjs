@@ -705,6 +705,11 @@ try {
   await outerLayerSelect.selectOption("short_bomber");
   await captureVisual("03-outer-short-bomber");
   const shortLayerBox = await page.locator(".garment-layer.short-bomber").evaluate(node => node.getBBox().height);
+  const outerPaintOrder = await page.locator(".street-bomber-shell").evaluate(baseOutfit => {
+    const outerLayer = document.querySelector(".garment-layer.short-bomber");
+    return !!outerLayer && !!(baseOutfit.compareDocumentPosition(outerLayer) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  assert.equal(outerPaintOrder, true, "The outer bomber must paint above the selected base street_bomber outfit");
   const shortOuterSleeveCount = await page.locator(".garment-layer.outer-layer-sleeves").count();
   assert.equal(shortOuterSleeveCount, 1, "A short bomber outer layer must render its own sleeves above the base sleeves");
   const shortSleevePaintOrder = await page.locator(".garment-sleeves").evaluate(baseSleeves => {
