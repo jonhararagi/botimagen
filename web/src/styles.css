@@ -33,3 +33,15 @@
 .saved-profile-copy{flex:0 0 auto;min-width:62px;padding:7px 8px;border:1px solid #453854;border-radius:7px;color:#d9c0e3;background:#221b2e;font-size:9px;font-weight:600}
 .saved-profile-copy:hover:not(:disabled){border-color:#b18bc0;background:#30213a}
 .saved-profile-copy:disabled{opacity:.55;cursor:wait}
+
+
+/* BIMG-ENGINE-001 · CyberStreet Style Lab */
+.style-lab{margin:18px 0 0;padding:17px;border:1px solid #30344a;border-radius:14px;background:linear-gradient(145deg,#171b2b,#101521);display:grid;gap:15px}
+.style-lab-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.style-lab-head .kicker{color:#d7b1e6;font-size:10px;letter-spacing:.12em}.style-lab-head p{margin:5px 0 0;color:#8e98b2;font-size:11px}
+.view-toggle{display:flex;gap:4px;padding:3px;border:1px solid #353a51;border-radius:9px;background:#0d111d}.view-toggle button{padding:7px 10px;border:0;border-radius:6px;background:transparent;color:#929bb3;font-size:11px}.view-toggle button.selected{background:#39324b;color:#f7eaff}
+.style-ranges{display:grid;grid-template-columns:1fr 1fr;gap:13px 18px}.style-range{display:grid;gap:7px;color:#c4c9da;font-size:11px}.style-range>span{display:flex;justify-content:space-between;gap:8px}.style-range b{font:11px Consolas,monospace;color:#e6bde9}.style-range input{width:100%;accent-color:#d3a0e3}
+.style-fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}.style-fields label{display:grid;gap:6px;color:#9fa8bf;font-size:10px}.style-fields select{width:100%;min-width:0;padding:9px;border:1px solid #343a50;border-radius:8px;background:#0e1320;color:#edf0f7;font-size:11px}.style-fields input[type=color]{width:100%;height:34px;padding:3px;border:1px solid #343a50;border-radius:8px;background:#0e1320}
+.contrast-note,.contrast-warning{margin:0;padding:9px 10px;border-radius:8px;font-size:10px;line-height:1.5}.contrast-note{color:#9dcbb7;background:#7cc6a10d;border:1px solid #7cc6a122}.contrast-warning{color:#f4c1a2;background:#ef8b4312;border:1px solid #ef8b4340}
+.visual-character-svg{overflow:visible}.visual-character-svg[data-nanowear="transformation"]{filter:drop-shadow(0 0 4px #6ee5f555)}.visual-character-svg[data-nanowear="nanoweave"]{filter:drop-shadow(0 0 2px #61dcd433)}
+@media(max-width:1100px){.style-lab{padding:14px}.style-ranges{gap:12px}.style-fields{gap:9px}}
+@media(max-width:650px){.style-lab-head{align-items:flex-start;flex-direction:column}.style-ranges,.style-fields{grid-template-columns:1fr}.view-toggle{width:100%}.view-toggle button{flex:1}}
