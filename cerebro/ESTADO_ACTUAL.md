@@ -311,3 +311,21 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - Implementación remota preparada en la rama del PR #11: módulo `bodyLandmarks.ts`, consumo real en cuello/torso, contrato semántico de capas, prueba estática nueva y workflow ampliado.
 - Verificación local: `NOT_RUN` (sin checkout local en esta ejecución). CI #314 `SUCCESS` sobre `9b8f9a69465c5b21e2a3d43fd29ad94674c42365`: build, prueba de landmarks/capas y smoke Chromium pasan. Artefacto visual generado; seis capturas front/back a fit 50 inspeccionadas; los extremos están presentes pero no todos se revisaron individualmente.
 - No se modifica `main` ni el PR #12. Progreso global de referencia: 63%. `WINDOWS_MANUAL_QA: NOT_RUN`.
+
+
+## Continuidad actual · BIMG-ENGINE-007-R1A-REMOTE-02 (2026-10-11)
+
+La sincronización previa sigue válida. La rama del PR #11 avanzó a `9613bca14f730c8357aaf9054c2a374615f079e9`; `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86`; el PR #11 sigue abierto y sin fusionar.
+
+Se migraron las rutas de brazos, manos, pelvis, piernas y la forma base de calzado para consumir landmarks compartidos. Se añadieron IDs semánticos a las raíces de prendas y capas exteriores y un chequeo Chromium del orden de pintura en el DOM real. La primera ejecución detectó el marcador `outfit` faltante en la raíz `street_bomber`; la corrección se publicó en `9613bca` y CI #38152019549 pasó sobre ese HEAD exacto.
+
+- CI: https://github.com/jonhararagi/botimagen/actions/runs/38152019549
+- Artefacto: https://github.com/jonhararagi/botimagen/actions/runs/38152019549/artifacts/11706434232
+- Renderer y smoke test: cambios funcionales publicados y CI validada.
+- Reconstrucción visual completa del cuerpo: sigue PARTIAL.
+- Inspección artística individual de todas las capturas: pendiente.
+- `WINDOWS_MANUAL_QA: NOT_RUN`.
+- Progreso global ponderado: **63%**.
+- TIMER: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
+
+Siguiente paso: inspeccionar la matriz visual del artefacto, corregir defectos visibles encontrados y migrar el siguiente conjunto de landmarks con tests que comprueben continuidad geométrica y no solo presencia de atributos.

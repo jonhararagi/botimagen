@@ -122,3 +122,35 @@ The available GitHub file operations can create commits that replace individual 
 - La migración es intencionalmente incremental: no sustituye las geometrías de `street_bomber`, `tactical_baseball` ni `long_coat`; conserva sus rutas originales. CI #314 sobre `9b8f9a69465c5b21e2a3d43fd29ad94674c42365`: `SUCCESS`, incluido build TypeScript/Vite y smoke Chromium. Artefacto `botimagen-visual-garment-qa` generado; inspección manual de seis capturas comparables front/back a fit 50 confirmó que se conservan las siluetas diferenciadas y la estructura actual. Las capturas de extremos 0/100 están en el mismo artefacto, pero no todas fueron revisadas una por una.
 - `WINDOWS_MANUAL_QA: NOT_RUN`.
 - TIMER de esta entrega: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
+
+
+## R1A-REMOTE-02 · Migración de extremidades y verificación de pintura DOM (2026-10-11)
+
+**Estado: PARTIAL · cambios funcionales publicados y CI PASS; reconstrucción anatómica completa pendiente.**
+
+### Cambios funcionales
+
+- `web/src/visual/VisualCharacterRenderer.tsx`: el trazado de brazos consume hombros, codos, muñecas, manos y puntos de pecho del modelo compartido. Las manos frontales y posteriores se posicionan mediante anclas de landmarks.
+- La silueta de pelvis y piernas consume landmarks de pelvis, rodillas y tobillos; los puntos de rodilla se interpolan sobre las aristas existentes para conservar la geometría visual previa mientras la fuente de coordenadas queda centralizada.
+- La forma base del calzado consume landmarks de tobillos y pies. Los perfiles específicos de cada calzado siguen conservando sus propios detalles y varias rutas de estilo continúan siendo coordenadas dedicadas.
+- Se añadió `data-layer-id` a las raíces de las prendas principales y capas exteriores para que el contrato semántico de capas pueda verificarse en el SVG renderizado.
+- `web/browser_smoke.mjs` ahora lee en Chromium la secuencia real de `[data-layer-id][data-layer-order]` para cada captura de la matriz frontal/posterior y comprueba que los índices de pintura no retrocedan. También verifica las capas obligatorias y la presencia de `outer-layer` en la captura con `long_coat`.
+- `tests/test_visual_body_landmarks.py` valida el consumo de landmarks en extremidades, pelvis, piernas y calzado, así como la comprobación E2E del orden de pintura del DOM.
+
+### Persistencia y validación
+
+- HEAD BEFORE: `ba07e789f1d2491f0f4a024e87b2b6f460ccf8f1`.
+- Primer commit funcional: [`66b3470`](https://github.com/jonhararagi/botimagen/commit/66b3470cc38696f73412144fe27532628d769925). Su CI #381518 detectó correctamente que la raíz de `street_bomber` no exponía una capa `outfit`; por tanto, el smoke test falló y no se presentó como PASS.
+- Corrección: [`9613bca`](https://github.com/jonhararagi/botimagen/commit/9613bca14f730c8357aaf9054c2a374615f079e9) etiqueta las raíces de todas las prendas y capas exteriores principales.
+- HEAD funcional validado: [`9613bca14f730c8357aaf9054c2a374615f079e9`](https://github.com/jonhararagi/botimagen/commit/9613bca14f730c8357aaf9054c2a374615f079e9).
+- CI exacta: [run #38152019549](https://github.com/jonhararagi/botimagen/actions/runs/38152019549), `SUCCESS`, incluido test Python, build Vite/TypeScript, smoke Chromium y generación del artefacto visual.
+- Artefacto generado: [botimagen-visual-garment-qa · 81 archivos](https://github.com/jonhararagi/botimagen/actions/runs/38152019549/artifacts/11706434232). El artefacto está disponible para revisión; no se declara aquí una inspección artística individual de todos sus PNG.
+
+### Lo que permanece pendiente
+
+- Las rutas de brazo y pierna conservan una silueta cercana a la base previa; aún no se afirma una mejora artística completa de la anatomía.
+- La vista posterior sigue siendo esquemática y los calzados individuales todavía tienen rutas específicas fuera de la parametrización común.
+- El smoke E2E verifica el orden de los elementos etiquetados del DOM para los escenarios capturados; no sustituye una revisión artística ni la validación física en Windows.
+- `WINDOWS_MANUAL_QA: NOT_RUN`.
+- Progreso global ponderado: **63%**, sin incremento porque la beta local no ha cerrado una nueva fase ponderada.
+- TIMER de la entrega: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.

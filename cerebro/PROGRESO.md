@@ -101,3 +101,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 
 - BIMG-ENGINE-007-R1A-REMOTE-01 (2026-10-11): landmarks compartidos consumidos por cuello/torso, contrato de capas aplicado y CI #314 `SUCCESS` en `9b8f9a69465c5b21e2a3d43fd29ad94674c42365`; capturas front/back generadas y seis revisadas. Se conserva **63%** porque la fase de beta no está cerrada. QA física Windows: `NOT_RUN`. TIMER 4–6 h estimadas; tiempo real `NOT_MEASURED`.
+
+
+- **BIMG-ENGINE-007-R1A-REMOTE-02 (2026-10-11):** se conectaron landmarks compartidos a brazos, manos, pelvis, piernas y forma base del calzado; las raíces de prendas y capas exponen IDs semánticos, y Chromium comprueba el orden no decreciente de las capas etiquetadas en la matriz visual. CI #38152019549 `SUCCESS` en el HEAD exacto `9613bca14f730c8357aaf9054c2a374615f079e9`: https://github.com/jonhararagi/botimagen/actions/runs/38152019549. La ejecución anterior falló porque `street_bomber` no tenía marcador `outfit`; se corrigió antes del PASS final. Artefacto QA de 81 archivos: https://github.com/jonhararagi/botimagen/actions/runs/38152019549/artifacts/11706434232. La reconstrucción anatómica y revisión artística completa siguen pendientes; `WINDOWS_MANUAL_QA: NOT_RUN`. TIMER 4–6 h estimadas; tiempo real `NOT_MEASURED`. **Progreso global sin cambios: 63%**.
