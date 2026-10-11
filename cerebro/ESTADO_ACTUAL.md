@@ -303,3 +303,11 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **Landmarks/capas/capturas R1A:** NOT_IMPLEMENTED / NOT_RUN. PR #12 sigue independiente; dataset y contratos públicos no se tocaron en esta tarea.
 - **Siguiente acción:** realizar un merge commit normal de main a la rama, verificar la presencia de los 16 PNG y sus hashes, volver a inspeccionar el HEAD y recién entonces empezar el refactor.
 - **TIMER:** estimación inicial 4–8 h; tiempo real medido NOT_MEASURED; implementación consumida 0 h de código. Estimación revisada tras sincronizar: 4–8 h, sujeta a conflictos/regresiones.
+
+
+## BIMG-ENGINE-007-R1A-REMOTE-01 · estado de implementación
+
+- HEAD BEFORE: `51e6515ec4ce65bbc930f2c1bfbe0b71b9ca03b0`.
+- Implementación remota preparada en la rama del PR #11: módulo `bodyLandmarks.ts`, consumo real en cuello/torso, contrato semántico de capas, prueba estática nueva y workflow ampliado.
+- Verificación local: `NOT_RUN` (sin checkout local en esta ejecución). Build, prueba nueva, smoke Chromium y capturas comparables: pendientes de CI en el nuevo HEAD.
+- No se modifica `main` ni el PR #12. Progreso global de referencia: 63%. `WINDOWS_MANUAL_QA: NOT_RUN`.

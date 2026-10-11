@@ -82,3 +82,14 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - Successful Chromium run before this documentation-only status entry: https://github.com/jonhararagi/botimagen/actions/runs/38059452763. Its capture artifact contains 58 PNGs plus the base and matrix manifests: https://github.com/jonhararagi/botimagen/actions/runs/38059452763/artifacts/11672242529.
 - The 22 endpoint capture pairs (11 torso/waist IDs, 11 sleeve IDs) were compared as rendered PNGs. Every pair differed in 5,040–15,028 pixels, confirming a rendered-output difference in addition to the geometry assertions. Representative captures were visually inspected; no obvious detached sleeves or floating Chromapatch appeared in the reviewed contact sheet and selected full-size captures.
 - The matrix confirms parameter response, not full artistic polish for every combination. WINDOWS_MANUAL_QA: NOT_RUN. Re-run CI after this documentation commit to bind final validation to the final PR head.
+
+
+## BIMG-ENGINE-007-R1A-REMOTE-01 · 2026-10-11
+
+- HEAD BEFORE: `51e6515ec4ce65bbc930f2c1bfbe0b71b9ca03b0`.
+- PR #11 confirmado abierto y sin fusionar; `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86` al preflight remoto.
+- Cambio funcional: landmarks tipados compartidos para el `viewBox` 340×490; `VisualCharacterRenderer.tsx` usa el modelo para generar la ruta del torso y el contorno del cuello. Contrato de capas conectado a elementos SVG con `data-layer-order`.
+- Prueba nueva: `tests/test_visual_body_landmarks.py`; añadida al workflow `Validate BotImagen`. La validación real queda pendiente hasta consultar CI del nuevo HEAD.
+- Se preservan receta v3, migraciones v1/v2, controles de ajuste, NanoWear, Chromapatch y los IDs de las prendas; esta entrega no rediseña todavía la silueta completa.
+- `WINDOWS_MANUAL_QA: NOT_RUN`. Capturas del nuevo HEAD: no inspeccionadas aún.
+- Progreso ponderado conservado en 63%; esta migración parcial no completa por sí sola una fase de beta.

@@ -113,3 +113,11 @@ The available GitHub file operations can create commits that replace individual 
 - R1A implementation time consumed: **0 hours of code implementation**; time spent on remote inspection is not reliably timed.
 - Revised estimate after safe synchronization: **4–8 hours** for landmarks, effective layer contract, garment/control regression coverage, comparable screenshots, and exact-head CI. Increase if merge conflicts or visual regressions appear.
 - R1B estimate remains **NOT_RELIABLY_ESTIMABLE** until R1A and its screenshots are validated; provisional planning window **1–3 concentrated days**, to be recalculated from the real implementation delta.
+
+
+## R1A · primera migración estructural (2026-10-11)
+
+- Se introduce `web/src/visual/bodyLandmarks.ts` como modelo tipado compartido en el `viewBox` real de 340×490. Los puntos iniciales corresponden a coordenadas observadas en los paths existentes; torso y cuello ya consumen landmarks, y el largo de torso/ajuste de cintura siguen derivando de `hemY` y `waistHalf` de recipe v3.
+- `SVG_LAYER_ORDER` es consumido por elementos SVG mediante `data-layer-order`; la prueba nueva comprueba la secuencia semántica expuesta por el contrato y la presencia de sus consumidores en el renderer.
+- La migración es intencionalmente incremental: no sustituye las geometrías de `street_bomber`, `tactical_baseball` ni `long_coat`; conserva sus rutas originales. La CI del commit debe confirmar el build y la prueba estática antes de considerar la entrega automatizada validada.
+- Capturas nuevas e inspección visual R1A: pendientes de la ejecución de CI. `WINDOWS_MANUAL_QA: NOT_RUN`.
