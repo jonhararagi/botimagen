@@ -1,27 +1,21 @@
 # Dataset de referencia corporal de BotImagen
 
-Esta carpeta está reservada para organizar el conjunto de dibujos de referencia usados para estudiar proporciones, anatomía y poses.
+Esta carpeta contiene **16 originales PNG** (`0.png` a `15.png`) para estudiar proporciones, siluetas y poses. El repositorio `jonhararagi/botimagen` es público; los archivos son visibles y descargables por cualquiera mientras esa configuración se mantenga.
 
-## ⚠️ Privacidad antes de subir archivos
+## Auditoría
 
-El repositorio `jonhararagi/botimagen` es actualmente **público**. Todo archivo que se añada aquí será visible y descargable por cualquiera mientras el repositorio siga siendo público.
+- Informe técnico y visual: [BIMG-DATASET-001](../../cerebro/auditorias/BIMG-DATASET-001.md).
+- Manifiesto de metadatos y clasificación: [BIMG-DATASET-001.manifest.json](../../cerebro/auditorias/BIMG-DATASET-001.manifest.json).
+- Estado de auditoría: **PARTIAL**; se inspeccionaron visualmente 12 de 16 imágenes. `4.png`, `6.png`, `7.png` y `8.png` están marcadas como `UNKNOWN` hasta poder observarlas.
+- Los 16 PNG se leen correctamente; todos miden 768×1280, tienen modo RGBA de 8 bits y un canal alfa completamente opaco. El canal alfa no hace transparente el fondo.
+- SHA-256, metadatos exactos y posibles similitudes están en el manifiesto. No se encontraron duplicados exactos por hash.
 
-**No subas aquí los dibujos originales todavía** si no quieres publicarlos. Antes, convierte el repositorio en privado o utiliza un repositorio privado separado y confirma que el bot obrero tenga acceso. Esta carpeta contiene únicamente documentación de organización, no el dataset.
+## Protección y procedencia
 
-## Flujo previsto de auditoría
+Los originales se conservaron intactos durante la auditoría. No se crearon miniaturas, recortes ni otras imágenes derivadas, y no se añadió ningún PNG al producto/editor.
 
-1. Conservar los originales sin modificarlos.
-2. Generar un inventario de nombres, formatos, dimensiones y hashes.
-3. Detectar duplicados exactos sin eliminar archivos.
-4. Clasificar candidatos por pose y vista cuando sea posible.
-5. Registrar procedencia y permisos de uso.
-6. No incorporar imágenes al producto ni redistribuirlas hasta verificar sus condiciones de uso.
+Autoría, fuente original, licencia y derecho de redistribución individuales: **UNKNOWN / UNVERIFIED**. La publicación por decisión del usuario no demuestra que los archivos tengan una licencia reutilizable. No empaquetar ni redistribuir las referencias hasta verificar sus condiciones.
 
-Los originales, miniaturas personales, cachés e informes con datos privados deben permanecer fuera del repositorio público. No se debe realizar scraping masivo ni asumir que una referencia externa se puede reutilizar.
+## Próximo paso
 
-## Estado
-
-- [x] Carpeta de organización creada.
-- [ ] Confirmar un destino privado para los originales.
-- [ ] Auditar el inventario en modo de solo lectura.
-- [ ] Evaluar cuerpos base y poses reutilizables.
+Completar la inspección visual de los cuatro PNG pendientes y buscar evidencia de procedencia/licencia. Después, utilizar los candidatos identificados como referencias para un refactor 2D de anatomía y landmarks, sin declarar implementados el rigging ni el editor 3D.

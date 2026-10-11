@@ -291,3 +291,15 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **CI #190 PASS_REAL** añade la auditoría de etiquetas en ocho pestañas. Generador, API local, cobertura del editor, npm ci, build web y Chromium E2E completados: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
 - **TIMER:** 5–10 minutos de trabajo incremental y verificación. La cobertura E2E se amplió, pero no se cierra una fase de producto por pruebas solas. Progreso ponderado mantenido en **62,16 / 100 → 62%**. QA física en Windows, Chrome/Edge instalado y medidas de rendimiento continúan NOT_RUN.
 
+
+
+## BIMG-DATASET-001 · Auditoría del dataset corporal (2026-10-11)
+
+- HEAD base auditado: `b508cfe7d3216eda801438d46dff8873842cea86`. Trabajo documental preparado en la rama `audit/bimg-dataset-001-body-reference`; PR #11 de anatomía/ropa se dejó intacto.
+- GitHub confirma 16 PNG (`0.png`–`15.png`) y `README.md` en `references/dataset-cuerpos/`; volumen PNG 13.882.547 bytes (13,239 MiB), todas las imágenes 768×1280, PNG RGBA 8-bit con alfa opaco.
+- Pillow `Image.verify()`: 16/16 PASS_REAL; SHA-256 doble estable; cero grupos de duplicados exactos. Se calculó dHash exploratorio; no se etiquetó ninguna pareja como duplicado por similitud aproximada.
+- Inspección visual PARTIAL: se observaron 12/16. `4.png`, `6.png`, `7.png` y `8.png` permanecen UNKNOWN por límite de lectura visual del conector; no se inventaron sus categorías.
+- Candidato primario para referencia de cuerpo completo 2D: `12.png`; secundario `15.png`; ninguno es una plantilla modular validada. Los fondos son opacos y tienen decoraciones; el alfa no permite recortar la figura directamente.
+- Procedencia/autor/licencia individual: UNKNOWN/UNVERIFIED. La presencia en el repositorio público no concede derechos de redistribución.
+- BIMG-ENGINE-007 sigue PARTIAL en PR #11 y recomienda refactor de landmarks/capas antes de cambios aislados de anatomía. No se modificó código de renderer, modelo ni imágenes.
+- Informe: [BIMG-DATASET-001](auditorias/BIMG-DATASET-001.md); manifiesto: [BIMG-DATASET-001.manifest.json](auditorias/BIMG-DATASET-001.manifest.json). Estado del hito: PARTIAL. TIMER inicial 2–4 h; tiempo de reloj real NOT_MEASURED; pendientes 30–90 min de inspección visual y revisión de procedencia si hay fuente.
