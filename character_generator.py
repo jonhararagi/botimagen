@@ -402,6 +402,7 @@ class CharacterGenerator:
         seed: int | None = None,
         coherence: float = 0.82,
         surprise: bool = False,
+        visual_recipe: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         chosen = dict(selections or {})
         rng = random.Random(seed)
@@ -450,7 +451,7 @@ class CharacterGenerator:
         style_direction = self._style_direction(profile)
         rationale = self._rationale(chosen, profile, labels)
 
-        return {
+        result = {
             "version": self.rules.get("version", 1),
             "style_id": self.visual_standard["id"],
             "style_name": self.visual_standard["name"],
@@ -465,6 +466,43 @@ class CharacterGenerator:
             "coherence": coherence,
             "surprise": surprise,
         }
+        if visual_recipe is not None:
+            result["visual_recipe"] = dict(visual_recipe)
+            result["prompt"] += " " + self._visual_recipe_prompt(visual_recipe)
+        return result
+
+    @staticmethod
+    def _visual_recipe_prompt(recipe: dict[str, Any]) -> str:
+        state = {
+            "everyday": "ordinary wearable street clothing with subtle seams",
+            "nanoweave": "technical programmable nanofabric with restrained luminous seam channels",
+            "transformation": "transformed synthetic textile sheen and controlled futuristic panel accents",
+        }.get(str(recipe.get("nanowear_state")), "ordinary wearable street clothing")
+        finish = {
+            "textile": "matte everyday textile",
+            "nanoweave": "fine technical nanoweave surface",
+            "synthetic": "glossy synthetic finish",
+        }.get(str(recipe.get("material_finish")), "matte everyday textile")
+        return (
+            "Visual recipe CyberStreet v3: "
+            f"{recipe.get('anime_influence', 68)}% anime influence, "
+            f"{recipe.get('toon_influence', 56)}% toon influence, "
+            f"{recipe.get('streetwear_cyberpunk', 30)}% streetwear-to-cyberpunk detailing, "
+            f"{recipe.get('detail_level', 58)}% decorative detail. "
+            f"NanoWear fabric base {recipe.get('garment_base_color', '#343246')}, panels "
+            f"{recipe.get('garment_panel_color', '#48516a')}, technology accent "
+            f"{recipe.get('garment_accent_color', '#5ce4dc')}, pattern {recipe.get('fabric_pattern', 'circuit')}. "
+            f"NanoWear state: {state}; material finish: {finish}. "
+            f"Garment fit parameters: torso length {recipe.get('torso_length', 80)}/100, "
+            f"sleeve length {recipe.get('sleeve_length', 60)}/100, waist fit {recipe.get('waist_fit', 50)}/100. "
+            "These parameters adjust the selected garment silhouette without replacing its catalog identity or fabric palette. "
+            f"Original personal Chromapatch emblem: {recipe.get('emblem_shape', 'bunny')}, "
+            f"color {recipe.get('emblem_color', '#f3c96b')}, position {recipe.get('emblem_position', 'chest')}, "
+            f"contrast mode {recipe.get('emblem_contrast', 'auto')}. "
+            "Preserve the selected fabric palette across NanoWear states and keep the chosen personal emblem stable. "
+            "Keep the selected outfit recognizable as wearable clothing; technology accents must remain "
+            "proportional to the cyberpunk balance and never replace every garment with armor."
+        )
 
     @staticmethod
     def _style_direction(profile: dict[str, str]) -> str:

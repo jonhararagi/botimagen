@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -375,6 +376,118 @@ try {
   assert.equal(await scalesSelect.inputValue(), "cheek_temple_scales",
     "A manually locked anatomy option must not be silently normalized to the species");
 
+  // Exercise the real CyberStreet controls and verify their generated prompt contract.
+  const initialHairColor = await page.locator(".visual-character-svg").getAttribute("data-hair-color");
+  const initialSkinColor = await page.locator(".visual-character-svg").getAttribute("data-skin-color");
+  const fabricInputs = page.locator(".style-fields input[type=color]");
+  const setColor = async (input, color) => input.evaluate((el, value) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    setter?.call(el, value);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, color);
+  await setColor(fabricInputs.nth(0), "#234567");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Changing base nanotela color must immediately update the SVG clothing recipe");
+  await setColor(fabricInputs.nth(1), "#456789");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Changing secondary fabric color must update SVG panels");
+  await setColor(fabricInputs.nth(2), "#55d9cf");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Changing technology accent must update the SVG recipe");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-hair-color"), initialHairColor, "Changing garment colors must not recolor hair");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-skin-color"), initialSkinColor, "Changing garment colors must not recolor skin");
+  await page.locator(".style-fields select").nth(0).selectOption("geometric");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "The geometric pattern must be connected to the live SVG");
+  assert.ok(await page.locator(".visual-character-svg defs pattern path").count() > 0, "The selected geometric pattern must render actual SVG geometry");
+  // Exercise actual SVG geometry, not only recipe attributes.
+  await page.getByRole("tab", { name: /Vestuario/i }).click();
+  const originalOutfit = await page.locator("#trait-outfit").inputValue();
+  const outfitField = page.locator(".field").filter({ has: page.locator("#trait-outfit") });
+  if (await page.locator("#trait-outfit").isDisabled()) await outfitField.locator("button.lock").click();
+  await page.locator("#trait-outfit").selectOption("combat_jacket");
+  const torsoSlider = page.getByRole("slider", { name: "Largo del torso" });
+  const sleeveSlider = page.getByRole("slider", { name: "Largo de mangas" });
+  const waistSlider = page.getByRole("slider", { name: "Ajuste de cintura" });
+  assert.equal(await torsoSlider.isDisabled(), false, "Combat jacket should expose torso length");
+  assert.equal(await sleeveSlider.isDisabled(), false, "Combat jacket should expose sleeve length");
+  assert.equal(await waistSlider.isDisabled(), false, "Combat jacket should expose waist fit");
+  const torsoPath = page.locator(".garment-torso-main");
+  await torsoSlider.focus(); await torsoSlider.press("Home");
+  const shortTorsoD = await torsoPath.getAttribute("d");
+  await torsoSlider.press("End");
+  const longTorsoD = await torsoPath.getAttribute("d");
+  assert.notEqual(shortTorsoD, longTorsoD, "Torso slider endpoints must change actual SVG path geometry");
+  const sleevePath = page.locator(".garment-sleeves path").first();
+  await sleeveSlider.focus(); await sleeveSlider.press("Home");
+  const shortSleeveD = await sleevePath.getAttribute("d");
+  await sleeveSlider.press("End");
+  const longSleeveD = await sleevePath.getAttribute("d");
+  assert.notEqual(shortSleeveD, longSleeveD, "Sleeve slider endpoints must change actual sleeve geometry");
+  await waistSlider.focus(); await waistSlider.press("Home");
+  const fittedTorsoTransform = await torsoPath.getAttribute("transform");
+  const fittedTorsoD = await torsoPath.getAttribute("d");
+  await waistSlider.press("End");
+  assert.notEqual(await torsoPath.getAttribute("d"), fittedTorsoD, "Waist fit must change actual torso path geometry");
+  assert.notEqual(await torsoPath.getAttribute("transform"), fittedTorsoTransform, "Waist fit must alter the garment-only transform");
+  const setRangeValue = async (locator, value) => locator.evaluate((el, next) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    setter?.call(el, String(next));
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+  await setRangeValue(torsoSlider, 24);
+  await setRangeValue(sleeveSlider, 92);
+  await setRangeValue(waistSlider, 76);
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-torso-length"), "24");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-sleeve-length"), "92");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-waist-fit"), "76");
+  await page.locator("#trait-outfit").selectOption(originalOutfit);
+  await page.locator(".style-fields select").nth(1).selectOption("transformation");
+  await page.locator(".view-toggle button").nth(1).click();
+  await page.locator(".style-fields select").nth(3).selectOption("fox");
+  await page.locator(".style-fields select").nth(5).selectOption("auto");
+  await page.locator(".style-fields input[type=color]").nth(3).evaluate(el => {
+    const input = el;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    setter?.call(input, "#111111");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  const animeSlider = page.locator(".style-range input").nth(0);
+  await animeSlider.focus();
+  await animeSlider.press("End");
+  assert.equal(await animeSlider.inputValue(), "100", "The Anime influence slider should be interactive");
+  assert.equal(await saveButton.isDisabled(), true, "Changing the visual recipe must invalidate the generated snapshot");
+  await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+  await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "hidden" });
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-nanowear"), "transformation");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Transformation must preserve the selected fabric base color");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "Transformation must preserve the selected fabric pattern");
+  const autoPatchColor = await page.locator('.visual-character-svg g[aria-label="Chromapatch"] > g').getAttribute("fill");
+  assert.notEqual(autoPatchColor, "#111111", "Auto contrast must derive the emblem color from fabric rather than retain the manual color");
+  assert.notEqual(autoPatchColor, "#234567", "The automatic emblem must remain distinguishable from the fabric base");
+  const patchContrast = await page.locator(".visual-character-svg").evaluate((svg, patch) => {
+    const lum = (hex) => { const rgb = [1,3,5].map(i => parseInt(hex.slice(i, i+2),16)/255).map(c => c <= .04045 ? c/12.92 : ((c+.055)/1.055)**2.4); return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]; };
+    const a = lum(svg.getAttribute("data-fabric-base")), b = lum(patch);
+    return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  }, autoPatchColor);
+  assert.ok(patchContrast >= 3, `Automatic Chromapatch contrast should be at least 3:1, got ${patchContrast}`);
+  assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i);
+  prompt = await page.locator(".prompt-panel pre").innerText();
+  assert.ok(prompt.includes("Visual recipe CyberStreet v3"), "The official prompt should include the visual recipe v3");
+  assert.ok(prompt.includes("torso length 24/100"), "The official prompt should include parametric torso length");
+  assert.ok(prompt.includes("sleeve length 92/100"), "The official prompt should include parametric sleeve length");
+  assert.ok(prompt.includes("waist fit 76/100"), "The official prompt should include parametric waist fit");
+  assert.ok(prompt.includes("transformed synthetic textile sheen"), "The selected NanoWear state should reach the prompt");
+  const [profileDownload] = await Promise.all([page.waitForEvent("download"), page.locator(".prompt-actions button").nth(2).click()]);
+  const exportedProfile = JSON.parse(await readFile(await profileDownload.path(), "utf8"));
+  assert.equal(exportedProfile.visual_recipe.garment_base_color, "#234567", "Export must preserve the NanoWear base color");
+  assert.equal(exportedProfile.visual_recipe.garment_panel_color, "#456789", "Export must preserve the NanoWear panel color");
+  assert.equal(exportedProfile.visual_recipe.garment_accent_color, "#55d9cf", "Export must preserve the technology accent");
+  assert.equal(exportedProfile.visual_recipe.fabric_pattern, "geometric", "Export must preserve the fabric pattern");
+  assert.equal(exportedProfile.visual_recipe.torso_length, 24, "Export must preserve torso length");
+  assert.equal(exportedProfile.visual_recipe.sleeve_length, 92, "Export must preserve sleeve length");
+  assert.equal(exportedProfile.visual_recipe.waist_fit, 76, "Export must preserve waist fit");
+  assert.equal(await saveButton.isDisabled(), false, "A synchronized visual recipe should be saveable");
+
   await page.getByRole("tab", { name: /Cabello/i }).click();
   const profileSummary = page.locator(".saved-profile-panel summary");
   await profileSummary.waitFor({ state: "visible" });
@@ -407,6 +520,21 @@ try {
   );
   assert.equal(await tipSelect.inputValue(), "metallic_gold",
     "Loading a saved profile should restore the tip color selection");
+  assert.equal(await page.locator(".style-fields select").nth(1).inputValue(), "transformation",
+    "Loading a saved profile should restore its NanoWear state");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-base"), "#234567", "Loading a saved profile must restore the NanoWear base color");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-panel"), "#456789", "Loading a saved profile must restore the NanoWear panel color");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-accent"), "#55d9cf", "Loading a saved profile must restore the technology accent");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-fabric-pattern"), "geometric", "Loading a saved profile must restore the fabric pattern");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-torso-length"), "24", "Loading a saved profile must restore torso length");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-sleeve-length"), "92", "Loading a saved profile must restore sleeve length");
+  assert.equal(await page.locator(".visual-character-svg").getAttribute("data-waist-fit"), "76", "Loading a saved profile must restore waist fit");
+  assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /trasera/i,
+    "Loading a saved profile should restore the selected presentation view");
+  assert.equal(await page.locator(".style-fields select").nth(3).inputValue(), "fox", "Loading a saved profile should restore its Chromapatch shape");
+  assert.equal(await page.locator(".style-fields input[type=color]").nth(3).inputValue(), "#111111", "Loading a saved profile should restore the selected emblem color");
+  assert.equal(await page.locator(".style-range input").nth(0).inputValue(), "100",
+    "Loading a saved profile should restore the saved Style Lab recipe");
   assert.equal(await arrangementSelect.inputValue(), "coleta_trenzada",
     "Loading a saved profile should restore the manually locked braided ponytail");
   assert.equal(await lengthSelect.inputValue(), selectedLengthForArrangement,
@@ -483,6 +611,332 @@ try {
     assert.ok(audit.fieldCount > 0, `Tab ${tabName} should render its trait fields`);
     assert.deepEqual(audit.invalid, [], `Every visible field must have a connected label in tab ${tabName}`);
   }
+
+  // Legacy profiles without a visual recipe must still load with safe defaults.
+  const legacyProfile = await page.evaluate(async () => {
+    const response = await fetch("/api/profiles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Legacy profile without visual recipe",
+        profile: { schema_version: 1, mode: "local-engine", style_id: "bw-modern-gacha-v1", seed: 11, selections: { species: "humana" } },
+      }),
+    });
+    if (!response.ok) throw new Error("Unable to create a legacy profile fixture");
+    return response.json();
+  });
+  assert.ok(legacyProfile.id, "The API should save the legacy fixture independently");
+  const profileDetails = page.locator(".saved-profile-panel");
+  if (!(await profileDetails.evaluate(element => element.open))) await profileDetails.locator("summary").click();
+  await page.locator(".refresh-profiles").click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("Lista de perfiles locales actualizada"),
+    undefined,
+    { timeout: 10000 },
+  );
+  await page.locator(".saved-profile-item").filter({ hasText: "Legacy profile without visual recipe" }).click();
+  await page.waitForFunction(
+    () => document.querySelector(".main-footer")?.textContent?.includes("Perfil cargado con cambios no sincronizados"),
+    undefined,
+    { timeout: 10000 },
+  );
+  assert.equal(await page.locator(".style-fields select").nth(1).inputValue(), "everyday",
+    "A legacy profile without visual_recipe should receive the safe NanoWear default");
+  assert.equal(await page.locator(".style-fields select").nth(3).inputValue(), "bunny",
+    "A legacy profile without visual_recipe should receive the safe Chromapatch default");
+  assert.match(await page.locator(".visual-character-svg").getAttribute("aria-label"), /frontal/i,
+    "A legacy profile without visual_recipe should default to the front presentation");
+
+  // BIMG-ENGINE-004: capture reproducible visual QA from the real application.
+  // Captures are CI artifacts, never committed as product assets.
+  const visualQaDir = resolve(root, "artifacts", "visual-qa");
+  await mkdir(visualQaDir, { recursive: true });
+  const visualSvg = page.locator(".visual-character-svg");
+  const captureVisual = async name => page.locator(".canvas").screenshot({
+    path: resolve(visualQaDir, name + ".png"),
+  });
+  const setVisualRange = async (label, value) => {
+    const slider = page.locator('input[type="range"][aria-label="' + label + '"]');
+    await slider.evaluate((element, nextValue) => {
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+      setter.call(element, String(nextValue));
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+      element.dispatchEvent(new Event("change", { bubbles: true }));
+    }, value);
+    await page.waitForFunction(({ label, value }) => {
+      const input = document.querySelector('input[type="range"][aria-label="' + label + '"]');
+      return input && Number(input.value) === value;
+    }, { label, value });
+  };
+
+  await page.getByRole("tab", { name: /Vestuario/i }).click();
+  const qaOutfitLock = page.locator('label[for="trait-outfit"]').locator("xpath=../..").locator("button.lock");
+  const qaOuterLayerLock = page.locator('label[for="trait-outer_layer"]').locator("xpath=../..").locator("button.lock");
+  if (await outfitSelect.isDisabled()) await qaOutfitLock.click();
+  if (await outerLayerSelect.isDisabled()) await qaOuterLayerLock.click();
+  await outfitSelect.selectOption("street_bomber");
+  await outerLayerSelect.selectOption("none");
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  await page.locator(".style-fields select").nth(1).selectOption("everyday");
+  await page.locator(".style-fields select").nth(4).selectOption("chest");
+
+  await setVisualRange("Largo del torso", 0);
+  const bomberShortD = await page.locator(".street-bomber-shell").getAttribute("d");
+  const bomberShortBox = await page.locator(".street-bomber-shell").evaluate(node => node.getBBox().height);
+  const bomberPatchYShort = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
+  const bomberPatchScaleShort = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-scale"));
+  assert.ok(bomberPatchScaleShort <= .65, "Chromapatch must shrink deterministically when the bomber hem is very short");
+  const lowerBodyPaintOrder = await page.locator(".character-lower-body").evaluate((lowerBody) => {
+    const shell = document.querySelector(".street-bomber-shell");
+    return !!shell && !!(lowerBody.compareDocumentPosition(shell) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  assert.equal(lowerBodyPaintOrder, true, "The final bomber shell must paint above the lower-body surface it overlaps");
+  await captureVisual("01-street-bomber-torso-short");
+  await setVisualRange("Largo del torso", 50);
+  const bomberMidD = await page.locator(".street-bomber-shell").getAttribute("d");
+  assert.notEqual(bomberMidD, bomberShortD, "The visible bomber hem must change at torso_length=50");
+  await setVisualRange("Largo del torso", 100);
+  const bomberLongD = await page.locator(".street-bomber-shell").getAttribute("d");
+  const bomberLongBox = await page.locator(".street-bomber-shell").evaluate(node => node.getBBox().height);
+  const bomberPatchYLong = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
+  const bomberPatchScaleLong = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-scale"));
+  assert.notEqual(bomberLongD, bomberShortD, "The visible bomber shell must change at torso_length=100");
+  assert.ok(bomberLongBox > bomberShortBox, "The long bomber shell must have a greater visible hem extent");
+  assert.ok(bomberPatchYLong > bomberPatchYShort, "The chest Chromapatch must follow the bomber hem as its length changes");
+  assert.ok(bomberPatchScaleLong > bomberPatchScaleShort, "Chromapatch size must recover as the garment gains enough chest area");
+  await captureVisual("02-street-bomber-torso-long");
+
+  await outerLayerSelect.selectOption("short_bomber");
+  await captureVisual("03-outer-short-bomber");
+  const shortLayerBox = await page.locator(".garment-layer.short-bomber").evaluate(node => node.getBBox().height);
+  const outerPaintOrder = await page.locator(".street-bomber-shell").evaluate(baseOutfit => {
+    const outerLayer = document.querySelector(".garment-layer.short-bomber");
+    return !!outerLayer && !!(baseOutfit.compareDocumentPosition(outerLayer) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  assert.equal(outerPaintOrder, true, "The outer bomber must paint above the selected base street_bomber outfit");
+  const shortOuterSleeveCount = await page.locator(".garment-layer.outer-layer-sleeves").count();
+  assert.equal(shortOuterSleeveCount, 1, "A short bomber outer layer must render its own sleeves above the base sleeves");
+  const shortSleevePaintOrder = await page.locator(".garment-sleeves").evaluate(baseSleeves => {
+    const outerSleeves = document.querySelector(".garment-layer.outer-layer-sleeves");
+    return !!outerSleeves && !!(baseSleeves.compareDocumentPosition(outerSleeves) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  assert.equal(shortSleevePaintOrder, true, "Outer-layer sleeves must paint after base sleeves");
+  await outerLayerSelect.selectOption("long_coat");
+  await captureVisual("04-outer-long-coat");
+  const longLayerBox = await page.locator(".garment-layer.long-coat path").first().evaluate(node => node.getBBox().height);
+  assert.ok(longLayerBox > shortLayerBox, "The long coat must extend farther than the short bomber outer layer");
+  assert.equal(await page.locator(".garment-layer.outer-layer-sleeves").count(), 1,
+    "A long coat must retain its own visible outer sleeves");
+  await outerLayerSelect.selectOption("none");
+  assert.equal(await page.locator(".garment-layer.outer-layer-sleeves").count(), 0,
+    "The none outer-layer ID must not draw an extra sleeve layer");
+
+  await outerLayerSelect.selectOption("none");
+  await setVisualRange("Largo de mangas", 0);
+  const sleeveShortD = await page.locator(".garment-sleeves path").first().getAttribute("d");
+  const sleeveShortBox = await page.locator(".garment-sleeves path").first().evaluate(node => node.getBBox().height);
+  await captureVisual("05-sleeves-short");
+  await setVisualRange("Largo de mangas", 50);
+  const sleeveMidD = await page.locator(".garment-sleeves path").first().getAttribute("d");
+  assert.notEqual(sleeveMidD, sleeveShortD, "Sleeve geometry must change at sleeve_length=50");
+  await setVisualRange("Largo de mangas", 100);
+  const sleeveLongD = await page.locator(".garment-sleeves path").first().getAttribute("d");
+  const sleeveLongBox = await page.locator(".garment-sleeves path").first().evaluate(node => node.getBBox().height);
+  assert.notEqual(sleeveLongD, sleeveShortD, "Sleeve endpoints must change the final sleeve geometry");
+  assert.ok(sleeveLongBox > sleeveShortBox, "Long sleeves must visibly extend farther down the arms");
+  await captureVisual("06-sleeves-long");
+
+  await setVisualRange("Ajuste de cintura", 0);
+  const waistFittedWidth = await page.locator(".garment-torso-main").evaluate(node => node.getBoundingClientRect().width);
+  await captureVisual("07-waist-fitted");
+  await setVisualRange("Ajuste de cintura", 100);
+  const waistLooseWidth = await page.locator(".garment-torso-main").evaluate(node => node.getBoundingClientRect().width);
+  assert.ok(waistLooseWidth > waistFittedWidth, "Loose waist fit must widen the final torso surface without replacing the garment");
+  await captureVisual("08-waist-loose");
+
+  await setVisualRange("Largo del torso", 50);
+  await setVisualRange("Ajuste de cintura", 50);
+  await page.locator(".style-fields select").nth(4).selectOption("chest");
+  await captureVisual("09-chromapatch-chest-front");
+  await page.getByRole("button", { name: "Trasera", exact: true }).click();
+  await captureVisual("10-chromapatch-chest-back");
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  await page.locator(".style-fields select").nth(4).selectOption("sleeve");
+  assert.equal(await page.locator(".chromapatch-anchor").getAttribute("data-effective-position"), "sleeve",
+    "Sleeve Chromapatch must anchor to an available sleeve");
+  const sleeveAnchorY = Number(await page.locator(".chromapatch-anchor").getAttribute("data-anchor-y"));
+  assert.ok(sleeveAnchorY >= 285 && sleeveAnchorY <= 335,
+    "Sleeve Chromapatch anchor must track the current sleeve length");
+  await captureVisual("11-chromapatch-sleeve");
+
+  await outerLayerSelect.selectOption("none");
+  await page.locator(".style-fields select").nth(4).selectOption("hood");
+  assert.equal(await page.locator(".chromapatch-anchor").getAttribute("data-effective-position"), "chest",
+    "A hood emblem must fall back to chest when no hood exists");
+  await page.getByText(/no tiene capucha/i).waitFor({ state: "visible" });
+  await outerLayerSelect.selectOption("hooded_jacket");
+  assert.equal(await page.locator(".chromapatch-anchor").getAttribute("data-effective-position"), "hood",
+    "A hood emblem must anchor to the actual hood when present");
+  await captureVisual("12-chromapatch-hood");
+
+  await outerLayerSelect.selectOption("none");
+  await page.locator(".style-fields select").nth(4).selectOption("chest");
+  await page.locator(".style-fields select").nth(1).selectOption("everyday");
+  await captureVisual("13-nanowear-everyday");
+  await page.locator(".style-fields select").nth(1).selectOption("transformation");
+  await captureVisual("14-nanowear-transformation");
+  const qaManifest = {
+    source: "real BotImagen web app; .canvas captured by Chromium",
+    seed: "314159",
+    outfit: "street_bomber",
+    captures: [
+      "01-street-bomber-torso-short.png", "02-street-bomber-torso-long.png",
+      "03-outer-short-bomber.png", "04-outer-long-coat.png",
+      "05-sleeves-short.png", "06-sleeves-long.png",
+      "07-waist-fitted.png", "08-waist-loose.png",
+      "09-chromapatch-chest-front.png", "10-chromapatch-chest-back.png",
+      "11-chromapatch-sleeve.png", "12-chromapatch-hood.png",
+      "13-nanowear-everyday.png", "14-nanowear-transformation.png",
+    ],
+    note: "CI artifact only, not product artwork. Capture generation does not constitute independent artistic sign-off.",
+  };
+  await writeFile(resolve(visualQaDir, "manifest.json"), JSON.stringify(qaManifest, null, 2));
+  assert.equal(await visualSvg.getAttribute("data-nanowear"), "transformation",
+    "The final QA capture should preserve the selected transformation NanoWear state");
+
+
+  // BIMG-ENGINE-005: cross-validate every currently declared garment capability.
+  // Each value is checked on the selected garment surface, not only on the generic torso.
+  const matrixCaptureNames = [];
+  const torsoMatrix = [
+    ["outfit", "tactical_baseball", ".tactical-baseball"],
+    ["outfit", "combat_jacket", ".combat-jacket"],
+    ["outfit", "techwear_sport", ".techwear-sport"],
+    ["outfit", "street_bomber", ".street-bomber-shell"],
+    ["outfit", "support_coat", ".support-coat"],
+    ["outfit", "baseball_tech_suit", ".baseball-tech-suit"],
+    ["outfit", "elegant_command", ".elegant-command"],
+    ["outer", "short_bomber", ".short-bomber"],
+    ["outer", "hooded_jacket", ".hooded-jacket"],
+    ["outer", "long_coat", ".long-coat"],
+    ["outer", "chaqueta_corta_asimetrica", ".asymmetric-short-jacket"],
+  ];
+  const sleeveMatrix = [
+    ["outfit", "tactical_baseball", ".garment-sleeves path"],
+    ["outfit", "combat_jacket", ".garment-sleeves path"],
+    ["outfit", "techwear_sport", ".garment-sleeves path"],
+    ["outfit", "street_bomber", ".garment-sleeves path"],
+    ["outfit", "support_coat", ".garment-sleeves path"],
+    ["outfit", "baseball_tech_suit", ".garment-sleeves path"],
+    ["outer", "short_bomber", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "hooded_jacket", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "long_coat", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "chaqueta_corta_asimetrica", ".garment-layer.outer-layer-sleeves path"],
+    ["outer", "mangas_desmontables", ".detachable-sleeves"],
+  ];
+  const selectMatrixGarment = async (kind, id) => {
+    if (kind === "outfit") {
+      await outerLayerSelect.selectOption("none");
+      await outfitSelect.selectOption(id);
+    } else {
+      await outfitSelect.selectOption("street_bomber");
+      await outerLayerSelect.selectOption(id);
+    }
+  };
+  const boxMetrics = async selector => page.locator(selector).first().evaluate(node => {
+    const b = node.getBoundingClientRect();
+    return { x: b.x, y: b.y, width: b.width, height: b.height, area: b.width * b.height };
+  });
+  const sliderEnabled = async label => page.locator('input[type="range"][aria-label="' + label + '"]').isEnabled();
+
+  for (const [kind, id, selector] of torsoMatrix) {
+    await selectMatrixGarment(kind, id);
+    assert.equal(await sliderEnabled("Largo del torso"), true, id + " must enable torso length");
+    assert.equal(await sliderEnabled("Ajuste de cintura"), true, id + " must enable waist fit");
+    const torsoBoxes = [];
+    for (const value of [0, 50, 100]) {
+      await setVisualRange("Largo del torso", value);
+      torsoBoxes.push(await boxMetrics(selector));
+      if (value === 0 || value === 100) {
+        const name = "matrix-torso-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + value;
+        await captureVisual(name);
+        matrixCaptureNames.push(name + ".png");
+      }
+    }
+    assert.ok(torsoBoxes[0].height < torsoBoxes[1].height && torsoBoxes[1].height < torsoBoxes[2].height,
+      id + " selected garment surface must grow monotonically at torso_length 0/50/100");
+    const waistBoxes = [];
+    for (const value of [0, 50, 100]) {
+      await setVisualRange("Ajuste de cintura", value);
+      waistBoxes.push(await boxMetrics(selector));
+    }
+    assert.ok(waistBoxes[0].width < waistBoxes[1].width && waistBoxes[1].width < waistBoxes[2].width,
+      id + " selected garment surface must widen monotonically at waist_fit 0/50/100");
+  }
+
+  for (const [kind, id, selector] of sleeveMatrix) {
+    await selectMatrixGarment(kind, id);
+    assert.equal(await sliderEnabled("Largo de mangas"), true, id + " must enable sleeve length");
+    const sleeveBoxes = [];
+    for (const value of [0, 50, 100]) {
+      await setVisualRange("Largo de mangas", value);
+      sleeveBoxes.push(await boxMetrics(selector));
+      if (value === 0 || value === 100) {
+        const name = "matrix-sleeves-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + value;
+        await captureVisual(name);
+        matrixCaptureNames.push(name + ".png");
+      }
+    }
+    assert.ok(sleeveBoxes[0].height < sleeveBoxes[1].height && sleeveBoxes[1].height < sleeveBoxes[2].height,
+      id + " selected sleeve surface must grow monotonically at sleeve_length 0/50/100");
+  }
+  await selectMatrixGarment("outfit", "elegant_command");
+  assert.equal(await sliderEnabled("Largo de mangas"), false,
+    "elegant_command must not promise sleeve length because it is not in the canonical sleeve capability set");
+  const matrixManifest = {
+    source: "real BotImagen web app rendered in Chromium",
+    seed: "314159",
+    checks: "All declared torso, waist and sleeve capabilities at 0/50/100 on selected garment surfaces",
+    captures: matrixCaptureNames,
+    note: "CI QA artifact only. Bounding-box checks are geometry evidence, not independent artistic sign-off.",
+  };
+  await writeFile(resolve(visualQaDir, "matrix-manifest.json"), JSON.stringify(matrixManifest, null, 2));
+
+  // BIMG-ENGINE-005 visual slice: same character/camera, distinct garment structures.
+  const sliceCaptures = [];
+  const captureSliceGarment = async (kind, id, view, fit, state = "everyday") => {
+    if (kind === "outfit") {
+      await outerLayerSelect.selectOption("none");
+      await outfitSelect.selectOption(id);
+    } else {
+      await outfitSelect.selectOption("street_bomber");
+      await outerLayerSelect.selectOption(id);
+    }
+    await page.getByRole("button", { name: view === "front" ? "Frontal" : "Trasera" }).click();
+    await setVisualRange("Largo del torso", fit);
+    await page.getByLabel("Estado NanoWear").selectOption(state);
+    const name = "visual-slice-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + view + "-fit-" + fit + "-" + state;
+    await captureVisual(name);
+    sliceCaptures.push(name + ".png");
+  };
+  for (const [kind, id] of [["outfit", "street_bomber"], ["outfit", "tactical_baseball"], ["outer", "long_coat"]]) {
+    for (const view of ["front", "back"]) {
+      for (const fit of [0, 50, 100]) await captureSliceGarment(kind, id, view, fit);
+    }
+  }
+  await captureSliceGarment("outfit", "street_bomber", "front", 50, "transformation");
+  await captureSliceGarment("outfit", "tactical_baseball", "front", 50, "nanoweave");
+  const sliceManifest = {
+    source: "unmodified BotImagen app rendered in Chromium",
+    sameCharacterAndViewport: true,
+    garments: ["street_bomber", "tactical_baseball", "long_coat"],
+    views: ["front", "back"],
+    torsoFitValues: [0, 50, 100],
+    nanowearStates: ["everyday", "nanoweave", "transformation"],
+    captures: sliceCaptures,
+    note: "Real application screenshots; capture and geometry assertions do not constitute independent aesthetic approval.",
+  };
+  await writeFile(resolve(visualQaDir, "visual-slice-manifest.json"), JSON.stringify(sliceManifest, null, 2));
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
