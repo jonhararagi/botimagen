@@ -6,7 +6,7 @@ Esta carpeta contiene **16 originales PNG** (`0.png` a `15.png`) para estudiar p
 
 - Informe técnico y visual: [BIMG-DATASET-001](../../cerebro/auditorias/BIMG-DATASET-001.md).
 - Manifiesto de metadatos y clasificación: [BIMG-DATASET-001.manifest.json](../../cerebro/auditorias/BIMG-DATASET-001.manifest.json).
-- Estado de auditoría: **PARTIAL**; se inspeccionaron visualmente 12 de 16 imágenes. `4.png`, `6.png`, `7.png` y `8.png` están marcadas como `UNKNOWN` hasta poder observarlas.
+- Estado de auditoría visual: **COMPLETE_WITH_LIMITATIONS**; se inspeccionaron visualmente 16 de 16 imágenes. Las cuatro imágenes antes pendientes ya tienen descripciones visuales en el informe y el manifiesto.
 - Los 16 PNG se leen correctamente; todos miden 768×1280, tienen modo RGBA de 8 bits y un canal alfa completamente opaco. El canal alfa no hace transparente el fondo.
 - SHA-256, metadatos exactos y posibles similitudes están en el manifiesto. No se encontraron duplicados exactos por hash.
 
@@ -18,4 +18,4 @@ Autoría, fuente original, licencia y derecho de redistribución individuales: *
 
 ## Próximo paso
 
-Completar la inspección visual de los cuatro PNG pendientes y buscar evidencia de procedencia/licencia. Después, utilizar los candidatos identificados como referencias para un refactor 2D de anatomía y landmarks, sin declarar implementados el rigging ni el editor 3D.
+Buscar evidencia verificable de procedencia/licencia. Para BIMG-ENGINE-007, definir landmarks compartidos y contrato de capas antes de reconstruir anatomía, conservando APIs, IDs, perfiles, recetas y controles.
