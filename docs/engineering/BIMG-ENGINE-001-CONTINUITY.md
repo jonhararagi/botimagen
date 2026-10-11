@@ -89,7 +89,7 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - HEAD BEFORE: `51e6515ec4ce65bbc930f2c1bfbe0b71b9ca03b0`.
 - PR #11 confirmado abierto y sin fusionar; `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86` al preflight remoto.
 - Cambio funcional: landmarks tipados compartidos para el `viewBox` 340×490; `VisualCharacterRenderer.tsx` usa el modelo para generar la ruta del torso y el contorno del cuello. Contrato de capas conectado a elementos SVG con `data-layer-order`.
-- Prueba nueva: `tests/test_visual_body_landmarks.py`; añadida al workflow `Validate BotImagen`. La validación real queda pendiente hasta consultar CI del nuevo HEAD.
+- Prueba nueva: `tests/test_visual_body_landmarks.py`; añadida al workflow `Validate BotImagen`. CI #314 `SUCCESS` sobre `9b8f9a69465c5b21e2a3d43fd29ad94674c42365`: prueba nueva, contratos existentes, `npm ci`, build y smoke Chromium. Artefacto visual generado; inspeccionadas seis capturas comparables a fit 50; los extremos 0/100 están incluidos pero no todos se revisaron individualmente.
 - Se preservan receta v3, migraciones v1/v2, controles de ajuste, NanoWear, Chromapatch y los IDs de las prendas; esta entrega no rediseña todavía la silueta completa.
-- `WINDOWS_MANUAL_QA: NOT_RUN`. Capturas del nuevo HEAD: no inspeccionadas aún.
+- `WINDOWS_MANUAL_QA: NOT_RUN`. TIMER: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
 - Progreso ponderado conservado en 63%; esta migración parcial no completa por sí sola una fase de beta.

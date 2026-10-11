@@ -309,5 +309,5 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 
 - HEAD BEFORE: `51e6515ec4ce65bbc930f2c1bfbe0b71b9ca03b0`.
 - Implementación remota preparada en la rama del PR #11: módulo `bodyLandmarks.ts`, consumo real en cuello/torso, contrato semántico de capas, prueba estática nueva y workflow ampliado.
-- Verificación local: `NOT_RUN` (sin checkout local en esta ejecución). Build, prueba nueva, smoke Chromium y capturas comparables: pendientes de CI en el nuevo HEAD.
+- Verificación local: `NOT_RUN` (sin checkout local en esta ejecución). CI #314 `SUCCESS` sobre `9b8f9a69465c5b21e2a3d43fd29ad94674c42365`: build, prueba de landmarks/capas y smoke Chromium pasan. Artefacto visual generado; seis capturas front/back a fit 50 inspeccionadas; los extremos están presentes pero no todos se revisaron individualmente.
 - No se modifica `main` ni el PR #12. Progreso global de referencia: 63%. `WINDOWS_MANUAL_QA: NOT_RUN`.

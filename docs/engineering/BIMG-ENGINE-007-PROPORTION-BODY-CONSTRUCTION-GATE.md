@@ -119,5 +119,6 @@ The available GitHub file operations can create commits that replace individual 
 
 - Se introduce `web/src/visual/bodyLandmarks.ts` como modelo tipado compartido en el `viewBox` real de 340×490. Los puntos iniciales corresponden a coordenadas observadas en los paths existentes; torso y cuello ya consumen landmarks, y el largo de torso/ajuste de cintura siguen derivando de `hemY` y `waistHalf` de recipe v3.
 - `SVG_LAYER_ORDER` es consumido por elementos SVG mediante `data-layer-order`; la prueba nueva comprueba la secuencia semántica expuesta por el contrato y la presencia de sus consumidores en el renderer.
-- La migración es intencionalmente incremental: no sustituye las geometrías de `street_bomber`, `tactical_baseball` ni `long_coat`; conserva sus rutas originales. La CI del commit debe confirmar el build y la prueba estática antes de considerar la entrega automatizada validada.
-- Capturas nuevas e inspección visual R1A: pendientes de la ejecución de CI. `WINDOWS_MANUAL_QA: NOT_RUN`.
+- La migración es intencionalmente incremental: no sustituye las geometrías de `street_bomber`, `tactical_baseball` ni `long_coat`; conserva sus rutas originales. CI #314 sobre `9b8f9a69465c5b21e2a3d43fd29ad94674c42365`: `SUCCESS`, incluido build TypeScript/Vite y smoke Chromium. Artefacto `botimagen-visual-garment-qa` generado; inspección manual de seis capturas comparables front/back a fit 50 confirmó que se conservan las siluetas diferenciadas y la estructura actual. Las capturas de extremos 0/100 están en el mismo artefacto, pero no todas fueron revisadas una por una.
+- `WINDOWS_MANUAL_QA: NOT_RUN`.
+- TIMER de esta entrega: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
