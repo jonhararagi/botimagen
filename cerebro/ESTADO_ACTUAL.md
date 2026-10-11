@@ -329,3 +329,8 @@ Se migraron las rutas de brazos, manos, pelvis, piernas y la forma base de calza
 - TIMER: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
 
 Siguiente paso: inspeccionar la matriz visual del artefacto, corregir defectos visibles encontrados y migrar el siguiente conjunto de landmarks con tests que comprueben continuidad geométrica y no solo presencia de atributos.
+
+
+### Inspección visual posterior a R1A-REMOTE-02 (2026-10-11)
+
+Descargué y revisé una matriz de contacto con seis capturas front/back a fit 50 para los tres atuendos prioritarios, desde el artefacto de CI #38152019549. Las prendas continúan diferenciadas, pero el cuerpo sigue compacto/chibi, la vista posterior sigue esquemática y brazos/manos/calzado requieren un pase visual adicional. La inspección fue de seis capturas, no de los 81 archivos individualmente. Esto guía la próxima tarea hacia proporciones de silueta compartida y continuidad de piernas/calzado. Progreso global sin cambio: **63%**; `WINDOWS_MANUAL_QA: NOT_RUN`.

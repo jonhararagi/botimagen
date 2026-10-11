@@ -154,3 +154,19 @@ The available GitHub file operations can create commits that replace individual 
 - `WINDOWS_MANUAL_QA: NOT_RUN`.
 - Progreso global ponderado: **63%**, sin incremento porque la beta local no ha cerrado una nueva fase ponderada.
 - TIMER de la entrega: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
+
+
+## Revisión visual acotada del artefacto R1A-REMOTE-02 (2026-10-11)
+
+Se descargó el artefacto real `botimagen-visual-garment-qa` del run #38152019549 y se inspeccionó una matriz de contacto de seis capturas generadas por Chromium: vista frontal y posterior de `street_bomber`, `tactical_baseball` y `long_coat`, todas con torso fit 50 y estado everyday.
+
+Observaciones limitadas a esas seis capturas:
+
+- Las tres construcciones de prenda siguen siendo distinguibles en vista frontal y posterior.
+- La figura completa conserva una proporción compacta/chibi; la cabeza ocupa una fracción grande respecto del torso y las piernas.
+- La vista posterior continúa esquemática, con la masa de cabello cubriendo casi toda la cabeza posterior y poca lectura anatómica de la espalda.
+- La forma de brazos y manos es legible en silueta general, pero sigue siendo simple; la unión pierna-tobillo-calzado aún necesita más continuidad visual.
+
+Esta revisión confirma que el refactor estructural y el smoke E2E no equivalen a una aprobación artística ni demuestran por sí solos una mejora significativa de proporciones. Solo se inspeccionó una matriz de seis imágenes; no se declara que se hayan revisado individualmente los 81 archivos del artefacto.
+
+Evidencia: [CI #38152019549](https://github.com/jonhararagi/botimagen/actions/runs/38152019549) · [artefacto QA](https://github.com/jonhararagi/botimagen/actions/runs/38152019549/artifacts/11706434232). Siguiente prioridad: un pase de re-proporción de silueta compartida, después de decidir un objetivo de proporciones con referencias visuales adecuadas.
