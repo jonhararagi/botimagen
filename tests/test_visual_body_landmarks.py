@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RENDERER = (ROOT / "web/src/visual/VisualCharacterRenderer.tsx").read_text(encoding="utf-8")
 LANDMARKS = (ROOT / "web/src/visual/bodyLandmarks.ts").read_text(encoding="utf-8")
 RECIPE_TESTS = (ROOT / "tests/test_visual_recipe_contract.py").read_text(encoding="utf-8")
+SMOKE = (ROOT / "web/browser_smoke.mjs").read_text(encoding="utf-8")
 
 
 class VisualBodyLandmarkContractTests(unittest.TestCase):
@@ -56,6 +57,29 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn("schema_version: 3", RENDERER)
         self.assertIn("nanowear_state", RENDERER)
         self.assertIn("chromapatch", RENDERER.lower())
+
+    def test_shared_landmarks_drive_extremities_pelvis_legs_and_footwear(self):
+        for declaration in ("const armSkinPath =", "const lowerBodyPath =", "const legSilhouettePath =", "const baseFootwearPath ="):
+            self.assertIn(declaration, RENDERER)
+        for landmark in ("elbowLeft", "elbowRight", "wristLeft", "wristRight",
+                         "handLeft", "handRight", "pelvisLeft", "pelvisCenter",
+                         "pelvisRight", "kneeLeft", "kneeRight", "ankleLeft",
+                         "ankleRight", "footLeft", "footRight"):
+            self.assertIn(f"landmarks.{landmark}.", RENDERER)
+        self.assertIn("d={armSkinPath}", RENDERER)
+        self.assertIn("d={lowerBodyPath}", RENDERER)
+        self.assertIn("d={legSilhouettePath}", RENDERER)
+        self.assertIn("d={baseFootwearPath}", RENDERER)
+        self.assertIn("landmarks.handLeft.x - 108", RENDERER)
+        self.assertIn("landmarks.handRight.x - 232", RENDERER)
+        self.assertIn('data-qa-surface="legs"', RENDERER)
+        self.assertIn('data-qa-surface="footwear-base"', RENDERER)
+
+    def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
+        self.assertIn('querySelectorAll("[data-layer-id][data-layer-order]")', SMOKE)
+        self.assertIn("domLayers.every((entry, index) => index === 0 || entry.order >= domLayers[index - 1].order)", SMOKE)
+        self.assertIn("layerOrderChecks.push", SMOKE)
+        self.assertIn("domLayerOrderValidated: true", SMOKE)
 
 
 if __name__ == "__main__":

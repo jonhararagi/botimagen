@@ -904,6 +904,7 @@ try {
 
   // BIMG-ENGINE-005 visual slice: same character/camera, distinct garment structures.
   const sliceCaptures = [];
+  const layerOrderChecks = [];
   const captureSliceGarment = async (kind, id, view, fit, state = "everyday") => {
     if (kind === "outfit") {
       await outerLayerSelect.selectOption("none");
@@ -915,6 +916,25 @@ try {
     await page.getByRole("button", { name: view === "front" ? "Frontal" : "Trasera" }).click();
     await setVisualRange("Largo del torso", fit);
     await page.getByLabel("Estado NanoWear").selectOption(state);
+    const domLayers = await page.locator("svg.visual-character-svg").evaluate(svg =>
+      Array.from(svg.querySelectorAll("[data-layer-id][data-layer-order]"), element => ({
+        id: element.getAttribute("data-layer-id"),
+        order: Number(element.getAttribute("data-layer-order")),
+      }))
+    );
+    assert.ok(domLayers.length >= 12, "The real SVG DOM should expose the expected anatomy/garment paint layers");
+    assert.ok(domLayers.every(entry => entry.id && Number.isInteger(entry.order)),
+      "Every painted layer marker must expose a semantic ID and numeric order");
+    assert.ok(domLayers.every((entry, index) => index === 0 || entry.order >= domLayers[index - 1].order),
+      "Real SVG child paint order must be non-decreasing according to the declared layer contract: " + domLayers.map(entry => entry.id + ":" + entry.order).join(" -> "));
+    const requiredPaintLayers = ["ground-shadow", "hair-back", "neck", "arm-skin", "hands", "base-sleeves", "base-torso", "lower-body", "footwear", "outfit", "chromapatch"];
+    assert.ok(requiredPaintLayers.every(layer => domLayers.some(entry => entry.id === layer)),
+      "The SVG DOM must expose all required layers: " + requiredPaintLayers.filter(layer => !domLayers.some(entry => entry.id === layer)).join(", "));
+    if (kind === "outer") {
+      assert.ok(domLayers.some(entry => entry.id === "outer-layer"),
+        "A selected outer garment must appear after the base outfit in the actual SVG DOM");
+    }
+    layerOrderChecks.push({ kind, id, view, fit, state, paintOrder: domLayers.map(entry => entry.id) });
     const name = "visual-slice-" + id.replace(/[^a-z0-9]+/gi, "-") + "-" + view + "-fit-" + fit + "-" + state;
     await captureVisual(name);
     sliceCaptures.push(name + ".png");
@@ -934,6 +954,9 @@ try {
     torsoFitValues: [0, 50, 100],
     nanowearStates: ["everyday", "nanoweave", "transformation"],
     captures: sliceCaptures,
+    layerOrderChecks,
+    domLayerOrderValidated: true,
+    layerOrderNote: "For each captured garment/view/fit, the actual SVG DOM paint sequence is checked against non-decreasing semantic layer order.",
     note: "Real application screenshots; capture and geometry assertions do not constitute independent aesthetic approval.",
   };
   await writeFile(resolve(visualQaDir, "visual-slice-manifest.json"), JSON.stringify(sliceManifest, null, 2));
