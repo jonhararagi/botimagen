@@ -173,7 +173,9 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {!rear && <path d="M110 90 Q72 137 99 235 L83 338 Q81 377 109 400 L137 374 L138 273 L163 245 L188 246 L211 281 L211 376 L242 401 Q268 371 255 331 L238 238 Q265 130 224 82 Z" fill={`url(#cw-hair-${uid})`}/>}
     {rear && <path d="M116 91 Q82 135 101 236 L110 263 L138 250 L144 218 L196 218 L202 250 L230 263 L237 235 Q259 132 222 83 Z" fill={`url(#cw-hair-${uid})`}/>}
     <path d="M137 190 L135 233 L116 260 L149 282 L170 248 L193 281 L225 259 L207 229 L204 190 Z" fill={`url(#cw-skin-${uid})`}/>
-    <path className="character-arm-skin" data-qa-surface="arm-skin" d="M113 243 Q88 249 89 309 L98 372 L125 371 L133 301 L151 278 Z M226 243 Q252 249 251 310 L244 372 L218 371 L213 301 L194 278 Z" fill={`url(#cw-skin-${uid})`} stroke={stroke} strokeWidth={line}/>
+    <path className="character-arm-skin" data-qa-surface="arm-skin" d="M113 243 Q98 244 94 268 Q91 292 98 324 L105 361 Q107 371 118 369 Q128 367 126 356 L122 320 Q122 303 134 286 L151 278 Z M226 243 Q241 244 246 268 Q249 292 242 324 L235 361 Q233 371 222 369 Q212 367 214 356 L218 320 Q218 303 206 286 L194 278 Z" fill={`url(#cw-skin-${uid})`} stroke={stroke} strokeWidth={line}/>
+    {!rear && <g className="character-hands" data-qa-surface="hands" fill={`url(#cw-skin-${uid})`} stroke={stroke} strokeWidth={line * .72} strokeLinejoin="round"><path d="M105 358 Q99 356 98 365 L100 381 Q103 389 111 386 L121 380 Q127 376 123 371 L117 368 L115 359 Q112 354 109 360 L108 369 Z"/><path d="M235 358 Q241 356 242 365 L240 381 Q237 389 229 386 L219 380 Q213 376 217 371 L223 368 L225 359 Q228 354 231 360 L232 369 Z"/></g>}
+    {rear && <g className="character-hands" data-qa-surface="hands" fill={`url(#cw-skin-${uid})`} stroke={stroke} strokeWidth={line * .72} strokeLinejoin="round"><path d="M105 358 Q99 356 98 365 L100 381 Q103 389 111 386 L121 380 Q127 376 123 371 L117 368 L115 359 Z"/><path d="M235 358 Q241 356 242 365 L240 381 Q237 389 229 386 L219 380 Q213 376 217 371 L223 368 L225 359 Z"/></g>}
     {capabilities.sleeveLength && <g className="garment-sleeves" data-qa-surface="base-sleeves" data-sleeve-end={sleeveEnd}>
       <path d={`M113 243 Q88 249 89 309 L${Math.max(92, 89 + (sleeveEnd - 309) * .12)} ${sleeveEnd} L125 ${sleeveEnd - 2} L133 301 L151 278 Z M226 243 Q252 249 251 309 L${Math.min(248, 251 - (sleeveEnd - 309) * .12)} ${sleeveEnd} L218 ${sleeveEnd - 2} L213 301 L194 278 Z`} fill={`url(#cw-fabric-${uid})`} stroke={stroke} strokeWidth={line}/>
       <path d={`M${Math.max(92, 89 + (sleeveEnd - 309) * .12)} ${sleeveEnd} L125 ${sleeveEnd - 2} M${Math.min(248, 251 - (sleeveEnd - 309) * .12)} ${sleeveEnd} L218 ${sleeveEnd - 2}`} stroke={accent} strokeWidth={r.nanowear_state === "everyday" ? .6 : 1.4} fill="none" opacity={r.nanowear_state === "everyday" ? .35 : .9}/>
@@ -199,10 +201,13 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {!rear && <>
       <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>
       <path d="M128 120 L101 83 L129 94 M219 118 L250 81 L229 97" fill="none" stroke={hairAccent} strokeWidth={4 + street * 5} strokeLinecap="round"/>
-      <path d="M143 148 Q156 140 165 148 M185 148 Q196 140 205 148" fill="none" stroke="#664253" strokeWidth={1.5 + toon * 2.5} strokeLinecap="round"/>
-      <ellipse cx="155" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={eyeColor}/>
-      <ellipse cx="195" cy="151" rx={5 + anime * 3} ry={6 + anime * 3} fill={optionColor(values.eyes ?? "", "#d7a64f")}/>
-      <path d={values.expression?.includes("sonrisa") ? "M160 176 Q170 188 181 176" : "M160 179 L180 179"} fill="none" stroke="#9c526a" strokeWidth={2 + toon} strokeLinecap="round"/>
+      <path d="M132 143 Q145 132 163 141 M181 141 Q199 132 211 143" fill="none" stroke={stroke} strokeWidth={1.6 + toon * 1.8} strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M135 146 Q148 136 164 146 Q164 158 151 160 Q139 158 135 146 Z M180 146 Q196 136 208 146 Q204 158 192 160 Q181 158 180 146 Z" fill="#fff0e9" stroke="#68485a" strokeWidth={.8 + toon * .6}/>
+      <ellipse cx="151" cy="150" rx={3.2 + anime * 2.3} ry={5 + anime * 2.8} fill={eyeColor}/>
+      <ellipse cx="192" cy="150" rx={3.2 + anime * 2.3} ry={5 + anime * 2.8} fill={eyeColor}/>
+      <ellipse cx="152" cy="148" rx="1.6" ry="2.1" fill="#fffaf6"/><ellipse cx="193" cy="148" rx="1.6" ry="2.1" fill="#fffaf6"/>
+      <path d="M170 151 l-3 12 5 1" fill="none" stroke="#b77c8e" strokeWidth={.9 + toon * .5} strokeLinecap="round"/>
+      <path d={values.expression?.includes("sonrisa") ? "M158 177 Q170 188 183 177 Q171 181 158 177 Z" : "M160 179 Q170 181 180 179"} fill={values.expression?.includes("sonrisa") ? "#a94f68" : "none"} stroke="#9c526a" strokeWidth={1.5 + toon} strokeLinecap="round"/>
       {values.ear_style === "orejas_gato" && <path d="M126 121 L111 82 L143 103 M214 121 L230 82 L199 103" fill={skin} stroke={stroke} strokeWidth={line}/>}
       {values.ear_style === "orejas_zorro" && <path d="M126 120 L105 70 L146 100 M214 120 L235 70 L194 100" fill={skin} stroke={stroke} strokeWidth={line}/>}
       {values.ear_style === "orejas_lobo" && <path d="M126 121 L115 75 L145 101 M214 121 L225 75 L195 101" fill={skin} stroke={stroke} strokeWidth={line}/>}
