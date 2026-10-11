@@ -158,11 +158,11 @@ No decir BETA READY hasta que:
 
 ## Hito de investigación · BIMG-DATASET-001 (2026-10-11)
 
-**Estado: PARTIAL.** La auditoría de solo lectura confirma 16 PNG originales (13,239 MiB), resolución 768×1280, RGBA/8-bit, alfa completamente opaco, 16/16 decodificables y sin duplicados exactos por SHA-256. Doce imágenes se inspeccionaron visualmente; `4.png`, `6.png`, `7.png` y `8.png` siguen `UNKNOWN` debido a una limitación de transferencia de imágenes en esta sesión.
+**Estado: COMPLETE_WITH_LIMITATIONS.** La auditoría de solo lectura confirma 16 PNG originales (13,239 MiB), resolución 768×1280, RGBA/8-bit, alfa completamente opaco, 16/16 decodificables y sin duplicados exactos por SHA-256. Las 16 imágenes ya se inspeccionaron visualmente. La procedencia, autoría y derechos de redistribución individuales siguen UNKNOWN/UNVERIFIED.
 
 - Informe: [cerebro/auditorias/BIMG-DATASET-001.md](auditorias/BIMG-DATASET-001.md).
 - Manifiesto: [cerebro/auditorias/BIMG-DATASET-001.manifest.json](auditorias/BIMG-DATASET-001.manifest.json).
 - Evidencia: `12.png` es la referencia primaria propuesta para estudiar una silueta 2D de cuerpo entero; `15.png` es secundaria. Son referencias, no plantillas paramétricas aprobadas.
 - Decisión: **2D primero, híbrido a largo plazo**. No se implementó el editor 3D ni rigging. Respetar la puerta de BIMG-ENGINE-007: refactorizar landmarks y contrato de capas antes de otra reconstrucción anatómica, sin reescribir el renderer ni cambiar las APIs públicas.
 - Procedencia, autoría y licencia individual siguen UNKNOWN/UNVERIFIED. No distribuir los dibujos en paquetes hasta encontrar pruebas de derechos.
-- Este hito de análisis **no suma puntos funcionales** a las fases de beta y no cambia el porcentaje global.
+- Este hito de análisis **no suma puntos funcionales** a las fases de beta y no cambia el porcentaje global. Progreso global conservado en 63%.
