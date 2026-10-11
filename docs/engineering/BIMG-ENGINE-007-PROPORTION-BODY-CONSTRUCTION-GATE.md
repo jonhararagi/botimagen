@@ -71,3 +71,45 @@ Do not create a second renderer, replace the editor, introduce external art/depe
 ## TIMER
 
 Planning estimate remains **8–12 hours** for the reconstruction, compatibility across three garments, test coverage, screenshot capture and visual review. Actual elapsed time was not measured.
+
+
+## R1A · Foundation of shared anatomy and layer contract · 2026-10-11
+
+**Status: BLOCKED_BEFORE_CODE_CHANGE.** The requested renderer refactor was not started. The mandatory safe-sync gate could not be completed with the available repository operations, so this record deliberately preserves the current renderer and its history rather than making edits on a stale branch.
+
+### Baseline checked
+
+- `main` HEAD observed: `b508cfe7d3216eda801438d46dff8873842cea86` ([commit](https://github.com/jonhararagi/botimagen/commit/b508cfe7d3216eda801438d46dff8873842cea86)).
+- Shared merge base reported by GitHub compare: `46bc7e702ae5d608927345991b5c4f0a661318a9`.
+- PR #11 branch: `feature/bimg-engine-001-cyberstreet-visual-renderer`; last evidenced source/documentation commit consulted: `0bfc5c2dde3476d78fd556e29c12462cbb989236` ([commit](https://github.com/jonhararagi/botimagen/commit/0bfc5c2dde3476d78fd556e29c12462cbb989236)).
+- GitHub compare reports the feature branch diverged from main with 98 branch-only commits and 2 main-only commits. The two main-side commits since the merge base are `17adad8fc62e5b24f77b05219d25d112b2b57f6c` (dataset README) and `b508cfe7d3216eda801438d46dff8873842cea86` (dataset PNG upload). The renderer branch therefore needs a real non-destructive merge of current main before implementation.
+- The PR #11 and PR #12 search results both still identify their existing PRs. PR #12 remains separate and was not changed or merged.
+
+### Why implementation stopped
+
+The available GitHub file operations can create commits that replace individual files, but they do not provide a verified merge operation for bringing main's two commits into this diverged feature branch. A fast-forward ref update is not possible across divergence; force-pushing or manually rebuilding the branch tree would risk losing shared history or dataset assets. In accordance with the task's safety gate, no renderer source, tests, catalog, recipes, or dataset files were edited.
+
+### R1A result
+
+- Canonical landmarks: **NOT_IMPLEMENTED**.
+- Effective semantic layer contract: **NOT_IMPLEMENTED**.
+- Front/back garment matrix and before/after screenshots: **NOT_RUN**.
+- Existing baseline evidence remains the prior ENGINE-005 CI and artifacts; it is not R1A validation.
+- `WINDOWS_MANUAL_QA: NOT_RUN`.
+- Public renderer API, catalog IDs, recipe schema, profiles, controls, and original PNGs were not changed by this blocked attempt.
+- Beta progress remains **63%**; no weighted functional capability was completed.
+
+### Safe resume procedure
+
+1. Use a Git operation that can merge `main` into `feature/bimg-engine-001-cyberstreet-visual-renderer` with a normal merge commit, preserving both parents and all existing commits.
+2. Verify the resulting branch contains `b508cfe7d3216eda801438d46dff8873842cea86` in its ancestry and confirm all 16 `references/dataset-cuerpos/*.png` files and their hashes remain unchanged.
+3. Re-fetch the branch HEAD, PR #11/#12 status, renderer, smoke tests, and CI status.
+4. Only then begin R1A implementation in small tested slices.
+
+### TIMER
+
+- Initial estimate supplied: **4–8 hours**.
+- Actual elapsed time: **NOT_MEASURED**.
+- R1A implementation time consumed: **0 hours of code implementation**; time spent on remote inspection is not reliably timed.
+- Revised estimate after safe synchronization: **4–8 hours** for landmarks, effective layer contract, garment/control regression coverage, comparable screenshots, and exact-head CI. Increase if merge conflicts or visual regressions appear.
+- R1B estimate remains **NOT_RELIABLY_ESTIMABLE** until R1A and its screenshots are validated; provisional planning window **1–3 concentrated days**, to be recalculated from the real implementation delta.
