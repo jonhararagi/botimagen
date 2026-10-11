@@ -291,3 +291,15 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **CI #190 PASS_REAL** añade la auditoría de etiquetas en ocho pestañas. Generador, API local, cobertura del editor, npm ci, build web y Chromium E2E completados: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
 - **TIMER:** 5–10 minutos de trabajo incremental y verificación. La cobertura E2E se amplió, pero no se cierra una fase de producto por pruebas solas. Progreso ponderado mantenido en **62,16 / 100 → 62%**. QA física en Windows, Chrome/Edge instalado y medidas de rendimiento continúan NOT_RUN.
 
+
+
+## BIMG-ENGINE-007-R1A · checkpoint de seguridad · 2026-10-11
+
+- **Estado:** BLOCKED_BEFORE_CODE_CHANGE. No se modificó el renderizador porque la rama del PR #11 requiere sincronización no destructiva con `main` antes de continuar.
+- **main HEAD observado:** `b508cfe7d3216eda801438d46dff8873842cea86`.
+- **Rama:** `feature/bimg-engine-001-cyberstreet-visual-renderer`; último commit de referencia consultado: `0bfc5c2dde3476d78fd556e29c12462cbb989236`; merge-base reportado: `46bc7e702ae5d608927345991b5c4f0a661318a9`.
+- **Divergencia:** GitHub compare reportó 98 commits propios de la rama y 2 commits de main no incorporados. El intento no tenía una operación de merge verificada disponible; no se hizo force-push, reset ni edición de código.
+- **Documentación de bloqueo:** `docs/engineering/BIMG-ENGINE-007-PROPORTION-BODY-CONSTRUCTION-GATE.md`, sección R1A.
+- **Landmarks/capas/capturas R1A:** NOT_IMPLEMENTED / NOT_RUN. PR #12 sigue independiente; dataset y contratos públicos no se tocaron en esta tarea.
+- **Siguiente acción:** realizar un merge commit normal de main a la rama, verificar la presencia de los 16 PNG y sus hashes, volver a inspeccionar el HEAD y recién entonces empezar el refactor.
+- **TIMER:** estimación inicial 4–8 h; tiempo real medido NOT_MEASURED; implementación consumida 0 h de código. Estimación revisada tras sincronizar: 4–8 h, sujeta a conflictos/regresiones.
