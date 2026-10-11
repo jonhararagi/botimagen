@@ -158,7 +158,7 @@ El análisis técnico se ejecutó sobre un clon temporal de solo lectura, con HE
 - SHA-256: `hashlib.sha256(path.read_bytes()).hexdigest()`, dos pasadas.
 - SHA-1 Git para integridad del blob: `git hash-object <ruta>`, cotejado con el SHA del blob de GitHub.
 - Similitud exploratoria: dHash 64-bit con conversión a escala de grises y redimensionado en memoria a 9×8. No se guardaron esas matrices como archivos.
-- Se inspeccionaron visualmente mediante lectura de PNG los archivos `0.png`, `1.png`, `2.png`, `3.png`, `5.png`, `9.png`, `10.png`, `11.png`, `12.png`, `13.png`, `14.png` y `15.png`.
+- Se inspeccionaron visualmente los 16 originales (`0.png`–`15.png`) desde sus URLs raw de GitHub. Las cuatro imágenes antes pendientes se describen en la tabla visual y en el manifiesto, con evidencia enlazada a cada PNG.
 
 ## 11. Estados de pruebas
 
