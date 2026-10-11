@@ -6,7 +6,7 @@
   "audited_ref": "main",
   "audited_head": "b508cfe7d3216eda801438d46dff8873842cea86",
   "folder": "references/dataset-cuerpos/",
-  "status": "PARTIAL",
+  "status": "COMPLETE_WITH_LIMITATIONS",
   "summary": {
     "directory_entries": 17,
     "png_images": 16,
@@ -29,15 +29,15 @@
     "actual_transparency": false,
     "readable_images": 16,
     "corrupt_images": 0,
-    "visual_reviewed": 12,
-    "visual_unknown": 4,
+    "visual_reviewed": 16,
+    "visual_unknown": 0,
     "exact_duplicate_groups": [],
     "beta_progress_before": 63,
     "beta_progress_after": 63
   },
   "method": {
     "technical_inspection": "PASS_REAL",
-    "visual_inspection": "PARTIAL",
+    "visual_inspection": "PASS_REAL",
     "image_decoder": "Pillow Image.open + Image.verify",
     "hash": "SHA-256",
     "hash_repeat_check": "PASS_REAL",
@@ -47,7 +47,8 @@
     "working_copy_clean": "PASS_REAL",
     "originals_modified": false,
     "derived_image_files_created": false,
-    "repository_files_copied": false
+    "repository_files_copied": false,
+    "visual_inspection_note": "All 16 originals were directly rendered and inspected in a compatible browser workflow. The four previously pending images were checked at their raw GitHub URLs; no derivative files were created."
   },
   "similarity": {
     "exact_duplicates": [],
@@ -127,7 +128,7 @@
     ],
     "path": "2D-first hybrid",
     "confidence": "MEDIUM",
-    "reason": "The reviewed subset has multiple full-body 2D illustrations and pose references, but lacks transparent backgrounds, standardized orthographic front/side/back views, a neutral A/T pose, controlled reference dimensions, and all 3D production data."
+    "reason": "All 16 references were visually reviewed, but they remain stylized illustrations with opaque decorative backgrounds, inconsistent poses/crops, no standardized orthographic front/side/back set, no neutral A/T pose, and no validated production landmarks or 3D data."
   },
   "images": [
     {
@@ -360,19 +361,20 @@
         "reason": "No source/author/license statement was present in references/dataset-cuerpos/README.md or verified during this audit."
       },
       "visual": {
-        "review": "NOT_RUN",
-        "kind": "UNKNOWN",
-        "view": "UNKNOWN",
-        "pose": "UNKNOWN",
-        "arms": "UNKNOWN",
-        "legs": "UNKNOWN",
-        "joints": "UNKNOWN",
-        "silhouette": "UNKNOWN",
-        "background": "UNKNOWN",
-        "anatomy": "UNKNOWN",
-        "confidence": "UNKNOWN",
-        "utility": "UNKNOWN",
-        "limitations": "GitHub Contents API returned empty base64 for PNG >1 MiB; visual transfer path unavailable in this session"
+        "review": "VISUAL_REVIEWED",
+        "kind": "stylized human-body anime illustration",
+        "view": "frontal or near-frontal; slight obliqueness cannot be excluded",
+        "pose": "upright standing; lower legs/ankles crossed",
+        "arms": "both arms and hands visible; arms held behind or close to the body, exact joint path partly occluded",
+        "legs": "both legs and bare feet visible; lower legs cross at the ankles",
+        "joints": "no explicit landmarks or joint axes; some contours visible but arm/hip overlap limits tracing",
+        "silhouette": "full body from head to feet; crossed ankles create overlap",
+        "background": "opaque pale off-white with a soft oval ground shadow and orange sparkle shapes",
+        "anatomy": "stylized illustration; quantitative anatomical correctness UNKNOWN",
+        "confidence": "HIGH for full-body framing, crossed lower legs and limb visibility; MEDIUM for exact view/arm placement",
+        "utility": "strong full-body standing reference including feet and leg overlap",
+        "limitations": "arms overlap/lie behind body; crossed ankles; opaque decorative background",
+        "evidence": "https://raw.githubusercontent.com/jonhararagi/botimagen/audit/bimg-dataset-001-body-reference/references/dataset-cuerpos/4.png"
       }
     },
     {
@@ -458,19 +460,20 @@
         "reason": "No source/author/license statement was present in references/dataset-cuerpos/README.md or verified during this audit."
       },
       "visual": {
-        "review": "NOT_RUN",
-        "kind": "UNKNOWN",
-        "view": "UNKNOWN",
-        "pose": "UNKNOWN",
-        "arms": "UNKNOWN",
-        "legs": "UNKNOWN",
-        "joints": "UNKNOWN",
-        "silhouette": "UNKNOWN",
-        "background": "UNKNOWN",
-        "anatomy": "UNKNOWN",
-        "confidence": "UNKNOWN",
-        "utility": "UNKNOWN",
-        "limitations": "GitHub Contents API returned empty base64 for PNG >1 MiB; visual transfer path unavailable in this session"
+        "review": "VISUAL_REVIEWED",
+        "kind": "stylized human-body anime illustration",
+        "view": "near-frontal with a slight turn; not verified orthographic",
+        "pose": "standing; arms held low and outward with elbows slightly bent; hips appear tilted",
+        "arms": "both arms and hands visible; elbows slightly flexed",
+        "legs": "legs visible to lower-shin area; feet outside the frame",
+        "joints": "no explicit landmarks or joint axes; elbow and knee contours are illustrative only",
+        "silhouette": "head through lower shins visible; feet and lower extremity endpoints cropped",
+        "background": "opaque pale off-white with multiple orange star/spark shapes",
+        "anatomy": "stylized illustration; quantitative anatomical correctness UNKNOWN",
+        "confidence": "HIGH for crop and broad pose; MEDIUM for exact view and hip angle",
+        "utility": "torso, arms, hands and upper-leg reference; not a full-body reference",
+        "limitations": "feet cropped; no transparent background or measured landmarks",
+        "evidence": "https://raw.githubusercontent.com/jonhararagi/botimagen/audit/bimg-dataset-001-body-reference/references/dataset-cuerpos/6.png"
       }
     },
     {
@@ -507,19 +510,20 @@
         "reason": "No source/author/license statement was present in references/dataset-cuerpos/README.md or verified during this audit."
       },
       "visual": {
-        "review": "NOT_RUN",
-        "kind": "UNKNOWN",
-        "view": "UNKNOWN",
-        "pose": "UNKNOWN",
-        "arms": "UNKNOWN",
-        "legs": "UNKNOWN",
-        "joints": "UNKNOWN",
-        "silhouette": "UNKNOWN",
-        "background": "UNKNOWN",
-        "anatomy": "UNKNOWN",
-        "confidence": "UNKNOWN",
-        "utility": "UNKNOWN",
-        "limitations": "GitHub Contents API returned empty base64 for PNG >1 MiB; visual transfer path unavailable in this session"
+        "review": "VISUAL_REVIEWED",
+        "kind": "stylized human-body anime illustration",
+        "view": "three-quarter/oblique; face turned toward viewer",
+        "pose": "side-leaning pose; both arms raised and bent behind/over the head",
+        "arms": "both arms substantially visible; hand/forearm placement approaches frame edges and exact hand placement is partly uncertain",
+        "legs": "hips and upper thighs visible; lower legs and feet outside the frame",
+        "joints": "no explicit landmarks or joint axes; elbows partly obscured by raised-arm/head overlap",
+        "silhouette": "head through upper thighs; raised arms approach the frame edges",
+        "background": "opaque pale off-white with orange sparkle shapes",
+        "anatomy": "stylized illustration; quantitative anatomical correctness UNKNOWN",
+        "confidence": "HIGH for broad pose and crop; MEDIUM for exact hand placement and view",
+        "utility": "raised-arm, shoulder, torso and hip positioning reference; poor lower-limb reference",
+        "limitations": "lower body cropped; hand placement partly obscured/near edges; opaque decorative background",
+        "evidence": "https://raw.githubusercontent.com/jonhararagi/botimagen/audit/bimg-dataset-001-body-reference/references/dataset-cuerpos/7.png"
       }
     },
     {
@@ -556,19 +560,20 @@
         "reason": "No source/author/license statement was present in references/dataset-cuerpos/README.md or verified during this audit."
       },
       "visual": {
-        "review": "NOT_RUN",
-        "kind": "UNKNOWN",
-        "view": "UNKNOWN",
-        "pose": "UNKNOWN",
-        "arms": "UNKNOWN",
-        "legs": "UNKNOWN",
-        "joints": "UNKNOWN",
-        "silhouette": "UNKNOWN",
-        "background": "UNKNOWN",
-        "anatomy": "UNKNOWN",
-        "confidence": "UNKNOWN",
-        "utility": "UNKNOWN",
-        "limitations": "GitHub Contents API returned empty base64 for PNG >1 MiB; visual transfer path unavailable in this session"
+        "review": "VISUAL_REVIEWED",
+        "kind": "stylized human-body anime illustration",
+        "view": "near-frontal three-quarter/oblique",
+        "pose": "torso and hips curved; both arms lifted outward/upward",
+        "arms": "only upper portions of both arms visible; forearms and hands extend beyond left/right frame edges",
+        "legs": "hips and upper thighs visible; lower legs and feet cropped out",
+        "joints": "no explicit landmarks or joint axes; shoulders visible, distal arm articulation unavailable outside frame",
+        "silhouette": "head through mid-thigh; both arms cut by side edges",
+        "background": "opaque pale off-white with orange accent motif near upper right",
+        "anatomy": "stylized illustration; quantitative anatomical correctness UNKNOWN",
+        "confidence": "HIGH for crop and broad arm gesture; MEDIUM for exact view/curve",
+        "utility": "upper-body, shoulder, arm-silhouette and hip-pose reference; not suitable for complete-limb reference",
+        "limitations": "forearms/hands and lower legs/feet outside frame; opaque background",
+        "evidence": "https://raw.githubusercontent.com/jonhararagi/botimagen/audit/bimg-dataset-001-body-reference/references/dataset-cuerpos/8.png"
       }
     },
     {
