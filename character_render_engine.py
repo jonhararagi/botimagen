@@ -130,10 +130,20 @@ def _head_count(values: dict[str,str]) -> float:
 
 
 def _face_maturity(values: dict[str,str]) -> float:
-    shape=values.get("face_shape","equilibrada")
-    if shape in {"suave","menton_corto","mandibula_suave"}: return .88
-    if shape in {"afilada","rostro_alargado","menton_fino","diamante","pomulos_definidos"}: return 1.12
-    return 1.0
+    """Keep every face adult-coded while giving each catalogued jaw/face shape a distinct profile."""
+    shape = values.get("face_shape", "equilibrada")
+    return {
+        "suave": .94,
+        "equilibrada": 1.0,
+        "afilada": 1.12,
+        "corazon": 1.04,
+        "diamante": 1.09,
+        "mandibula_suave": .92,
+        "menton_corto": .86,
+        "menton_fino": 1.10,
+        "rostro_alargado": 1.12,
+        "pomulos_definidos": 1.08,
+    }.get(shape, 1.0)
 
 
 def _resolve_hairstyle(values: dict[str,str]) -> str:
@@ -145,19 +155,35 @@ def _resolve_hairstyle(values: dict[str,str]) -> str:
     sides=values.get("side_hair","mechones_largos")
     back=values.get("back_hair","recto_liso")
     short_base=original in {"bob","short_wavy","wolf_cut","curly_lob"}
+    # Use all of the vendored renderer's distinct silhouettes before layering
+    # bangs, side locks and texture. Previously several catalog styles collapsed
+    # into the same long/short shape even when their back/side controls differed.
+    if original == "hime_cut":
+        style = "long_fringed"
+    elif original == "long_straight":
+        style = "long_blunt"
+    elif original == "layered_shag":
+        style = "long_parted" if HAIR_LENGTHS.get(values.get("hair_length", "medio"), .38) >= .35 else "short_tousled"
+    elif original == "asymmetrical":
+        style = "long_parted"
+    elif original == "wolf_cut":
+        style = "short_tousled"
+    elif original == "curly_lob":
+        style = "short_tousled"
     if short_base:
-        if texture in {"ondas_suaves","rizos_sueltos","rizos_definidos","esponjado_suave","puntas_dinamicas"}: style="short_tousled"
+        if texture in {"ondas_suaves","rizos_sueltos","rizos_definidos","esponjado_suave","puntas_dinamicas","volumen_grueso"}: style="short_tousled"
         if bangs in {"abierto_centro","sin_flequillo"}: style="short_crop"
         elif bangs in {"cubriendo_un_ojo","asimetrico","lateral"}: style="short_tousled"
     else:
         if bangs in {"cortina","abierto_centro","sin_flequillo"}: style="long_center_part"
         elif bangs in {"lateral","cubriendo_un_ojo","asimetrico"}: style="long_parted"
-        elif bangs in {"recto","irregular","mechones_separados","corto"} and original in {"long_flowing","hime_cut","long_straight","medium_layers"}: style="long_fringed"
-        if sides in {"patillas_hime","volumen_lateral"}: style="long_fringed"
-        elif sides in {"mechones_cortos","detras_orejas"} and original in {"long_flowing","long_straight"}: style="short_layered"
+        elif bangs in {"recto","irregular","mechones_separados","corto"} and original in {"long_flowing","hime_cut","long_straight","medium_layers","layered_shag"}: style="long_fringed"
+        if sides in {"patillas_hime","volumen_lateral","laterales_asimetricos"}: style="long_fringed"
+        elif sides in {"mechones_cortos","detras_orejas"} and original in {"long_flowing","long_straight","medium_layers"}: style="short_layered"
+        elif sides in {"laterales_ondulados","rizos_marco","mechones_finos"}: style="long_parted"
         if back in {"nuca_corta","bob_trasero","nuca_despeinada"}: style="short_tousled" if texture in {"ondas_suaves","rizos_sueltos","rizos_definidos"} else "short_layered"
-        elif back in {"capas_largas","puntas_largas","ondas_traseras","panel_trenzado"} and style.startswith("short"): style="long_traced"
-        if texture in {"rizos_sueltos","rizos_definidos","esponjado_suave"} and style.startswith("long"): style="long_parted"
+        elif back in {"capas_largas","puntas_largas","ondas_traseras","panel_trenzado","capas_medias","seccion_asimetrica"} and style.startswith("short"): style="long_traced"
+        if texture in {"rizos_sueltos","rizos_definidos","esponjado_suave","volumen_grueso"} and style.startswith("long"): style="long_parted"
     return style
 
 
@@ -198,7 +224,13 @@ def _face_style(values: dict[str,str]) -> FaceStyle:
         brow_length=.78 if brow=="cortas" else 1.12 if brow=="largas" else 1.0,
         mouth_curve=curve,mouth_width=1.04 if mouth in {"sonrisa_amplia","boca_abierta_energia"} else .88,
         mouth_open=.58 if mouth=="boca_abierta_energia" else .42 if expression=="sonrisa_abierta" else .06,
-        nose_dot=True,blush=.42 if expression in {"sonrisa_abierta","sonrisa_picara","confiada"} or facial=="rubor_sutil" else .08,
+        # The catalog's nose control must reach the actual face renderer. Minimal noses
+        # use the dot; bridge/curve/defined-tip choices use the engine's mature linework.
+        nose_dot=values.get("nose_style", "minima") in {"minima", "sombra_minima"},
+        eye_gap={"corazon": .56, "diamante": .48, "rostro_alargado": .54,
+                 "menton_corto": .42, "pomulos_definidos": .47}.get(values.get("face_shape", ""), None),
+        mouth_drop={"rostro_alargado": .045, "menton_fino": .025, "menton_corto": -.025}.get(values.get("face_shape", ""), 0.0),
+        blush=.42 if expression in {"sonrisa_abierta","sonrisa_picara","confiada"} or facial=="rubor_sutil" else .08,
         glasses=any(word in accessory for word in ("glasses","gafas","lentes","visor")),
         chin_shadow=facial=="sombra_de_ojera_suave",scar_side=1 if facial=="cicatriz_fina" else 0,
     )
@@ -305,11 +337,33 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
         cloth = p.outfit.coat_color or p.outfit.tunic_color or base
         parts.append(f'<path class="back-clothing-panel" d="M{cx-sw:.1f} {sk.shoulder_y:.1f} Q{cx:.1f} {sk.shoulder_y-r*.24:.1f} {cx+sw:.1f} {sk.shoulder_y:.1f} L{cx+ww:.1f} {sk.waist_y:.1f} L{cx+hemw:.1f} {bottom:.1f} Q{cx:.1f} {bottom+r*.05:.1f} {cx-hemw:.1f} {bottom:.1f} L{cx-ww:.1f} {sk.waist_y:.1f} Z" fill="{cloth}" stroke="#0d0d0d" stroke-width="{max(1.2,r*.026):.1f}"/>')
         parts.append(f'<path d="M{cx:.1f} {sk.shoulder_y+r*.03:.1f} L{cx:.1f} {bottom-r*.04:.1f} M{cx-sw*.66:.1f} {sk.shoulder_y+r*.30:.1f} Q{cx:.1f} {sk.shoulder_y+r*.46:.1f} {cx+sw*.66:.1f} {sk.shoulder_y+r*.30:.1f}" fill="none" stroke="{accent}" stroke-width="{max(1.2,r*.025):.1f}" opacity=".85"/>')
-        parts.append(f'<path class="back-head-cover" d="M{cx-r*.96:.1f} {cy-r*.12:.1f} C{cx-r*1.07:.1f} {cy-r*.75:.1f} {cx-r*.48:.1f} {cy-r*1.06:.1f} {cx:.1f} {cy-r*1.04:.1f} C{cx+r*.58:.1f} {cy-r*1.05:.1f} {cx+r*1.06:.1f} {cy-r*.67:.1f} {cx+r*.96:.1f} {cy-r*.12:.1f} L{cx+r*.90:.1f} {cy+r*.55:.1f} Q{cx:.1f} {cy+r*1.25:.1f} {cx-r*.90:.1f} {cy+r*.55:.1f} Z" fill="{hair}" stroke="#0d0d0d" stroke-width="{max(1.4,r*.035):.1f}"/>')
-        strands=3 if detail<45 else 5
+        hair_length=HAIR_LENGTHS.get(values.get("hair_length","medio"),.38)
+        hair_style=values.get("hairstyle","long_flowing")
+        back_hair=values.get("back_hair","recto_liso")
+        back_fall=min(sk.hip_y-r*.10,cy+r*(.28+hair_length*1.62))
+        if hair_style in {"bob","curly_lob"} or back_hair in {"bob_trasero","nuca_corta"}:
+            back_fall=min(back_fall,cy+r*.72)
+        if back_hair in {"capas_largas","puntas_largas","ondas_traseras","panel_trenzado"}:
+            back_fall=min(sk.ankle_y-r*.15, max(back_fall,cy+r*(.42+hair_length*1.72)))
+        left_fall=back_fall
+        right_fall=back_fall
+        if hair_style=="asymmetrical" or back_hair=="seccion_asimetrica":
+            left_fall=min(sk.hip_y-r*.08,back_fall+r*.22)
+            right_fall=max(cy+r*.52,back_fall-r*.16)
+        if hair_style in {"layered_shag","wolf_cut","short_wavy"} or back_hair=="nuca_despeinada":
+            left_fall=min(left_fall,cy+r*.86)
+            right_fall=min(right_fall,cy+r*.78)
+        parts.append(f'<path class="back-head-cover" data-hair-style="{HAIRSTYLE_MAP.get(hair_style, "long_traced")}" d="M{cx-r*.96:.1f} {cy-r*.12:.1f} C{cx-r*1.07:.1f} {cy-r*.75:.1f} {cx-r*.48:.1f} {cy-r*1.06:.1f} {cx:.1f} {cy-r*1.04:.1f} C{cx+r*.58:.1f} {cy-r*1.05:.1f} {cx+r*1.06:.1f} {cy-r*.67:.1f} {cx+r*.96:.1f} {cy-r*.12:.1f} L{cx+r*.90:.1f} {right_fall:.1f} Q{cx:.1f} {back_fall+r*.08:.1f} {cx-r*.90:.1f} {left_fall:.1f} Z" fill="{hair}" stroke="#0d0d0d" stroke-width="{max(1.4,r*.035):.1f}"/>')
+        strands=3 if detail<45 else 7
         for i in range(strands):
-            offset=(i-(strands-1)/2)*r*.22
-            parts.append(f'<path d="M{cx+offset-r*.04:.1f} {cy-r*.66:.1f} Q{cx+offset+r*.12:.1f} {cy+r*.12:.1f} {cx+offset+r*.06:.1f} {cy+r*.55:.1f}" fill="none" stroke="{_shade(hair,.72)}" stroke-width="{max(1.0,r*.018):.1f}" stroke-linecap="round"/>')
+            offset=(i-(strands-1)/2)*r*.20
+            strand_end=right_fall if offset>r*.1 else left_fall if offset<-r*.1 else back_fall
+            sway=(.04 if i%2 else -.035)*r
+            parts.append(f'<path class="back-hair-strand" d="M{cx+offset-r*.04:.1f} {cy-r*.66:.1f} C{cx+offset+sway:.1f} {cy-r*.08:.1f} {cx+offset-sway:.1f} {cy+r*.24:.1f} {cx+offset+r*.03:.1f} {strand_end:.1f}" fill="none" stroke="{_shade(hair,.72)}" stroke-width="{max(1.0,r*.018):.1f}" stroke-linecap="round"/>')
+        if back_hair=="panel_trenzado":
+            for i in range(4):
+                y=cy+r*(.18+i*.18)
+                parts.append(f'<path class="back-hair-braid" d="M{cx-r*.13:.1f} {y:.1f} l{r*.12:.1f} {r*.10:.1f} l{-r*.12:.1f} {r*.10:.1f} l{-r*.12:.1f} {-r*.10:.1f} Z" fill="{_shade(hair,.84)}" stroke="{_shade(hair,.62)}" stroke-width="{max(.7,r*.012):.1f}"/>')
     else:
         pattern=recipe["fabric_pattern"]
         if pattern in {"circuit","geometric","gradient"}:
@@ -459,6 +513,8 @@ def render_profile_svg(selections: Any, visual_recipe: Any = None) -> str:
     svg=svg.replace("</svg>",_overlays(values,recipe,params,skeleton)+"</svg>")
     attrs=(f'class="parametric-anime-svg" data-renderer="{RENDERER_ID}" data-view="{recipe["view"]}" data-head-count="{heads:.2f}" data-face-maturity="{maturity:.2f}" '
            f'data-hair-color="{hair}" data-skin-color="{skin}" data-eye-color="{eye}" '
+           f'data-face-shape="{values.get("face_shape") in {"suave","equilibrada","afilada","corazon","diamante","mandibula_suave","menton_corto","menton_fino","rostro_alargado","pomulos_definidos"} and values.get("face_shape") or "equilibrada"}" '
+           f'data-nose-style="{values.get("nose_style") in {"minima","pequena_redondeada","puente_sutil","punta_definida","triangular_suave","sombra_minima","linea_corta","puente_recto","nariz_curva_sutil","perfil_anguloso"} and values.get("nose_style") or "minima"}" '
            f'data-fabric-base="{recipe["garment_base_color"]}" data-fabric-panel="{recipe["garment_panel_color"]}" '
            f'data-fabric-accent="{recipe["garment_accent_color"]}"')
     svg=svg.replace('<svg xmlns="http://www.w3.org/2000/svg"',f'<svg {attrs} xmlns="http://www.w3.org/2000/svg"',1)
