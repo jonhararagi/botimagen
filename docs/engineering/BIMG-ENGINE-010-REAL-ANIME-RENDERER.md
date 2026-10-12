@@ -1,0 +1,30 @@
+# BIMG-ENGINE-010 · Integración del motor anime paramétrico
+
+**Estado al publicar:** implementación integrada en la rama visual; aceptación pendiente de CI del SHA final y revisión de capturas reales.  
+**Rama:** \`feature/bimg-engine-001-cyberstreet-visual-renderer\` · **PR:** https://github.com/jonhararagi/botimagen/pull/11  
+**HEAD de partida:** \`542d8c21e5e5d264ae9ca1a104b2526672dd389c\`  
+**TIMER:** 6–10 horas estimadas para integración, QA de capturas y correcciones. Tiempo real no medido de forma fiable.
+
+## Qué cambia
+
+La vista previa principal deja de depender solamente del SVG procedural original de CyberStreet. Se integra el motor paramétrico SVG de [rhedak/anime-character-creator](https://github.com/rhedak/anime-character-creator), upstream SHA \`1bcb2f875050fbab16968318112fea1615968a3e\`. La licencia MIT y la atribución están preservadas en \`vendor/anime_character_creator/\`.
+
+El motor dibuja geometría SVG calculada a partir de un esqueleto proporcional, con cabeza, rostro, ojos y boca paramétricos, cabello por capas, anatomía, brazos, manos, piernas, calzado y vestuario. BotImagen no copia los presets, personajes, PNG ni SVG de ejemplo del repositorio de origen. Sus identificadores de catálogo, paleta, receta visual y detalles CyberStreet se aplican mediante \`character_render_engine.py\`.
+
+## Flujo conectado
+
+- React envía las selecciones reales y la receta a \`POST /api/render/character\`.
+- El servicio Python valida los IDs frente al catálogo canónico y la receta frente al contrato existente.
+- El adaptador transforma las opciones en \`CharacterParams\`, \`FaceStyle\`, \`Outfit\` y un esqueleto SVG de proporción adulta.
+- La vista previa visible utiliza la salida SVG local. El renderer antiguo queda como fallback explícito y fixture para las pruebas existentes de Style Lab.
+- No se añade dependencia Python, npm, servicio remoto ni clave de IA.
+
+## Verificación exigida
+
+La CI debe demostrar que el servidor emite SVG, que los cambios de opciones alteran la salida real, que el contrato rechaza valores no existentes y que la app carga la imagen desde el nuevo endpoint. Después hay que revisar las capturas producidas por la CI. Compilar y pasar tests no basta para aceptar calidad artística.
+
+## Límites reconocidos
+
+La geometría adicional de orejas, cuernos, colas, marcas y detalles CyberStreet se compone en capas SVG. No todas las 47 categorías tienen aún una geometría individual especializada. La vista posterior es una composición de presentación sobre el mismo esqueleto, no un segundo rig anatómico completo. Esos límites no deben describirse como funciones terminadas.
+
+**Pendiente:** CI del SHA final, inspección de la salida visual en artefactos y QA manual en Windows/Chrome/Edge (\`NOT_RUN\` hasta ejecutarse físicamente). El progreso global no sube hasta revisar evidencias y volver a calcular la beta con su ponderación real.

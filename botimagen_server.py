@@ -11,6 +11,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
+from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
 
 ROOT = Path(__file__).resolve().parent
 ASSET_MANIFEST_PATH = ROOT / "assets_manifest.json"
@@ -177,6 +178,32 @@ def generate_from_payload(payload: Any, generator: CharacterGenerator) -> dict[s
         )
     except ValueError as exc:
         raise ApiInputError(str(exc)) from exc
+
+
+def render_character_from_payload(payload: Any, generator: CharacterGenerator) -> dict[str, Any]:
+    """Validate a render request against the canonical catalogue and recipe contract."""
+    if not isinstance(payload, dict):
+        raise ApiInputError("El cuerpo JSON debe ser un objeto.")
+    allowed = {"selections", "visual_recipe"}
+    extra = set(payload) - allowed
+    if extra:
+        raise ApiInputError("Campos no reconocidos en la solicitud de render: " + ", ".join(sorted(map(str, extra))) + ".")
+    if "selections" not in payload or not isinstance(payload["selections"], dict):
+        raise ApiInputError("'selections' debe ser un objeto JSON.")
+    args = validate_generation_payload(
+        {
+            "selections": payload["selections"],
+            "visual_recipe": payload.get("visual_recipe", DEFAULT_RENDER_RECIPE),
+        },
+        generator,
+    )
+    try:
+        svg = render_profile_svg(args["selections"], args["visual_recipe"])
+    except (TypeError, ValueError, KeyError) as exc:
+        raise ApiInputError("No se pudo construir el personaje desde las opciones admitidas.") from exc
+    if len(svg.encode("utf-8")) > 256 * 1024:
+        raise ApiInputError("El SVG generado supera el límite de salida permitido.", HTTPStatus.INTERNAL_SERVER_ERROR)
+    return {"renderer": RENDERER_ID, "view": args["visual_recipe"]["view"], "svg": svg}
 
 
 def _profile_summary(record: dict[str, Any]) -> dict[str, Any]:
@@ -392,11 +419,15 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
-            if path not in {"/api/generate", "/api/profiles"}:
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
                 payload = self._read_json()
+                if path == "/api/render/character":
+                    result = render_character_from_payload(payload, generator)
+                    self._send_json(HTTPStatus.OK, result)
+                    return
                 if path == "/api/generate":
                     result = generate_from_payload(payload, generator)
                     self._send_json(HTTPStatus.OK, result)

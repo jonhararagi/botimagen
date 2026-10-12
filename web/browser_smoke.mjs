@@ -88,6 +88,20 @@ try {
     undefined,
     { timeout: 20000 },
   );
+  await page.waitForFunction(
+    () => {
+      const image = document.querySelector("img.server-character-art");
+      return image instanceof HTMLImageElement
+        && image.src.startsWith("data:image/svg+xml;charset=utf-8,")
+        && image.dataset.renderer === "parametric-anime-svg-v1";
+    },
+    undefined,
+    { timeout: 20000 },
+  );
+  const initialEnginePreview = await page.locator("img.server-character-art").getAttribute("src");
+  assert.ok(initialEnginePreview?.startsWith("data:image/svg+xml;charset=utf-8,"),
+    "The user-facing preview must load the SVG returned by the local parametric anime engine");
+
 
   const assetContracts = await page.evaluate(async () => {
     const response = await fetch("/api/assets/contracts");
@@ -116,6 +130,11 @@ try {
 
   if ((await tipLock.innerText()).includes("AUTO")) await tipLock.click();
   await tipSelect.selectOption("turquoise");
+  await page.waitForFunction(
+    previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous,
+    initialEnginePreview,
+    { timeout: 15000 },
+  );
   // Simulate a transient API failure, verify the message reaches the user, then recover.
   const footer = page.locator(".main-footer");
   await page.route("**/api/generate", async route => {

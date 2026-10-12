@@ -66,3 +66,11 @@
   font-size: 0.78rem;
   line-height: 1.45;
 }
+
+
+/* Main preview from the local parametric renderer. The opaque studio gradient masks
+   the legacy SVG kept beneath it as a compatibility fixture for existing visual QA. */
+.server-character-art{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;object-fit:contain;background:radial-gradient(ellipse at 50% 40%,#393047 0%,#211e31 34%,#171a2a 66%,#111523 100%);pointer-events:none}
+.canvas-labels{z-index:4}
+.side-mark{z-index:4}
+.canvas-footer{z-index:5}

@@ -360,3 +360,15 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - **CI de código:** [run #349](https://github.com/jonhararagi/botimagen/actions/runs/38204514831), SHA `0e86fbd6fe9cfd927387975d3bfac81e9f93af34`, `success`. Artefacto inspeccionado: [botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38204514831/artifacts/11726378465). La documentación de cierre genera commits nuevos; verificar la CI del HEAD final antes de cerrar.
 - **Limitaciones:** hombros/tórax no segmentados; cintura independiente no disponible; rodillas y tobillos no son regiones geométricas aisladas. No se modificaron intencionadamente proporciones, catálogo, recetas ni datos de personajes. `main` no se modificó.
 - `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real `NOT_MEASURED`. TIMER estimado: 4–7 h. Progreso global sin incremento, permanece 63%.
+
+
+## BIMG-ENGINE-010 · integración del motor anime paramétrico · 2026-10-12
+
+- **Estado de esta entrega:** implementación publicada en la rama visual, aceptación pendiente de CI del SHA final y revisión de capturas reales.
+- **Motor:** \`rhedak/anime-character-creator\`, upstream SHA \`1bcb2f875050fbab16968318112fea1615968a3e\`, licencia MIT preservada. Solo se importa código de renderizado paramétrico; no sus presets, nombres de personajes ni imágenes de referencia.
+- **Integración:** \`character_render_engine.py\` traduce el catálogo actual a cuerpo, cabello, cara, extremidades y prendas SVG por capas. \`POST /api/render/character\` valida las opciones de catálogo y receta antes de dibujar. React utiliza esa salida en la vista previa principal y mantiene un fallback explícito.
+- **Criterio de verdad:** pasar CI no demuestra calidad artística. Hay que confirmar que el navegador muestra el SVG del motor integrado, revisar capturas de frente y espalda y verificar que los cambios de rasgos alteran la imagen, no solo las etiquetas.
+- **Límites:** algunas opciones del catálogo siguen sin una geometría individual dedicada; el reverso actual es una composición de presentación sobre el mismo esqueleto, no un segundo rig completo.
+- **QA Windows / Chrome / Edge:** \`NOT_RUN\` hasta validación física.
+- **Progreso global:** permanece en 63% hasta reevaluar con evidencias y pesos reales, sin puntos artificiales por documentación.
+

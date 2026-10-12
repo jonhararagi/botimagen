@@ -104,6 +104,8 @@ export default function App(){
  const [coherence,setCoherence]=useState(.82);
  const [generated,setGenerated]=useState<GeneratedCharacter|null>(null);
  const [visualRecipe,setVisualRecipe]=useState<VisualRecipe>({...DEFAULT_VISUAL_RECIPE});
+ const [renderedSvg,setRenderedSvg]=useState<string|null>(null);
+ const [renderState,setRenderState]=useState("Preparando motor anime local…");
  const [status,setStatus]=useState("Conectando con el motor local de BotImagen…");
  const [showNegative,setShowNegative]=useState(false);
  const [saved,setSaved]=useState(false);
@@ -252,6 +254,37 @@ export default function App(){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="botimagen-profile.json";link.click();URL.revokeObjectURL(url);setStatus("Perfil exportado como JSON.");
  }
 
+
+ useEffect(()=>{
+  let disposed=false;
+  const controller=new AbortController();
+  const timer=window.setTimeout(async()=>{
+   if(disposed)return;
+   setRenderState("REDIBUJANDO…");
+   try{
+    const response=await fetch("/api/render/character",{
+     method:"POST",
+     headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({selections:values,visual_recipe:normalizeVisualRecipe(visualRecipe)}),
+     signal:controller.signal
+    });
+    const result=await jsonResponse<{svg:string;renderer:string;view:string}>(response);
+    if(typeof result.svg!=="string"||!result.svg.startsWith('<svg class="parametric-anime-svg"')||result.svg.length>262144){
+     throw new Error("El motor devolvió una salida SVG incompatible.");
+    }
+    if(disposed)return;
+    setRenderedSvg(result.svg);
+    setRenderState(result.renderer==="parametric-anime-svg-v1"?"MOTOR ANIME LOCAL":result.renderer);
+   }catch(error){
+    if(disposed||controller.signal.aborted)return;
+    setRenderedSvg(null);
+    setRenderState("VISTA PROVISIONAL · MOTOR NO DISPONIBLE");
+   }
+  },180);
+  return()=>{disposed=true;controller.abort();window.clearTimeout(timer);};
+ },[values,visualRecipe]);
+
+
  return <div className="shell">
   <aside className="sidebar">
    <div className="brand"><span className="brand-mark">✳</span><span><b>BotImagen</b><small>CHARACTER STUDIO</small></span></div>
@@ -274,11 +307,12 @@ export default function App(){
       <div className="grid-bg"/><div className="halo halo-a"/><div className="halo halo-b"/>
       <div className="canvas-labels"><span>BW / DESIGN STUDY</span><span>#{(Number.parseInt(seed,10)||314159).toString().padStart(6,"0").slice(-6)}</span></div><div className="watermark">CHARACTER<br/>PROTOTYPE</div>
       <VisualCharacterRenderer values={values} recipe={visualRecipe}/>
+      {renderedSvg&&<img className="server-character-art" data-renderer="parametric-anime-svg-v1" alt="Personaje dibujado por el motor anime local" src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderedSvg)}`}/>}
       <div className="side-mark left"><span>01</span>IDENTITY</div><div className="side-mark right"><span>02</span>SILHOUETTE</div>
-      <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>ILUSTRACIÓN NO GENERADA</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
+      <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>{renderState}</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><div className="roadmap"><b>✦ Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. La geometría es 2D estilizada, no un modelo 3D ni una ilustración final generada.</span></div>
+     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><div className="roadmap"><b>✦ Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">

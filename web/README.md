@@ -55,3 +55,8 @@ Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botima
 El motor visual es una representación SVG 2D estilizada, no un modelo 3D ni una ilustración anime final. Algunas categorías existentes solo reciben una representación neutral porque todavía no tienen geometría dedicada. No existe generación neuronal de imagen, pipeline real de Pixel Art, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración completa del intake de assets. La API ya publica los contratos oficiales en modo de solo lectura; selección, vista previa, validación binaria y copia de la imagen siguen pendientes. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
 
 El smoke test automatizado headless de Chromium en Linux ya pasa en GitHub Actions. Falta probar manualmente en Chrome/Edge en Windows y medir memoria/rendimiento; la prueba de CI no sustituye esa verificación física.
+
+
+## Motor de dibujo anime local
+
+La vista previa principal usa un motor paramétrico SVG incorporado en \`vendor/anime_character_creator/\` bajo licencia MIT. El adaptador \`character_render_engine.py\` traduce opciones admitidas del catálogo al esqueleto, cabello, rostro, anatomía y capas de vestuario. El navegador consulta \`POST /api/render/character\` en el servicio Python local. No requiere una API externa ni nuevas dependencias de ejecución. El renderizador CyberStreet anterior queda como respaldo explícito si la ruta nueva no está disponible y como fixture de compatibilidad para algunas pruebas históricas del Style Lab.
