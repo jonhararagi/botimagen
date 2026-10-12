@@ -1,10 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
-<title>Tech pleated skirt</title><desc>Original detachable lower-body garment component with cyan piping and magenta panels.</desc>
-<g id="skirt" stroke="#18213d" stroke-width="5" stroke-linejoin="round">
-<path fill="#262b4a" d="M209 344 Q256 358 303 344 L328 432 L306 449 L282 415 L256 455 L230 415 L205 449 L184 432Z"/>
-<path fill="#171d36" d="M209 350 L229 354 L219 433 L205 449 L196 436Z M240 356 L256 357 L256 455 L239 430Z M272 356 L288 352 L306 436 L282 415Z"/>
-<path fill="none" stroke="#4af4ee" stroke-width="7" d="M195 421 L317 421"/>
-<path fill="#f64dbd" d="M205 449 L230 415 L239 430 L230 461Z M282 415 L306 449 L282 461 L273 430Z" stroke="none"/>
-<path fill="#3d4774" d="M231 357 L240 356 L239 430 L230 415Z M272 356 L282 354 L282 415 L273 430Z"/>
-</g>
-</svg>
+<title>CyberStreet techwear pleated skirt</title><desc>Original detachable navy pleated skirt with magenta belt, cyan piping, angular side panels, stitched pleats and a small utility module.</desc>
+<g id="skirt" stroke="#18213d" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#262b4a" d="M209 344 Q256 358 303 344 L328 432 L306 449 L282 415 L256 455 L230 415 L205 449 L184 432Z"/><path fill="#171d36" d="M209 350 L229 354 L219 433 L205 449 L196 436Z M240 356 L256 357 L256 455 L239 430Z M272 356 L288 352 L306 436 L282 415Z"/><path fill="#343d70" d="M231 357 L240 356 L239 430 L230 415Z M272 356 L282 354 L282 415 L273 430Z" stroke="none"/>
+<path fill="none" stroke="#55628f" stroke-width="2.5" d="M217 366 L207 426 M247 366 L247 414 M265 367 L265 414 M294 365 L305 425"/><path fill="#11182d" d="M210 344 Q256 357 302 344 L306 363 Q256 377 206 363Z" stroke-width="3.5"/><path fill="#f64dbd" d="M211 349 Q256 361 301 349 L302 360 Q256 372 210 360Z" stroke="none"/><rect x="245" y="351" width="22" height="13" rx="2" fill="#252b4b" stroke="#4af4ee" stroke-width="2.5"/><circle cx="256" cy="357.5" r="2.4" fill="#f64dbd" stroke="none"/>
+<path fill="none" stroke="#4af4ee" stroke-width="6" d="M195 421 L317 421"/><path fill="#f64dbd" d="M205 449 L230 415 L239 430 L230 461Z M282 415 L306 449 L282 461 L273 430Z" stroke="none"/><path fill="none" stroke="#f8b8e7" stroke-width="2" d="M211 443 L231 421 M299 443 L282 421"/><path fill="#11182d" d="M298 379 L317 381 L320 400 L301 402Z" stroke-width="3"/><path fill="#4af4ee" d="M304 385 L313 386 L314 391 L305 390Z" stroke="none"/><path fill="#f64dbd" d="M305 394 L315 395 L315 398 L305 397Z" stroke="none"/>
+</g></svg>

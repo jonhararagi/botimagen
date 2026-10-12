@@ -63,6 +63,8 @@ def get_cyberstreet_manifest() -> dict[str, Any]:
     manifest = _load_manifest()
     labels = {
         "base-body": "Cuerpo base",
+        "face-anime-cyan": "Rostro anime",
+        "sneakers-neon": "Zapatillas neón",
         "skirt-tech-pleated": "Falda tecnológica",
         "top-neon-jacket": "Chaqueta neón",
         "hair-midnight-cyan": "Cabello cyan",

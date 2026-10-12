@@ -123,6 +123,28 @@
       "attribution_required": true,
       "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
       "purpose": "Detachable pleated techwear skirt for the CyberStreet OC layer stack."
+    },
+    {
+      "kind": "modular-component",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+      "id": "character-part.oc-cyberstreet.face-anime-cyan",
+      "path": "assets/modular/oc-cyberstreet/face-anime-cyan.svg",
+      "purpose": "Independent editable anime face layer so facial expression remains visible when hair is toggled."
+    },
+    {
+      "kind": "modular-component",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+      "id": "character-part.oc-cyberstreet.sneakers-neon",
+      "path": "assets/modular/oc-cyberstreet/sneakers-neon.svg",
+      "purpose": "Detachable original neon high-top sneakers anchored to both ankles."
     }
   ]
 }

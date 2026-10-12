@@ -36,6 +36,14 @@
     "hip": {
       "x": 256,
       "y": 421
+    },
+    "ankle_left": {
+      "x": 208,
+      "y": 678
+    },
+    "ankle_right": {
+      "x": 312,
+      "y": 678
     }
   },
   "layers": [
@@ -47,12 +55,28 @@
       "editable": false
     },
     {
+      "id": "face-anime-cyan",
+      "path": "face-anime-cyan.svg",
+      "z": 15,
+      "role": "facial-features",
+      "editable": true,
+      "anchor": "head"
+    },
+    {
       "id": "skirt-tech-pleated",
       "path": "skirt-tech-pleated.svg",
       "z": 20,
       "role": "lower-garment",
       "editable": true,
       "anchor": "waist"
+    },
+    {
+      "id": "sneakers-neon",
+      "path": "sneakers-neon.svg",
+      "z": 25,
+      "role": "footwear",
+      "editable": true,
+      "anchor": "ankle_left,ankle_right"
     },
     {
       "id": "top-neon-jacket",
@@ -72,8 +96,9 @@
     }
   ],
   "limitations": [
-    "Starter vector components, not production-grade anatomy.",
-    "Layer alignment is preliminary and requires visual QA in the live compositor.",
+    "Original vector components are a stylized starter pack, not production-grade illustration.",
+    "The face is now an independent layer and the fringe frames rather than fully hides the eyes.",
+    "Layer alignment must still be rechecked in the live React/Python compositor after the asset update.",
     "No external artwork or game-extracted asset is included."
   ]
 }

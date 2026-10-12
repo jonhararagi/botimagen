@@ -1,11 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
-<title>Neon cropped street jacket</title><desc>Original detachable upper-body garment. Designed for the BotImagen neutral body canvas, front view.</desc>
-<g id="jacket" stroke="#18213d" stroke-width="5" stroke-linejoin="round">
-<path fill="#252b4b" d="M214 181 L184 198 L164 286 L190 305 L213 249 L211 344 Q255 359 302 344 L299 249 L322 305 L349 286 L328 198 L290 181 L268 204 L240 204Z"/>
-<path fill="#11182d" d="M240 204 L256 223 L268 204 L281 190 L292 207 L280 244 L256 266 L231 243 L220 207Z"/>
-<path fill="#f64dbd" d="M212 333 Q256 343 300 333 L301 350 Q256 362 210 350Z" stroke="none"/>
-<path fill="none" stroke="#4af4ee" stroke-width="7" d="M190 218 L176 278 L190 287 M322 218 L336 278 L322 287 M224 212 L236 240 L256 259 L276 240 L288 212"/>
-<path fill="#f64dbd" d="M182 276 L198 284 L191 301 L174 292Z M330 276 L314 284 L321 301 L338 292Z"/>
-<path fill="#2f3864" d="M214 181 L240 204 L230 222 L205 201Z M290 181 L268 204 L278 222 L303 201Z"/>
-</g>
-</svg>
+<title>CyberStreet neon technical street jacket</title><desc>Original detachable cropped jacket with layered collar, cyan piping, panel seams, zipper, tech chest pockets, reflective cuffs and magenta waistband.</desc>
+<g id="jacket" stroke="#18213d" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#252b4b" d="M214 181 L184 198 L164 286 Q159 305 174 314 L192 320 L213 249 L211 344 Q256 359 302 344 L299 249 L322 320 L340 314 Q355 305 349 286 L328 198 L290 181 L268 204 L240 204Z"/>
+<path fill="#343d70" d="M214 183 L240 204 L224 224 L201 202Z M290 183 L268 204 L284 224 L307 202Z"/><path fill="#11182d" d="M240 204 L256 226 L268 204 L281 190 L292 207 L280 244 L256 265 L231 243 L220 207Z"/>
+<path fill="#11182d" d="M169 281 L194 289 L188 308 L173 301Z M343 281 L318 289 L324 308 L339 301Z"/><path fill="#f64dbd" d="M174 291 L190 298 L186 310 L171 303Z M338 291 L322 298 L326 310 L341 303Z" stroke="none"/>
+<path fill="none" stroke="#4af4ee" stroke-width="7" d="M190 218 L176 278 L190 287 M322 218 L336 278 L322 287 M224 212 L236 240 L256 259 L276 240 L288 212"/><path fill="none" stroke="#8bfff9" stroke-width="2.5" d="M195 222 L183 272 M317 222 L329 272"/>
+<path d="M256 263 L256 334" fill="none" stroke="#10172c" stroke-width="5"/><path d="M256 270 L256 329" fill="none" stroke="#a4b8d9" stroke-width="2.2"/><path d="M252 282 l4 4 4-4 M252 294 l4 4 4-4 M252 306 l4 4 4-4 M252 318 l4 4 4-4" fill="none" stroke="#b9c8e6" stroke-width="1.8"/><rect x="252" y="268" width="8" height="12" rx="2" fill="#f64dbd" stroke="#18213d" stroke-width="1.5"/>
+<path fill="#171d36" d="M210 264 L239 269 L236 294 L207 290Z M273 269 L302 264 L305 290 L276 294Z" stroke-width="3.5"/><path fill="none" stroke="#4af4ee" stroke-width="3" d="M212 271 L235 275 M278 275 L300 271"/><path fill="#f64dbd" d="M218 281 l8 0 0 5 -8 0Z M286 281 l8 0 0 5 -8 0Z" stroke="none"/>
+<path fill="#f64dbd" d="M212 333 Q256 343 300 333 L301 350 Q256 362 210 350Z" stroke="none"/><path fill="none" stroke="#f7b8e4" stroke-width="2.2" d="M219 340 Q256 350 293 340"/><path fill="none" stroke="#707da8" stroke-width="2" d="M202 211 L214 224 M310 211 L298 224 M218 306 L237 309 M275 309 L294 306"/>
+<path fill="#11182d" d="M197 233 L211 228 L216 245 L202 250Z" stroke-width="2.5"/><path fill="#4af4ee" d="M204 235 l5 2 -3 5 -5-2Z" stroke="none"/>
+</g></svg>

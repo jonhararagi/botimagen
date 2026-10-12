@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
-<title>Original OC base body silhouette</title><desc>Neutral stylized anime body base for BotImagen modular composition. Transparent background, front view, no clothing.</desc>
-<g id="body" stroke="#392d49" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-<path fill="#f2c6b5" d="M215 176 Q185 185 175 220 L153 302 Q147 326 164 337 Q180 345 191 322 L211 264 L207 342 Q202 376 184 414 L164 498 Q158 520 177 528 Q195 535 204 513 L236 427 L245 526 L229 665 Q227 688 250 690 Q271 691 275 668 L293 535 L309 667 Q312 689 334 686 Q354 682 348 658 L338 511 L326 421 Q321 383 305 345 L301 263 L322 320 Q333 343 350 334 Q366 325 356 302 L331 221 Q320 185 287 176 Z"/>
-<path fill="#f2c6b5" d="M217 120 Q215 92 250 89 Q290 88 294 120 L288 179 Q267 202 244 180 Z"/>
-<path fill="#e5a895" d="M218 142 Q255 164 291 141 L288 177 Q262 198 244 180 Z" stroke="none"/>
+<title>Original CyberStreet anime body base</title><desc>Front-facing neutral body silhouette with separate legs and arms; face, clothes, hair and footwear remain independent layers.</desc>
+<g id="arms" stroke="#392d49" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#f2c6b5" d="M218 177 Q203 180 193 198 L165 286 Q157 307 171 319 Q185 329 196 309 L218 244 L232 207Z"/>
+<path fill="#f2c6b5" d="M294 177 Q309 180 319 198 L347 286 Q355 307 341 319 Q327 329 316 309 L294 244 L280 207Z"/>
 </g>
-<g fill="#d78e88" opacity=".38"><path d="M215 198 Q198 230 196 257 L177 316 Q181 323 187 311 L210 252Z"/><path d="M298 202 Q319 224 324 253 L345 315 Q340 323 334 310 L307 249Z"/></g>
+<g id="torso-and-legs" stroke="#392d49" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#f2c6b5" d="M218 177 Q256 168 294 177 L310 204 L301 355 Q279 369 256 365 Q233 369 211 355 L202 204Z"/>
+<path fill="#f2c6b5" d="M219 348 Q237 360 256 356 L256 415 Q239 440 232 472 L221 664 Q219 686 200 688 Q180 689 181 667 L194 473 Q197 441 207 411Z"/>
+<path fill="#f2c6b5" d="M256 356 Q275 360 293 348 L305 411 Q315 441 318 473 L331 666 Q332 689 312 688 Q293 687 290 665 L279 473 Q273 442 256 415Z"/>
+<path fill="#f2c6b5" d="M217 120 Q215 92 250 89 Q290 88 294 120 L288 179 Q267 202 244 180Z"/>
+</g>
+<g fill="#d78e88" opacity=".28"><path d="M215 198 Q201 218 194 258 L176 300 Q181 311 188 300 L211 251Z"/><path d="M297 198 Q311 218 318 258 L336 300 Q331 311 324 300 L301 251Z"/><path d="M203 484 L192 658 Q193 672 202 673 L214 493Z"/><path d="M309 484 L320 658 Q319 672 310 673 L298 493Z"/></g>
+<g fill="none" stroke-linecap="round"><path d="M219 203 Q212 215 207 236 M293 203 Q300 215 305 236" stroke="#ffddd1" stroke-width="4" opacity=".9"/><path d="M188 301 l-5 11 M324 301 l5 11" stroke="#a9636d" stroke-width="2.5" opacity=".6"/><path d="M232 555 L226 644 M300 555 L306 644" stroke="#ffddd1" stroke-width="3.2" opacity=".75"/></g>
 </svg>

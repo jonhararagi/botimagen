@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
-<title>Midnight cyan layered anime hair</title><desc>Original front-view hair component for BotImagen OC assembly. Aligns to head anchor x=256 y=145.</desc>
-<g id="back-hair" fill="#20233e" stroke="#11162b" stroke-width="5" stroke-linejoin="round"><path d="M207 160 Q178 113 199 78 Q218 40 266 48 Q316 47 328 94 Q341 126 309 174 L318 236 L287 210 L270 260 L247 212 L215 242 L218 195 L190 218Z"/></g>
-<path d="M207 99 Q233 61 269 64 Q301 65 316 98 Q287 85 266 96 Q241 108 207 99Z" fill="#3c4778"/>
-<path d="M205 103 Q194 144 220 178 Q236 154 242 122 Q258 154 272 162 Q289 132 286 105 Q307 135 309 174 L294 197 L278 174 L262 202 L245 172 L226 193 L215 159Z" fill="#272e53" stroke="#11162b" stroke-width="5" stroke-linejoin="round"/>
-<path d="M205 112 Q215 91 236 82 M283 80 Q305 91 310 113" fill="none" stroke="#47e5e7" stroke-width="7" stroke-linecap="round"/>
-<path d="M221 123 Q215 150 226 171 M292 119 Q302 145 294 164" fill="none" stroke="#718cff" stroke-width="4" stroke-linecap="round"/>
-<g fill="#47e5e7"><path d="M199 168 l-9 20 16-7Z"/><path d="M311 164 l13 20-18-8Z"/></g>
+<title>Midnight cyan layered anime hair with open face frame</title><desc>Original midnight-blue anime hair with split fringe, face-framing side locks, glossy cyan streaks and a small neon hair clip. Facial features remain visible while the hair layer is enabled.</desc>
+<g id="crown" stroke="#11162b" stroke-width="5" stroke-linejoin="round">
+<path fill="#20233e" d="M207 132 Q183 110 190 80 Q198 42 242 45 Q278 35 306 62 Q337 88 317 125 L302 146 L291 120 Q279 101 257 100 Q232 98 219 118 L215 142Z"/>
+<path fill="#3c4778" stroke="none" d="M199 83 Q214 52 246 52 Q285 48 307 81 Q281 68 259 74 Q225 81 199 83Z"/>
+<path fill="#2a3158" d="M202 95 Q222 68 248 75 Q272 64 300 89 L291 111 Q280 99 262 99 Q239 98 222 115 L209 132Z"/>
+<path fill="#222744" d="M210 102 Q230 77 251 81 L245 112 L232 130 L220 119Z"/><path fill="#272e53" d="M255 81 Q285 76 308 103 L293 120 L280 130 L269 111Z"/>
+<path fill="none" stroke="#47e5e7" stroke-width="6" stroke-linecap="round" d="M204 83 Q218 60 239 57 M275 59 Q298 63 308 82"/><path fill="none" stroke="#718cff" stroke-width="4" stroke-linecap="round" d="M222 89 Q230 85 236 86 M275 84 Q286 85 294 92"/>
+</g>
+<g id="side-locks" stroke="#11162b" stroke-width="4.5" stroke-linejoin="round">
+<path fill="#20233e" d="M207 103 Q194 119 199 148 L205 177 L222 157 L218 124 L226 111Z"/><path fill="#272e53" d="M305 105 Q319 122 312 151 L306 178 L289 158 L294 126 L286 112Z"/>
+<path fill="#343d70" stroke="none" d="M204 123 L207 158 L214 149 L211 119Z M306 123 L302 158 L295 149 L299 119Z"/><path fill="none" stroke="#47e5e7" stroke-width="4" stroke-linecap="round" d="M202 132 L207 154 M309 132 L304 154"/>
+</g>
+<g transform="rotate(-18 285 91)"><rect x="278" y="88" width="20" height="7" rx="3" fill="#f64dbd" stroke="#11162b" stroke-width="2"/><path d="M283 89 l5 5 5-5" fill="none" stroke="#fff0fb" stroke-width="1.5"/></g>
 </svg>

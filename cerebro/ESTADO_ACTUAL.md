@@ -516,3 +516,15 @@ QA Windows: `NOT_RUN`.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - TIMER estimado para este tramo: 6–12 horas activas. Tiempo real medido: `NOT_MEASURED`.
 - Siguiente acción: revisar las dos capturas del artefacto; si la alineación es aceptable, calibrar anclajes y ampliar el E2E para chaqueta/falda y migración de perfiles legacy.
+
+
+
+## Revisión visual real y corrección CyberStreet · 2026-10-12
+
+- Se inspeccionaron las capturas publicadas por [Validate BotImagen #457](https://github.com/jonhararagi/botimagen/actions/runs/38279676595/artifacts/11760567894), no solo el estado verde de CI.
+- El E2E de la versión anterior sí probaba cambios de capa, persistencia y exportación, pero la captura no superaba la aceptación artística: al ocultar cabello la cabeza quedaba sin rasgos; con cabello visible, el flequillo tapaba la cara; la silueta original tenía una pose inferior asimétrica y no tenía calzado.
+- Esta corrección añade la capa independiente `face-anime-cyan.svg`, separa la capa `sneakers-neon.svg`, regulariza la silueta del cuerpo y refina flequillo, chaqueta y falda. Se ajustan manifiesto, catálogo, etiquetas y tests de orden/capas.
+- Estado artístico permanece `component_candidate`: son SVG vectoriales originales estilizados, todavía no ilustración anime de calidad final. La integración funcional previa está validada por CI #457, pero esa CI corresponde al commit anterior, no a esta corrección.
+- Comprobación obligatoria tras el commit: ejecutar CI de la nueva revisión, inspeccionar capturas nuevas con cabello encendido/apagado y perfiles restaurados, y corregir las desalineaciones que aparezcan antes de elevar el estado del componente.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- TIMER para esta corrección visual e integración: estimación provisional de 3–6 horas activas, no tiempo ya medido ni estimación para terminar todo BotImagen.

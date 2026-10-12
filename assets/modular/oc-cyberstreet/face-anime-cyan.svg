@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
+<title>CyberStreet anime face details</title><desc>Original editable face features: teal-violet eyes, expressive brows, petite nose, smile and soft cheek accents. Separate from the body and hair.</desc>
+<g id="face-features" stroke-linecap="round" stroke-linejoin="round">
+<path d="M222 129 Q234 122 247 128" fill="none" stroke="#35263f" stroke-width="4.2"/><path d="M266 128 Q279 122 288 130" fill="none" stroke="#35263f" stroke-width="4.2"/>
+<path d="M222 139 Q234 128 247 138 Q239 150 228 147Z" fill="#fff8f5" stroke="#392d49" stroke-width="2.4"/><path d="M265 138 Q278 128 289 140 L283 147 Q272 150 265 138Z" fill="#fff8f5" stroke="#392d49" stroke-width="2.4"/>
+<ellipse cx="236" cy="139.5" rx="5.1" ry="7.2" fill="#35d6d8" stroke="#1b5e78" stroke-width="1.6"/><ellipse cx="276" cy="139.5" rx="5.1" ry="7.2" fill="#35d6d8" stroke="#1b5e78" stroke-width="1.6"/>
+<ellipse cx="237" cy="140.5" rx="2.6" ry="4.5" fill="#20233e" stroke="none"/><ellipse cx="275" cy="140.5" rx="2.6" ry="4.5" fill="#20233e" stroke="none"/>
+<circle cx="238" cy="136.5" r="1.8" fill="#fff" stroke="none"/><circle cx="277" cy="136.5" r="1.8" fill="#fff" stroke="none"/>
+<path d="M223 140 L218 136 M246 139 L250 135 M266 139 L261 135 M287 140 L292 136" fill="none" stroke="#392d49" stroke-width="2.1"/>
+<path d="M257 146 L254.5 153.5 L259 154" fill="none" stroke="#bd7f7d" stroke-width="2.1"/>
+<path d="M246 163 Q256 169 267 162 Q264 173 255 172 Q249 170 246 163Z" fill="#a84967" stroke="#73344f" stroke-width="1.8"/><path d="M249 164 Q257 167 264 163" fill="none" stroke="#ffb2bd" stroke-width="1.5"/>
+<path d="M223 154 l4 1 M229 156 l4 1 M279 156 l4 -1 M284 154 l4 -1" stroke="#ef879b" stroke-width="2.5" opacity=".8"/>
+<path d="M242 116 Q256 112 271 117" fill="none" stroke="#ffded3" stroke-width="2.4" opacity=".75"/><circle cx="265" cy="157" r="1.2" fill="#d78e88" stroke="none"/>
+</g></svg>
