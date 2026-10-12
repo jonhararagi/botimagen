@@ -667,7 +667,7 @@ def publish_model_layer(
     from modular_asset_library import import_user_asset
     record = import_user_asset({
         "filename": label.strip().replace("/", "_") + ".png",
-        "source_filename": layer["filename"],
+        "source_filename": (model_id.replace(".", "-") + "-" + layer["id"] + ".png"),
         "mime_type": "image/png",
         "data_base64": base64.b64encode(png_data).decode("ascii"),
         "category": category,
