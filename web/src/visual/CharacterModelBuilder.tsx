@@ -124,7 +124,7 @@ export function CharacterModelBuilder() {
       if(!tempCtx||!maskCtx||!maskCanvas)return;
       tempCtx.drawImage(layer,0,0,512,768);
       const rgba=tempCtx.getImageData(0,0,512,768),mask=maskCtx.createImageData(512,768);
-      for(let i=0;i<rgba.data.length;i+=4){const value=rgba.data[i+3];mask.data[i]=value;mask.data[i+1]=value;mask.data[i+2]=value;mask.data[i+3]=255;}
+      for(let i=0;i<rgba.data.length;i+=4){const value=rgba.data[i+3]>0?255:0;mask.data[i]=value;mask.data[i+1]=value;mask.data[i+2]=value;mask.data[i+3]=255;}
       maskCtx.putImageData(mask,0,0);maskHistoryRef.current=[];setMaskDirty(false);setPolygonPoints([]);maskLoaded=true;markReady();
     };
     source.src=imageUrl(model.id,"source.png");
