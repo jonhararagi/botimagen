@@ -167,6 +167,7 @@ export function CharacterModelBuilder() {
       const response=await fetch("/api/character-models/"+encodeURIComponent(model.id)+"/edit-layer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({layer_id:editingLayerId,mask_png_base64:dataUrl.split(",")[1]})});
       const data=await response.json();if(!response.ok)throw new Error(data.error||"No se pudo guardar la máscara.");
       setModel(data.model);setLayerLabels(Object.fromEntries(data.model.layers.map((layer:ModelLayer)=>[layer.id,layer.label])));
+      await refreshModels();
       setNotice("Máscara guardada. Se conservaron los colores originales de la fuente y se recalculó la reconstrucción.");
     }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
     finally{setBusy(false);}
@@ -177,7 +178,7 @@ export function CharacterModelBuilder() {
     try{
       const response=await fetch("/api/character-models/"+encodeURIComponent(model.id)+"/reset-layer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({layer_id:editingLayerId})});
       const data=await response.json();if(!response.ok)throw new Error(data.error||"No hay máscara original para restaurar.");
-      setModel(data.model);setMaskDirty(false);setNotice("Máscara original restaurada.");
+      setModel(data.model);setMaskDirty(false);await refreshModels();setNotice("Máscara original restaurada.");
     }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
     finally{setBusy(false);}
   };
@@ -330,6 +331,7 @@ export function CharacterModelBuilder() {
       const data=await response.json();if(!response.ok)throw new Error(data.error||"No se pudo guardar el rol.");
       setModel(data);setLayerLabels(Object.fromEntries(data.layers.map((item:ModelLayer)=>[item.id,item.label])));
       setLayerCategories(Object.fromEntries(data.layers.filter((item:ModelLayer)=>item.semantic_category).map((item:ModelLayer)=>[item.id,item.semantic_category!])));
+      await refreshModels();
       setNotice("Nombre y rol guardados en el modelo local (revisión "+data.revision+").");
     }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
     finally{setBusy(false);}
