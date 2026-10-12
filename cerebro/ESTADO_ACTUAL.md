@@ -353,10 +353,10 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 
 ## BIMG-ENGINE-009-R1 · separación cuerpo/vestuario · 2026-10-12
 
-- **Veredicto provisional: PARTIAL.** Se añadió `getBodyBaseGeometry(view)` para torso, pelvis, piernas y pies, independiente de la selección de prendas y de los sliders `torso_length` / `waist_fit`. El grupo SVG `body-base` tiene regiones explícitas; el arnés oculta las prendas en lugar de recolorearlas como piel.
-- **Rama:** `feature/bimg-engine-001-cyberstreet-visual-renderer`, PR #11 abierto y sin fusionar. HEAD de implementación antes de documentación: `727dcc94e4c87c254475f9c074ae425119063e06`. La documentación posterior y la CI exacta final deben comprobarse antes del cierre.
-- **Cambios de código:** `web/src/visual/bodyLandmarks.ts`, `web/src/visual/VisualCharacterRenderer.tsx`, `web/browser_smoke.mjs`, `tests/test_visual_body_landmarks.py`. Firma pública del renderer preservada. No se modificaron catálogo, recetas, datos de personajes ni `main`.
-- **Limitaciones:** base geométrica mínima, hombros/tórax no segmentados, cintura independiente no disponible, rodillas/tobillos solo como landmarks. Se necesita inspección humana de capturas front/back y vestuario; no se autoriza calibración de proporciones.
+- **Veredicto: PARTIAL.** La geometría de torso, pelvis, piernas y pies está separada de la selección de prendas y de los controles `torso_length` / `waist_fit`. El renderer conserva su API pública y mantiene la composición vestida.
+- **Rama/PR:** `feature/bimg-engine-001-cyberstreet-visual-renderer`, [PR #11](https://github.com/jonhararagi/botimagen/pull/11), abierto y sin fusionar. Código revisado: `0e86fbd6fe9cfd927387975d3bfac81e9f93af34`.
+- **Inspección visual:** revisadas las capturas front/back neutras y una captura vestida del artefacto CI. El cuerpo base sigue visible sin prendas y la composición con ropa continúa funcionando. La figura base aún es esquemática y requiere revisión artística; no se autoriza calibración de proporciones.
 - **Informe:** [BIMG-ENGINE-009-R1](../docs/engineering/BIMG-ENGINE-009-R1-BODY-GARMENT-SEPARATION.md).
-- **CI R5 previo:** run #337 falló en una aserción del fixture antiguo; no cuenta como PASS. **CI R6 exacta:** pendiente de verificar sobre el HEAD final tras la documentación.
-- `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real no medido. TIMER estimado: 4–7 h. Progreso global sin incremento, permanece 63%.
+- **CI de código:** [run #349](https://github.com/jonhararagi/botimagen/actions/runs/38204514831), SHA `0e86fbd6fe9cfd927387975d3bfac81e9f93af34`, `success`. Artefacto inspeccionado: [botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38204514831/artifacts/11726378465). La documentación de cierre genera commits nuevos; verificar la CI del HEAD final antes de cerrar.
+- **Limitaciones:** hombros/tórax no segmentados; cintura independiente no disponible; rodillas y tobillos no son regiones geométricas aisladas. No se modificaron intencionadamente proporciones, catálogo, recetas ni datos de personajes. `main` no se modificó.
+- `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real `NOT_MEASURED`. TIMER estimado: 4–7 h. Progreso global sin incremento, permanece 63%.
