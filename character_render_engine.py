@@ -177,7 +177,7 @@ def _resolve_hairstyle(values: dict[str,str]) -> str:
     else:
         if bangs in {"cortina","abierto_centro","sin_flequillo"}: style="long_center_part"
         elif bangs in {"lateral","cubriendo_un_ojo","asimetrico"}: style="long_parted"
-        elif bangs in {"recto","irregular","mechones_separados","corto"} and original in {"long_flowing","hime_cut","long_straight","medium_layers","layered_shag"}: style="long_fringed"
+        elif bangs in {"recto","irregular","mechones_separados","corto"} and original in {"long_flowing","hime_cut","medium_layers","layered_shag"}: style="long_fringed"
         if sides in {"patillas_hime","volumen_lateral","laterales_asimetricos"}: style="long_fringed"
         elif sides in {"mechones_cortos","detras_orejas"} and original in {"long_flowing","long_straight","medium_layers"}: style="short_layered"
         elif sides in {"laterales_ondulados","rizos_marco","mechones_finos"}: style="long_parted"
