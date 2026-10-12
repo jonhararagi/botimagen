@@ -655,3 +655,47 @@ QA Windows: `NOT_RUN`.
 - `main` sigue intacta (`b508cfe7d3216eda801438d46dff8873842cea86`); PR #11 sigue abierta/sin fusionar y PR #14 sigue independiente.
 
 - Head público verificado tras la retirada de enlaces: `26df8cf69971d749ae829ff8699a29dc928093f3`. `main` sin cambios y las PR #11/#14 conservan su estado abierto e independiente.
+
+
+## BIMG-MODEL-BUILDER-001 · constructor reutilizable de modelos de personaje por PNG · 2026-10-12
+
+### Implementado en la aplicación real
+
+- Nuevo módulo: `character_model_builder.py`. UI: `web/src/visual/CharacterModelBuilder.tsx`. La pantalla está integrada en `web/src/App.tsx`, junto a la biblioteca modular existente y el compositor real.
+- API local integrada en `botimagen_server.py`:
+  - `GET/POST /api/character-models`
+  - `GET /api/character-models/{id}`
+  - `GET /api/character-models/{id}/source.png`, `preview.png` y `layers/{layerId}[-thumb].png`
+  - `POST /api/character-models/{id}/extend` para añadir referencias al perfil visual guardado.
+  - `POST /api/character-models/{id}/publish-layer` para importar una región o un grupo de regiones al catálogo modular.
+- Selección por lote: entre 1 y 32 recursos ya importados a la biblioteca. El usuario elige cuál será la imagen base, da nombre/ID al modelo y limita la descomposición a 24, 48 o 64 capas.
+- La fuente se normaliza a un lienzo transparente 512×768. Se intenta quitar un fondo plano conectado a las esquinas antes de normalizar; se guarda la imagen de fuente y la reconstrucción desde máscaras.
+- Separación automática por color cuantizado y conectividad de píxeles (4-conectada). Se guardan máscaras PNG transparentes independientes y miniaturas recortadas, conteos de píxeles, límites, color representativo, hashes y orden de capa. La prueba verifica que al superponer las máscaras se reconstruyen exactamente los píxeles visibles de la imagen base.
+- Firma de estilo guardada: paleta dominante calculada sobre las referencias, procedencia, tipo/categoría/vista, cobertura alfa y estado de fondo. La operación «Añadir selección al estilo abierto» agrega referencias nuevas y actualiza esa paleta sin destruir las capas de la imagen base.
+- **Agrupación multi-región:** el usuario puede marcar varias regiones visibles, asignar una categoría semántica y guardarlas como una sola pieza PNG transparente. Esto permite unir varios bloques de color de la chaqueta, cabello o accesorio antes de incorporar la pieza a la biblioteca modular.
+- Tras importar una pieza, el catálogo conserva su procedencia y los anclajes permanecen como estimaciones no validadas hasta revisarlos en el editor/esqueleto existente.
+- Datos locales persistidos bajo `user_data/character_models`; no se suben los PNG ni las máscaras a un servicio remoto desde este módulo.
+
+### Verificación real
+
+- **Commit de código y workflow validado:** `f13b661f2657a2895b69d885e95bde82849d05c1`.
+- **CI #524 · SUCCESS:** https://github.com/jonhararagi/botimagen/actions/runs/38312545782
+- La ejecución pasó sintaxis Python, suite unitaria nueva `tests/test_character_model_builder.py`, `tests/test_local_api.py` (crear modelo, servir preview/máscaras, ampliar referencias, importar una capa y agrupar dos regiones), resto de suites existentes, build TypeScript/React y el smoke test de Chromium.
+- **Artefacto de Chromium:** https://github.com/jonhararagi/botimagen/actions/runs/38312545782/artifacts/11774983674
+  - `character-model-builder-region-decomposition.png`: captura del constructor después de crear el modelo; muestra la imagen base, reconstrucción, paleta y máscaras por región.
+  - `character-model-builder-grouped-piece.png`: captura posterior a agrupar dos regiones e importarlas como una pieza de catálogo.
+- Las dos capturas anteriores muestran una figura geométrica sintética usada por QA. **No son Firefly ni arte de Honkai: Star Rail. No afirmar que el arte de Firefly aparece en las capturas.**
+- Prueba automatizada de navegador: completó la creación del modelo, la visualización de regiones, la reconstrucción exacta y la agrupación multi-región. Esta prueba verifica funcionalidad, no calidad artística humana.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+
+### Límites conocidos, expresados sin ambigüedad
+
+- La separación automática actual es por color/conectividad, **no segmentación semántica por IA**. No puede afirmar por sí sola «esto es cabello» o «esto es una chaqueta»; se inspeccionan las máscaras, se marcan las regiones y se asigna el rol manualmente. La agrupación multi-región ayuda a reunirlas.
+- El perfil de estilo **no es un modelo de difusión entrenado** ni ajusta pesos de un generador de IA. En esta versión es un paquete local reutilizable de PNG/máscaras, referencias y paleta. La generación paramétrica existente no se reemplazó.
+- Si el PNG es una ilustración plana, no contiene los píxeles que quedan ocultos detrás de otra pieza; el sistema no inventa esas zonas. Para obtener capas completas ocultas se necesitan otras vistas, dibujos separados o recursos con esas partes.
+- No se añadieron imágenes privadas de usuario ni capturas/derivados de referencias al repositorio público. La prueba anterior con el repositorio privado de referencias se mantiene separada y no se presenta como evidencia de esta UI.
+- `main` sigue en `b508cfe7d3216eda801438d46dff8873842cea86`; PR #11 y PR #14 siguen abiertas y sin fusionar.
+
+### Próximo trabajo concreto
+
+Mejorar la segmentación semántica y las herramientas de corrección de máscara para pasar de regiones de color a partes anatómicas/prendas más útiles; conectar categorías confirmadas con variantes reutilizables sin alterar la reconstrucción del original. **Timer estimado: 4–8 horas activas para esa siguiente fase**, no tiempo medido ni estimación de finalización de todo BotImagen.
