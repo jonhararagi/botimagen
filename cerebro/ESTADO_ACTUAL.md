@@ -97,8 +97,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 ## Validación estricta del campo de semilla · CI #136/#137
 
 - Se detectó que `Number.parseInt("12-3", 10)` devuelve `12` y aceptaba la entrada sin avisar. La UI ahora valida la cadena con un patrón de entero estricto y después verifica `Number.isSafeInteger` antes de enviar la semilla.
-- El campo amplió su límite de edición a 17 caracteres para incluir el signo negativo y el rango completo de enteros seguros de JavaScript, en lugar de limitar arbitrariamente a 15.
-- **CI #136 PASS_REAL** probó el rechazo del formato malformado `12-3` y recuperación mediante una semilla válida: https://github.com/jonhararagi/botimagen/actions/runs/37950027112.
+- El campo amplió su límite de edición a 17 caracteres para incluir el signo negativo y el rango completo de enteros seguros de JavaScript, en lugar de limitar arbitrariamente a 15.- **CI #136 PASS_REAL** probó el rechazo del formato malformado `12-3` y recuperación mediante una semilla válida: https://github.com/jonhararagi/botimagen/actions/runs/37950027112.
 - **CI #137 PASS_REAL** añade pruebas de navegador para el máximo seguro `9007199254740991` (aceptado) y el entero siguiente `9007199254740992` (rechazado sin redondear), además del caso malformado. Toda la batería Python/API, cobertura UI, `npm ci`, build y Chromium E2E pasa: https://github.com/jonhararagi/botimagen/actions/runs/37950307373.
 - La corrección es de calidad de entrada y reproducibilidad. No altera la estimación de fases ni el total: **58,65 / 100 → 59%**.
 - **TIMER:** 30–60 minutos estimados de trabajo de implementación y pruebas. El smoke test físico en Windows sigue `NOT_RUN`.
@@ -198,7 +197,6 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - `tests/test_web_field_coverage.py` valida estáticamente estos guardarraíles y conserva la comprobación de las 47 categorías/8 pestañas. Es cobertura de contrato fuente, no sustituye el test de navegador.
 - **CI #100: PASS_REAL**, con pruebas Python, contrato de editor, `npm ci` y build React/TypeScript: https://github.com/jonhararagi/botimagen/actions/runs/37925030261.
 - TIMER de la mejora: 30–60 minutos estimados. El total ponderado sigue siendo **49,2 / 100 → 49%** porque la QA real en navegador/Windows sigue pendiente.
-
 ## Última mejora semántica AUTO capilar · catálogo v8
 
 - Se actualizó `character_rules.json` de v7 a v8. Continúa con 47 categorías; no se cambiaron IDs ni se añadieron categorías de interfaz.
@@ -297,8 +295,7 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 
 - Rama aislada \`feature/bimg-analysis-001-contract-poc\`, creada desde el HEAD verificado de \`main\`.
 - Capacidad opcional separada de \`CharacterGenerator\`: \`image_analysis.py\`, contrato en \`docs/engineering/BIMG-ANALYSIS-001-CONTRACT-POC.md\` y ruta binaria \`POST /api/analyze\`.
-- Entrada explícita de bytes, sin rutas de disco; límite propio de 12 MiB, 8192 px por lado, 20 MP y formatos PNG/JPEG/WebP. El límite JSON de 64 KiB permanece intacto.
-- Pillow queda fijado en \`requirements-analysis.txt\`; CI instala la dependencia y ejecuta tests del módulo. La ruta valida MIME/formato y restringe Origin a puertos locales de BotImagen.
+- Entrada explícita de bytes, sin rutas de disco; límite propio de 12 MiB, 8192 px por lado, 20 MP y formatos PNG/JPEG/WebP. El límite JSON de 64 KiB permanece intacto.- Pillow queda fijado en \`requirements-analysis.txt\`; CI instala la dependencia y ejecuta tests del módulo. La ruta valida MIME/formato y restringe Origin a puertos locales de BotImagen.
 - Se miden metadatos y, si hay alfa, distribución, caja delimitadora, ocupación rectangular y contacto con bordes. Sin alfa devuelve \`NOT_SUPPORTED\`; alfa completamente cero produce \`EMPTY_CONTENT\`.
 - Tests sintéticos con resultados conocidos y test HTTP sobre \`references/dataset-cuerpos/0.png\` existente. La licencia/procedencia de ese dataset sigue pendiente de revisión.
 - La interfaz React no se modifica ni anuncia análisis disponible. QA física Windows: \`NOT_RUN\`.
@@ -312,6 +309,18 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **HEAD BEFORE verificado:** `492c039797abec89b01ce8c1e3dd20e9c9bec119`; PR #14 abierto y sin fusionar. `main` conserva `b508cfe7d3216eda801438d46dff8873842cea86`; PR #11 continúa abierto, independiente y sin fusionar.
 - **Causa raíz confirmada en CI #361:** `tests/test_image_analysis.py` enviaba la imagen completa del fixture real con `PUT /api/analyze`. El servidor rechaza correctamente el método no permitido con HTTP 405 antes de consumir el cuerpo, por lo que el cliente podía recibir `BrokenPipeError` al seguir transmitiendo. No fue un fallo del analizador de píxeles.
 - **Corrección mínima:** la prueba envía un cuerpo vacío con `PUT`; conserva las aserciones de HTTP 405 y `METHOD_NOT_ALLOWED`. No se modificó `botimagen_server.py`, el contrato de producción, las mediciones, los límites ni las dependencias.
-- **Commit de corrección:** `8db097cdd652bf072e48b97b3df390172d8ddb20`, archivo `tests/test_image_analysis.py`. CI #362 se lanzó para este SHA: https://github.com/jonhararagi/botimagen/actions/runs/38210409120. El resultado se registra como pendiente hasta que termine.
-- **Validación local:** no se declara ejecución local en este entorno; la validación reproducible se realiza en GitHub Actions. La aceptación requiere CI completa del SHA final, incluida la suite Python/API, Pillow, build React/TypeScript y smoke Chromium.
-- **Pendiente:** CI final del SHA de esta ficha; revisión de procedencia/licencia de `references/dataset-cuerpos/0.png`; integración UI/React, análisis semántico/anatómico y QA física Windows permanecen fuera del alcance. Progreso ponderado de beta local: **63%**, sin cambios por esta corrección de pruebas.
+- **Commit de corrección:** `8db097cdd652bf072e48b97b3df390172d8ddb20`, archivo `tests/test_image_analysis.py`. CI #362: https://github.com/jonhararagi/botimagen/actions/runs/38210409120.
+- **Validación automatizada del SHA final de R1:** CI #363 terminó **SUCCESS** para `27a904236b1c6591127556d98d6ec5069740d483`: https://github.com/jonhararagi/botimagen/actions/runs/38210460520. Pasaron suite Python/API, instalación de Pillow, análisis determinista, build React/TypeScript y smoke test de Chromium.
+- **Validación local y QA física:** no se declara ejecución local en este entorno. La CI valida código y pruebas automatizadas en Linux; no sustituye la prueba física de Chrome/Edge en Windows, que sigue `NOT_RUN`.
+- **Estado técnico R1:** aprobado para la corrección de la prueba HTTP y las comprobaciones automatizadas del SHA validado. No significa que estén implementados análisis semántico/anatómico, integración React del analizador o generación de imágenes.
+- **Pendientes reales:** revisar procedencia/licencia de `references/dataset-cuerpos/0.png`; integración UI/React, análisis semántico/anatómico y QA física Windows siguen fuera del alcance. Progreso ponderado de beta local: **63%**, sin cambios por esta corrección de pruebas.
+
+## BIMG-ANALYSIS-001-R2 · cierre documental verificado · 2026-10-12
+
+- **HEAD BEFORE verificado:** `27a904236b1c6591127556d98d6ec5069740d483`. PR #14 (`feature/bimg-analysis-001-contract-poc`) estaba abierto y sin fusionar; `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86`. PR #11 permanece abierto, independiente y sin fusionar.
+- **Cierre de R1 confirmado:** CI #363 terminó `SUCCESS` sobre el SHA `27a904236b1c6591127556d98d6ec5069740d483`: https://github.com/jonhararagi/botimagen/actions/runs/38210460520. La evidencia corresponde al código de R1, no al nuevo commit documental de R2.
+- **Cambio R2 exclusivamente documental:** esta sección registra la CI #363 como aprobada, separa la validación automatizada de la QA física en Windows y aclara el alcance real. No se modifican código, pruebas, contratos ni dependencias.
+- **Estado técnico:** `APPROVED` para la corrección R1 y sus validaciones automatizadas. `WINDOWS_MANUAL_QA: NOT_RUN`. La CI no certifica comportamiento en Windows ni aprobación artística.
+- **No implementado por esta tarea:** análisis semántico o anatómico, integración del analizador en React y generación de imágenes. La procedencia/licencia de `references/dataset-cuerpos/0.png` sigue pendiente.
+- **Progreso ponderado de la beta local:** **63%**, sin cambios según la fórmula vigente de `cerebro/PROGRESO.md`.
+- **CI del HEAD documental R2:** pendiente de ejecución y verificación tras este commit; el cierre definitivo de R2 requiere que esa ejecución termine en `SUCCESS`.
