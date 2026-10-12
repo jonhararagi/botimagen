@@ -19,7 +19,10 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
                      "handLeft", "pelvisCenter", "kneeLeft", "ankleLeft", "footLeft"):
             self.assertRegex(LANDMARKS, rf"\b{name}: \{{ x:")
         self.assertIn("headTop: { x: 170, y: 80 }", LANDMARKS)
-        self.assertIn("chestCenter: { x: 170, y: rear ? 249 : 248 }", LANDMARKS)
+        self.assertIn("shoulderLeft: { x: 120, y: 251 }", LANDMARKS)
+        self.assertIn("torsoShoulderLeft: { x: 128, y: 254 }", LANDMARKS)
+        self.assertIn("kneeLeft: { x: 150, y: 442 }", LANDMARKS)
+        self.assertIn("chestCenter: { x: 170, y: rear ? 242 : 241 }", LANDMARKS)
         self.assertIn("hemY - 57", LANDMARKS)
         self.assertIn("waistHalf * 0.72", LANDMARKS)
 
