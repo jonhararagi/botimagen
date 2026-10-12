@@ -2,7 +2,7 @@ name: Validate BotImagen
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/bimg-engine-001-cyberstreet-visual-renderer]
   pull_request:
 
 jobs:
