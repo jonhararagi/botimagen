@@ -491,3 +491,15 @@ Estado actual: `IN_PROGRESS / NOT_VALIDATED_IN_EDITOR`.
 CI del HEAD `210f9530ba305a034564217d44ab2d241ee1a693`: no hay checks confirmados en la consulta actual.
 QA visual del paquete en el compositor real: `NOT_RUN`.
 QA Windows: `NOT_RUN`.
+
+
+## BIMG-MODULAR-INTEGRATION-REAL-003 · CyberStreet conectado al editor
+
+- Se añadió `cyberstreet_svg_compositor.py`: valida el manifiesto del paquete, restringe las rutas a `assets/modular/oc-cyberstreet/`, verifica que existan SVG válidos con lienzo 512×768 y compone las capas reales en el orden z declarado.
+- `botimagen_server.py` publica `GET /api/modular-cyberstreet` y `POST /api/modular-cyberstreet/render`; la selección enviada solo puede activar/desactivar IDs presentes en el manifiesto. El cuerpo base no se puede desactivar.
+- `web/src/visual/ModularCharacterComposer.tsx` ahora consume ese endpoint, renderiza las cuatro piezas SVG reales, conecta guardar/restaurar con `/api/profiles` y rasteriza la composición actual a PNG transparente 512×768 mediante Canvas del navegador.
+- Se añadió `tests/test_cyberstreet_svg_compositor.py` y la validación de sintaxis correspondiente en CI.
+- Commits de implementación publicados en la rama de trabajo: `43d85cb5767800d5ddb043347b10717211b8ef4c`, `1590adb4c628bac2ed76cb0a2647fb327e624263`, `7ae0eda3756ba3dce05f2153141e04dc2f84c2fb`, `41fac9c30dd6003810f92673301ec589ebefcf5f`, `cd9084893f2bef0501b1f640f278c72e60b9bb08`.
+- Estado de pruebas al registrar esta ficha: CI #442 está en ejecución; sus resultados aún no se consideran aprobados. No se ha ejecutado QA visual manual ni QA física de Windows en esta sesión.
+- Limitación conocida: los anclajes originales siguen siendo preliminares. La integración compone las piezas en el lienzo compartido y no declara corregida/validada su anatomía artística. La exportación PNG depende del soporte SVG/Canvas del navegador.
+- TIMER: estimación provisional de 6–12 horas activas para el tramo; tiempo real medido `NOT_MEASURED`.
