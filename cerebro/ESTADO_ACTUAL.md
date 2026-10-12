@@ -699,3 +699,32 @@ QA Windows: `NOT_RUN`.
 ### Próximo trabajo concreto
 
 Mejorar la segmentación semántica y las herramientas de corrección de máscara para pasar de regiones de color a partes anatómicas/prendas más útiles; conectar categorías confirmadas con variantes reutilizables sin alterar la reconstrucción del original. **Timer estimado: 4–8 horas activas para esa siguiente fase**, no tiempo medido ni estimación de finalización de todo BotImagen.
+
+
+## Dirección ejecutiva fijada por el usuario · una sola orden de implementación · 2026-10-12
+
+El usuario pidió cerrar el ciclo de documentación y hacer el programa de verdad. El próximo encargo está guardado en `cerebro/PROMPT_OBRERO_MODELO_PNG_MULTICAPA_002.md` y está diseñado para ejecutarse en **un solo prompt**, sin una cadena de tareas o nuevas rondas para volver a explicar el objetivo.
+
+### No volver a repetir los fallos de confianza de la sesión
+
+- El usuario señaló correctamente que ninguna de las capturas que se le mostraron contenía a Firefly. La captura pública del constructor de modelos del artefacto #524 enseña una figura geométrica sintética, no material de Firefly. No etiquetarla ni presentarla como captura de Honkai: Star Rail.
+- La prueba privada #10 sí utilizó el PNG real `referencias/honkai-star-rail-firefly-character-preview.png` y generó importación + recorte manual. Sin embargo, el artefacto de esa prueba contiene solo `report.json` y `report.md`, no una captura del editor con Firefly visible. Por tanto, existe evidencia de importación medida, pero todavía **no existe evidencia visual capturada que muestre Firefly dentro del constructor**.
+- Las ejecuciones privadas anteriores #1–#9 incluyeron fallos de harness y un recorte de sólo `248×50` que no era útil como pieza de ropa. No ocultarlos ni usarlos como prueba final; la ejecución #10 corrigió el encuadre y registró un candidato manual de `176×210`, alfa visible `0.0779`.
+- Los PNG `16.png`–`29.png` del repositorio privado son distintos encuadres/poses; su prueba de importación a 512×768 no prueba por sí sola que sean piezas separadas. El modelo debe usar varias como referencias de estilo/pose y solo crear piezas cuando las máscaras estén separadas/corregidas.
+- El constructor de modelos actual ya existe y está integrado: `character_model_builder.py`, `web/src/visual/CharacterModelBuilder.tsx`, rutas `/api/character-models`, perfiles de color y descomposición en regiones conectadas. La limitación central pendiente es corregir regiones y asignar roles, no reconstruir todo el programa.
+- La separación automática actual por color/conectividad no es segmentación semántica; la firma de paleta/estilo no es un modelo de difusión entrenado. Decirlo explícitamente y mejorar la utilidad sin promesas mágicas.
+- El trabajo siguiente debe editar código y flujos UI existentes, ofrecer máscaras editables/agrupación de regiones, y demostrar el flujo con capturas Playwright del fixture Firefly real en el repositorio privado. Las capturas y derivados del fixture se quedan privados; no se copian al repo público.
+- La interfaz debe usar las imágenes de prueba directamente, no añadir más paneles de enlaces externos para que el usuario las busque. No generar otra documentación como sustituto de la integración.
+- Preservar `main`, PR #11 y PR #14. La rama de trabajo del repo público continúa siendo `feature/bimg-engine-001-cyberstreet-visual-renderer`; la rama de verificación privada es `test/reference-import-bimg-001`.
+
+### Evidencia vigente antes de empezar el siguiente encargo
+
+- Constructor modular de modelos: CI #524 SUCCESS, commit de código `f13b661f2657a2895b69d885e95bde82849d05c1`, https://github.com/jonhararagi/botimagen/actions/runs/38312545782
+- Importación privada real (14 imágenes + Firefly): ejecución #10 SUCCESS con informe, https://github.com/jonhararagi/botimagen-referencias-privadas/actions/runs/38296646209
+- Artefacto privado #10 (informe, no capturas): https://github.com/jonhararagi/botimagen-referencias-privadas/actions/runs/38296646209/artifacts/11768523241
+- HEAD público actual al registrar esta instrucción: `1151edf2e221ce21c494a8fa439ea853deb18705`; `main` permaneció en `b508cfe7d3216eda801438d46dff8873842cea86`.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+
+### Siguiente objetivo no negociable
+
+Ejecutar una sola orden de trabajo para completar la edición de máscaras y el flujo de modelo multi-PNG, ampliar/validar el modelo con varias referencias privadas y producir capturas privadas que **visualmente contengan el fixture Firefly** dentro del programa. Timer estimado: **8–16 horas activas** para esta fase, no medido y no equivalente a terminar todo BotImagen.
