@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
+<title>Tech pleated skirt</title><desc>Original detachable lower-body garment component with cyan piping and magenta panels.</desc>
+<g id="skirt" stroke="#18213d" stroke-width="5" stroke-linejoin="round">
+<path fill="#262b4a" d="M209 344 Q256 358 303 344 L328 432 L306 449 L282 415 L256 455 L230 415 L205 449 L184 432Z"/>
+<path fill="#171d36" d="M209 350 L229 354 L219 433 L205 449 L196 436Z M240 356 L256 357 L256 455 L239 430Z M272 356 L288 352 L306 436 L282 415Z"/>
+<path fill="none" stroke="#4af4ee" stroke-width="7" d="M195 421 L317 421"/>
+<path fill="#f64dbd" d="M205 449 L230 415 L239 430 L230 461Z M282 415 L306 449 L282 461 L273 430Z" stroke="none"/>
+<path fill="#3d4774" d="M231 357 L240 356 L239 430 L230 415Z M272 356 L282 354 L282 415 L273 430Z"/>
+</g>
+</svg>

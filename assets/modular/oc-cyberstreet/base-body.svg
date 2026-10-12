@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
+<title>Original OC base body silhouette</title><desc>Neutral stylized anime body base for BotImagen modular composition. Transparent background, front view, no clothing.</desc>
+<g id="body" stroke="#392d49" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#f2c6b5" d="M215 176 Q185 185 175 220 L153 302 Q147 326 164 337 Q180 345 191 322 L211 264 L207 342 Q202 376 184 414 L164 498 Q158 520 177 528 Q195 535 204 513 L236 427 L245 526 L229 665 Q227 688 250 690 Q271 691 275 668 L293 535 L309 667 Q312 689 334 686 Q354 682 348 658 L338 511 L326 421 Q321 383 305 345 L301 263 L322 320 Q333 343 350 334 Q366 325 356 302 L331 221 Q320 185 287 176 Z"/>
+<path fill="#f2c6b5" d="M217 120 Q215 92 250 89 Q290 88 294 120 L288 179 Q267 202 244 180 Z"/>
+<path fill="#e5a895" d="M218 142 Q255 164 291 141 L288 177 Q262 198 244 180 Z" stroke="none"/>
+</g>
+<g fill="#d78e88" opacity=".38"><path d="M215 198 Q198 230 196 257 L177 316 Q181 323 187 311 L210 252Z"/><path d="M298 202 Q319 224 324 253 L345 315 Q340 323 334 310 L307 249Z"/></g>
+</svg>

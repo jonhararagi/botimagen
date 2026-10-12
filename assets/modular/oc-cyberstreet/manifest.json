@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "pack_id": "oc-cyberstreet-original-starter",
+  "title": "CyberStreet OC modular starter pack",
+  "status": "component_candidate",
+  "author": "BotImagen Studio",
+  "license": "LicenseRef-BotImagen-Original-Assets",
+  "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+  "source_url": "https://github.com/jonhararagi/botimagen",
+  "view": {
+    "width": 512,
+    "height": 768,
+    "orientation": "front"
+  },
+  "anchors": {
+    "head": {
+      "x": 256,
+      "y": 145
+    },
+    "neck": {
+      "x": 256,
+      "y": 184
+    },
+    "shoulder_left": {
+      "x": 184,
+      "y": 205
+    },
+    "shoulder_right": {
+      "x": 328,
+      "y": 205
+    },
+    "waist": {
+      "x": 256,
+      "y": 347
+    },
+    "hip": {
+      "x": 256,
+      "y": 421
+    }
+  },
+  "layers": [
+    {
+      "id": "base-body",
+      "path": "base-body.svg",
+      "z": 10,
+      "role": "body",
+      "editable": false
+    },
+    {
+      "id": "skirt-tech-pleated",
+      "path": "skirt-tech-pleated.svg",
+      "z": 20,
+      "role": "lower-garment",
+      "editable": true,
+      "anchor": "waist"
+    },
+    {
+      "id": "top-neon-jacket",
+      "path": "top-neon-jacket.svg",
+      "z": 30,
+      "role": "upper-garment",
+      "editable": true,
+      "anchor": "shoulder_left,shoulder_right,waist"
+    },
+    {
+      "id": "hair-midnight-cyan",
+      "path": "hair-midnight-cyan.svg",
+      "z": 40,
+      "role": "hair-front-and-back",
+      "editable": true,
+      "anchor": "head"
+    }
+  ],
+  "limitations": [
+    "Starter vector components, not production-grade anatomy.",
+    "Layer alignment is preliminary and requires visual QA in the live compositor.",
+    "No external artwork or game-extracted asset is included."
+  ]
+}

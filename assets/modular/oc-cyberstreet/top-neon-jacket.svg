@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
+<title>Neon cropped street jacket</title><desc>Original detachable upper-body garment. Designed for the BotImagen neutral body canvas, front view.</desc>
+<g id="jacket" stroke="#18213d" stroke-width="5" stroke-linejoin="round">
+<path fill="#252b4b" d="M214 181 L184 198 L164 286 L190 305 L213 249 L211 344 Q255 359 302 344 L299 249 L322 305 L349 286 L328 198 L290 181 L268 204 L240 204Z"/>
+<path fill="#11182d" d="M240 204 L256 223 L268 204 L281 190 L292 207 L280 244 L256 266 L231 243 L220 207Z"/>
+<path fill="#f64dbd" d="M212 333 Q256 343 300 333 L301 350 Q256 362 210 350Z" stroke="none"/>
+<path fill="none" stroke="#4af4ee" stroke-width="7" d="M190 218 L176 278 L190 287 M322 218 L336 278 L322 287 M224 212 L236 240 L256 259 L276 240 L288 212"/>
+<path fill="#f64dbd" d="M182 276 L198 284 L191 301 L174 292Z M330 276 L314 284 L321 301 L338 292Z"/>
+<path fill="#2f3864" d="M214 181 L240 204 L230 222 L205 201Z M290 181 L268 204 L278 222 L303 201Z"/>
+</g>
+</svg>

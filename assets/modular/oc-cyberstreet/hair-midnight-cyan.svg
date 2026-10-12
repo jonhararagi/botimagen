@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 768" width="512" height="768">
+<title>Midnight cyan layered anime hair</title><desc>Original front-view hair component for BotImagen OC assembly. Aligns to head anchor x=256 y=145.</desc>
+<g id="back-hair" fill="#20233e" stroke="#11162b" stroke-width="5" stroke-linejoin="round"><path d="M207 160 Q178 113 199 78 Q218 40 266 48 Q316 47 328 94 Q341 126 309 174 L318 236 L287 210 L270 260 L247 212 L215 242 L218 195 L190 218Z"/></g>
+<path d="M207 99 Q233 61 269 64 Q301 65 316 98 Q287 85 266 96 Q241 108 207 99Z" fill="#3c4778"/>
+<path d="M205 103 Q194 144 220 178 Q236 154 242 122 Q258 154 272 162 Q289 132 286 105 Q307 135 309 174 L294 197 L278 174 L262 202 L245 172 L226 193 L215 159Z" fill="#272e53" stroke="#11162b" stroke-width="5" stroke-linejoin="round"/>
+<path d="M205 112 Q215 91 236 82 M283 80 Q305 91 310 113" fill="none" stroke="#47e5e7" stroke-width="7" stroke-linecap="round"/>
+<path d="M221 123 Q215 150 226 171 M292 119 Q302 145 294 164" fill="none" stroke="#718cff" stroke-width="4" stroke-linecap="round"/>
+<g fill="#47e5e7"><path d="M199 168 l-9 20 16-7Z"/><path d="M311 164 l13 20-18-8Z"/></g>
+</svg>
