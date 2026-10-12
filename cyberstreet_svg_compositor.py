@@ -61,6 +61,12 @@ def _load_manifest() -> dict[str, Any]:
 
 def get_cyberstreet_manifest() -> dict[str, Any]:
     manifest = _load_manifest()
+    labels = {
+        "base-body": "Cuerpo base",
+        "skirt-tech-pleated": "Falda tecnológica",
+        "top-neon-jacket": "Chaqueta neón",
+        "hair-midnight-cyan": "Cabello cyan",
+    }
     return {
         "schema_version": 1,
         "pack_id": manifest["pack_id"],
@@ -68,7 +74,7 @@ def get_cyberstreet_manifest() -> dict[str, Any]:
         "width": manifest["view"]["width"],
         "height": manifest["view"]["height"],
         "layers": [
-            {"id": layer["id"], "label": layer["id"].replace("-", " ").title(),
+            {"id": layer["id"], "label": labels.get(layer["id"], layer["id"].replace("-", " ").title()),
              "role": layer.get("role", "detail"), "z": layer.get("z", 0),
              "editable": bool(layer.get("editable", False)),
              "enabled_by_default": True}
