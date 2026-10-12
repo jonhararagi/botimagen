@@ -1189,11 +1189,11 @@ try {
   await selectVisualTrait("nose_style", "puente_recto");
   await page.screenshot({ path: resolve(visualQaDir, "art-face-diamond-straight-bridge.png"), fullPage: true });
   await page.getByRole("tab", { name: /Cabello/i }).click();
-  await selectVisualTrait("hairstyle", "hime_cut");
+  await selectVisualTrait("hairstyle", "long_straight");
   await selectVisualTrait("hair", "turquesa");
-  await page.screenshot({ path: resolve(visualQaDir, "art-hime-cut-turquoise.png"), fullPage: true });
+  await page.screenshot({ path: resolve(visualQaDir, "art-long-straight-pink.png"), fullPage: true });
   await selectVisualTrait("hair_length", "extra_largo");
-  await page.screenshot({ path: resolve(visualQaDir, "art-hime-cut-extra-long.png"), fullPage: true });
+  await page.screenshot({ path: resolve(visualQaDir, "art-long-straight-extra-long.png"), fullPage: true });
 
   const productStudioManifest = {
     source: "Live BotImagen React app with POST /api/render/character SVG as the only visible character renderer",
