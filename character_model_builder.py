@@ -726,6 +726,148 @@ def publish_model_layer(
         "merged_region_count": len(selected_ids),
     }
 
+
+def edit_character_model_layer(
+    model_id: str,
+    layer_id: str,
+    mask_png_base64: str,
+    models_root: Path | None = None,
+) -> dict[str, Any]:
+    """Apply an editable grayscale mask while preserving source RGB pixels."""
+    import base64
+    import binascii
+
+    if not LAYER_ID_RE.fullmatch(layer_id):
+        raise CharacterModelError("La región no existe.")
+    if not isinstance(mask_png_base64, str) or len(mask_png_base64) > 8_000_000:
+        raise CharacterModelError("La máscara supera el límite permitido.")
+    try:
+        raw_mask = base64.b64decode(mask_png_base64, validate=True)
+        with Image.open(io.BytesIO(raw_mask)) as opened:
+            opened.load()
+            if opened.format != "PNG" or opened.size != CANVAS_SIZE:
+                raise CharacterModelError("La máscara debe ser un PNG de 512×768.")
+            mask = opened.convert("L")
+    except (binascii.Error, OSError, ValueError) as exc:
+        raise CharacterModelError("La máscara PNG no es válida.") from exc
+
+    root = Path(models_root) if models_root else DEFAULT_MODELS_ROOT
+    model = read_character_model(model_id, root)
+    layer = next((item for item in model.get("layers", []) if item.get("id") == layer_id), None)
+    if layer is None:
+        raise CharacterModelError("La región no existe.")
+    folder = _safe_model_folder(model_id, root)
+    layers_dir = folder / "layers"
+    layer_path = layers_dir / (layer_id + ".png")
+    if layers_dir.is_symlink() or layer_path.is_symlink():
+        raise CharacterModelError("La máscara no puede salir del directorio del modelo.")
+    originals_dir = layers_dir / "originals"
+    originals_dir.mkdir(mode=0o700, exist_ok=True)
+    original_path = originals_dir / (layer_id + ".png")
+    if not original_path.exists():
+        original_path.write_bytes(layer_path.read_bytes())
+
+    source_bytes = (folder / "source.png").read_bytes()
+    with Image.open(io.BytesIO(source_bytes)) as opened:
+        opened.load()
+        source = opened.convert("RGBA")
+    mask_bytes = mask.tobytes()
+    source_bytes_rgba = source.tobytes()
+    pixels = bytearray(len(source_bytes_rgba))
+    visible = 0
+    left, top, right, bottom = CANVAS_SIZE[0], CANVAS_SIZE[1], -1, -1
+    for index, value in enumerate(mask_bytes):
+        offset = index * 4
+        source_alpha = source_bytes_rgba[offset + 3]
+        alpha = (source_alpha * value + 127) // 255
+        if alpha:
+            visible += 1
+            x, y = index % CANVAS_SIZE[0], index // CANVAS_SIZE[0]
+            left, top = min(left, x), min(top, y)
+            right, bottom = max(right, x), max(bottom, y)
+            pixels[offset:offset + 3] = source_bytes_rgba[offset:offset + 3]
+            pixels[offset + 3] = alpha
+    edited = Image.frombytes("RGBA", CANVAS_SIZE, bytes(pixels))
+    if visible == 0:
+        raise CharacterModelError("La máscara no puede dejar la región vacía.")
+    output = io.BytesIO()
+    edited.save(output, format="PNG", optimize=True)
+    layer_path.write_bytes(output.getvalue())
+    bbox = {"x": left, "y": top, "width": right-left+1, "height": bottom-top+1}
+    thumb = edited.crop((left, top, right+1, bottom+1))
+    thumb.save(layers_dir / (layer_id + "-thumb.png"), format="PNG", optimize=True)
+    layer["pixel_count"] = visible
+    layer["bbox"] = bbox
+    layer["sha256"] = hashlib.sha256(output.getvalue()).hexdigest()
+    layer["edited_by_user"] = True
+    model["revision"] = int(model.get("revision", 1)) + 1
+    model["updated_at"] = _now()
+    model["decomposition"]["round_trip_exact_visible_pixels"] = False
+    _rebuild_model_preview(model, folder)
+    _write_model_json(model, folder)
+    return {"model": model, "layer_id": layer_id, "pixel_count": visible, "bbox": bbox}
+
+
+def reset_character_model_layer(
+    model_id: str,
+    layer_id: str,
+    models_root: Path | None = None,
+) -> dict[str, Any]:
+    if not LAYER_ID_RE.fullmatch(layer_id):
+        raise CharacterModelError("La región no existe.")
+    root = Path(models_root) if models_root else DEFAULT_MODELS_ROOT
+    model = read_character_model(model_id, root)
+    layer = next((item for item in model.get("layers", []) if item.get("id") == layer_id), None)
+    if layer is None:
+        raise CharacterModelError("La región no existe.")
+    folder = _safe_model_folder(model_id, root)
+    layers_dir = folder / "layers"
+    original = layers_dir / "originals" / (layer_id + ".png")
+    current = layers_dir / (layer_id + ".png")
+    if original.is_symlink() or current.is_symlink():
+        raise CharacterModelError("La máscara no puede salir del directorio del modelo.")
+    if not original.exists():
+        raise CharacterModelError("Esta región todavía no tiene una edición para restaurar.")
+    data = original.read_bytes()
+    with Image.open(io.BytesIO(data)) as opened:
+        opened.load()
+        image = opened.convert("RGBA")
+    bbox = _alpha_bounds(image)
+    if not bbox:
+        raise CharacterModelError("La máscara original está vacía.")
+    current.write_bytes(data)
+    cropped = image.crop((bbox["x"], bbox["y"], bbox["x"]+bbox["width"], bbox["y"]+bbox["height"]))
+    cropped.save(layers_dir / (layer_id + "-thumb.png"), format="PNG", optimize=True)
+    layer["pixel_count"] = sum(1 for value in image.getchannel("A").tobytes() if value > 0)
+    layer["bbox"] = bbox
+    layer["sha256"] = hashlib.sha256(data).hexdigest()
+    layer.pop("edited_by_user", None)
+    model["revision"] = int(model.get("revision", 1)) + 1
+    model["updated_at"] = _now()
+    model["decomposition"]["round_trip_exact_visible_pixels"] = all(not item.get("edited_by_user") for item in model["layers"])
+    _rebuild_model_preview(model, folder)
+    _write_model_json(model, folder)
+    return {"model": model, "layer_id": layer_id, "pixel_count": layer["pixel_count"]}
+
+
+def _rebuild_model_preview(model: dict[str, Any], folder: Path) -> None:
+    reconstruction = Image.new("RGBA", CANVAS_SIZE, (0, 0, 0, 0))
+    for layer in model.get("layers", []):
+        path = folder / "layers" / Path(layer.get("filename", "")).name
+        with Image.open(path) as opened:
+            opened.load()
+            reconstruction = Image.alpha_composite(reconstruction, opened.convert("RGBA"))
+    reconstruction.save(folder / "preview.png", format="PNG", optimize=True)
+
+
+def _write_model_json(model: dict[str, Any], folder: Path) -> None:
+    temp = folder / "model.json.tmp"
+    with temp.open("w", encoding="utf-8") as handle:
+        json.dump(model, handle, ensure_ascii=False, indent=2)
+        handle.write("\\n")
+    temp.replace(folder / "model.json")
+
+
 def _save_layer_category(
     model_id: str,
     layer_id: str,
