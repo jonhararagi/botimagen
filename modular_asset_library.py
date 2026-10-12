@@ -117,6 +117,23 @@ def list_user_assets(library_root: Path | None = None) -> dict[str, Any]:
     return {"schema_version": 1, "count": len(visible), "assets": visible}
 
 
+def read_user_asset(asset_id: str, library_root: Path | None = None) -> tuple[bytes, str]:
+    if not isinstance(asset_id, str) or not re.fullmatch(r"user\\.[0-9a-f]{32}", asset_id):
+        raise AssetImportError("Identificador de asset inválido.")
+    root = Path(library_root) if library_root else DEFAULT_LIBRARY_ROOT
+    catalog = _read_catalog(root)
+    item = next((entry for entry in catalog["assets"] if isinstance(entry, dict) and entry.get("id") == asset_id), None)
+    if item is None:
+        raise FileNotFoundError(asset_id)
+    stored_name = item.get("stored_name")
+    if not isinstance(stored_name, str) or Path(stored_name).name != stored_name:
+        raise AssetImportError("Ruta interna de asset inválida.")
+    path = root / stored_name
+    if path.is_symlink() or not path.is_file() or path.resolve().parent != root.resolve():
+        raise FileNotFoundError(asset_id)
+    return path.read_bytes(), str(item.get("mime_type", "application/octet-stream"))
+
+
 def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise AssetImportError("El cuerpo debe ser un objeto JSON.")
