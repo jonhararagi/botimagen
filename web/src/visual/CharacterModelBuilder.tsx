@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 
 type LibraryAsset = {
   id:string; label:string; category:string; kind:string; filename:string; source_filename?:string;
@@ -54,8 +55,132 @@ export function CharacterModelBuilder() {
   const [notice,setNotice]=useState("");
   const [showAllLayers,setShowAllLayers]=useState(false);
   const [filter,setFilter]=useState("");
+  const [editingLayerId,setEditingLayerId]=useState("");
+  const [maskTool,setMaskTool]=useState<"add"|"erase"|"polygon-add"|"polygon-erase">("add");
+  const [brushSize,setBrushSize]=useState(18);
+  const [polygonPoints,setPolygonPoints]=useState<Array<{x:number;y:number}>>([]);
+  const [maskDirty,setMaskDirty]=useState(false);
+  const previewCanvasRef=useRef<HTMLCanvasElement|null>(null);
+  const maskCanvasRef=useRef<HTMLCanvasElement|null>(null);
+  const sourceImageRef=useRef<HTMLImageElement|null>(null);
+  const maskHistoryRef=useRef<ImageData[]>([]);
+  const paintingRef=useRef(false);
+
 
   const selectedAssets=useMemo(()=>assets.filter(asset=>selectedIds.includes(asset.id)),[assets,selectedIds]);
+  const importReferenceFiles=async(files:FileList|null)=>{
+    if(!files?.length)return;
+    setBusy(true);setError("");setNotice("");
+    try{
+      const imported:string[]=[];
+      for(const file of Array.from(files)){
+        const mime=file.type.toLowerCase();
+        if(!["image/png","image/jpeg","image/webp"].includes(mime))throw new Error(file.name+": usa PNG, JPEG o WebP.");
+        if(file.size>12*1024*1024)throw new Error(file.name+": supera el límite de 12 MiB.");
+        const bytes=new Uint8Array(await file.arrayBuffer());
+        let binary="";
+        for(let offset=0;offset<bytes.length;offset+=0x8000)binary+=String.fromCharCode(...bytes.subarray(offset,Math.min(offset+0x8000,bytes.length)));
+        const response=await fetch("/api/modular-assets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+          filename:file.name,mime_type:mime,data_base64:btoa(binary),category:"reference",label:file.name.slice(0,100),
+          kind:"reference",view:"unknown",license:"USER_PROVIDED_REFERENCE",source_url:"",source_filename:file.name
+        })});
+        const data=await response.json();
+        if(!response.ok)throw new Error(data.error||"No se pudo importar "+file.name+".");
+        imported.push(data.asset?.id||data.id);
+      }
+      const ids=imported.filter((id):id is string=>typeof id==="string");
+      await refreshAssets();
+      setSelectedIds(current=>Array.from(new Set([...current,...ids])).slice(0,32));
+      if(ids.length&&!baseAssetId)setBaseAssetId(ids[0]);
+      setNotice(ids.length+" imagen(es) importadas a la biblioteca y añadidas al lote. Las vistas distintas se conservan como referencias, no como prendas automáticas.");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+  const drawMaskPreview=()=>{
+    const canvas=previewCanvasRef.current,maskCanvas=maskCanvasRef.current,source=sourceImageRef.current;
+    if(!canvas||!maskCanvas||!source)return;
+    const ctx=canvas.getContext("2d"),maskCtx=maskCanvas.getContext("2d");
+    if(!ctx||!maskCtx)return;
+    ctx.clearRect(0,0,512,768);ctx.drawImage(source,0,0,512,768);
+    const mask=maskCtx.getImageData(0,0,512,768),overlay=ctx.createImageData(512,768);
+    for(let i=0;i<mask.data.length;i+=4){const value=mask.data[i];overlay.data[i]=255;overlay.data[i+1]=35;overlay.data[i+2]=110;overlay.data[i+3]=Math.round(value*0.48);}
+    ctx.putImageData(overlay,0,0);
+    ctx.strokeStyle="#f8fafc";ctx.lineWidth=1;
+    if(polygonPoints.length){ctx.beginPath();polygonPoints.forEach((point,index)=>index===0?ctx.moveTo(point.x,point.y):ctx.lineTo(point.x,point.y));ctx.stroke();}
+  };
+  useEffect(()=>{
+    if(!model||!editingLayerId)return;
+    let cancelled=false;
+    const source=new Image(),layer=new Image();
+    source.onload=()=>{if(cancelled)return;sourceImageRef.current=source;};
+    layer.onload=()=>{
+      if(cancelled)return;
+      const maskCanvas=maskCanvasRef.current;
+      const temp=document.createElement("canvas");temp.width=512;temp.height=768;
+      const tempCtx=temp.getContext("2d"),maskCtx=maskCanvas?.getContext("2d");
+      if(!tempCtx||!maskCtx||!maskCanvas)return;
+      tempCtx.drawImage(layer,0,0,512,768);
+      const rgba=tempCtx.getImageData(0,0,512,768),mask=maskCtx.createImageData(512,768);
+      for(let i=0;i<rgba.data.length;i+=4){const value=rgba.data[i+3];mask.data[i]=value;mask.data[i+1]=value;mask.data[i+2]=value;mask.data[i+3]=255;}
+      maskCtx.putImageData(mask,0,0);maskHistoryRef.current=[];setMaskDirty(false);setPolygonPoints([]);
+      if(source.complete&&source.naturalWidth)drawMaskPreview();
+      else source.onload=()=>{if(!cancelled){sourceImageRef.current=source;drawMaskPreview();}};
+    };
+    source.src=imageUrl(model.id,"source.png");
+    layer.src=imageUrl(model.id,"layers/"+editingLayerId+".png");
+    return ()=>{cancelled=true;};
+  },[model?.id,model?.revision,editingLayerId]);
+  useEffect(()=>{if(polygonPoints.length)drawMaskPreview();},[polygonPoints]);
+  const canvasPoint=(event:ReactPointerEvent<HTMLCanvasElement>)=>{
+    const rect=event.currentTarget.getBoundingClientRect();
+    return {x:Math.max(0,Math.min(511,(event.clientX-rect.left)*512/rect.width)),y:Math.max(0,Math.min(767,(event.clientY-rect.top)*768/rect.height))};
+  };
+  const paintAt=(point:{x:number;y:number},begin:boolean)=>{
+    const canvas=maskCanvasRef.current,ctx=canvas?.getContext("2d");
+    if(!canvas||!ctx)return;
+    if(begin){maskHistoryRef.current.push(ctx.getImageData(0,0,512,768));if(maskHistoryRef.current.length>20)maskHistoryRef.current.shift();}
+    ctx.globalCompositeOperation="source-over";
+    ctx.strokeStyle=maskTool==="add"?"#ffffff":"#000000";
+    ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=brushSize;ctx.lineCap="round";ctx.lineJoin="round";
+    if(begin){ctx.beginPath();ctx.arc(point.x,point.y,brushSize/2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(point.x,point.y);paintingRef.current=true;}
+    else if(paintingRef.current){ctx.lineTo(point.x,point.y);ctx.stroke();ctx.beginPath();ctx.moveTo(point.x,point.y);}
+    drawMaskPreview();setMaskDirty(true);
+  };
+  const finishPaint=()=>{const ctx=maskCanvasRef.current?.getContext("2d");if(ctx&&paintingRef.current)ctx.closePath();paintingRef.current=false;};
+  const applyPolygon=()=>{
+    const canvas=maskCanvasRef.current,ctx=canvas?.getContext("2d");
+    if(!ctx||polygonPoints.length<3){setError("Marca al menos tres puntos para cerrar el polígono.");return;}
+    maskHistoryRef.current.push(ctx.getImageData(0,0,512,768));
+    ctx.beginPath();polygonPoints.forEach((point,index)=>index===0?ctx.moveTo(point.x,point.y):ctx.lineTo(point.x,point.y));ctx.closePath();
+    ctx.fillStyle=maskTool==="polygon-add"?"#ffffff":"#000000";ctx.fill();setPolygonPoints([]);setMaskDirty(true);drawMaskPreview();
+  };
+  const undoMask=()=>{
+    const previous=maskHistoryRef.current.pop(),ctx=maskCanvasRef.current?.getContext("2d");
+    if(previous&&ctx){ctx.putImageData(previous,0,0);setMaskDirty(true);drawMaskPreview();}
+  };
+  const saveMask=async()=>{
+    if(!model||!editingLayerId||!maskCanvasRef.current)return;
+    setBusy(true);setError("");setNotice("");
+    try{
+      const dataUrl=maskCanvasRef.current.toDataURL("image/png");
+      const response=await fetch("/api/character-models/"+encodeURIComponent(model.id)+"/edit-layer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({layer_id:editingLayerId,mask_png_base64:dataUrl.split(",")[1]})});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||"No se pudo guardar la máscara.");
+      setModel(data.model);setLayerLabels(Object.fromEntries(data.model.layers.map((layer:ModelLayer)=>[layer.id,layer.label])));
+      setNotice("Máscara guardada. Se conservaron los colores originales de la fuente y se recalculó la reconstrucción.");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+  const resetMask=async()=>{
+    if(!model||!editingLayerId)return;
+    setBusy(true);setError("");setNotice("");
+    try{
+      const response=await fetch("/api/character-models/"+encodeURIComponent(model.id)+"/reset-layer",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({layer_id:editingLayerId})});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||"No hay máscara original para restaurar.");
+      setModel(data.model);setMaskDirty(false);setNotice("Máscara original restaurada.");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+
   const candidates=useMemo(()=>selectedAssets.filter(asset=>asset.id!==baseAssetId),[selectedAssets,baseAssetId]);
   const filteredAssets=useMemo(()=>{
     const q=filter.trim().toLowerCase();
@@ -230,6 +355,7 @@ export function CharacterModelBuilder() {
           <label>Máximo de capas candidatas<select value={maxRegions} onChange={event=>setMaxRegions(event.target.value)}><option value="24">24 capas</option><option value="48">48 capas</option><option value="64">64 capas</option></select></label>
           <label>Imagen que se va a separar<select value={baseAssetId} onChange={event=>setBaseAssetId(event.target.value)}><option value="">Elegir imagen base</option>{selectedAssets.map(asset=><option key={asset.id} value={asset.id}>{asset.label}</option>)}</select></label>
         </div>
+        <label className="model-builder-upload">Importar varias imágenes directamente<input aria-label="Importar varias imágenes directamente" type="file" accept="image/png,image/jpeg,image/webp" multiple disabled={busy} onChange={event=>{void importReferenceFiles(event.currentTarget.files);event.currentTarget.value="";}}/><small>PNG, JPEG o WebP. Las imágenes se guardan como referencias con SHA-256, procedencia y vista sin clasificar automáticamente como prendas.</small></label>
         <label className="model-builder-search">Filtrar recursos<input value={filter} onChange={event=>setFilter(event.target.value)} placeholder="Nombre, archivo o categoría…" /></label>
         <button type="button" className="model-builder-secondary" disabled={busy} onClick={refreshLibrary}>Actualizar biblioteca local</button>
         <div className="model-builder-asset-list">
@@ -262,10 +388,31 @@ export function CharacterModelBuilder() {
                 <label>Nombre<input value={layerLabels[layer.id]??layer.label} onChange={event=>setLayerLabels(current=>({...current,[layer.id]:event.target.value}))} /></label>
                 <div className="model-builder-region-meta"><span>{layer.pixel_count.toLocaleString()} px</span>{layer.color_hex&&<i style={{background:layer.color_hex}} title={layer.color_hex}/>}<small>{layer.suggested_zone}</small></div>
                 <label>Rol para importar<select value={layerCategories[layer.id]||""} onChange={event=>setLayerCategories(current=>({...current,[layer.id]:event.target.value}))}><option value="">Solo candidato</option>{roleOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+                <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>{setEditingLayerId(layer.id);setMaskTool("add");setPolygonPoints([]);setError("");}}>Editar máscara</button>
                 <button type="button" className="model-builder-region-import" disabled={busy||!layerCategories[layer.id]} onClick={()=>publishLayer(layer)}>Importar como pieza</button>
               </div>
             </article>)}
           </div>
+          {editingLayerId&&model.layers.some(layer=>layer.id===editingLayerId)&&<div className="model-builder-group-panel" data-testid="mask-editor">
+            <div className="model-builder-group-heading"><b>Corregir máscara · {model.layers.find(layer=>layer.id===editingLayerId)?.label}</b><span>Rojo = píxeles seleccionados. Pincel y polígono solo seleccionan píxeles que ya existen en la fuente; no inventan zonas ocultas.</span></div>
+            <div className="model-builder-form-row"><label>Herramienta<select value={maskTool} onChange={event=>setMaskTool(event.target.value as typeof maskTool)}><option value="add">Pincel: sumar</option><option value="erase">Pincel: borrar</option><option value="polygon-add">Polígono: sumar</option><option value="polygon-erase">Polígono: borrar</option></select></label>
+              <label>Tamaño del pincel<input type="range" min="2" max="72" value={brushSize} onChange={event=>setBrushSize(Number(event.target.value))}/></label></div>
+            <div style={{position:"relative",width:"min(100%, 320px)",margin:"0 auto",background:"#151522",borderRadius:"8px",overflow:"hidden"}}>
+              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" style={{display:"block",width:"100%",height:"auto",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} />
+              <canvas ref={maskCanvasRef} width={512} height={768} aria-hidden="true" style={{position:"absolute",left:"-10000px",top:0,pointerEvents:"none"}} />
+            </div>
+            {maskTool.startsWith("polygon")&&<p>{polygonPoints.length} puntos marcados. Haz clic en la imagen para añadir vértices.</p>}
+            <div className="model-builder-action-row">
+              <button type="button" className="model-builder-secondary" disabled={busy||!maskHistoryRef.current.length} onClick={undoMask}>Deshacer última edición</button>
+              <button type="button" className="model-builder-secondary" disabled={busy||polygonPoints.length<3} onClick={applyPolygon}>Aplicar polígono</button>
+              <button type="button" className="model-builder-secondary" disabled={busy||!polygonPoints.length} onClick={()=>setPolygonPoints([])}>Cancelar polígono</button>
+            </div>
+            <div className="model-builder-action-row">
+              <button type="button" className="model-builder-primary" disabled={busy||!maskDirty} onClick={saveMask}>Guardar máscara corregida</button>
+              <button type="button" className="model-builder-secondary" disabled={busy} onClick={resetMask}>Restaurar máscara original</button>
+              <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>setEditingLayerId("")}>Cerrar editor</button>
+            </div>
+          </div>}
           {selectedRegionIds.length>0&&<div className="model-builder-group-panel">
             <div className="model-builder-group-heading"><b>Agrupar regiones seleccionadas</b><span>{selectedRegionIds.length} regiones se convertirán en una sola máscara PNG transparente.</span></div>
             <div className="model-builder-group-fields">

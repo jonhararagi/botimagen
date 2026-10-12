@@ -748,6 +748,8 @@ def edit_character_model_layer(
             if opened.format != "PNG" or opened.size != CANVAS_SIZE:
                 raise CharacterModelError("La máscara debe ser un PNG de 512×768.")
             mask = opened.convert("L")
+    except CharacterModelError:
+        raise
     except (binascii.Error, OSError, ValueError) as exc:
         raise CharacterModelError("La máscara PNG no es válida.") from exc
 

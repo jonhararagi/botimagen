@@ -29,7 +29,7 @@ function pngChunk(type, data) {
   const checksum = Buffer.alloc(4); checksum.writeUInt32BE(crc32(Buffer.concat([name, data])));
   return Buffer.concat([length, name, data, checksum]);
 }
-function makeQaPng() {
+function makeQaPng(variant = 0) {
   const width = 320, height = 480;
   const rowBytes = width * 4;
   const raw = Buffer.alloc((rowBytes + 1) * height);
@@ -37,7 +37,7 @@ function makeQaPng() {
     const rowStart = y * (rowBytes + 1);
     raw[rowStart] = 0; // PNG filter: None
     for (let x = 0; x < width; x++) {
-      let r = 247, g = 247, b = 247, a = 255;
+      let r = 247 - variant, g = 247, b = 247, a = 255;
       if (x >= 118 && x < 202 && y >= 75 && y < 147) { r = 230; g = 164; b = 206; }
       if (x >= 105 && x < 215 && y >= 155 && y < 315) { r = 71; g = 123; b = 224; }
       if (((x >= 115 && x < 150) || (x >= 170 && x < 205)) && y >= 310 && y < 435) { r = 48; g = 54; b = 75; }
@@ -1602,6 +1602,9 @@ try {
   const modelBuilder = page.locator(".character-model-builder");
   await modelBuilder.scrollIntoViewIfNeeded();
   await modelBuilder.getByRole("button", { name: "Actualizar biblioteca local" }).click();
+  await modelBuilder.getByLabel("Importar varias imágenes directamente").setInputFiles({ name: "qa-batch-direct.png", mimeType: "image/png", buffer: makeQaPng(1) });
+  await modelBuilder.getByRole("status").filter({ hasText: "imagen(es) importadas" }).waitFor({ state: "visible", timeout: 15000 });
+  await modelBuilder.locator(".model-builder-asset").filter({ hasText: "qa-batch-direct.png" }).waitFor({ state: "visible", timeout: 10000 });
   const modelBaseAsset = modelBuilder.locator(".model-builder-asset")
     .filter({ hasText: "qa-synthetic-character" })
     .filter({ hasText: "Personaje completo" })
@@ -1671,6 +1674,22 @@ try {
   assert.equal(modelBuilderAssetCount, 1, "Grouping color regions must add one reusable piece to the local modular library");
   await modelBuilder.screenshot({ path: resolve(visualQaDir, "character-model-builder-grouped-piece.png") });
   console.log("PASS_REAL: UI created a saved character model from local PNGs, emitted independently reviewable masks, extracted a reusable palette, reconstructed all visible pixels, and grouped multiple regions into one modular catalog piece.");
+
+  // Exercise the mask editor against the source and save/reset through the real Python API.
+  await firstRegion.getByRole("button", { name: "Editar máscara" }).click();
+  const maskEditor = modelBuilder.getByTestId("mask-editor");
+  await maskEditor.waitFor({ state: "visible", timeout: 10000 });
+  const maskCanvas = maskEditor.getByTestId("mask-preview");
+  const maskBox = await maskCanvas.boundingBox();
+  assert.ok(maskBox, "The mask editor must show the source image with a real canvas overlay");
+  await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
+  await maskEditor.getByRole("button", { name: "Guardar máscara corregida" }).click();
+  await modelBuilder.getByRole("status").filter({ hasText: "Máscara guardada" }).waitFor({ state: "visible", timeout: 15000 });
+  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 2/);
+  await maskEditor.getByRole("button", { name: "Restaurar máscara original" }).click();
+  await modelBuilder.getByRole("status").filter({ hasText: "Máscara original restaurada" }).waitFor({ state: "visible", timeout: 15000 });
+  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 3/);
+  console.log("PASS_REAL: Chromium imported a multi-file-capable reference through the builder, edited a mask with the canvas brush, persisted the new model revision, and restored the original mask through the API.");
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
