@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 from botimagen_server import ApiInputError, render_character_from_payload
 from character_generator import CharacterGenerator
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
+from vendor.anime_character_creator.character import _head_shape
 
 GENERATOR = CharacterGenerator(ROOT / "character_rules.json")
 
@@ -162,3 +163,13 @@ def test_hime_and_long_straight_keep_distinct_front_hair_silhouettes():
     hime = render_profile_svg({**common, "hairstyle": "hime_cut"}, DEFAULT_RENDER_RECIPE)
     straight = render_profile_svg({**common, "hairstyle": "long_straight"}, DEFAULT_RENDER_RECIPE)
     assert hime != straight, "Hime cut and long straight must not collapse to the same SVG silhouette"
+
+
+def test_adult_face_shape_changes_the_actual_jaw_contour():
+    neutral_default = _head_shape(1.0)
+    neutral_explicit = _head_shape(1.0, "equilibrada")
+    diamond = _head_shape(1.0, "diamante")
+    short_chin = _head_shape(1.0, "menton_corto")
+    assert neutral_default == neutral_explicit, "Neutral contour must preserve the vendored renderer's historical geometry"
+    assert diamond != neutral_default, "Diamond face must change cheek and jaw coordinates, not only metadata"
+    assert short_chin != neutral_default, "Short-chin face must change the lower skull contour"
