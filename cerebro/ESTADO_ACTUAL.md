@@ -399,7 +399,7 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 ## Checkpoint · BIMG-ART-002-R1 · calidad facial y cabello posterior
 
 - **HEAD inicial:** `5ef17beb774f17d5ae57ada655c949343cee92aa`.
-- **Último HEAD de implementación/pruebas y manifiesto E2E:** `e53235616bf0d58ff623dd4f19e74abdc1a15417` (los commits documentales siguientes no deben confundirse con el código validado).
+- **Último HEAD de implementación/pruebas y manifiesto E2E:** `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab` (los commits documentales siguientes no deben confundirse con el código validado).
 - **Cambios:** `character_render_engine.py` mejora los perfiles de forma facial, conecta `nose_style` con el renderer adulto, amplía la resolución de peinados y calcula la caída del cabello trasero según largo y landmarks; `tests/test_character_render_engine.py` añade regresiones de cara/nariz y silueta posterior; `web/browser_smoke.mjs` prepara capturas Chromium de ambos presets frontal/trasera y variantes de cara, nariz, corte, color y largo.
 - **CI exacta:** PENDING al escribir este checkpoint; no afirmar PASS hasta que la ejecución corresponda al HEAD final.
 - **Capturas:** la prueba E2E prepara PNG y un manifiesto con `GITHUB_SHA`; artefacto e inspección humana pendientes.
@@ -408,3 +408,12 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - **Estado de tarea:** PARTIAL. Progreso global de beta sin cambios: **63%**.
 - **TIMER:** estimación inicial 10–16 horas activas; tiempo real `NOT_MEASURED`.
 - Informe: [BIMG-ART-002-R1](../docs/engineering/BIMG-ART-002-R1.md).
+
+
+### BIMG-ART-002-R1 · revisión visual real y estado actualizado
+
+- El renderer vendorizado ahora recibe `face_shape` y modifica coordenadas reales de pómulos/mandíbula/mentón; el perfil neutral conserva el contorno histórico.
+- Añadidos sombreado ajustado a la silueta y costuras específicas para prendas largas, bomber y equipamiento táctico. Vista posterior de cabello depende de largo y landmarks.
+- **CI #399 SUCCESS** para el HEAD de implementación `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`; artefacto: https://github.com/jonhararagi/botimagen/actions/runs/38253325201/artifacts/11748818282.
+- Capturas PNG reales inspeccionadas: dos presets en frontal/trasera, cara/nariz y variaciones de peinado/color/largo. Mejora visible en la longitud del cabello posterior y en el contorno facial; el sombreado frontal sigue siendo moderado. Persisten rigidez de pose/manos pequeñas y familias de peinado compartidas. Por tanto, **PARTIAL**, sin aceptación artística completa.
+- CI del SHA final después de los cambios documentales: pendiente. `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real: `NOT_MEASURED`. Beta global: **63%**.
