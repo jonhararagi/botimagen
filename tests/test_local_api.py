@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import io
 import json
 import sys
 import tempfile
@@ -8,6 +10,8 @@ import unittest
 from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
 from pathlib import Path
+
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -443,6 +447,126 @@ class LocalApiTests(unittest.TestCase):
                     self.assertIn("Método HTTP", payload["error"])
                 finally:
                     connection.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
+    def test_character_model_builder_http_create_extend_and_publish(self):
+        def png_image(shift=0):
+            image = Image.new("RGBA", (96, 144), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(image)
+            draw.rectangle((35 + shift, 8, 60 + shift, 35), fill=(210, 65, 105, 255))
+            draw.rectangle((25 + shift, 36, 70 + shift, 88), fill=(45, 115, 220, 255))
+            draw.rectangle((29 + shift, 89, 43 + shift, 135), fill=(35, 35, 48, 255))
+            draw.rectangle((52 + shift, 89, 66 + shift, 135), fill=(35, 35, 48, 255))
+            output = io.BytesIO()
+            image.save(output, format="PNG")
+            return output.getvalue()
+
+        def image_payload(filename, data, kind):
+            return {
+                "filename": filename,
+                "mime_type": "image/png",
+                "data_base64": base64.b64encode(data).decode("ascii"),
+                "category": "portrait" if kind == "full_character" else "reference",
+                "label": filename,
+                "kind": kind,
+                "view": "front",
+                "license": "USER_PROVIDED_REFERENCE",
+                "source_url": "https://example.invalid/reference",
+            }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp = Path(temp_dir)
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(
+                    self.generator,
+                    temp / "profiles",
+                    temp / "modular-assets",
+                    temp / "character-models",
+                ),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+
+            def request(method, path, payload=None):
+                connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=10)
+                try:
+                    headers = {"Content-Type": "application/json"} if payload is not None else {}
+                    body = json.dumps(payload).encode("utf-8") if payload is not None else None
+                    connection.request(method, path, body=body, headers=headers)
+                    response = connection.getresponse()
+                    data = response.read()
+                    content_type = response.getheader("Content-Type", "")
+                    parsed = json.loads(data.decode("utf-8")) if "application/json" in content_type else data
+                    return response.status, content_type, parsed
+                finally:
+                    connection.close()
+
+            try:
+                status, _, base = request("POST", "/api/modular-assets", image_payload("base.png", png_image(), "full_character"))
+                self.assertEqual(status, 201)
+                status, _, reference = request("POST", "/api/modular-assets", image_payload("ref.png", png_image(2), "reference"))
+                self.assertEqual(status, 201)
+
+                status, _, created = request("POST", "/api/character-models", {
+                    "name": "API-created character model",
+                    "style_id": "api-style-v1",
+                    "base_asset_id": base["id"],
+                    "asset_ids": [base["id"], reference["id"]],
+                    "max_regions": 16,
+                })
+                self.assertEqual(status, 201)
+                model = created["model"]
+                model_id = model["id"]
+                self.assertTrue(model["decomposition"]["round_trip_exact_visible_pixels"])
+                self.assertGreaterEqual(len(model["layers"]), 2)
+
+                status, content_type, image = request("GET", f"/api/character-models/{model_id}/preview.png")
+                self.assertEqual(status, 200)
+                self.assertEqual(content_type, "image/png")
+                self.assertTrue(image.startswith(b"\x89PNG\r\n\x1a\n"))
+
+                layer_id = model["layers"][0]["id"]
+                status, content_type, image = request(
+                    "GET", f"/api/character-models/{model_id}/layers/{layer_id}-thumb.png"
+                )
+                self.assertEqual(status, 200)
+                self.assertEqual(content_type, "image/png")
+                self.assertTrue(image.startswith(b"\x89PNG\r\n\x1a\n"))
+
+                status, _, listed = request("GET", "/api/character-models")
+                self.assertEqual(status, 200)
+                self.assertEqual(listed["count"], 1)
+                self.assertEqual(listed["models"][0]["id"], model_id)
+
+                status, _, reference2 = request("POST", "/api/modular-assets", image_payload("ref2.png", png_image(3), "reference"))
+                self.assertEqual(status, 201)
+                status, _, extended = request(
+                    "POST", f"/api/character-models/{model_id}/extend", {"asset_ids": [reference2["id"]]}
+                )
+                self.assertEqual(status, 200)
+                self.assertEqual(extended["model"]["revision"], 2)
+                self.assertEqual(len(extended["model"]["references"]), 3)
+                self.assertEqual(len(extended["model"]["layers"]), len(model["layers"]))
+
+                status, _, published = request("POST", f"/api/character-models/{model_id}/publish-layer", {
+                    "layer_id": layer_id,
+                    "label": "Candidate body region",
+                    "category": "clothing_top",
+                    "view": "front",
+                })
+                self.assertEqual(status, 201)
+                self.assertEqual(published["asset"]["kind"], "modular_piece")
+                self.assertEqual(published["asset"]["category"], "clothing_top")
+                self.assertFalse(published["asset"]["anchors_validated"])
+                status, _, asset_list = request("GET", "/api/modular-assets")
+                self.assertEqual(status, 200)
+                self.assertEqual(asset_list["count"], 4)
             finally:
                 server.shutdown()
                 server.server_close()

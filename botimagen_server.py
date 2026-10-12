@@ -11,6 +11,10 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
+from character_model_builder import (
+    CharacterModelError, create_character_model, extend_character_model,
+    list_character_models, publish_model_layer, read_character_model, read_character_model_image,
+)
 from modular_character_compositor import CompositionError, compose_png, validate_selection
 from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
 from modular_asset_library import read_user_asset
@@ -290,10 +294,17 @@ def make_asset_contract_catalog(manifest_path: Path | None = None) -> dict[str, 
     return {"manifest_version": manifest["version"], "count": len(contracts), "contracts": contracts}
 
 
-def make_handler(generator: CharacterGenerator, profiles_path: Path | None = None):
+def make_handler(
+    generator: CharacterGenerator,
+    profiles_path: Path | None = None,
+    modular_assets_root: Path | None = None,
+    character_models_root: Path | None = None,
+):
     catalog = make_catalog(generator)
     asset_contract_catalog = make_asset_contract_catalog()
     profile_root = Path(profiles_path) if profiles_path else ROOT / "generated_characters" / "web_profiles"
+    asset_library_root = Path(modular_assets_root) if modular_assets_root else None
+    model_root = Path(character_models_root) if character_models_root else None
 
     class BotImagenHandler(BaseHTTPRequestHandler):
         server_version = "BotImagenLocal/0.2"
@@ -344,6 +355,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/catalog": ("GET",),
                 "/api/assets/contracts": ("GET",),
                 "/api/modular-assets": ("GET", "POST"),
+                "/api/character-models": ("GET", "POST"),
                 "/api/modular-compose": ("POST",),
                 "/api/modular-cyberstreet/render": ("POST",),
                 "/api/profiles": ("GET", "POST"),
@@ -352,6 +364,8 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             allowed = allowed_by_path.get(path)
             if path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors"):
                 allowed = ("POST",)
+            elif path.startswith("/api/character-models/"):
+                allowed = ("POST",) if path.endswith(("/extend", "/publish-layer")) else ("GET",)
             if allowed is None:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
@@ -393,14 +407,14 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 return
             if path == "/api/modular-assets":
                 try:
-                    self._send_json(HTTPStatus.OK, list_user_assets())
+                    self._send_json(HTTPStatus.OK, list_user_assets(asset_library_root))
                 except AssetImportError as exc:
                     self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
                 return
             if path.startswith("/api/modular-assets/") and path.endswith("/image"):
                 asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/image").strip("/")
                 try:
-                    image_bytes, mime_type = read_user_asset(asset_id)
+                    image_bytes, mime_type = read_user_asset(asset_id, asset_library_root)
                 except FileNotFoundError:
                     self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
                     return
@@ -417,6 +431,39 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 return
             if path == "/api/profiles":
                 self._list_profiles()
+                return
+            if path == "/api/character-models":
+                try:
+                    self._send_json(HTTPStatus.OK, list_character_models(model_root))
+                except CharacterModelError as exc:
+                    self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            if path.startswith("/api/character-models/"):
+                remainder = path.removeprefix("/api/character-models/").split("/")
+                try:
+                    if len(remainder) == 1 and remainder[0]:
+                        self._send_json(HTTPStatus.OK, read_character_model(remainder[0], model_root))
+                        return
+                    if len(remainder) == 2 and remainder[1] in {"preview.png", "source.png"}:
+                        image_bytes, mime_type = read_character_model_image(remainder[0], remainder[1], model_root)
+                    elif len(remainder) == 3 and remainder[1] == "layers":
+                        image_bytes, mime_type = read_character_model_image(remainder[0], remainder[2], model_root)
+                    else:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": "Ruta de modelo no encontrada."})
+                        return
+                except FileNotFoundError:
+                    self._send_json(HTTPStatus.NOT_FOUND, {"error": "Modelo o imagen no encontrada."})
+                    return
+                except CharacterModelError as exc:
+                    self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                    return
+                self.send_response(HTTPStatus.OK.value)
+                self.send_header("Content-Type", mime_type)
+                self.send_header("Content-Length", str(len(image_bytes)))
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.end_headers()
+                self.wfile.write(image_bytes)
                 return
             if path.startswith("/api/profiles/"):
                 self._get_profile(path.removeprefix("/api/profiles/"))
@@ -464,7 +511,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 self._method_not_allowed()
                 return
             validate_anchor_route = path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors")
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route:
+            model_extend_route = path.startswith("/api/character-models/") and path.endswith("/extend")
+            model_publish_route = path.startswith("/api/character-models/") and path.endswith("/publish-layer")
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route and not model_extend_route and not model_publish_route:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
@@ -478,7 +527,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                         raise ApiInputError("Se requiere confirm=true y, opcionalmente, el mapa de anclajes ajustados.")
                     asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/validate-anchors").strip("/")
                     try:
-                        result = confirm_user_asset_anchors(asset_id, anchors=payload.get("anchors"))
+                        result = confirm_user_asset_anchors(asset_id, library_root=asset_library_root, anchors=payload.get("anchors"))
                     except FileNotFoundError:
                         self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
                         return
@@ -503,7 +552,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                         raise ApiInputError("Se requieren pieces (lista) y canvas_size [ancho, alto].")
                     try:
                         selected = validate_selection(pieces)
-                        image = compose_png(selected, lambda asset_id: read_user_asset(asset_id)[0], tuple(size))
+                        image = compose_png(selected, lambda asset_id: read_user_asset(asset_id, asset_library_root)[0], tuple(size))
                     except (CompositionError, AssetImportError, FileNotFoundError, TypeError, ValueError) as exc:
                         raise ApiInputError(str(exc)) from exc
                     import base64
@@ -511,10 +560,39 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                     return
                 if path == "/api/modular-assets":
                     try:
-                        result = import_user_asset(payload)
+                        result = import_user_asset(payload, asset_library_root)
                     except AssetImportError as exc:
                         raise ApiInputError(str(exc)) from exc
                     self._send_json(HTTPStatus.CREATED if not result.get("duplicate") else HTTPStatus.OK, result)
+                    return
+                if path == "/api/character-models":
+                    try:
+                        result = create_character_model(payload, asset_library_root, model_root)
+                    except (CharacterModelError, AssetImportError) as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.CREATED, result)
+                    return
+                if model_extend_route:
+                    model_id = path.removeprefix("/api/character-models/").removesuffix("/extend").strip("/")
+                    try:
+                        result = extend_character_model(model_id, payload, asset_library_root, model_root)
+                    except FileNotFoundError as exc:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                        return
+                    except (CharacterModelError, AssetImportError) as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
+                    return
+                if model_publish_route:
+                    model_id = path.removeprefix("/api/character-models/").removesuffix("/publish-layer").strip("/")
+                    try:
+                        result = publish_model_layer(model_id, payload, asset_library_root, model_root)
+                    except FileNotFoundError as exc:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                        return
+                    except (CharacterModelError, AssetImportError) as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.CREATED if not result["asset"].get("duplicate") else HTTPStatus.OK, result)
                     return
                 if path == "/api/render/character":
                     result = render_character_from_payload(payload, generator)

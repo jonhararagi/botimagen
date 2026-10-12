@@ -31,6 +31,7 @@ MAX_REGIONS = 64
 PALETTE_COLORS = 24
 MODEL_ID_RE = re.compile(r"^model\.([0-9a-f]{32})$")
 LAYER_ID_RE = re.compile(r"^layer-[0-9]{3}$")
+LAYER_IMAGE_RE = re.compile(r"^layer-[0-9]{3}(?:-thumb)?$")
 ALLOWED_KINDS = {"reference", "full_character", "portrait", "modular_piece"}
 ALLOWED_CATEGORIES = {
     "reference", "body", "head", "face", "hair_back", "hair_front", "eyes", "brows",
@@ -351,6 +352,12 @@ def _split_into_regions(
         buffer = io.BytesIO()
         layer_image.save(buffer, format="PNG", optimize=True)
         (destination / Path(layer["filename"]).name).write_bytes(buffer.getvalue())
+        box = layer["bbox"]
+        cropped = layer_image.crop((box["x"], box["y"], box["x"] + box["width"], box["y"] + box["height"]))
+        thumb_buffer = io.BytesIO()
+        cropped.save(thumb_buffer, format="PNG", optimize=True)
+        (destination / (layer["id"] + "-thumb.png")).write_bytes(thumb_buffer.getvalue())
+        layer["thumbnail_filename"] = "layers/" + layer["id"] + "-thumb.png"
         layer["sha256"] = hashlib.sha256(buffer.getvalue()).hexdigest()
         layer_images.append(layer_image)
 
@@ -462,19 +469,26 @@ def read_character_model_image(
     models_root: Path | None = None,
 ) -> tuple[bytes, str]:
     root = Path(models_root) if models_root else DEFAULT_MODELS_ROOT
+    if root.is_symlink():
+        raise CharacterModelError("El directorio de modelos no puede ser un enlace simbólico.")
     folder = _safe_model_folder(model_id, root)
-    if image_name not in {"preview.png", "source.png"} and not LAYER_ID_RE.fullmatch(image_name.removesuffix(".png")):
+    if folder.is_symlink():
+        raise CharacterModelError("El directorio de un modelo no puede ser un enlace simbólico.")
+    if image_name not in {"preview.png", "source.png"} and not LAYER_IMAGE_RE.fullmatch(image_name.removesuffix(".png")):
         raise CharacterModelError("Nombre de imagen del modelo inválido.")
     if image_name.endswith(".png"):
         image_name = image_name[:-4]
     if image_name.startswith("layer-"):
         model = read_character_model(model_id, root)
         known = {Path(item.get("filename", "")).stem for item in model.get("layers", []) if isinstance(item, dict)}
-        if image_name not in known:
+        base_name = image_name.removesuffix("-thumb")
+        if base_name not in known:
             raise FileNotFoundError("Capa no encontrada.")
         path = folder / "layers" / (image_name + ".png")
     else:
         path = folder / (image_name + ".png")
+    if path.is_symlink() or path.parent.resolve() not in {folder.resolve(), (folder / "layers").resolve()}:
+        raise CharacterModelError("La imagen del modelo no puede salir de su directorio.")
     try:
         data = path.read_bytes()
     except FileNotFoundError as exc:
@@ -588,6 +602,8 @@ def extend_character_model(
     by_id = {item.get("id"): item for item in library}
     if any(asset_id not in by_id for asset_id in new_ids):
         raise CharacterModelError("Una imagen nueva ya no existe en la biblioteca local.")
+    if any(by_id[asset_id].get("kind") not in ALLOWED_KINDS for asset_id in new_ids):
+        raise CharacterModelError("El lote contiene recursos que no son imágenes o referencias de personaje.")
     folder = _safe_model_folder(model_id, root)
     for asset_id in new_ids:
         record, _normalized = _analyze_source(by_id[asset_id], library_root)
