@@ -80,8 +80,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
 
     def test_neutral_body_fixture_is_temporary_and_records_front_back_bounds(self):
         self.assertIn('bimg-neutral-body-qa-only', SMOKE)
-        self.assertIn('neutral-body-front', SMOKE)
-        self.assertIn('neutral-body-back', SMOKE)
+        self.assertIn('"neutral-body-" + view', SMOKE)
         self.assertIn('neutral-body-manifest.json', SMOKE)
         self.assertIn("box('[data-layer-id=\"neck\"]')", SMOKE)
         self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
