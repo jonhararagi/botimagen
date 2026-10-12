@@ -16,11 +16,13 @@ if str(ROOT) not in sys.path:
 from character_model_builder import (
     CharacterModelError,
     create_character_model,
+    edit_character_model_layer,
     extend_character_model,
     list_character_models,
     publish_model_layer,
     read_character_model,
     read_character_model_image,
+    reset_character_model_layer,
 )
 from modular_asset_library import import_user_asset, list_user_assets
 
@@ -164,6 +166,65 @@ class CharacterModelBuilderTests(unittest.TestCase):
             self.assertEqual(published["asset"]["category"], "clothing_top")
             self.assertFalse(published["asset"]["anchors_validated"])
             self.assertEqual(list_user_assets(library)["count"], initial_count + 1)
+
+    def test_edit_mask_preserves_source_rgb_and_reset_restores_original_layer(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            library, models = root / "library", root / "models"
+            base = add_asset(png_bytes(), library, "base.png")
+            model = create_character_model({
+                "name": "Mask edit", "base_asset_id": base["id"], "asset_ids": [base["id"]],
+            }, library, models)["model"]
+            layer = model["layers"][0]
+            source_bytes, _ = read_character_model_image(model["id"], "source.png", models)
+            original_bytes, _ = read_character_model_image(model["id"], layer["id"] + ".png", models)
+            with Image.open(io.BytesIO(source_bytes)) as opened:
+                source = opened.convert("RGBA")
+            with Image.open(io.BytesIO(original_bytes)) as opened:
+                original = opened.convert("RGBA")
+            original_alpha = original.getchannel("A")
+            mask = Image.new("L", (512, 768), 0)
+            mask.paste(original_alpha)
+            source_alpha = source.getchannel("A")
+            source_values, mask_values = source_alpha.tobytes(), bytearray(mask.tobytes())
+            added_index = next(i for i, alpha in enumerate(source_values) if alpha > 0 and mask_values[i] == 0)
+            mask_values[added_index] = 255
+            mask = Image.frombytes("L", (512, 768), bytes(mask_values))
+            encoded = io.BytesIO()
+            mask.save(encoded, format="PNG")
+            result = edit_character_model_layer(
+                model["id"], layer["id"], base64.b64encode(encoded.getvalue()).decode("ascii"), models
+            )
+            self.assertEqual(result["model"]["revision"], 2)
+            self.assertTrue(result["model"]["layers"][0]["edited_by_user"])
+            edited_bytes, _ = read_character_model_image(model["id"], layer["id"] + ".png", models)
+            with Image.open(io.BytesIO(edited_bytes)) as opened:
+                edited = opened.convert("RGBA")
+            self.assertEqual(edited.getpixel((added_index % 512, added_index // 512))[:3],
+                             source.getpixel((added_index % 512, added_index // 512))[:3])
+            self.assertGreater(edited.getchannel("A").getbbox()[2], 0)
+            reset = reset_character_model_layer(model["id"], layer["id"], models)
+            self.assertEqual(reset["model"]["revision"], 3)
+            self.assertFalse(reset["model"]["layers"][0].get("edited_by_user", False))
+            restored, _ = read_character_model_image(model["id"], layer["id"] + ".png", models)
+            self.assertEqual(restored, original_bytes)
+
+    def test_mask_edit_rejects_wrong_canvas_and_invalid_layer_ids(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            library, models = root / "library", root / "models"
+            base = add_asset(png_bytes(), library, "base.png")
+            model = create_character_model({
+                "name": "Mask validation", "base_asset_id": base["id"], "asset_ids": [base["id"]],
+            }, library, models)["model"]
+            wrong = io.BytesIO()
+            Image.new("L", (16, 16), 255).save(wrong, format="PNG")
+            with self.assertRaisesRegex(CharacterModelError, "512×768"):
+                edit_character_model_layer(model["id"], model["layers"][0]["id"],
+                                           base64.b64encode(wrong.getvalue()).decode("ascii"), models)
+            with self.assertRaisesRegex(CharacterModelError, "región"):
+                edit_character_model_layer(model["id"], "../outside",
+                                           base64.b64encode(wrong.getvalue()).decode("ascii"), models)
 
     def test_rejects_bad_ids_and_invalid_model_requests(self):
         with tempfile.TemporaryDirectory() as temp:
