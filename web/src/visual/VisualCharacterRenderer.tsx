@@ -213,8 +213,6 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
     {values.footwear === "calzado_ligero_pitcher" && <path data-layer-id="footwear" data-layer-order={svgLayerIndex("footwear")} d="M148 452 L181 452 L180 468 L148 468 Z M190 452 L219 452 L224 468 L194 468 Z" fill={fabric} stroke={accent} strokeWidth={line}/>}
     {values.footwear === "botines_elegantes" && <path data-layer-id="footwear" data-layer-order={svgLayerIndex("footwear")} d="M151 442 L172 442 L179 467 L150 467 Z M191 442 L210 442 L222 467 L195 467 Z" fill={fabric} stroke={stroke} strokeWidth={line}/>}
     {values.footwear === "botas_reforzadas" && <path data-layer-id="footwear" data-layer-order={svgLayerIndex("footwear")} d="M149 429 L173 429 L180 470 L147 470 Z M190 429 L212 429 L226 470 L194 470 Z" fill={panel} stroke={accent} strokeWidth={line}/>}
-    {/* First controlled proportion pass: head scale is independent from torso/garment controls. */}
-    <g className="character-head-proportion-group" data-qa-surface="head-proportions" transform="translate(170 140) scale(0.84 0.88) translate(-170 -140)">
     <ellipse cx="170" cy="143" rx={52 - anime * 3} ry={63 - anime * 4} fill={`url(#cw-skin-${uid})`} stroke="#f5d7ce" strokeWidth={1 + toon * 1.8}/>
     {!rear && <>
       <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>
@@ -235,7 +233,6 @@ export function VisualCharacterRenderer({ values, recipe }: RendererProps) {
       {values.facial_detail && !values.facial_detail.includes("sin_") && <g fill={hairAccent}><circle cx="145" cy="166" r="2"/><circle cx="149" cy="169" r="1.4"/></g>}
     </>}
     {rear && <path d="M118 152 Q107 91 150 63 Q211 35 233 96 L221 149 L206 102 Q173 117 130 110 Z" fill={`url(#cw-hair-${uid})`} stroke={stroke} strokeWidth={line}/>}
-    </g>
     {Array.from({ length: Math.round(2 + detail * 7) }, (_, i) => <path key={i} d={`M${139 + i * 4} 275 l${(i % 2 ? 4 : -3) + street * 2} ${30 + detail * 16}`} stroke={accent} strokeWidth={.45 + detail * .8} opacity={r.nanowear_state === "everyday" ? .12 + street * .2 : .25 + street * .65} fill="none"/>)}
 
     {values.outfit === "street_bomber" && <g className="garment-layer street-bomber" data-layer-id="outfit" data-layer-order={svgLayerIndex("outfit")} data-qa-surface="outfit-garment" transform={fitTransform}>
