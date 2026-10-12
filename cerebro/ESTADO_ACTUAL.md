@@ -569,3 +569,18 @@ QA Windows: `NOT_RUN`.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - TIMER estimado restante para cerrar y pulir este tramo tras la primera CI: **3–6 horas activas**. Para ampliar a un sistema artístico robusto con segmentación de piezas complejas, más presets y anclajes revisables, estimar por separado; no presentar este timer como la finalización de todo BotImagen.
 - Mantener esta rama, no alterar `main`, no fusionar/cerrar PRs sin autorización y producir cambios de programa/recursos antes que nuevos planes.
+
+
+### BIMG-PNG-TO-MATERIAL-001 · verificación integrada completada · 2026-10-12
+
+- **CI #480 · SUCCESS en HEAD de código 4470c2e11c4bb02e87cf6a07dd386ab54dd77d4f:** https://github.com/jonhararagi/botimagen/actions/runs/38286277714
+- Pasaron instalación declarada de Pillow 12.3.0, sintaxis Python, tests del importador modular (7/7), contrato del compositor de personaje, compositor SVG CyberStreet, manifiesto, catálogo/procedencia, suites Python/API existentes, instalación npm ci, compilación React/TypeScript y smoke de Chromium.
+- El smoke de Chromium genera una figura sintética visible de 320×480 con fondo plano; confirma salida transparente 512×768, fondo conectado eliminado, contenido conservado y archivo original preservado; guarda una copia como full_character, vuelve a convertir la misma fuente como pieza de cuerpo y comprueba que el motor Python existente compone un PNG 512×768. Resultado PASS.
+- Capturas/evidencia del run #480: https://github.com/jonhararagi/botimagen/actions/runs/38286277714/artifacts/11762904000
+- La ejecución detectó y corrigió fallos reales: botón antiguo en el smoke, fixture PNG que era completamente transparente, selector ambiguo para el par original/convertido, ausencia de Pillow en instalación limpia y registro de categorías incompleto en el compositor. No se debe volver a tratar la integración como pendiente de construir; usar este CI/HEAD como estado verificado.
+- **Uso previsto:** una imagen de personaje completa entra como full_character, conserva la pose y permanece como raster plano. Para modificar cabello/rostro/ropa/calzado por separado, importar cada pieza aislada o recortada como modular_piece, seleccionar categoría/vista, preparar y revisar el PNG 512×768, guardar, revisar los anclajes estimados y confirmarlos antes de componer. No se promete segmentación semántica automática ni recuperación de zonas ocultas.
+- La dependencia del compositor PNG quedó declarada en requirements-engine.txt (Pillow>=10.0.0) y se instala desde .github/workflows/validate.yml. En Windows se instala una vez con: py -m pip install -r requirements-engine.txt.
+- WINDOWS_MANUAL_QA: NOT_RUN; TIME_MEASURED: NOT_MEASURED.
+- main comprobada sin cambios (b508cfe7d3216eda801438d46dff8873842cea86). PR #11 permanece abierta/sin fusionar y PR #14 permanece independiente.
+- TIMER para ampliar la siguiente fase artística (mejor segmentación asistida, biblioteca extensa de piezas, mayor riqueza visual y anclajes editables): estimación inicial **8–16 horas activas** según alcance; no es una estimación de finalización de todo BotImagen.
+- Referencias oficiales para el usuario: wallpapers/media https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper ; Art Collection Vol. 2 https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263 ; Art Collection Vol. 1 https://honkaiimpact3.hoyoverse.com/global/en-us/news/106541?cate=516 ; noticias oficiales https://honkaiimpact3.hoyoverse.com/global/en-us/news . No se incorporaron imágenes oficiales al repositorio; importarlas de forma manual y mantener su procedencia/licencia.
