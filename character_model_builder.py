@@ -625,32 +625,62 @@ def publish_model_layer(
     library_root: Path | None = None,
     models_root: Path | None = None,
 ) -> dict[str, Any]:
-    if not isinstance(payload, dict) or set(payload) - {"layer_id", "label", "category", "view", "license"}:
+    """Promote one or more selected raster regions to a transparent modular part."""
+    allowed_fields = {"layer_id", "layer_ids", "label", "category", "view", "license"}
+    if not isinstance(payload, dict) or set(payload) - allowed_fields:
         raise CharacterModelError("La solicitud de importación de región contiene campos inválidos.")
-    layer_id = payload.get("layer_id")
+    if ("layer_id" in payload) == ("layer_ids" in payload):
+        raise CharacterModelError("Indica layer_id para una región o layer_ids para agrupar varias regiones, no ambos.")
+    if "layer_ids" in payload:
+        raw_ids = payload.get("layer_ids")
+        if not isinstance(raw_ids, list) or not 1 <= len(raw_ids) <= MAX_REGIONS:
+            raise CharacterModelError("Selecciona entre 1 y 64 regiones para la pieza.")
+        if any(not isinstance(item, str) or not LAYER_ID_RE.fullmatch(item) for item in raw_ids):
+            raise CharacterModelError("La selección contiene un identificador de región inválido.")
+        if len(set(raw_ids)) != len(raw_ids):
+            raise CharacterModelError("No repitas una región en la misma pieza.")
+        selected_ids = list(raw_ids)
+    else:
+        layer_id = payload.get("layer_id")
+        if not isinstance(layer_id, str) or not LAYER_ID_RE.fullmatch(layer_id):
+            raise CharacterModelError("Selecciona una región válida.")
+        selected_ids = [layer_id]
+
     label = payload.get("label")
     category = payload.get("category")
     view = payload.get("view", "front")
     license_name = payload.get("license", "USER_PROVIDED_REFERENCE")
-    if not isinstance(layer_id, str) or not LAYER_ID_RE.fullmatch(layer_id):
-        raise CharacterModelError("Selecciona una región válida.")
     if not isinstance(label, str) or not label.strip() or len(label.strip()) > 100:
         raise CharacterModelError("El nombre de la pieza debe tener entre 1 y 100 caracteres.")
     if category not in {"body", "head", "face", "hair_back", "hair_front", "eyes", "brows", "mouth", "clothing_top", "clothing_bottom", "footwear", "accessory_back", "accessory_front"}:
         raise CharacterModelError("Selecciona una categoría modular válida.")
     if view not in {"front", "back", "side", "unknown"}:
         raise CharacterModelError("La vista del recurso no es válida.")
+
     model = read_character_model(model_id, models_root)
-    layer = next((item for item in model["layers"] if item.get("id") == layer_id), None)
-    if layer is None:
-        raise CharacterModelError("La región seleccionada no existe en este modelo.")
-    image_bytes, _mime = read_character_model_image(model_id, layer["id"] + ".png", models_root)
+    model_layers = {item.get("id"): item for item in model.get("layers", []) if isinstance(item, dict)}
+    selected_layers = [model_layers.get(item) for item in selected_ids]
+    if any(layer is None for layer in selected_layers):
+        raise CharacterModelError("Una de las regiones seleccionadas no existe en este modelo.")
+
     from PIL import Image
-    with Image.open(io.BytesIO(image_bytes)) as img:
-        img.load()
-        bounds = _alpha_bounds(img.convert("RGBA"))
+    combined = Image.new("RGBA", CANVAS_SIZE, (0, 0, 0, 0))
+    for layer in selected_layers:
+        assert layer is not None
+        image_bytes, _mime = read_character_model_image(model_id, layer["id"] + ".png", models_root)
+        try:
+            with Image.open(io.BytesIO(image_bytes)) as opened:
+                opened.load()
+                layer_image = opened.convert("RGBA")
+        except (OSError, ValueError) as exc:
+            raise CharacterModelError("No se pudo leer una de las máscaras PNG seleccionadas.") from exc
+        if layer_image.size != CANVAS_SIZE:
+            raise CharacterModelError("Las regiones del modelo deben conservar el lienzo 512×768.")
+        combined.alpha_composite(layer_image)
+
+    bounds = _alpha_bounds(combined)
     if not bounds:
-        raise CharacterModelError("La región está vacía y no se puede importar.")
+        raise CharacterModelError("La selección de regiones está vacía y no se puede importar.")
     center_x = (bounds["x"] + bounds["width"] / 2) / CANVAS_SIZE[0]
     center_y = (bounds["y"] + bounds["height"] / 2) / CANVAS_SIZE[1]
     rig_category = {
@@ -660,14 +690,16 @@ def publish_model_layer(
         "accessory_back": "accessory", "accessory_front": "accessory",
     }[category]
     stage_png = io.BytesIO()
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
-    image.save(stage_png, format="PNG", optimize=True)
+    combined.save(stage_png, format="PNG", optimize=True)
     png_data = stage_png.getvalue()
     import base64
     from modular_asset_library import import_user_asset
+    # A stable safe source filename ties the saved piece back to the model and selected region set.
+    selection_hash = hashlib.sha256(",".join(selected_ids).encode("ascii")).hexdigest()[:12]
+    source_filename = model_id.replace(".", "-") + "-group-" + selection_hash + ".png"
     record = import_user_asset({
         "filename": label.strip().replace("/", "_") + ".png",
-        "source_filename": (model_id.replace(".", "-") + "-" + layer["id"] + ".png"),
+        "source_filename": source_filename,
         "mime_type": "image/png",
         "data_base64": base64.b64encode(png_data).decode("ascii"),
         "category": category,
@@ -678,7 +710,8 @@ def publish_model_layer(
         "source_url": next((item.get("source_url", "") for item in model["references"] if item.get("asset_id") == model.get("base_asset_id")), ""),
         "conversion": {
             "schema_version": 1, "algorithm": "botimagen-png-stage-v1", "normalized": True,
-            "canvas_width": 512, "canvas_height": 768, "source_width": 512, "source_height": 768,
+            "canvas_width": CANVAS_SIZE[0], "canvas_height": CANVAS_SIZE[1],
+            "source_width": CANVAS_SIZE[0], "source_height": CANVAS_SIZE[1],
             "source_format": "image/png", "background_removed": True, "background_tolerance": 0,
             "scale_percent": 100, "offset_x": 0, "offset_y": 0, "pose": view,
             "rig_category": rig_category, "content_bounds": bounds,
@@ -686,8 +719,12 @@ def publish_model_layer(
             "anchor_status": "estimated_not_validated", "cutout_applied": False,
         },
     }, library_root)
-    return {"asset": record, "model_id": model_id, "layer_id": layer_id}
-
+    return {
+        "asset": record, "model_id": model_id,
+        "layer_id": selected_ids[0] if len(selected_ids) == 1 else None,
+        "layer_ids": selected_ids,
+        "merged_region_count": len(selected_ids),
+    }
 
 def _save_layer_category(
     model_id: str,

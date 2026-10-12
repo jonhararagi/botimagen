@@ -1657,7 +1657,20 @@ try {
   assert.equal(modelOutput.exactLabel, "RECONSTRUCCIÓN EXACTA", "The source pixels must reconstruct exactly from region layers");
   assert.ok(modelOutput.firstRegionWidth < 512 && modelOutput.firstRegionHeight < 768, "The region preview should show the cropped mask, not a scaled full-stage image");
   await modelBuilder.screenshot({ path: resolve(visualQaDir, "character-model-builder-region-decomposition.png") });
-  console.log("PASS_REAL: UI created a saved character model from selected local PNGs, emitted multiple cropped region masks, extracted a reusable style palette, and verified pixel-exact reconstruction.");
+
+  // Group multiple color regions into one reusable transparent garment candidate.
+  const firstRegion = modelBuilder.locator(".model-builder-region").nth(0);
+  const secondRegion = modelBuilder.locator(".model-builder-region").nth(1);
+  await firstRegion.locator(".model-builder-region-select input[type=\"checkbox\"]").check();
+  await secondRegion.locator(".model-builder-region-select input[type=\"checkbox\"]").check();
+  await modelBuilder.getByLabel("Nombre de la pieza agrupada").fill("QA combined regional piece");
+  await modelBuilder.getByLabel("Rol de la pieza").selectOption("clothing_top");
+  await modelBuilder.getByRole("button", { name: "Unir e importar 2 regiones como una pieza" }).click();
+  await modelBuilder.getByRole("status").filter({ hasText: "2 regiones unidas e importadas" }).waitFor({ state: "visible", timeout: 15000 });
+  const modelBuilderAssetCount = await modelBuilder.locator(".model-builder-asset").filter({ hasText: "QA combined regional piece" }).count();
+  assert.equal(modelBuilderAssetCount, 1, "Grouping color regions must add one reusable piece to the local modular library");
+  await modelBuilder.screenshot({ path: resolve(visualQaDir, "character-model-builder-grouped-piece.png") });
+  console.log("PASS_REAL: UI created a saved character model from local PNGs, emitted independently reviewable masks, extracted a reusable palette, reconstructed all visible pixels, and grouped multiple regions into one modular catalog piece.");
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {

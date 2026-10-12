@@ -46,6 +46,9 @@ export function CharacterModelBuilder() {
   const [activeModelId,setActiveModelId]=useState("");
   const [layerLabels,setLayerLabels]=useState<Record<string,string>>({});
   const [layerCategories,setLayerCategories]=useState<Record<string,string>>({});
+  const [selectedRegionIds,setSelectedRegionIds]=useState<string[]>([]);
+  const [groupLabel,setGroupLabel]=useState("Pieza agrupada");
+  const [groupCategory,setGroupCategory]=useState("clothing_top");
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState("");
   const [notice,setNotice]=useState("");
@@ -84,6 +87,7 @@ export function CharacterModelBuilder() {
     setModel(data);
     setActiveModelId(id);
     setLayerLabels(Object.fromEntries((data.layers||[]).map((layer:ModelLayer)=>[layer.id,layer.label])));
+    setSelectedRegionIds([]);
     setLayerCategories(Object.fromEntries((data.layers||[]).filter((layer:ModelLayer)=>layer.semantic_category).map((layer:ModelLayer)=>[layer.id,layer.semantic_category! ])));
     setShowAllLayers(false);
   };
@@ -146,6 +150,7 @@ export function CharacterModelBuilder() {
       setModel(data.model);setActiveModelId(data.model.id);
       setLayerLabels(Object.fromEntries(data.model.layers.map((layer:ModelLayer)=>[layer.id,layer.label])));
       setLayerCategories({});
+      setSelectedRegionIds([]);
       await refreshModels();
       setNotice("Modelo creado: "+data.model.layers.length+" capas raster, "+data.model.references.length+" referencias y una paleta de estilo guardada.");
       setShowAllLayers(false);
@@ -167,6 +172,29 @@ export function CharacterModelBuilder() {
     }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
     finally{setBusy(false);}
   };
+  const toggleRegion=(id:string,checked:boolean)=>{
+    setSelectedRegionIds(current=>checked?(current.includes(id)?current:[...current,id]):current.filter(value=>value!==id));
+  };
+  const publishSelectedRegions=async()=>{
+    if(!model){setError("Primero crea o abre un modelo.");return;}
+    if(!selectedRegionIds.length){setError("Selecciona al menos una región para unir.");return;}
+    if(!groupLabel.trim()){setError("Pon un nombre para la pieza agrupada.");return;}
+    setBusy(true);setError("");setNotice("");
+    try{
+      const response=await fetch("/api/character-models/"+encodeURIComponent(model.id)+"/publish-layer",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({layer_ids:selectedRegionIds,label:groupLabel.trim(),category:groupCategory,view:"front"}),
+      });
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"No se pudieron unir las regiones.");
+      const count=Number(data.merged_region_count)||selectedRegionIds.length;
+      setSelectedRegionIds([]);
+      await refreshAssets();
+      setNotice(count+" regiones unidas e importadas como una única pieza «"+groupLabel.trim()+"». Los anclajes quedan pendientes de validar.");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+
   const publishLayer=async(layer:ModelLayer)=>{
     if(!model)return;
     const category=layerCategories[layer.id];
@@ -230,6 +258,7 @@ export function CharacterModelBuilder() {
             {layersToShow.map(layer=><article className="model-builder-region" key={layer.id}>
               <div className="model-builder-region-image"><img src={imageUrl(model.id,"layers/"+layer.id+"-thumb.png")} alt={layer.label}/></div>
               <div className="model-builder-region-body">
+                <label className="model-builder-region-select"><input type="checkbox" checked={selectedRegionIds.includes(layer.id)} onChange={event=>toggleRegion(layer.id,event.target.checked)}/>Unir en pieza</label>
                 <label>Nombre<input value={layerLabels[layer.id]??layer.label} onChange={event=>setLayerLabels(current=>({...current,[layer.id]:event.target.value}))} /></label>
                 <div className="model-builder-region-meta"><span>{layer.pixel_count.toLocaleString()} px</span>{layer.color_hex&&<i style={{background:layer.color_hex}} title={layer.color_hex}/>}<small>{layer.suggested_zone}</small></div>
                 <label>Rol para importar<select value={layerCategories[layer.id]||""} onChange={event=>setLayerCategories(current=>({...current,[layer.id]:event.target.value}))}><option value="">Solo candidato</option>{roleOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
@@ -237,6 +266,14 @@ export function CharacterModelBuilder() {
               </div>
             </article>)}
           </div>
+          {selectedRegionIds.length>0&&<div className="model-builder-group-panel">
+            <div className="model-builder-group-heading"><b>Agrupar regiones seleccionadas</b><span>{selectedRegionIds.length} regiones se convertirán en una sola máscara PNG transparente.</span></div>
+            <div className="model-builder-group-fields">
+              <label>Nombre de la pieza agrupada<input value={groupLabel} maxLength={100} onChange={event=>setGroupLabel(event.target.value)}/></label>
+              <label>Rol de la pieza<select value={groupCategory} onChange={event=>setGroupCategory(event.target.value)}>{roleOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+            </div>
+            <button type="button" className="model-builder-primary" disabled={busy||!groupLabel.trim()} onClick={publishSelectedRegions}>Unir e importar {selectedRegionIds.length} regiones como una pieza</button>
+          </div>}
           {(model.layers.length>18)&&<button type="button" className="model-builder-secondary" onClick={()=>setShowAllLayers(value=>!value)}>{showAllLayers?"Mostrar menos":"Mostrar las "+model.layers.length+" regiones"}</button>}
           <div className="model-builder-warning"><strong>Qué hace esta separación</strong><p>Se divide la imagen en regiones conectadas por color. Al superponer todas las capas se reconstruyen los píxeles visibles de la imagen base. Esto no significa que el programa sepa por sí solo cuál región es una chaqueta o un ojo: revisa el recorte, asigna el rol correcto e importa solo las regiones que sirvan. Las otras imágenes amplían la paleta y el registro del estilo, pero no se mezclan automáticamente con la pose base.</p></div>
         </>}

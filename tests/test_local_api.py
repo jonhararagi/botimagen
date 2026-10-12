@@ -567,6 +567,31 @@ class LocalApiTests(unittest.TestCase):
                 status, _, asset_list = request("GET", "/api/modular-assets")
                 self.assertEqual(status, 200)
                 self.assertEqual(asset_list["count"], 4)
+
+                selected_region_ids = [item["id"] for item in model["layers"][:2]]
+                self.assertEqual(len(selected_region_ids), 2)
+                status, _, grouped = request("POST", f"/api/character-models/{model_id}/publish-layer", {
+                    "layer_ids": selected_region_ids,
+                    "label": "Grouped clothing region",
+                    "category": "clothing_top",
+                    "view": "front",
+                })
+                self.assertEqual(status, 201)
+                self.assertEqual(grouped["layer_ids"], selected_region_ids)
+                self.assertEqual(grouped["merged_region_count"], 2)
+                self.assertEqual(grouped["asset"]["kind"], "modular_piece")
+                self.assertEqual(grouped["asset"]["category"], "clothing_top")
+                status, content_type, merged_png = request(
+                    "GET", f"/api/modular-assets/{grouped['asset']['id']}/image"
+                )
+                self.assertEqual(status, 200)
+                self.assertEqual(content_type, "image/png")
+                with Image.open(io.BytesIO(merged_png)) as merged_image:
+                    self.assertEqual(merged_image.size, (512, 768))
+                    self.assertIsNotNone(merged_image.getchannel("A").getbbox())
+                status, _, final_assets = request("GET", "/api/modular-assets")
+                self.assertEqual(status, 200)
+                self.assertEqual(final_assets["count"], 5)
             finally:
                 server.shutdown()
                 server.server_close()
