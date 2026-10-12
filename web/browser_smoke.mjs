@@ -1688,6 +1688,20 @@ try {
   await maskEditor.waitFor({ state: "visible", timeout: 10000 });
   const maskCanvas = maskEditor.getByTestId("mask-preview");
   await page.waitForFunction(() => document.querySelector('[data-testid="mask-preview"]')?.getAttribute("data-mask-ready") === "true", null, { timeout: 15000 });
+  const maskOverlayPixels = await maskCanvas.evaluate(canvas => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return 0;
+    const pixels = ctx.getImageData(0, 0, 512, 768).data;
+    let visible = 0;
+    for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) visible++;
+    return visible;
+  });
+  assert.ok(maskOverlayPixels > 100, "The visible canvas must contain the real selected mask overlay, not an empty canvas");
+  const sourceUnderMask = await maskEditor.getByAltText("Fuente original detrás de la máscara editable").evaluate(async image => {
+    if (!(image instanceof HTMLImageElement)) return [0, 0];
+    await image.decode(); return [image.naturalWidth, image.naturalHeight];
+  });
+  assert.deepEqual(sourceUnderMask, [512, 768], "The editable mask must be displayed over the actual source image");
   const maskBox = await maskCanvas.boundingBox();
   assert.ok(maskBox, "The mask editor must show the source image with a real canvas overlay");
   await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
