@@ -340,11 +340,11 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
         hair_length=HAIR_LENGTHS.get(values.get("hair_length","medio"),.38)
         hair_style=values.get("hairstyle","long_flowing")
         back_hair=values.get("back_hair","recto_liso")
-        back_fall=min(sk.hip_y-r*.10,cy+r*(.28+hair_length*1.62))
+        back_fall=min(sk.hip_y-r*.10,cy+r*(.52+hair_length*4.10))
         if hair_style in {"bob","curly_lob"} or back_hair in {"bob_trasero","nuca_corta"}:
             back_fall=min(back_fall,cy+r*.72)
         if back_hair in {"capas_largas","puntas_largas","ondas_traseras","panel_trenzado"}:
-            back_fall=min(sk.ankle_y-r*.15, max(back_fall,cy+r*(.42+hair_length*1.72)))
+            back_fall=min(sk.ankle_y-r*.15, max(back_fall,cy+r*(.52+hair_length*4.30)))
         left_fall=back_fall
         right_fall=back_fall
         if hair_style=="asymmetrical" or back_hair=="seccion_asimetrica":
