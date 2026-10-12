@@ -18,7 +18,7 @@ export type BodyLandmarkSet = Readonly<{
 }>;
 
 const SVG_LAYER_ORDER = [
-  "ground-shadow", "hair-back", "neck", "arm-skin", "hands", "base-sleeves",
+  "ground-shadow", "hair-back", "body-base", "neck", "arm-skin", "hands", "base-sleeves",
   "base-torso", "lower-body", "footwear", "outfit", "outer-layer",
   "surface-details", "chromapatch",
 ] as const;
@@ -56,5 +56,18 @@ export function getBodyLandmarks(view: BodyView, hemY: number, waistHalf: number
     kneeLeft: { x: 150, y: 442 }, kneeRight: { x: 190, y: 442 },
     ankleLeft: { x: 150, y: 458 }, ankleRight: { x: 210, y: 458 },
     footLeft: { x: 146, y: 478 }, footRight: { x: 226, y: 478 },
+  };
+}
+
+
+/** Fixed body geometry, independent of garment selection and fit recipe values. */
+export type BodyBaseGeometry = Readonly<{ torso: string; pelvis: string; legs: string; feet: string }>;
+export function getBodyBaseGeometry(view: BodyView): BodyBaseGeometry {
+  const rear = view === "back";
+  return {
+    torso: rear ? "M128 254 Q170 230 212 254 L194 347 Q170 359 146 347 Z" : "M128 254 Q170 230 212 254 L194 346 Q170 354 146 346 Z",
+    pelvis: rear ? "M146 346 Q170 354 194 346 L208 390 Q190 408 170 410 Q150 408 132 390 Z" : "M146 346 Q170 354 194 346 L205 389 Q190 404 170 411 Q150 404 135 389 Z",
+    legs: rear ? "M135 386 Q145 389 158 397 L166 441 L158 458 L145 458 L145 442 L142 414 Z M182 397 Q195 389 205 386 L198 414 L195 442 L195 458 L182 458 L174 441 Z" : "M135 386 Q147 390 160 398 L164 441 L157 458 L145 458 L145 442 L142 414 Z M180 398 Q193 390 205 386 L198 414 L195 442 L195 458 L183 458 L176 441 Z",
+    feet: "M145 455 L158 455 L160 470 Q172 475 178 479 L143 479 Q140 474 145 455 Z M183 455 L195 455 L199 475 L226 479 L190 479 L183 470 Z",
   };
 }
