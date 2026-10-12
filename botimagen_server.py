@@ -12,10 +12,12 @@ from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
+from modular_asset_library import AssetImportError, import_user_asset, list_user_assets
 
 ROOT = Path(__file__).resolve().parent
 ASSET_MANIFEST_PATH = ROOT / "assets_manifest.json"
 MAX_BODY_BYTES = 64 * 1024
+MAX_IMPORT_BODY_BYTES = 17 * 1024 * 1024
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 
@@ -309,7 +311,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             self.end_headers()
             self.wfile.write(raw)
 
-        def _read_json(self) -> Any:
+        def _read_json(self, max_bytes: int = MAX_BODY_BYTES) -> Any:
             header = self.headers.get("Content-Length")
             try:
                 length = int(header or "")
@@ -317,8 +319,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 raise ApiInputError("Se requiere Content-Length válido.", HTTPStatus.LENGTH_REQUIRED) from exc
             if length < 0:
                 raise ApiInputError("Longitud de solicitud inválida.")
-            if length > MAX_BODY_BYTES:
-                raise ApiInputError("El JSON supera el límite de 64 KiB.", HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+            if length > max_bytes:
+                limit_label = "12 MiB de imagen" if max_bytes == MAX_IMPORT_BODY_BYTES else "64 KiB"
+                raise ApiInputError(f"La solicitud supera el límite de {limit_label}.", HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
             if "application/json" not in self.headers.get("Content-Type", "").lower():
                 raise ApiInputError("Usa Content-Type: application/json.", HTTPStatus.UNSUPPORTED_MEDIA_TYPE)
             try:
@@ -335,6 +338,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/health": ("GET",),
                 "/api/catalog": ("GET",),
                 "/api/assets/contracts": ("GET",),
+                "/api/modular-assets": ("GET", "POST"),
                 "/api/profiles": ("GET", "POST"),
                 "/api/generate": ("POST",),
             }
@@ -370,6 +374,12 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 return
             if path == "/api/assets/contracts":
                 self._send_json(HTTPStatus.OK, asset_contract_catalog)
+                return
+            if path == "/api/modular-assets":
+                try:
+                    self._send_json(HTTPStatus.OK, list_user_assets())
+                except AssetImportError as exc:
+                    self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
                 return
             if path == "/api/profiles":
                 self._list_profiles()
@@ -419,11 +429,18 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character"}:
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
-                payload = self._read_json()
+                payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" else MAX_BODY_BYTES)
+                if path == "/api/modular-assets":
+                    try:
+                        result = import_user_asset(payload)
+                    except AssetImportError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.CREATED if not result.get("duplicate") else HTTPStatus.OK, result)
+                    return
                 if path == "/api/render/character":
                     result = render_character_from_payload(payload, generator)
                     self._send_json(HTTPStatus.OK, result)
