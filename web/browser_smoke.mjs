@@ -1328,11 +1328,13 @@ try {
   assert.ok(savedProfileOption, "The modular profile should be persisted through the existing profile API");
   await hairToggle.check();
   await profileSelect.selectOption(savedProfileOption);
+  const imageBeforeRestore = await cyberstreetPreview.getAttribute("src");
   await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
-  await page.waitForFunction(() => {
+  await page.waitForFunction(previous => {
     const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
-    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512;
-  }, null, { timeout: 15000 });
+    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
+  }, imageBeforeRestore, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
   await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
   await page.waitForFunction(() => {
