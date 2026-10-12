@@ -14,7 +14,7 @@ from character_generator import CharacterGenerator, TRAIT_KEYS
 from character_model_builder import (
     CharacterModelError, create_character_model, edit_character_model_layer, extend_character_model,
     list_character_models, publish_model_layer, read_character_model, read_character_model_image,
-    reset_character_model_layer,
+    reset_character_model_layer, _save_layer_category,
 )
 from modular_character_compositor import CompositionError, compose_png, validate_selection
 from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
@@ -366,7 +366,7 @@ def make_handler(
             if path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors"):
                 allowed = ("POST",)
             elif path.startswith("/api/character-models/"):
-                allowed = ("POST",) if path.endswith(("/extend", "/publish-layer", "/edit-layer", "/reset-layer")) else ("GET",)
+                allowed = ("POST",) if path.endswith(("/extend", "/publish-layer", "/edit-layer", "/reset-layer", "/classify-layer")) else ("GET",)
             if allowed is None:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
@@ -516,7 +516,8 @@ def make_handler(
             model_publish_route = path.startswith("/api/character-models/") and path.endswith("/publish-layer")
             model_edit_route = path.startswith("/api/character-models/") and path.endswith("/edit-layer")
             model_reset_route = path.startswith("/api/character-models/") and path.endswith("/reset-layer")
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route:
+            model_classify_route = path.startswith("/api/character-models/") and path.endswith("/classify-layer")
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route and not model_classify_route:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
@@ -616,6 +617,22 @@ def make_handler(
                         raise ApiInputError("Se requiere layer_id.")
                     try:
                         result = reset_character_model_layer(model_id, payload["layer_id"], model_root)
+                    except FileNotFoundError as exc:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                        return
+                    except CharacterModelError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
+                    return
+                if model_classify_route:
+                    model_id = path.removeprefix("/api/character-models/").removesuffix("/classify-layer").strip("/")
+                    if not isinstance(payload, dict) or set(payload) != {"layer_id", "label", "category"}:
+                        raise ApiInputError("Se requieren layer_id, label y category.")
+                    category = payload["category"]
+                    if not isinstance(category, str):
+                        raise ApiInputError("La categoría debe ser texto.")
+                    try:
+                        result = _save_layer_category(model_id, payload["layer_id"], payload["label"], category or None, model_root)
                     except FileNotFoundError as exc:
                         self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
                         return
