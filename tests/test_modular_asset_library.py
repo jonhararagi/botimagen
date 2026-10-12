@@ -15,9 +15,9 @@ def png_chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
 
 PNG_1X1 = (
-    b"\\x89PNG\\r\\n\\x1a\\n"
+    b"\x89PNG\r\n\x1a\n"
     + png_chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0))
-    + png_chunk(b"IDAT", zlib.compress(b"\\x00\\x00\\x00\\x00\\x00"))
+    + png_chunk(b"IDAT", zlib.compress(b"\x00\x00\x00\x00\x00"))
     + png_chunk(b"IEND", b"")
 )
 
