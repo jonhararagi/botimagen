@@ -1165,12 +1165,55 @@ try {
   const auroraCityBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await selectProductView("front", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-neon-archivist-front.png"), fullPage: true });
+  await selectProductView("back", "Trasera");
+  await page.screenshot({ path: resolve(visualQaDir, "product-studio-neon-archivist-back.png"), fullPage: true });
+
+  // Exercise actual face/hair controls on the visible Python-rendered character.
+  // Each capture is made only after the returned SVG data URI changes.
+  const selectVisualTrait = async (id, value) => {
+    const field = page.locator('label[for="trait-' + id + '"]').locator("xpath=../..");
+    const lock = field.locator("button.lock");
+    if ((await lock.innerText()).includes("AUTO")) await lock.click();
+    const select = field.locator("select");
+    const before = await productImage.getAttribute("src");
+    await select.selectOption(value);
+    await page.waitForFunction(
+      previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous,
+      before,
+      { timeout: 15000 },
+    );
+  };
+  await selectProductView("front", "Frontal");
+  await selectVisualTrait("face_shape", "diamante");
+  await selectVisualTrait("nose_style", "puente_recto");
+  await page.screenshot({ path: resolve(visualQaDir, "art-face-diamond-straight-bridge.png"), fullPage: true });
+  await selectVisualTrait("hairstyle", "hime_cut");
+  await selectVisualTrait("hair", "turquesa");
+  await page.screenshot({ path: resolve(visualQaDir, "art-hime-cut-turquoise.png"), fullPage: true });
+  await selectVisualTrait("hair_length", "extra_largo");
+  await page.screenshot({ path: resolve(visualQaDir, "art-hime-cut-extra-long.png"), fullPage: true });
+
   const productStudioManifest = {
     source: "Live BotImagen React app with POST /api/render/character SVG as the only visible character renderer",
+    sourceSha: process.env.GITHUB_SHA ?? "UNAVAILABLE",
     renderer: "parametric-anime-svg-v1",
+    baselineReference: {
+      sha: "5ef17beb774f17d5ae57ada655c949343cee92aa",
+      workflowRun: "https://github.com/jonhararagi/botimagen/actions/runs/38248523028",
+      note: "Prior product capture artifact is the before-reference; current artifact contains the after-captures.",
+    },
     presets: ["street-sentinel", "neon-archivist"],
     backgrounds: ["cyber-grid", "dusk-orbit", "aurora-city"],
-    captures: ["product-studio-front-cyber-grid.png", "product-studio-back-dusk-orbit.png", "product-studio-neon-archivist-front.png"],
+    captures: [
+      "product-studio-front-cyber-grid.png",
+      "product-studio-back-dusk-orbit.png",
+      "product-studio-neon-archivist-front.png",
+      "product-studio-neon-archivist-back.png",
+      "art-face-diamond-straight-bridge.png",
+      "art-hime-cut-turquoise.png",
+      "art-hime-cut-extra-long.png",
+    ],
+    exercisedControls: ["face_shape=diamante", "nose_style=puente_recto", "hairstyle=hime_cut", "hair=turquesa", "hair_length=extra_largo"],
     legacyRenderer: "Hidden QA fixture only; not part of the visible product preview",
     physicalWindowsQA: "NOT_RUN",
   };
