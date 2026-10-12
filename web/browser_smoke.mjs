@@ -691,6 +691,29 @@ try {
       }
     `;
     document.head.appendChild(style);
+    // Apply the same hiding directly to the rendered SVG as a guard against selector/style-order differences.
+    const svg = document.querySelector(".visual-character-svg");
+    if (!svg) throw new Error("Neutral QA fixture could not find the rendered SVG");
+    const hiddenSelectors = [
+      '[data-layer-id="ground-shadow"]', '[data-layer-id="hair-back"]',
+      ".character-hands", ".garment-sleeves", '[data-layer-id="base-sleeves"]',
+      ".garment-torso-panels", '[fill^="url(#cw-pattern-"]', '[fill^="url(#cw-gloss-"]',
+      '[data-layer-id="outfit"]', '[data-layer-id="outer-layer"]',
+      '[data-layer-id="footwear"]', '[data-layer-id="chromapatch"]',
+      ':scope > path:not([data-layer-id])',
+      ':scope > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"])',
+    ];
+    for (const selector of hiddenSelectors) {
+      for (const element of svg.querySelectorAll(selector)) element.style.setProperty("display", "none", "important");
+    }
+    for (const selector of [".garment-torso-main", ".character-lower-body", ".character-leg-silhouette"]) {
+      const element = svg.querySelector(selector);
+      if (element) {
+        element.style.setProperty("fill", "var(--skin)", "important");
+        element.style.setProperty("stroke", "#382b36", "important");
+        element.style.setProperty("stroke-width", "1.5", "important");
+      }
+    }
   }, neutralStyleId);
   const neutralBounds = async () => page.locator(".visual-character-svg").evaluate(svg => {
     const box = selector => {
