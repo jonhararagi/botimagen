@@ -101,11 +101,15 @@ function PolygonCutoutEditor({
 
   const pointString=points.map(point=>`${point.x*size.width},${point.y*size.height}`).join(" ");
   const addPoint=(event:MouseEvent<SVGSVGElement>)=>{
-    const rect=event.currentTarget.getBoundingClientRect();
-    if(!rect.width||!rect.height||!size.width||!size.height||points.length>=256)return;
+    if(!size.width||!size.height||points.length>=256)return;
+    const inverse=event.currentTarget.getScreenCTM()?.inverse();
+    if(!inverse)return;
+    // Convert viewport clicks to SVG viewBox coordinates. getBoundingClientRect()
+    // alone is wrong if the browser letterboxes an SVG with a mismatched aspect ratio.
+    const local=new DOMPoint(event.clientX,event.clientY).matrixTransform(inverse);
     const next:CutoutPoint={
-      x:Number(Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width)).toFixed(5)),
-      y:Number(Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height)).toFixed(5)),
+      x:Number(Math.max(0,Math.min(1,local.x/size.width)).toFixed(5)),
+      y:Number(Math.max(0,Math.min(1,local.y/size.height)).toFixed(5)),
     };
     onChange([...points,next]);
   };
@@ -117,7 +121,10 @@ function PolygonCutoutEditor({
       <p>Haz clic alrededor del cabello, rostro, ropa o accesorio que quieras extraer. Cada clic añade un punto. El exterior quedará transparente al preparar el PNG. Las partes ocultas detrás de otra prenda no existen en la imagen original.</p>
       {size.width>0&&size.height>0&&<svg
         className="modular-cutout-stage"
+        width={size.width}
+        height={size.height}
         viewBox={`0 0 ${size.width} ${size.height}`}
+        preserveAspectRatio="none"
         role="application"
         aria-label={label}
         onClick={addPoint}
