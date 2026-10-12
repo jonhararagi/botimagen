@@ -61,12 +61,20 @@ def test_visual_recipe_drives_fabric_geometry_emblem_and_back_view():
     front = render_profile_svg({"hair": "turquesa", "outfit": "combat_jacket"}, recipe)
     assert 'class="cyberpunk-fabric-details"' in front
     assert 'class="chromapatch"' in front
+    assert 'class="garment-volume-shading"' in front
+    assert 'class="garment-bomber-seams"' in front
     assert "#ff55cc" in front
     back = render_profile_svg({"hair": "turquesa", "outfit": "combat_jacket"}, {**recipe, "view": "back"})
     assert 'data-view="back"' in back
     assert 'class="back-head-cover"' in back
     assert 'class="back-clothing-panel"' in back
+    assert 'class="back-garment-shadow"' in back
     assert front != back
+
+    tactical = render_profile_svg({"hair": "turquesa", "outfit": "tactical_baseball"}, {**recipe, "outer_layer": "none"})
+    long_coat = render_profile_svg({"hair": "turquesa", "outfit": "street_bomber", "outer_layer": "long_coat"}, recipe)
+    assert 'class="garment-tactical-yoke"' in tactical
+    assert 'class="garment-tailored-seams"' in long_coat
 
 
 def test_render_endpoint_uses_canonical_catalogue_validation():
