@@ -1473,15 +1473,28 @@ try {
   const prepareAndSaveMaterial = async () => {
     await uploadSynthetic();
     await assetLibrary.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
-    const convertedPreview = assetLibrary.getByRole("img", { name: "PNG normalizado de qa-synthetic-character.png 512 por 768" });
-    await convertedPreview.waitFor({ timeout: 15000 });
-    const alphaCheck = await convertedPreview.evaluate(async image => {
-      await image.decode();
+    await page.waitForFunction(() => {
+      const image = document.querySelector('.modular-library img[alt="PNG normalizado de qa-synthetic-character.png 512 por 768"]');
+      const stage = document.querySelector(".modular-library .modular-preview-card .modular-anchor-stage");
+      return Boolean(image || stage);
+    }, null, { timeout: 15000 });
+    const alphaCheck = await assetLibrary.evaluate(async root => {
+      let image = root.querySelector('img[alt="PNG normalizado de qa-synthetic-character.png 512 por 768"]');
+      if (image instanceof HTMLImageElement) {
+        await image.decode();
+      } else {
+        const source = root.querySelector(".modular-preview-card .modular-anchor-stage image")?.getAttribute("href");
+        if (!source) throw new Error("Converted stage preview image is unavailable");
+        const loaded = new Image();
+        loaded.src = source;
+        await loaded.decode();
+        image = loaded;
+      }
       const canvas = document.createElement("canvas");
       canvas.width = 512; canvas.height = 768;
       const context = canvas.getContext("2d", { willReadFrequently: true });
       if (!context) throw new Error("Canvas alpha check unavailable");
-      context.drawImage(image, 0, 0);
+      context.drawImage(image, 0, 0, 512, 768);
       const pixels = context.getImageData(0, 0, 512, 768).data;
       return { width: image.naturalWidth, height: image.naturalHeight, cornerAlpha: pixels[3], centerAlpha: pixels[(384 * 512 + 256) * 4 + 3] };
     });
@@ -1505,6 +1518,11 @@ try {
   const modularBody = assetLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]')
     .filter({ hasText: "qa-synthetic-character" }).filter({ hasText: "body" });
   await modularBody.waitFor({ timeout: 15000 });
+  await modularBody.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
+  await page.waitForFunction(() =>
+    document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("Anclajes confirmados") ?? false,
+    null, { timeout: 10000 },
+  );
   await modularBody.locator('input[type="checkbox"]').check();
   await assetLibrary.getByRole("button", { name: /Componer selección \(1\)/ }).click();
   await page.waitForFunction(() =>
