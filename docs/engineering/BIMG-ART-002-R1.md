@@ -74,3 +74,13 @@ Comparación visual realizada contra el artefacto anterior de CI #378. Se apreci
 
 Estimación inicial del tramo: **10–16 horas activas** (aproximadamente 1–2 jornadas).  
 Tiempo real acumulado: **NOT_MEASURED**.
+
+## BIMG-PRODUCT-001-R1 follow-up · orientation contract guard
+
+- Follow-up implementation commit: `f68612a23e6f90df3c843fa3659a0d9a35802dcd`.
+- The React integration now rejects a render response when the API's `view` value or the SVG root's `data-view` differs from the requested `front`/`back` orientation. The rendered-state label is sourced from the validated response instead of independently repeating the requested recipe value.
+- Chromium smoke now decodes the actual `img.server-character-art` data URI, asserts that the initial Python-rendered product SVG declares `front`, then changes the Style Lab to `back` and waits for both the product image metadata and SVG root to declare `back`. This is separate from checks against the hidden React fixture.
+- Exact-head CI: [Validate BotImagen run #408](https://github.com/jonhararagi/botimagen/actions/runs/38259015720), **SUCCESS** on `f68612a23e6f90df3c843fa3659a0d9a35802dcd`.
+- Exact-run capture artifact: [botimagen-visual-garment-qa, artifact 11751397708](https://github.com/jonhararagi/botimagen/actions/runs/38259015720/artifacts/11751397708). I downloaded and inspected `product-studio-front-cyber-grid.png` and `product-studio-back-dusk-orbit.png`: the front capture exposes the face and the back capture presents the rear hair/garment composition. The reported CI #378 orientation symptom is not reproduced by these current captures.
+- This guard verifies orientation contracts; it does not prove semantic anatomical correctness. The pose remains rigid, hands read small at product-preview scale, and the rear view remains a parametric 2D composition. Overall artistic acceptance therefore remains **PARTIAL**.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; the capture run is headless Chromium on CI, not physical Windows Chrome/Edge. Beta remains **63%**.
