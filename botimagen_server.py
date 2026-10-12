@@ -12,8 +12,9 @@ from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
 from character_model_builder import (
-    CharacterModelError, create_character_model, extend_character_model,
+    CharacterModelError, create_character_model, edit_character_model_layer, extend_character_model,
     list_character_models, publish_model_layer, read_character_model, read_character_model_image,
+    reset_character_model_layer,
 )
 from modular_character_compositor import CompositionError, compose_png, validate_selection
 from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
@@ -365,7 +366,7 @@ def make_handler(
             if path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors"):
                 allowed = ("POST",)
             elif path.startswith("/api/character-models/"):
-                allowed = ("POST",) if path.endswith(("/extend", "/publish-layer")) else ("GET",)
+                allowed = ("POST",) if path.endswith(("/extend", "/publish-layer", "/edit-layer", "/reset-layer")) else ("GET",)
             if allowed is None:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
@@ -513,11 +514,13 @@ def make_handler(
             validate_anchor_route = path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors")
             model_extend_route = path.startswith("/api/character-models/") and path.endswith("/extend")
             model_publish_route = path.startswith("/api/character-models/") and path.endswith("/publish-layer")
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route and not model_extend_route and not model_publish_route:
+            model_edit_route = path.startswith("/api/character-models/") and path.endswith("/edit-layer")
+            model_reset_route = path.startswith("/api/character-models/") and path.endswith("/reset-layer")
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
-                payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" else MAX_BODY_BYTES)
+                payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" or model_edit_route else MAX_BODY_BYTES)
                 if validate_anchor_route:
                     if (
                         not isinstance(payload, dict)
@@ -593,6 +596,32 @@ def make_handler(
                     except (CharacterModelError, AssetImportError) as exc:
                         raise ApiInputError(str(exc)) from exc
                     self._send_json(HTTPStatus.CREATED if not result["asset"].get("duplicate") else HTTPStatus.OK, result)
+                    return
+                if model_edit_route:
+                    model_id = path.removeprefix("/api/character-models/").removesuffix("/edit-layer").strip("/")
+                    if not isinstance(payload, dict) or set(payload) != {"layer_id", "mask_png_base64"}:
+                        raise ApiInputError("Se requieren layer_id y mask_png_base64.")
+                    try:
+                        result = edit_character_model_layer(model_id, payload["layer_id"], payload["mask_png_base64"], model_root)
+                    except FileNotFoundError as exc:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                        return
+                    except CharacterModelError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
+                    return
+                if model_reset_route:
+                    model_id = path.removeprefix("/api/character-models/").removesuffix("/reset-layer").strip("/")
+                    if not isinstance(payload, dict) or set(payload) != {"layer_id"}:
+                        raise ApiInputError("Se requiere layer_id.")
+                    try:
+                        result = reset_character_model_layer(model_id, payload["layer_id"], model_root)
+                    except FileNotFoundError as exc:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                        return
+                    except CharacterModelError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
                     return
                 if path == "/api/render/character":
                     result = render_character_from_payload(payload, generator)
