@@ -187,7 +187,7 @@ class CharacterModelBuilderTests(unittest.TestCase):
             mask.paste(original_alpha)
             source_alpha = source.getchannel("A")
             source_values, mask_values = source_alpha.tobytes(), bytearray(mask.tobytes())
-            untouched_index = next(i for i, alpha in enumerate(source_values) if 0 < alpha < 255 and mask_values[i] == 255)
+            untouched_index = next(i for i, alpha in enumerate(source_values) if alpha > 0 and mask_values[i] == 255)
             added_index = next(i for i, alpha in enumerate(source_values) if alpha > 0 and mask_values[i] == 0)
             mask_values[added_index] = 255
             mask = Image.frombytes("L", (512, 768), bytes(mask_values))
@@ -205,7 +205,7 @@ class CharacterModelBuilderTests(unittest.TestCase):
                              source.getpixel((added_index % 512, added_index // 512))[:3])
             self.assertEqual(edited.getpixel((untouched_index % 512, untouched_index // 512))[3],
                              source.getpixel((untouched_index % 512, untouched_index // 512))[3],
-                             "Untouched antialiased source pixels must retain their original alpha")
+                             "Untouched source pixels must retain their original alpha")
             self.assertGreater(edited.getchannel("A").getbbox()[2], 0)
             reset = reset_character_model_layer(model["id"], layer["id"], models)
             self.assertEqual(reset["model"]["revision"], 3)
