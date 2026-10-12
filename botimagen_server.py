@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
 from modular_character_compositor import CompositionError, compose_png, validate_selection
+from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
 from modular_asset_library import read_user_asset
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
 from modular_asset_library import AssetImportError, import_user_asset, list_user_assets, read_user_asset
@@ -342,6 +343,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/assets/contracts": ("GET",),
                 "/api/modular-assets": ("GET", "POST"),
                 "/api/modular-compose": ("POST",),
+                "/api/modular-cyberstreet/render": ("POST",),
                 "/api/profiles": ("GET", "POST"),
                 "/api/generate": ("POST",),
             }
@@ -377,6 +379,13 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 return
             if path == "/api/assets/contracts":
                 self._send_json(HTTPStatus.OK, asset_contract_catalog)
+                return
+            if path == "/api/modular-cyberstreet":
+                try:
+                    from cyberstreet_svg_compositor import get_cyberstreet_manifest
+                    self._send_json(HTTPStatus.OK, get_cyberstreet_manifest())
+                except CyberStreetError as exc:
+                    self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
                 return
             if path == "/api/modular-assets":
                 try:
@@ -450,11 +459,21 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/modular-compose"}:
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/modular-compose", "/api/modular-cyberstreet/render"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
                 payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" else MAX_BODY_BYTES)
+                if path == "/api/modular-cyberstreet/render":
+                    enabled = payload.get("enabled") if isinstance(payload, dict) else None
+                    if not isinstance(enabled, dict) or any(not isinstance(k, str) or not isinstance(v, bool) for k, v in enabled.items()):
+                        raise ApiInputError("'enabled' debe ser un objeto de IDs y valores booleanos.")
+                    try:
+                        svg = compose_cyberstreet_svg(enabled)
+                    except CyberStreetError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, {"schema_version": 1, "mime_type": "image/svg+xml", "width": 512, "height": 768, "svg": svg})
+                    return
                 if path == "/api/modular-compose":
                     pieces = payload.get("pieces") if isinstance(payload, dict) else None
                     size = payload.get("canvas_size", [1024, 1024]) if isinstance(payload, dict) else [1024, 1024]
