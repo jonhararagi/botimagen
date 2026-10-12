@@ -306,3 +306,12 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 
 
 - Seguimiento CI: la ejecución inicial #358 encontró que el fixture RGBA de prueba tocaba el borde inferior aunque la aserción esperaba que no. Se corrigieron las dimensiones esperadas del fixture y el ejemplo contractual a 4×4; no era un fallo de cálculo del analizador. CI #360 terminó PASS_REAL para SHA `ebcaea3ab662f80d5390c4c47c6331a2bf64a8ff`, incluyendo generador, API, módulo de análisis, build web y smoke Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38207939186.
+
+## BIMG-ANALYSIS-001-R1 · corrección de CI BrokenPipeError · 2026-10-12
+
+- **HEAD BEFORE verificado:** `492c039797abec89b01ce8c1e3dd20e9c9bec119`; PR #14 abierto y sin fusionar. `main` conserva `b508cfe7d3216eda801438d46dff8873842cea86`; PR #11 continúa abierto, independiente y sin fusionar.
+- **Causa raíz confirmada en CI #361:** `tests/test_image_analysis.py` enviaba la imagen completa del fixture real con `PUT /api/analyze`. El servidor rechaza correctamente el método no permitido con HTTP 405 antes de consumir el cuerpo, por lo que el cliente podía recibir `BrokenPipeError` al seguir transmitiendo. No fue un fallo del analizador de píxeles.
+- **Corrección mínima:** la prueba envía un cuerpo vacío con `PUT`; conserva las aserciones de HTTP 405 y `METHOD_NOT_ALLOWED`. No se modificó `botimagen_server.py`, el contrato de producción, las mediciones, los límites ni las dependencias.
+- **Commit de corrección:** `8db097cdd652bf072e48b97b3df390172d8ddb20`, archivo `tests/test_image_analysis.py`. CI #362 se lanzó para este SHA: https://github.com/jonhararagi/botimagen/actions/runs/38210409120. El resultado se registra como pendiente hasta que termine.
+- **Validación local:** no se declara ejecución local en este entorno; la validación reproducible se realiza en GitHub Actions. La aceptación requiere CI completa del SHA final, incluida la suite Python/API, Pillow, build React/TypeScript y smoke Chromium.
+- **Pendiente:** CI final del SHA de esta ficha; revisión de procedencia/licencia de `references/dataset-cuerpos/0.png`; integración UI/React, análisis semántico/anatómico y QA física Windows permanecen fuera del alcance. Progreso ponderado de beta local: **63%**, sin cambios por esta corrección de pruebas.
