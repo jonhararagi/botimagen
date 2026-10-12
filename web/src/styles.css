@@ -79,3 +79,28 @@
 /* BIMG-PRODUCT-001-R1 · local library and one visible renderer. */
 .studio-background-picker,.character-preset-picker{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:7px 12px;margin:10px 0;padding:10px 12px;border:1px solid #30344a;border-radius:9px;background:#111522}.studio-background-picker label,.character-preset-picker label{display:flex;align-items:center;gap:7px;color:#a8afc6;font:9px Consolas,monospace;letter-spacing:.1em}.studio-background-picker label img,.character-preset-picker label img{width:17px;height:17px;object-fit:contain}.studio-background-picker select,.character-preset-picker select{min-width:0;width:100%;padding:8px 10px;border:1px solid #3a4057;border-radius:7px;background:#0d1220;color:#e9eaf4;font-size:11px}.studio-background-picker small,.character-preset-picker small{grid-column:2;color:#7e8aa4;font-size:9px;line-height:1.4}.character-preset-picker .btn{padding:7px 10px;font-size:10px}.studio-background{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;opacity:.76;transition:background-image .18s ease}.grid-bg{z-index:1;pointer-events:none}.halo{z-index:1;pointer-events:none}.legacy-renderer-fixture{position:absolute;inset:0;z-index:1;opacity:0;pointer-events:none;overflow:hidden}.server-character-art{background:transparent!important;object-fit:contain;z-index:2}.canvas-labels,.side-mark{z-index:4}.canvas-footer{z-index:5}.studio-library-mark{width:15px;height:15px;vertical-align:middle;object-fit:contain}
 @media(max-width:650px){.studio-background-picker,.character-preset-picker{grid-template-columns:1fr}.studio-background-picker small,.character-preset-picker small{grid-column:1}}
+
+
+/* Modular asset intake */
+.modular-library{margin:22px 0;padding:20px;border:1px solid rgba(116,225,231,.24);border-radius:18px;background:rgba(9,15,29,.72);color:#edf5ff}
+.modular-library-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.modular-library-head small{letter-spacing:.16em;color:#71e3df;font-size:10px}
+.modular-library-head h3{margin:6px 0;font-size:20px}
+.modular-library-head p{margin:0;color:#a8b7cd;font-size:12px;line-height:1.5;max-width:650px}
+.modular-library-head>b{white-space:nowrap;color:#72e6df;font-size:11px}
+.modular-library-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
+.modular-library-controls label{display:grid;gap:6px;color:#b6c5d9;font-size:11px}
+.modular-library-controls input,.modular-library-controls select{min-width:0;width:100%;padding:10px;border:1px solid #303d54;border-radius:8px;background:#101a2c;color:#f3f7ff}
+.modular-dropzone{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 12px;border:1px dashed #4b7487;border-radius:12px;background:rgba(54,119,139,.08);text-align:center}
+.modular-dropzone strong{font-size:14px}.modular-dropzone span{color:#a8b7cd;font-size:11px}
+.modular-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px}
+.modular-preview-grid>div{display:flex;min-width:0;flex-direction:column;gap:5px;padding:8px;border-radius:9px;background:#121e31}
+.modular-preview-grid img{width:100%;height:105px;object-fit:contain;background:#0a1020;border-radius:6px}
+.modular-preview-grid span,.modular-asset-list small{overflow-wrap:anywhere;color:#aebbd0;font-size:10px}
+.modular-preview-grid button{align-self:flex-start;border:0;background:none;color:#f0a5bc;cursor:pointer;font-size:11px}
+.modular-library-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0}
+.modular-library-actions [role=status]{flex:1 1 220px;color:#aebbd0;font-size:11px}
+.modular-asset-list{display:grid;gap:8px;margin-top:12px}
+.modular-asset-list article{display:grid;gap:4px;padding:10px 12px;border:1px solid rgba(131,157,191,.16);border-radius:8px;background:rgba(22,34,53,.6)}
+.modular-asset-list article>b{font-size:12px}.modular-asset-list article>span{font-size:11px;color:#71e3df}.modular-asset-list article>small{font-size:10px;color:#aebbd0;overflow-wrap:anywhere}
+@media(max-width:620px){.modular-library{padding:14px}.modular-library-controls{grid-template-columns:1fr}.modular-library-head{flex-direction:column}}
