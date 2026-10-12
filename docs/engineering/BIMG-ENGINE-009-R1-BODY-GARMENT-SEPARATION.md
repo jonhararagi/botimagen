@@ -5,7 +5,7 @@
 **PR:** [#11](https://github.com/jonhararagi/botimagen/pull/11)  
 **HEAD inicial revisado:** `a7c5aefcff7f1e8fda8b0f50361853f85c29f3bd`  
 **HEAD de implementación antes de la documentación:** `727dcc94e4c87c254475f9c074ae425119063e06`  
-**HEAD final documental:** se registra en el comentario de PR y se valida con CI antes del cierre.  
+**HEAD de código revisado y validado:** `0e86fbd6fe9cfd927387975d3bfac81e9f93af34`. El SHA final tras los commits documentales se registra en el comentario de PR con su CI exacta.  
 **TIMER:** 4–7 horas estimadas. Tiempo real: `NOT_MEASURED`.
 
 ## Resumen ejecutivo
@@ -55,8 +55,9 @@ No se proponen cambios de proporciones. La medición todavía no justifica una c
 ## Validación
 
 - **CI del HEAD inicial R5:** run [#337](https://github.com/jonhararagi/botimagen/actions/runs/38198306943) terminó en fallo en la prueba del contrato del arnés R5; por tanto, no se considera aprobado.
-- **CI R6:** la ejecución debe asociarse al HEAD final documental, y solo se informará PASS si todos los pasos, incluido build y smoke de Chromium, terminan correctamente.
-- **Capturas esperadas:** `neutral-body-front.png`, `neutral-body-back.png`, `neutral-body-manifest.json`, más las capturas habituales de vestuario del smoke. Los nombres están configurados en el arnés; la disponibilidad e inspección de artefactos se confirma después del run final.
+- **CI R6 verificada sobre el código revisado:** [run #349](https://github.com/jonhararagi/botimagen/actions/runs/38204514831), SHA `0e86fbd6fe9cfd927387975d3bfac81e9f93af34`, resultado `success`. Pasaron sintaxis Python, manifiestos, contratos, build web y smoke de Chromium.
+- **Artefacto QA:** [botimagen-visual-garment-qa, run #349](https://github.com/jonhararagi/botimagen/actions/runs/38204514831/artifacts/11726378465). Incluye `neutral-body-front.png`, `neutral-body-back.png`, `neutral-body-manifest.json` y capturas de vestuario. Las tres capturas principales se inspeccionaron visualmente. La base es visible sin prendas, pero sigue siendo esquemática: hombros/tórax no segmentados, cintura independiente no disponible, rodillas/tobillos sin contornos propios. La evidencia valida separación estructural, no aprobación artística definitiva.
+- **Cierre:** la documentación final genera un nuevo SHA; su CI se debe comprobar antes de declarar verificado el HEAD de cierre.
 - **API pública:** preservada; no se agregan props ni se cambian contratos de llamada.
 - **Catálogo/recetas:** sin cambios intencionados.
 - **Proporciones:** no se hizo una recalibración deliberada.
