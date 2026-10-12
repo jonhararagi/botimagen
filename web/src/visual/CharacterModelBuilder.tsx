@@ -131,8 +131,9 @@ export function CharacterModelBuilder() {
     return ()=>{cancelled=true;};
   },[model?.id,model?.revision,editingLayerId]);
   useEffect(()=>{if(polygonPoints.length)drawMaskPreview();},[polygonPoints]);
-  const canvasPoint=(event:{clientX:number;clientY:number;currentTarget:HTMLCanvasElement})=>{
-    const rect=event.currentTarget.getBoundingClientRect();
+  const canvasPoint=(event:{clientX:number;clientY:number;currentTarget:Element})=>{
+    const rect=previewCanvasRef.current?.getBoundingClientRect();
+    if(!rect)return {x:0,y:0};
     return {x:Math.max(0,Math.min(511,(event.clientX-rect.left)*512/rect.width)),y:Math.max(0,Math.min(767,(event.clientY-rect.top)*768/rect.height))};
   };
   const paintAt=(point:{x:number;y:number},begin:boolean)=>{
@@ -414,9 +415,9 @@ export function CharacterModelBuilder() {
             <div className="model-builder-group-heading"><b>Corregir máscara · {model.layers.find(layer=>layer.id===editingLayerId)?.label}</b><span>Rojo = píxeles seleccionados. Pincel y polígono solo seleccionan píxeles que ya existen en la fuente; no inventan zonas ocultas.</span></div>
             <div className="model-builder-form-row"><label>Herramienta<select value={maskTool} onChange={event=>setMaskTool(event.target.value as typeof maskTool)}><option value="add">Pincel: sumar</option><option value="erase">Pincel: borrar</option><option value="polygon-add">Polígono: sumar</option><option value="polygon-erase">Polígono: borrar</option></select></label>
               <label>Tamaño del pincel<input type="range" min="2" max="72" value={brushSize} onChange={event=>setBrushSize(Number(event.target.value))}/></label></div>
-            <div style={{position:"relative",width:"min(100%, 320px)",margin:"0 auto",background:"#151522",borderRadius:"8px",overflow:"hidden"}}>
-              <img src={imageUrl(model.id,"source.png")} alt="Fuente original detrás de la máscara editable" style={{display:"block",width:"100%",height:"auto"}} />
-              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" data-mask-ready={maskReady?"true":"false"} style={{position:"absolute",inset:0,zIndex:2,display:"block",width:"100%",height:"100%",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);setMaskDirty(true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} onClick={event=>{if(!maskTool.startsWith("polygon")&&!maskDirty){paintAt(canvasPoint(event),true);finishPaint();setMaskDirty(true);}}} />
+            <div style={{position:"relative",width:"min(100%, 320px)",margin:"0 auto",background:"#151522",borderRadius:"8px",overflow:"hidden",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);setMaskDirty(true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint}>
+              <img src={imageUrl(model.id,"source.png")} alt="Fuente original detrás de la máscara editable" style={{display:"block",width:"100%",height:"auto",pointerEvents:"none"}} />
+              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" data-mask-ready={maskReady?"true":"false"} style={{position:"absolute",inset:0,zIndex:2,display:"block",width:"100%",height:"100%",pointerEvents:"none"}} />
               <canvas ref={maskCanvasRef} width={512} height={768} aria-hidden="true" style={{position:"absolute",left:"-10000px",top:0,pointerEvents:"none"}} />
             </div>
             {maskTool.startsWith("polygon")&&<p>{polygonPoints.length} puntos marcados. Haz clic en la imagen para añadir vértices.</p>}
