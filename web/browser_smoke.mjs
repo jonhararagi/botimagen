@@ -1452,6 +1452,8 @@ try {
   // Exercise PNG-to-stage conversion, linked source metadata, and the real modular compositor.
   const assetLibrary = page.locator(".modular-library");
   await assetLibrary.scrollIntoViewIfNeeded();
+  assert.equal(await assetLibrary.locator('a[href="https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper"]').count(), 1, "The importer should expose the official Honkai wallpaper reference");
+  assert.equal(await assetLibrary.locator('a[href="https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540"]').count(), 1, "The importer should expose an official Honkai art collection reference");
   // Reset controls changed by the earlier two-sided rig test so this legacy full-character case is isolated.
   await assetLibrary.getByLabel("Tipo de recurso").selectOption("full_character");
   await assetLibrary.getByLabel("Clasificación de la imagen").selectOption("portrait");
@@ -1517,7 +1519,56 @@ try {
   const completeCharacter = assetLibrary.locator('.modular-asset-list article[data-asset-kind="full_character"]')
     .filter({ hasText: "qa-synthetic-character" });
   await completeCharacter.waitFor({ timeout: 15000 });
+
+  // Extract a visible clothing region from a flat PNG using a user-drawn polygon mask.
   await assetLibrary.getByLabel("Tipo de recurso").selectOption("modular_piece");
+  await assetLibrary.getByLabel("Clasificación de la imagen").selectOption("clothing_top");
+  await uploadSynthetic();
+  const cutoutCard = assetLibrary.locator(".modular-preview-card").filter({ hasText: "qa-synthetic-character.png" }).last();
+  await cutoutCard.getByRole("button", { name: "Dibujar contorno de pieza" }).click();
+  const lassoStage = cutoutCard.locator(".modular-cutout-stage");
+  await lassoStage.waitFor({ state: "visible", timeout: 10000 });
+  const lassoBounds = await lassoStage.boundingBox();
+  assert.ok(lassoBounds && lassoBounds.width > 40 && lassoBounds.height > 60, "The interactive polygon cutter should display the source image at a usable size");
+  for (const [x, y] of [[106 / 320, 156 / 480], [214 / 320, 156 / 480], [214 / 320, 314 / 480], [106 / 320, 314 / 480]]) {
+    await page.mouse.click(lassoBounds.x + lassoBounds.width * x, lassoBounds.y + lassoBounds.height * y);
+  }
+  assert.equal(await lassoStage.locator("polygon").count(), 1, "The drawn lasso should render a closed cutout preview");
+  await assetLibrary.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
+  await cutoutCard.locator(".modular-anchor-stage image").waitFor({ state: "attached", timeout: 15000 });
+  const cutoutAlpha = await cutoutCard.evaluate(async card => {
+    const href = card.querySelector(".modular-anchor-stage image")?.getAttribute("href");
+    if (!href) throw new Error("The cutout-normalized PNG preview is unavailable");
+    const image = new Image(); image.src = href; await image.decode();
+    const canvas = document.createElement("canvas"); canvas.width = 512; canvas.height = 768;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("Cutout alpha validation canvas unavailable");
+    context.drawImage(image, 0, 0, 512, 768);
+    const pixels = context.getImageData(0, 0, 512, 768).data;
+    const alphaAt = (x, y) => pixels[(y * 512 + x) * 4 + 3];
+    return { width: image.naturalWidth, height: image.naturalHeight, corner: alphaAt(8, 8), head: alphaAt(256, 100), garment: alphaAt(256, 273), legs: alphaAt(256, 500) };
+  });
+  assert.deepEqual([cutoutAlpha.width, cutoutAlpha.height], [512, 768], "A lasso cutout must be normalized to the shared 512×768 stage");
+  assert.equal(cutoutAlpha.corner, 0, "A lasso cutout must retain transparent corners");
+  assert.equal(cutoutAlpha.head, 0, "A lasso around clothing must exclude the character head");
+  assert.ok(cutoutAlpha.garment > 0, "The selected clothing pixels must survive the cutout");
+  assert.equal(cutoutAlpha.legs, 0, "A lasso around clothing must exclude the legs");
+  assert.ok((await assetLibrary.locator('[data-testid="modular-library-status"]').textContent())?.includes("con recorte manual"), "Conversion status should report that a lasso mask was applied");
+  await assetLibrary.getByRole("button", { name: "Guardar material convertido" }).click();
+  await page.waitForFunction(() =>
+    document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("material(es) convertido(s)") ?? false,
+    null, { timeout: 15000 },
+  );
+  const modularTop = assetLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]')
+    .filter({ hasText: "qa-synthetic-character" }).filter({ hasText: "clothing_top" });
+  await modularTop.waitFor({ timeout: 15000 });
+  assert.ok((await modularTop.textContent())?.includes("Recorte manual"), "The saved piece must retain cutout provenance");
+  await modularTop.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
+  await page.waitForFunction(() =>
+    document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("Anclajes confirmados") ?? false,
+    null, { timeout: 10000 },
+  );
+
   await assetLibrary.getByLabel("Clasificación de la imagen").selectOption("body");
   await prepareAndSaveMaterial();
   const modularBody = assetLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]')
@@ -1529,7 +1580,8 @@ try {
     null, { timeout: 10000 },
   );
   await modularBody.locator('input[type="checkbox"]').check();
-  await assetLibrary.getByRole("button", { name: /Componer selección \(1\)/ }).click();
+  await modularTop.locator('input[type="checkbox"]').check();
+  await assetLibrary.getByRole("button", { name: /Componer selección \(2\)/ }).click();
   await page.waitForFunction(() =>
     Boolean(document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.trim()),
     null, { timeout: 15000 },

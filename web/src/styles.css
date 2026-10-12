@@ -165,3 +165,24 @@
 
 .modular-composition-view{display:grid;gap:6px;margin-top:12px;max-width:240px;color:#b8c7db;font-size:11px}
 .modular-composition-view select{width:100%;padding:9px 10px;border:1px solid #34435a;border-radius:8px;background:#101a2c;color:#f3f7ff}
+
+
+
+/* Assisted PNG lasso: manually turn a visible region into a transparent material layer. */
+.modular-cutout-editor{display:grid;gap:7px;margin:6px 0}
+.modular-cutout-editor>p{margin:0;color:#aebbd0;font-size:10px;line-height:1.5}
+.modular-cutout-stage{display:block;width:100%;max-width:420px;height:auto;max-height:none;margin:0 auto;touch-action:manipulation;cursor:crosshair;border:1px solid #4b7487;border-radius:7px;background-color:#101827;background-image:linear-gradient(45deg,#20283a 25%,transparent 25%),linear-gradient(-45deg,#20283a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#20283a 75%),linear-gradient(-45deg,transparent 75%,#20283a 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.modular-cutout-fill{fill:#53e4d52b;stroke:#63f4e6;stroke-width:3;vector-effect:non-scaling-stroke;pointer-events:none}
+.modular-cutout-line{fill:none;stroke:#63f4e6;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:7 5;vector-effect:non-scaling-stroke;pointer-events:none}
+.modular-cutout-point{fill:#fb62c8;stroke:#fff;stroke-width:2;vector-effect:non-scaling-stroke;pointer-events:none}
+.modular-cutout-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.modular-cutout-actions>span,.modular-cutout-ready{color:#79e4dc;font-size:10px;line-height:1.4}
+.modular-cutout-actions>span{margin-right:auto}
+.modular-preview-card:has(.modular-cutout-stage){grid-column:1/-1}
+
+
+.modular-reference-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 16px;padding:11px 12px;border:1px solid rgba(116,225,231,.18);border-radius:10px;background:#0d1424}
+.modular-reference-links>b{flex-basis:100%;font-size:11px;color:#e0f7f7}
+.modular-reference-links>span{flex-basis:100%;font-size:10px;line-height:1.45;color:#aebbd0}
+.modular-reference-links>a{font-size:10px;color:#70e7df;text-decoration:underline;text-underline-offset:3px}
+.modular-reference-links>a:hover{color:#fff}

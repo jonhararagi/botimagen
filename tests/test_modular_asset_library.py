@@ -152,6 +152,33 @@ class ModularAssetLibraryTests(unittest.TestCase):
                 )
             self.assertEqual(list_user_assets(root)["count"], 1)
 
+    def test_manual_cutout_metadata_is_preserved_and_validated(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = import_user_asset(payload(), root)
+            conversion = conversion_metadata(source)
+            conversion["cutout_applied"] = True
+            conversion["cutout_polygon"] = [
+                {"x": 0.2, "y": 0.2}, {"x": 0.8, "y": 0.2},
+                {"x": 0.8, "y": 0.7}, {"x": 0.2, "y": 0.7},
+            ]
+            converted = import_user_asset(
+                payload(
+                    data=PNG_STAGE, filename="piece.png", kind="modular_piece",
+                    category="clothing_top", conversion=conversion, source_asset_id=source["id"],
+                ), root,
+            )
+            self.assertTrue(converted["conversion"]["cutout_applied"])
+            self.assertEqual(len(converted["conversion"]["cutout_polygon"]), 4)
+            bad = dict(conversion)
+            bad["cutout_polygon"] = [{"x": 1.2, "y": 0.5}, {"x": 0.8, "y": 0.2}, {"x": 0.2, "y": 0.7}]
+            with self.assertRaisesRegex(AssetImportError, "normalizado"):
+                import_user_asset(
+                    payload(data=PNG_STAGE, filename="bad-piece.png", kind="modular_piece",
+                        category="clothing_top", conversion=bad, source_asset_id=source["id"]),
+                    root,
+                )
+
     def test_cannot_confirm_reference_or_unconverted_candidate(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)

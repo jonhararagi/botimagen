@@ -7,6 +7,8 @@ export type AssetConversionOptions = {
   scalePercent: number;
   offsetX: number;
   offsetY: number;
+  /** Optional user-drawn lasso, normalized to the original source image. */
+  cutoutPolygon?: Array<{ x: number; y: number }>;
 };
 
 export type NormalizedBounds = { x: number; y: number; width: number; height: number };
@@ -31,6 +33,8 @@ export type AssetConversionMetadata = {
   content_bounds: NormalizedBounds;
   anchors: EstimatedAnchors;
   anchor_status: "estimated_not_validated";
+  cutout_applied: boolean;
+  cutout_polygon?: Array<{ x: number; y: number }>;
 };
 export type NormalizedAsset = { blob: Blob; metadata: AssetConversionMetadata };
 
@@ -234,7 +238,44 @@ export async function convertToModularStage(file: File, options: AssetConversion
       ? removeConnectedFlatBackground(workPixels, options.backgroundTolerance)
       : false;
     if (backgroundRemoved) workContext.putImageData(workPixels, 0, 0);
-    const sourceBounds = findAlphaBounds(backgroundRemoved ? workContext.getImageData(0, 0, width, height) : workPixels);
+
+    const cutoutPolygon = options.cutoutPolygon;
+    if (cutoutPolygon !== undefined) {
+      if (!Array.isArray(cutoutPolygon) || cutoutPolygon.length < 3 || cutoutPolygon.length > 256) {
+        throw new Error("El recorte necesita entre 3 y 256 puntos del contorno.");
+      }
+      let twiceArea = 0;
+      for (let index = 0; index < cutoutPolygon.length; index++) {
+        const current = cutoutPolygon[index];
+        const next = cutoutPolygon[(index + 1) % cutoutPolygon.length];
+        if (!current || !next
+          || !Number.isFinite(current.x) || !Number.isFinite(current.y)
+          || current.x < 0 || current.x > 1 || current.y < 0 || current.y > 1) {
+          throw new Error("Los puntos del recorte deben estar dentro de la imagen.");
+        }
+        twiceArea += current.x * next.y - next.x * current.y;
+      }
+      if (Math.abs(twiceArea) < 0.0001) {
+        throw new Error("El contorno del recorte es demasiado pequeño.");
+      }
+      // Apply a real alpha mask to the decoded source pixels. The original file is
+      // retained separately, so the cutout remains reproducible and attributable.
+      workContext.save();
+      workContext.globalCompositeOperation = "destination-in";
+      workContext.fillStyle = "#ffffff";
+      workContext.beginPath();
+      cutoutPolygon.forEach((point, index) => {
+        const x = point.x * width;
+        const y = point.y * height;
+        if (index === 0) workContext.moveTo(x, y);
+        else workContext.lineTo(x, y);
+      });
+      workContext.closePath();
+      workContext.fill();
+      workContext.restore();
+    }
+    const preparedPixels = workContext.getImageData(0, 0, width, height);
+    const sourceBounds = findAlphaBounds(preparedPixels);
     if (!sourceBounds) throw new Error("No quedó contenido visible. Reduce la tolerancia de fondo o desactiva la eliminación.");
     const zone = options.kind === "modular_piece" && !["body", "portrait", "reference"].includes(options.category)
       ? PIECE_ZONES[options.category] ?? { x: 36, y: 24, width: 440, height: 720 }
@@ -273,6 +314,10 @@ export async function convertToModularStage(file: File, options: AssetConversion
         x: finalBounds.x, y: finalBounds.y, width: finalBounds.width, height: finalBounds.height,
       },
       anchors, anchor_status: "estimated_not_validated",
+      cutout_applied: Boolean(cutoutPolygon && cutoutPolygon.length >= 3),
+      ...(cutoutPolygon && cutoutPolygon.length >= 3 ? { cutout_polygon: cutoutPolygon.map(point => ({
+        x: Number(clamp(point.x, 0, 1).toFixed(5)), y: Number(clamp(point.y, 0, 1).toFixed(5)),
+      })) } : {}),
     };
     source.close();
     return { blob, metadata };

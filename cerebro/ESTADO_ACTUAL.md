@@ -611,3 +611,23 @@ QA Windows: `NOT_RUN`.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - TIMER: esta integración de importador/rig se estima en **4–8 horas activas** de alcance de trabajo; ampliar calidad artística, variedad de piezas y segmentación asistida sigue siendo una fase separada (estimación provisional **8–16 horas activas**). Ninguna cifra es tiempo real medido ni estimación de finalización de todo BotImagen.
 - `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86`; PR #11 está abierta y sin fusionar; PR #14 sigue abierta e independiente.
+
+
+## BIMG-PNG-LASSO-001 · recorte asistido de PNG para crear piezas modulares · 2026-10-12
+
+- Extensión del importador PNG/biblioteca modular existente, sin crear un motor paralelo.
+- En cada vista previa, el usuario puede pulsar **Dibujar contorno de pieza** y marcar con clics el polígono que rodea una parte visible. Al preparar el material, el navegador aplica una máscara alfa real: el exterior del polígono queda transparente. La pieza se normaliza y se registra en el catálogo mediante los mismos endpoints y el mismo compositor.
+- `web/src/visual/pngToModularAsset.ts`: recibe puntos normalizados, valida la geometría, recorta el alfa antes de calcular los límites de contenido y registra `cutout_applied` más las coordenadas del contorno junto al hash/dimensiones de la fuente original.
+- `web/src/visual/ModularAssetLibrary.tsx`: incorpora el editor de polígono a la tarjeta del recurso, conserva la fuente original, guarda la pieza recortada como material independiente y muestra si se aplicó un recorte. Incluye enlaces de referencia al sitio oficial de Honkai Impact 3rd.
+- `modular_asset_library.py`: admite los nuevos metadatos con validación estricta y conserva compatibilidad con conversiones antiguas sin el campo `cutout_applied`.
+- `tests/test_modular_asset_library.py`: añade cobertura para persistencia y validación del polígono de recorte.
+- `web/browser_smoke.mjs`: añade E2E que sube una imagen de prueba, delimita la zona de ropa, comprueba que cabeza/piernas quedan fuera, verifica alfa transparente, guarda la pieza como `clothing_top`, confirma anclajes y la compone con el cuerpo. También comprueba que el importador presenta los enlaces oficiales de referencia.
+- CSS añadido para trabajar con el contorno en la vista previa grande y visualizar puntos y máscara.
+- **Límite funcional explícito:** esto es segmentación asistida manual, no IA de segmentación semántica. Funciona mejor cuando la parte visible tiene un borde identificable. Un PNG plano no contiene los píxeles de prendas o pelo ocultos; para esas piezas hacen falta referencias adicionales, recortes dibujados por separado o recursos independientes.
+- Fuentes oficiales enlazadas en la UI:
+  - Wallpapers y galería oficial: https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper
+  - Art Collection Vol. I / noticia oficial: https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540
+  - Art Collection Vol. II: https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263
+- Estado al publicar: `IMPLEMENTED_PENDING_CI`. No declarar esta mejora lista hasta que pasen los tests Python, el build TypeScript/React y el E2E de Chromium del HEAD de código que incluye el lasso. Inspeccionar el artefacto de Chromium posterior.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- TIMER estimado para cerrar esta integración y corregir los fallos de CI/E2E que aparezcan: **2–4 horas activas**; no es tiempo medido ni una estimación de finalización de todo BotImagen.

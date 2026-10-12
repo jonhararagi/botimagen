@@ -225,6 +225,7 @@ def _validate_conversion_metadata(value: Any, image_width: int, image_height: in
         "source_width", "source_height", "source_sha256", "source_format",
         "background_removed", "background_tolerance", "scale_percent", "offset_x",
         "offset_y", "pose", "rig_category", "content_bounds", "anchors", "anchor_status",
+        "cutout_applied", "cutout_polygon",
     }
     if set(value) - allowed:
         raise AssetImportError("Los metadatos de conversión contienen campos no reconocidos.")
@@ -267,6 +268,27 @@ def _validate_conversion_metadata(value: Any, image_width: int, image_height: in
         "top", "bottom", "footwear", "accessory", "full_character", "reference",
     }:
         raise AssetImportError("Categoría de esqueleto inválida.")
+    cutout_applied = value.get("cutout_applied", False)
+    if not isinstance(cutout_applied, bool):
+        raise AssetImportError("El indicador de recorte manual debe ser booleano.")
+    raw_cutout_polygon = value.get("cutout_polygon")
+    clean_cutout_polygon: list[dict[str, float]] | None = None
+    if raw_cutout_polygon is not None:
+        if not isinstance(raw_cutout_polygon, list) or not 3 <= len(raw_cutout_polygon) <= 256:
+            raise AssetImportError("El contorno guardado debe tener entre 3 y 256 puntos.")
+        clean_cutout_polygon = []
+        for point in raw_cutout_polygon:
+            if not isinstance(point, dict) or set(point) != {"x", "y"}:
+                raise AssetImportError("Punto de contorno mal formado.")
+            clean_point: dict[str, float] = {}
+            for axis in ("x", "y"):
+                coordinate = point[axis]
+                if isinstance(coordinate, bool) or not isinstance(coordinate, (int, float)) or not 0 <= coordinate <= 1:
+                    raise AssetImportError(f"Punto de contorno {axis} fuera del rango normalizado 0..1.")
+                clean_point[axis] = round(float(coordinate), 5)
+            clean_cutout_polygon.append(clean_point)
+    if cutout_applied and clean_cutout_polygon is None:
+        raise AssetImportError("El recorte aplicado debe guardar su contorno para poder rastrearlo.")
     if value.get("anchor_status") != "estimated_not_validated":
         raise AssetImportError("Los anclajes importados deben permanecer como estimaciones no validadas.")
     bounds = value.get("content_bounds")
@@ -307,6 +329,8 @@ def _validate_conversion_metadata(value: Any, image_width: int, image_height: in
         "pose": value["pose"], "rig_category": rig_category,
         "content_bounds": dict(bounds), "anchors": clean_anchors,
         "anchor_status": "estimated_not_validated",
+        "cutout_applied": cutout_applied,
+        **({"cutout_polygon": clean_cutout_polygon} if clean_cutout_polygon is not None else {}),
     }
 
 
