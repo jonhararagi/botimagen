@@ -362,7 +362,7 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
             parts.append(f'<path class="back-hair-strand" d="M{cx+offset-r*.04:.1f} {cy-r*.66:.1f} C{cx+offset+sway:.1f} {cy-r*.08:.1f} {cx+offset-sway:.1f} {cy+r*.24:.1f} {cx+offset+r*.03:.1f} {strand_end:.1f}" fill="none" stroke="{_shade(hair,.72)}" stroke-width="{max(1.0,r*.018):.1f}" stroke-linecap="round"/>')
         if back_hair=="panel_trenzado":
             for i in range(4):
-                y=cy+r*(.18+i*.18)
+                y=cy+r*(.12+((back_fall-cy)/r)*((i+1)/5))
                 parts.append(f'<path class="back-hair-braid" d="M{cx-r*.13:.1f} {y:.1f} l{r*.12:.1f} {r*.10:.1f} l{-r*.12:.1f} {r*.10:.1f} l{-r*.12:.1f} {-r*.10:.1f} Z" fill="{_shade(hair,.84)}" stroke="{_shade(hair,.62)}" stroke-width="{max(.7,r*.012):.1f}"/>')
     else:
         pattern=recipe["fabric_pattern"]
