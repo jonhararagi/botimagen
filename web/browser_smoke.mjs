@@ -1144,16 +1144,19 @@ try {
   await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
   await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousStreetSvg);
   await page.getByLabel("Fondo del estudio").selectOption("cyber-grid");
+  const cyberGridBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await selectProductView("frontal", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-front-cyber-grid.png"), fullPage: true });
   await selectProductView("trasera", "Trasera");
   await page.getByLabel("Fondo del estudio").selectOption("dusk-orbit");
+  const duskOrbitBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-back-dusk-orbit.png"), fullPage: true });
   const previousPresetSvg = await productImage.getAttribute("src");
   await page.getByLabel("Preset de personaje").selectOption("neon-archivist");
   await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
   await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousPresetSvg);
   await page.getByLabel("Fondo del estudio").selectOption("aurora-city");
+  const auroraCityBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await selectProductView("frontal", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-neon-archivist-front.png"), fullPage: true });
   const productStudioManifest = {
@@ -1167,7 +1170,12 @@ try {
   };
   await writeFile(resolve(visualQaDir, "product-studio-manifest.json"), JSON.stringify(productStudioManifest, null, 2));
   assert.equal(await page.locator(".canvas").getAttribute("data-studio-background"), "aurora-city", "The local background picker must update the actual studio canvas");
-  assert.ok(await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage.includes("aurora-city")), "The selected background must resolve to a bundled local SVG asset");
+  assert.notEqual(cyberGridBackgroundStyle, duskOrbitBackgroundStyle, "Selecting a different bundled background must change the actual canvas image");
+  assert.notEqual(duskOrbitBackgroundStyle, auroraCityBackgroundStyle, "The third bundled background must render a distinct canvas image");
+  assert.ok(
+    /^url\(["']?data:image\/svg\+xml|^url\(["']?http:\/\/127\.0\.0\.1:5173\/assets\//.test(auroraCityBackgroundStyle),
+    "The selected background must resolve to a bundled local SVG (inlined data URI or local Vite asset), not a remote image",
+  );
   assert.equal(await page.locator(".legacy-renderer-fixture").evaluate(el => getComputedStyle(el).opacity), "0", "The legacy React renderer must be visually transparent outside explicit QA capture, not a second visible character");
   assert.equal(await page.locator("img.server-character-art").getAttribute("data-renderer"), "parametric-anime-svg-v1", "The visible product character must come from the local Python renderer");
 
