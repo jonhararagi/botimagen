@@ -147,3 +147,18 @@ def test_rear_hair_length_and_braid_change_the_rendered_silhouette():
     assert 'class="back-hair-strand"' in long
     assert 'class="back-hair-braid"' in braided
     assert short != long != braided
+
+
+def test_hime_and_long_straight_keep_distinct_front_hair_silhouettes():
+    common = {
+        "skin_tone": "marfil_calido",
+        "hair": "turquesa",
+        "hair_length": "medio_largo",
+        "hair_bangs": "recto",
+        "side_hair": "mechones_largos",
+        "back_hair": "recto_liso",
+        "outfit": "elegant_command",
+    }
+    hime = render_profile_svg({**common, "hairstyle": "hime_cut"}, DEFAULT_RENDER_RECIPE)
+    straight = render_profile_svg({**common, "hairstyle": "long_straight"}, DEFAULT_RENDER_RECIPE)
+    assert hime != straight, "Hime cut and long straight must not collapse to the same SVG silhouette"
