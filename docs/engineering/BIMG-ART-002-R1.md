@@ -5,7 +5,7 @@
 **PR:** https://github.com/jonhararagi/botimagen/pull/11  
 **HEAD inicial comprobado:** `5ef17beb774f17d5ae57ada655c949343cee92aa`  
 **Último commit de código/pruebas y manifiesto E2E:** `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`  
-**CI de implementación:** #399 SUCCESS, asociada al HEAD de rama `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`: https://github.com/jonhararagi/botimagen/actions/runs/38253325201. La CI del SHA final después de estos cambios documentales queda pendiente.  
+**CI de implementación:** #399 SUCCESS, asociada al HEAD de rama `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`: https://github.com/jonhararagi/botimagen/actions/runs/38253325201. La CI #401 también pasó en el HEAD de integración `ec48ef00754248d5f45582531fecc1fa87a74bf0`; la validación de esta revisión documental queda asociada al run que se registre al final en el PR.  
 **Tiempo real medido:** NOT_MEASURED  
 **WINDOWS_MANUAL_QA:** NOT_RUN
 
