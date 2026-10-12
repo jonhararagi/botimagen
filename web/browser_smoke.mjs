@@ -251,7 +251,7 @@ try {
   await page.getByText("CAMBIOS PENDIENTES", { exact: true }).waitFor({ state: "visible" });
   const saveButton = page.locator(".heading-buttons .btn.primary");
   assert.equal(await saveButton.isDisabled(), true, "Saving must be blocked while the generated snapshot is stale");
-  assert.equal(await page.locator(".prompt-actions button").nth(2).isDisabled(), true,
+  assert.equal(await page.locator(".style-lab .prompt-actions button").nth(2).isDisabled(), true,
     "Exporting must be blocked while a stale prompt is displayed");
   assert.equal(await page.getByRole("button", { name: /Copiar texto/i }).isDisabled(), true,
     "Copying must be blocked while a stale prompt is displayed");
@@ -552,7 +552,7 @@ try {
   assert.ok(prompt.includes("sleeve length 92/100"), "The official prompt should include parametric sleeve length");
   assert.ok(prompt.includes("waist fit 76/100"), "The official prompt should include parametric waist fit");
   assert.ok(prompt.includes("transformed synthetic textile sheen"), "The selected NanoWear state should reach the prompt");
-  const [profileDownload] = await Promise.all([page.waitForEvent("download"), page.locator(".prompt-actions button").nth(2).click()]);
+  const [profileDownload] = await Promise.all([page.waitForEvent("download"), page.locator(".style-lab .prompt-actions button").nth(2).click()]);
   const exportedProfile = JSON.parse(await readFile(await profileDownload.path(), "utf8"));
   assert.equal(exportedProfile.visual_recipe.garment_base_color, "#234567", "Export must preserve the NanoWear base color");
   assert.equal(exportedProfile.visual_recipe.garment_panel_color, "#456789", "Export must preserve the NanoWear panel color");
