@@ -45,6 +45,17 @@ def validate_catalog() -> dict[str, int]:
             assert preset.get("id") == asset_id.removeprefix("character."), f"preset ID mismatch: {asset_id}"
             assert isinstance(preset.get("selections"), dict) and preset["selections"], f"preset selections missing: {asset_id}"
             assert isinstance(preset.get("visual_recipe"), dict), f"preset visual_recipe missing: {asset_id}"
+            assert preset.get("license") == item["license"], f"preset license must match catalog: {asset_id}"
+            assert preset.get("source_url") == item["source_url"], f"preset provenance must match catalog: {asset_id}"
+            rules = json.loads((ROOT / "character_rules.json").read_text(encoding="utf-8"))
+            for category, value in preset["selections"].items():
+                options = rules.get("categories", {}).get(category)
+                assert isinstance(options, list), f"preset uses unknown catalog category {category}: {asset_id}"
+                assert any(option.get("id") == value for option in options), f"preset uses unknown value {category}={value}: {asset_id}"
+            recipe = preset["visual_recipe"]
+            assert recipe.get("schema_version") == 3 and recipe.get("family") == "cyberstreet", f"unsupported visual recipe in preset: {asset_id}"
+            for key in ("anime_influence", "toon_influence", "streetwear_cyberpunk", "detail_level", "torso_length", "sleeve_length", "waist_fit"):
+                assert isinstance(recipe.get(key), int) and 0 <= recipe[key] <= 100, f"invalid {key} in preset: {asset_id}"
         kinds[item["kind"]] = kinds.get(item["kind"], 0) + 1
     license_notice = ROOT / "assets" / "licenses" / "README.md"
     assert license_notice.is_file() and "LicenseRef-BotImagen-Original-Assets" in license_notice.read_text(encoding="utf-8"), "original asset license notice missing"
