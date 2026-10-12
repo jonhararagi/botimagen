@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -101,3 +102,48 @@ def test_hair_bangs_texture_mouth_and_brows_change_the_rendered_svg():
     brow = render_profile_svg({**common, "eyebrow_style": "anguladas"}, DEFAULT_RENDER_RECIPE)
     assert len({straight,curtain,wavy,mouth,brow}) == 5
     assert 'class="hair-texture-strand"' in wavy
+
+
+def test_face_shape_and_nose_controls_reach_the_parametric_face():
+    common = {
+        "skin_tone": "marfil_calido",
+        "hair": "azul_nocturno",
+        "hairstyle": "long_straight",
+        "hair_length": "largo",
+        "outfit": "tactical_baseball",
+    }
+    short_minimal = render_profile_svg({
+        **common, "face_shape": "menton_corto", "nose_style": "minima",
+    }, DEFAULT_RENDER_RECIPE)
+    long_bridge = render_profile_svg({
+        **common, "face_shape": "rostro_alargado", "nose_style": "puente_recto",
+    }, DEFAULT_RENDER_RECIPE)
+
+    assert 'data-face-shape="menton_corto"' in short_minimal
+    assert 'data-face-shape="rostro_alargado"' in long_bridge
+    assert 'data-nose-style="minima"' in short_minimal
+    assert 'data-nose-style="puente_recto"' in long_bridge
+    assert 'data-face-maturity="0.86"' in short_minimal
+    assert 'data-face-maturity="1.12"' in long_bridge
+    assert short_minimal != long_bridge, "Face shape and nose selections must alter the actual SVG"
+
+
+def test_rear_hair_length_and_braid_change_the_rendered_silhouette():
+    common = {
+        "skin_tone": "marfil_calido",
+        "hair": "turquesa",
+        "hairstyle": "long_flowing",
+        "outfit": "street_bomber",
+    }
+    recipe = {**DEFAULT_RENDER_RECIPE, "view": "back"}
+    short = render_profile_svg({**common, "hair_length": "a_la_mandibula"}, recipe)
+    long = render_profile_svg({**common, "hair_length": "muy_largo", "back_hair": "puntas_largas"}, recipe)
+    braided = render_profile_svg({**common, "hair_length": "largo", "back_hair": "panel_trenzado"}, recipe)
+
+    short_path = re.search(r'class="back-head-cover"[^>]*d="([^"]+)"', short)
+    long_path = re.search(r'class="back-head-cover"[^>]*d="([^"]+)"', long)
+    assert short_path and long_path
+    assert short_path.group(1) != long_path.group(1), "Rear hair silhouette must follow selected hair length"
+    assert 'class="back-hair-strand"' in long
+    assert 'class="back-hair-braid"' in braided
+    assert short != long != braided
