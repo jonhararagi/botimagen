@@ -1625,7 +1625,7 @@ try {
 
   await modelBuilder.getByLabel("Nombre del modelo").fill("QA region model");
   await modelBuilder.getByLabel("ID de estilo").fill("qa-region-style-v1");
-  await modelBuilder.getByLabel("Imagen que se va a separar").selectOption({ label: /qa-synthetic-character/ });
+  await modelBuilder.getByLabel("Imagen que se va a separar").selectOption({ label: "qa-synthetic-character" });
   await modelBuilder.getByRole("button", { name: "Crear modelo y separar capas" }).click();
   await modelBuilder.getByText("RECONSTRUCCIÓN EXACTA", { exact: true }).waitFor({ state: "visible", timeout: 30000 });
   await page.waitForFunction(() => {
