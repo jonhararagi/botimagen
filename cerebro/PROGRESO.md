@@ -97,3 +97,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Estado: contrato y prueba de concepto local de métricas de píxeles, independiente del editor y del generador.
 - No forma parte del denominador de la beta local-first. **El porcentaje de beta permanece en 63%** hasta que exista evidencia que cierre criterios de alguna fase ponderada.
 - La aceptación requiere CI del SHA final y pruebas del módulo/API. La prueba física en Windows continúa separada.
+
+
+- Seguimiento BIMG-ANALYSIS-001: CI #358 detectó una expectativa incorrecta en el fixture sintético de bordes; el contador ponderado de beta permanece **63%**. La corrección del fixture debe pasar la siguiente CI antes de aceptar la prueba de concepto.

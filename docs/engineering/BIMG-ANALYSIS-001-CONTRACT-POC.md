@@ -48,18 +48,18 @@ Forma de error: \`{"error":{"code":"...","message":"..."}}\`. No se revelan ruta
 
 ## Ejemplo de salida válida
 
-Ejemplo esquemático de imagen RGBA 4×3 con cuatro píxeles opacos en x=1..2, y=1..2:
+Ejemplo esquemático de imagen RGBA 4×4 con cuatro píxeles opacos en x=1..2, y=1..2:
 
 \`\`\`json
 {
   "schema_version": 1,
   "status": "COMPLETE",
   "analyzer": {"id": "bimg-pixel-metrics/1.0.0", "method": "pillow-pixel-inspection"},
-  "input": {"format": "PNG", "mime_type": "image/png", "byte_size": 91, "width": 4, "height": 3, "aspect_ratio": 1.33333333},
+  "input": {"format": "PNG", "mime_type": "image/png", "byte_size": 91, "width": 4, "height": 4, "aspect_ratio": 1.0},
   "measurements": {
-    "transparency": {"status": "MEASURED", "transparent_pixels": 8, "translucent_pixels": 0, "opaque_pixels": 4, "transparent_percent": 66.6667, "translucent_percent": 0.0, "opaque_percent": 33.3333},
+    "transparency": {"status": "MEASURED", "transparent_pixels": 12, "translucent_pixels": 0, "opaque_pixels": 4, "transparent_percent": 75.0, "translucent_percent": 0.0, "opaque_percent": 25.0},
     "visible_bbox": {"status": "MEASURED", "value": {"left": 1, "top": 1, "right": 3, "bottom": 3, "width": 2, "height": 2}},
-    "canvas_occupancy": {"status": "MEASURED", "value_percent": 33.3333},
+    "canvas_occupancy": {"status": "MEASURED", "value_percent": 25.0},
     "touches_canvas_edges": {"status": "MEASURED", "left": false, "top": false, "right": false, "bottom": false}
   },
   "warnings": [],

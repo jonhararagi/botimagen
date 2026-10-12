@@ -18,17 +18,17 @@ def png_bytes(image: Image.Image) -> bytes:
 
 class ImageAnalysisTests(unittest.TestCase):
     def test_known_rgba_metrics(self):
-        image = Image.new("RGBA", (4, 3), (255, 0, 0, 0))
+        image = Image.new("RGBA", (4, 4), (255, 0, 0, 0))
         for x in (1, 2):
             for y in (1, 2): image.putpixel((x, y), (255, 0, 0, 255))
         result = analyze_image(png_bytes(image), "image/png")
-        self.assertEqual((result["input"]["width"], result["input"]["height"]), (4, 3))
-        self.assertEqual(result["input"]["aspect_ratio"], round(4/3, 8))
-        self.assertEqual(result["measurements"]["transparency"]["transparent_pixels"], 8)
+        self.assertEqual((result["input"]["width"], result["input"]["height"]), (4, 4))
+        self.assertEqual(result["input"]["aspect_ratio"], round(4/4, 8))
+        self.assertEqual(result["measurements"]["transparency"]["transparent_pixels"], 12)
         self.assertEqual(result["measurements"]["transparency"]["opaque_pixels"], 4)
         self.assertEqual(result["measurements"]["visible_bbox"]["value"],
                          {"left":1,"top":1,"right":3,"bottom":3,"width":2,"height":2})
-        self.assertEqual(result["measurements"]["canvas_occupancy"]["value_percent"], 33.3333)
+        self.assertEqual(result["measurements"]["canvas_occupancy"]["value_percent"], 25.0)
         self.assertFalse(any(result["measurements"]["touches_canvas_edges"][k] for k in ("left","top","right","bottom")))
 
     def test_fully_transparent_image(self):

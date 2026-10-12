@@ -303,3 +303,6 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - Tests sintéticos con resultados conocidos y test HTTP sobre \`references/dataset-cuerpos/0.png\` existente. La licencia/procedencia de ese dataset sigue pendiente de revisión.
 - La interfaz React no se modifica ni anuncia análisis disponible. QA física Windows: \`NOT_RUN\`.
 - Progreso ponderado de la beta local: sin cambio; esta línea opcional posterior no añade puntos al denominador.
+
+
+- Seguimiento CI: la ejecución inicial #358 encontró que el fixture RGBA de prueba tocaba el borde inferior aunque la aserción esperaba que no. Se corrigieron las dimensiones esperadas del fixture y el ejemplo contractual a 4×4; no era un fallo de cálculo del analizador. Se requiere verificar el nuevo SHA en CI.
