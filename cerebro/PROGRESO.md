@@ -113,3 +113,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - El arnés SVG y sus pruebas se reforzaron, pero no se cierra ninguna fase de la beta ni se aumenta el porcentaje: el renderer aún no ofrece una superficie anatómica neutra independiente de prendas. La estimación ponderada se mantiene en **62,96 / 100 → 63%**.
 - Evidencia/continuidad: [informe R5](../docs/engineering/BIMG-ENGINE-008-R5-ANATOMICAL-SVG-HARNESS.md). CI exacta y artefactos quedan pendientes de verificar contra el HEAD final. `WINDOWS_MANUAL_QA: NOT_RUN`.
 - TIMER: 2–4 horas estimadas; tiempo real no medido de forma fiable.
+
+
+- **BIMG-ENGINE-009-R1 (2026-10-12):** añadida una capa corporal independiente para torso, pelvis, piernas y pies; el arnés de QA oculta prendas y registra proxies/regiones no disponibles en vez de recolorear rutas de ropa. Estado **PARTIAL** hasta inspeccionar capturas, revisar continuidad artística y verificar CI en el HEAD final. La tarea no cierra una fase ponderada de beta: progreso se mantiene en **63%**. `WINDOWS_MANUAL_QA: NOT_RUN`. TIMER: 4–7 h estimadas; tiempo real `NOT_MEASURED`. Informe: [BIMG-ENGINE-009-R1](../docs/engineering/BIMG-ENGINE-009-R1-BODY-GARMENT-SEPARATION.md).
