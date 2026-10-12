@@ -1687,6 +1687,7 @@ try {
   const maskEditor = modelBuilder.getByTestId("mask-editor");
   await maskEditor.waitFor({ state: "visible", timeout: 10000 });
   const maskCanvas = maskEditor.getByTestId("mask-preview");
+  await page.waitForFunction(() => document.querySelector('[data-testid="mask-preview"]')?.getAttribute("data-mask-ready") === "true", null, { timeout: 15000 });
   const maskBox = await maskCanvas.boundingBox();
   assert.ok(maskBox, "The mask editor must show the source image with a real canvas overlay");
   await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
