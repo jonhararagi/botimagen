@@ -98,11 +98,11 @@ export function CharacterModelBuilder() {
     finally{setBusy(false);}
   };
   const drawMaskPreview=()=>{
-    const canvas=previewCanvasRef.current,maskCanvas=maskCanvasRef.current,source=sourceImageRef.current;
-    if(!canvas||!maskCanvas||!source)return;
+    const canvas=previewCanvasRef.current,maskCanvas=maskCanvasRef.current;
+    if(!canvas||!maskCanvas)return;
     const ctx=canvas.getContext("2d"),maskCtx=maskCanvas.getContext("2d");
     if(!ctx||!maskCtx)return;
-    ctx.clearRect(0,0,512,768);ctx.drawImage(source,0,0,512,768);
+    ctx.clearRect(0,0,512,768);
     const mask=maskCtx.getImageData(0,0,512,768),overlay=ctx.createImageData(512,768);
     for(let i=0;i<mask.data.length;i+=4){const value=mask.data[i];overlay.data[i]=255;overlay.data[i+1]=35;overlay.data[i+2]=110;overlay.data[i+3]=Math.round(value*0.48);}
     ctx.putImageData(overlay,0,0);
@@ -414,7 +414,8 @@ export function CharacterModelBuilder() {
             <div className="model-builder-form-row"><label>Herramienta<select value={maskTool} onChange={event=>setMaskTool(event.target.value as typeof maskTool)}><option value="add">Pincel: sumar</option><option value="erase">Pincel: borrar</option><option value="polygon-add">Polígono: sumar</option><option value="polygon-erase">Polígono: borrar</option></select></label>
               <label>Tamaño del pincel<input type="range" min="2" max="72" value={brushSize} onChange={event=>setBrushSize(Number(event.target.value))}/></label></div>
             <div style={{position:"relative",width:"min(100%, 320px)",margin:"0 auto",background:"#151522",borderRadius:"8px",overflow:"hidden"}}>
-              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" data-mask-ready={maskReady?"true":"false"} style={{display:"block",width:"100%",height:"auto",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} />
+              <img src={imageUrl(model.id,"source.png")} alt="Fuente original detrás de la máscara editable" style={{display:"block",width:"100%",height:"auto"}} />
+              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" data-mask-ready={maskReady?"true":"false"} style={{position:"absolute",inset:0,display:"block",width:"100%",height:"100%",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} />
               <canvas ref={maskCanvasRef} width={512} height={768} aria-hidden="true" style={{position:"absolute",left:"-10000px",top:0,pointerEvents:"none"}} />
             </div>
             {maskTool.startsWith("polygon")&&<p>{polygonPoints.length} puntos marcados. Haz clic en la imagen para añadir vértices.</p>}
