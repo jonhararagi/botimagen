@@ -1190,7 +1190,7 @@ try {
   await page.screenshot({ path: resolve(visualQaDir, "art-face-diamond-straight-bridge.png"), fullPage: true });
   await page.getByRole("tab", { name: /Cabello/i }).click();
   await selectVisualTrait("hairstyle", "long_straight");
-  await selectVisualTrait("hair", "turquesa");
+  await selectVisualTrait("hair", "rosa_chicle");
   await page.screenshot({ path: resolve(visualQaDir, "art-long-straight-pink.png"), fullPage: true });
   await selectVisualTrait("hair_length", "extra_largo");
   await page.screenshot({ path: resolve(visualQaDir, "art-long-straight-extra-long.png"), fullPage: true });
@@ -1212,10 +1212,10 @@ try {
       "product-studio-neon-archivist-front.png",
       "product-studio-neon-archivist-back.png",
       "art-face-diamond-straight-bridge.png",
-      "art-hime-cut-turquoise.png",
-      "art-hime-cut-extra-long.png",
+      "art-long-straight-pink.png",
+      "art-long-straight-extra-long.png",
     ],
-    exercisedControls: ["face_shape=diamante", "nose_style=puente_recto", "hairstyle=hime_cut", "hair=turquesa", "hair_length=extra_largo"],
+    exercisedControls: ["face_shape=diamante", "nose_style=puente_recto", "hairstyle=long_straight", "hair=rosa_chicle", "hair_length=extra_largo"],
     legacyRenderer: "Hidden QA fixture only; not part of the visible product preview",
     physicalWindowsQA: "NOT_RUN",
   };
