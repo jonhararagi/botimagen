@@ -1,4 +1,8 @@
+import sys
 import unittest
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg, get_cyberstreet_manifest
 import xml.etree.ElementTree as ET
 
