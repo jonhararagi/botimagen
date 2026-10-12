@@ -1597,6 +1597,68 @@ try {
   assert.deepEqual(composedDimensions, [512, 768], "The imported modular pieces must compose through the existing Python engine");
   console.log("PASS_REAL: PNG converter normalized source art to 512×768, removed the connected flat background, preserved the original source, registered estimated rig anchors, and composed a body piece through the real local API.");
 
+  // Exercise the real batch character-model builder against the saved PNGs above.
+  // This proves model creation, palette extraction, region masks, and exact pixel reconstruction.
+  const modelBuilder = page.locator(".character-model-builder");
+  await modelBuilder.scrollIntoViewIfNeeded();
+  await modelBuilder.getByRole("button", { name: "Actualizar biblioteca local" }).click();
+  const modelBaseAsset = modelBuilder.locator(".model-builder-asset")
+    .filter({ hasText: "qa-synthetic-character" })
+    .filter({ hasText: "Personaje completo" })
+    .first();
+  await modelBaseAsset.waitFor({ state: "visible", timeout: 15000 });
+  await modelBaseAsset.locator('input[type="checkbox"]').check();
+
+  const modelClothing = modelBuilder.locator(".model-builder-asset")
+    .filter({ hasText: "qa-synthetic-character" })
+    .filter({ hasText: "clothing_top" })
+    .first();
+  await modelClothing.waitFor({ state: "visible", timeout: 15000 });
+  await modelClothing.locator('input[type="checkbox"]').check();
+
+  const modelBodyPiece = modelBuilder.locator(".model-builder-asset")
+    .filter({ hasText: "qa-synthetic-character" })
+    .filter({ hasText: "body" })
+    .first();
+  await modelBodyPiece.waitFor({ state: "visible", timeout: 15000 });
+  await modelBodyPiece.locator('input[type="checkbox"]').check();
+
+  await modelBuilder.getByLabel("Nombre del modelo").fill("QA region model");
+  await modelBuilder.getByLabel("ID de estilo").fill("qa-region-style-v1");
+  await modelBuilder.getByLabel("Imagen que se va a separar").selectOption({ label: /qa-synthetic-character/ });
+  await modelBuilder.getByRole("button", { name: "Crear modelo y separar capas" }).click();
+  await modelBuilder.getByText("RECONSTRUCCIÓN EXACTA", { exact: true }).waitFor({ state: "visible", timeout: 30000 });
+  await page.waitForFunction(() => {
+    const region = document.querySelector(".character-model-builder .model-builder-region-image img");
+    return region instanceof HTMLImageElement && region.complete && region.naturalWidth > 0;
+  }, null, { timeout: 15000 });
+  const modelOutput = await modelBuilder.evaluate(async root => {
+    const source = root.querySelector('img[alt="Imagen base procesada"]');
+    const reconstructed = root.querySelector('img[alt="Reconstrucción a partir de las capas"]');
+    if (!(source instanceof HTMLImageElement) || !(reconstructed instanceof HTMLImageElement)) throw new Error("The model source/reconstruction previews are missing");
+    await Promise.all([source.decode(), reconstructed.decode()]);
+    const firstLayer = root.querySelector(".model-builder-region-image img");
+    if (!(firstLayer instanceof HTMLImageElement)) throw new Error("No raster layer preview was rendered");
+    await firstLayer.decode();
+    return {
+      source: [source.naturalWidth, source.naturalHeight],
+      reconstructed: [reconstructed.naturalWidth, reconstructed.naturalHeight],
+      regions: root.querySelectorAll(".model-builder-region").length,
+      fullPalette: root.querySelectorAll(".model-builder-palette span").length,
+      exactLabel: root.querySelector(".model-builder-check")?.textContent?.trim() || "",
+      firstRegionWidth: firstLayer.naturalWidth,
+      firstRegionHeight: firstLayer.naturalHeight,
+    };
+  });
+  assert.deepEqual(modelOutput.source, [512, 768], "Model source must use the shared 512×768 canvas");
+  assert.deepEqual(modelOutput.reconstructed, [512, 768], "The raster-layer preview must rebuild the shared canvas");
+  assert.ok(modelOutput.regions >= 2, "The model builder must emit multiple independently reviewable region masks");
+  assert.ok(modelOutput.fullPalette >= 2, "The model style signature must contain a visible palette");
+  assert.equal(modelOutput.exactLabel, "RECONSTRUCCIÓN EXACTA", "The source pixels must reconstruct exactly from region layers");
+  assert.ok(modelOutput.firstRegionWidth < 512 && modelOutput.firstRegionHeight < 768, "The region preview should show the cropped mask, not a scaled full-stage image");
+  await modelBuilder.screenshot({ path: resolve(visualQaDir, "character-model-builder-region-decomposition.png") });
+  console.log("PASS_REAL: UI created a saved character model from selected local PNGs, emitted multiple cropped region masks, extracted a reusable style palette, and verified pixel-exact reconstruction.");
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });

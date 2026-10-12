@@ -115,6 +115,16 @@ export function CharacterModelBuilder() {
     return ()=>{alive=false;};
   },[]);
 
+  const refreshLibrary=async()=>{
+    setBusy(true);setError("");setNotice("");
+    try{
+      await refreshAssets();
+      await refreshModels();
+      setNotice("Biblioteca actualizada. Las nuevas imágenes ya pueden añadirse a un modelo.");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+
   const toggleAsset=(id:string)=>{
     setSelectedIds(current=>{
       if(current.includes(id))return current.filter(value=>value!==id);
@@ -193,6 +203,7 @@ export function CharacterModelBuilder() {
           <label>Imagen que se va a separar<select value={baseAssetId} onChange={event=>setBaseAssetId(event.target.value)}><option value="">Elegir imagen base</option>{selectedAssets.map(asset=><option key={asset.id} value={asset.id}>{asset.label}</option>)}</select></label>
         </div>
         <label className="model-builder-search">Filtrar recursos<input value={filter} onChange={event=>setFilter(event.target.value)} placeholder="Nombre, archivo o categoría…" /></label>
+        <button type="button" className="model-builder-secondary" disabled={busy} onClick={refreshLibrary}>Actualizar biblioteca local</button>
         <div className="model-builder-asset-list">
           {filteredAssets.map(asset=><label className={selectedIds.includes(asset.id)?"model-builder-asset selected":"model-builder-asset"} key={asset.id}>
             <input type="checkbox" checked={selectedIds.includes(asset.id)} onChange={()=>toggleAsset(asset.id)} />
