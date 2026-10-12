@@ -12058,7 +12058,7 @@ def _ears(sk: Skeleton, p: CharacterParams) -> str:
 def _head_paths(sk: Skeleton) -> tuple[str, str, str]:
     """The head as path data: its filled shape, the silhouette line round the skull and
     cheeks, and the lighter line under the chin (`_head` says why they are two)."""
-    start, segments = _head_shape(sk.face_build)
+    start, segments = _head_shape(sk.face_build, sk.face_shape)
     cx, cy, r = sk.head_cx, sk.head_cy, sk.head_r
     anchors = [start] + [end for _, end in segments]
     chin_from, chin_to = 3, 5  # the two segments either side of the chin
