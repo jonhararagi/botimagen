@@ -78,6 +78,16 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn('data-qa-surface="legs"', RENDERER)
         self.assertIn('data-qa-surface="footwear-base"', RENDERER)
 
+    def test_head_proportion_pass_scales_head_without_changing_public_recipe(self):
+        self.assertIn('className="character-head-proportion-group"', RENDERER)
+        self.assertIn('data-qa-surface="head-proportions"', RENDERER)
+        self.assertIn('transform="translate(170 140) scale(0.84 0.88) translate(-170 -140)"', RENDERER)
+        self.assertIn('schema_version: 3', RENDERER)
+        self.assertIn('getBodyLandmarks(r.view, hemY, waistHalf)', RENDERER)
+        # Keep this focused transform outside the semantic layer markers so it
+        # cannot falsify the DOM paint-order contract for garment/anatomy layers.
+        self.assertNotIn('data-layer-id="head"', RENDERER)
+
     def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
         self.assertIn('querySelectorAll("[data-layer-id][data-layer-order]")', SMOKE)
         self.assertIn("domLayers.every((entry, index) => index === 0 || entry.order >= domLayers[index - 1].order)", SMOKE)
