@@ -1,39 +1,71 @@
 # Honkai Impact 3rd · índice de referencias artísticas y recursos
 
-Estado: investigación inicial; no implica que los archivos binarios estén descargados ni integrados en el catálogo de componentes.
+Estado: investigación de fuentes públicas. Este índice **no afirma que los binarios estén descargados**. Distingue referencias visuales, modelos de referencia, herramientas de creación 3D y componentes con licencia declarada.
 
-Este índice separa **referencias de estudio**, **modelos para herramientas específicas** y **recursos reutilizables con licencia identificada**. No registrar una referencia como pieza modular ni redistribuir su archivo hasta verificar su origen y sus condiciones.
+## A. Fuentes de Honkai para referencia visual
 
-## Fuentes localizadas
+| Fuente | Qué buscar | Cómo usarla en BotImagen |
+|---|---|---|
+| [Sitio oficial de Honkai Impact 3rd](https://honkaiimpact3.hoyoverse.com/) | Personajes, atuendos, ilustraciones y dirección artística | Referencia de estilo y análisis de siluetas. No tratar imágenes visibles como archivos redistribuibles por defecto. |
+| [HoYoverse: Art Collection Vol. 2](https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263) | Arte de personajes, vestuario y diseños de versiones anteriores | Referencia editorial; comprobar qué páginas y recursos se publican realmente. |
+| [HoYoLAB: ALL HONKAI 6.4 CONCEPTS! (OUTFITS + CHARACTERS)](https://www.hoyolab.com/article/16815036) | Conceptos de vestuario y variantes propuestas por la comunidad | Investigación de siluetas, capas y decisiones de diseño. No asumir que todo concepto mostrado es un plano descargable. |
+| [HoYoLAB: Official Honkai 3rd MMD Model DL Links (Updated)](https://www.hoyolab.com/article/9153161) | Índice comunitario de enlaces a modelos MMD publicados mediante páginas de Bilibili | Descargar desde la fuente enlazada cuando esté disponible y revisar las condiciones que acompañen a cada modelo. Usar como referencia 3D local solo según los permisos indicados. |
+| [HoYoLAB: Honkai MMD Models V5.7](https://www.hoyolab.com/article/4861805) | Otro índice de modelos MMD de personajes | Fuente adicional para localizar modelos y rastrear sus páginas de origen. Verificar cada descarga y sus términos. |
+| [DeviantArt: galería de modelos MMD de Honkai Impact 3rd](https://www.deviantart.com/oz-sys/gallery/90867715/mmd---honkai-impact-3rd---models) | Modelos y publicaciones comunitarias | Inspeccionar publicación por publicación; registrar autor, fuente y condiciones antes de usar o redistribuir. |
+| [Skowt: Honkai Impact 3rd assets](https://skowt.cc/games/honkai-impact-3rd) | Índice de recursos del juego | Útil para localizar nombres y tipos de assets. No copiar archivos extraídos al repositorio sin verificar origen y autorización. |
+| [Honkai Impact 3rd Wiki: imágenes](https://honkaiimpact3.fandom.com/wiki/Category:Images) | Arte e imágenes indexadas por la comunidad | Referencia y descubrimiento; seguir el enlace de origen de cada imagen. |
 
-| Fuente | Tipo | Uso previsto | Estado para incluir binarios en este repositorio |
-|---|---|---|---|
-| [Honkai Impact 3rd · sitio oficial](https://honkaiimpact3.hoyoverse.com/) | Referencia oficial del juego | Identidad visual, personajes, vestuario y dirección artística | Referencia/enlace. No se descargan ilustraciones oficiales al repositorio por defecto. |
-| [Art Collection Vol. 2: The Moon's Origin and Finality](https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263) | Anuncio oficial de libro de arte y diseños | Investigar hojas de diseño, bocetos y decisiones de vestuario | Referencia/enlace. No asumir que las imágenes publicadas tienen licencia de redistribución. |
-| [HoYoLAB: Official Honkai 3rd MMD Model DL Links (Updated)](https://www.hoyolab.com/article/9153161) | Índice comunitario de enlaces a modelos publicados en páginas oficiales de Bilibili | Referencia 3D, siluetas y estudio de vestuario; posible flujo de render de referencia | Verificar los términos de cada paquete y su formato antes de descargar, convertir o redistribuir. Los modelos MMD no son piezas 2D listas para ensamblar. |
-| [Honkai Impact 3rd Wiki · Category: Images](https://honkaiimpact3.fandom.com/wiki/Category:Images) | Archivo comunitario de imágenes | Buscar arte conceptual y variantes visuales, registrando la página de origen | Solo referencia hasta verificar fuente, atribución y permiso aplicable a cada archivo. |
-| [Skowt · Honkai Impact 3rd assets](https://skowt.cc/games/honkai-impact-3rd) | Índice de assets del juego, incluyendo arte y hojas de personajes | Localizar referencias por categoría | No copiar en bloque al repositorio. Tratar como referencia hasta verificar origen y condiciones de uso de cada recurso. |
-| [OpenGameArt · 16x16 character sheet with separate clothing layers](https://opengameart.org/content/16x16-character-sheet-with-separate-clothing-layers) | Ejemplo de sprite modular con hasta cinco capas | Prueba técnica de capas y recoloreado, no modelo visual final | La página declara CC BY 4.0. Antes de empaquetarlo, conservar atribución al autor Chrisf, enlace de origen y licencia. Es pixel art 16×16 y no satisface por sí solo la dirección anime de alta fidelidad. |
+## B. Herramientas y bases 3D para construir un creador propio
 
-## Clasificación obligatoria al importar
+| Fuente | Función | Evaluación inicial |
+|---|---|---|
+| [Blender](https://www.blender.org/) | Modelado, materiales, rigging, render y exportación | Herramienta principal recomendada para un flujo 3D original y automatizable. |
+| [CharMorph](https://github.com/Upliner/CharMorph) | Generación paramétrica de personajes dentro de Blender | Investigar como posible base de cuerpo y personalización. Revisar las licencias exactas del complemento y de cada modelo base antes de incorporarlos. |
+| [MakeHuman](https://www.makehumancommunity.org/) | Generación de mallas humanas parametrizadas | Posible base técnica para anatomía; por sí sola no proporciona el estilo anime de Honkai. Revisar licencias de modelos y complementos. |
+| [Blend Swap: character base meshes](https://blendswap.com/3d/character-base-mesh) | Modelos base comunitarios para Blender | Buscar por licencia, formato, rig y calidad. Cada modelo tiene sus propias condiciones. |
+| [Meshy: modelos 3D anime](https://www.meshy.ai/tags/anime) | Catálogo de modelos y flujo de generación/descarga | Fuente para explorar modelos de referencia; confirmar licencia y términos en cada ficha antes de incorporarlos. |
 
-- `reference_only`: ilustración completa, captura o arte conceptual que solo guía el diseño.
-- `component_candidate`: archivo potencialmente separable; todavía no validado anatómicamente.
-- `component_validated`: pieza con transparencia, anclajes, capa, compatibilidad y prueba visual confirmadas.
-- `license_review`: origen o condiciones pendientes de comprobación.
-- `redistribution_approved`: recurso cuya licencia o autorización se ha comprobado y documentado para la distribución prevista.
+**Arquitectura propuesta:** Blender para el autorado 3D y el render de referencias; BotImagen para la biblioteca, los perfiles OC, los cambios de vestuario, las fichas de diseño y la preparación de referencias para generadores. No hacer depender el editor de un único sitio externo.
 
-Cada archivo importado debe registrar URL de origen, autor si está disponible, fecha de consulta, licencia/permiso conocido, SHA-256, formato, dimensiones y estado de validación. No inferir licencia por el mero hecho de que una imagen sea visible o descargable.
+## C. Recurso modular con licencia declarada para probar el ensamblador 2D
 
-## Próxima tarea técnica
+[OpenGameArt: 16x16 character sheet with separate clothing layers](https://opengameart.org/content/16x16-character-sheet-with-separate-clothing-layers)
 
-1. Priorizar referencias de diseños y vestuario de Honkai para análisis visual.
-2. Buscar recursos originales de fans que declaren expresamente permiso de reutilización o licencias compatibles.
-3. Descargar primero solo recursos con condiciones verificadas; conservar el archivo de licencia/atribución junto al recurso.
-4. Importar referencias completas en la colección de referencias, no en el ensamblador de piezas.
-5. Construir piezas originales inspiradas en rasgos generales del género anime/ciencia ficción cuando no existan componentes con permiso verificable.
-6. No incluir en commits públicos paquetes de modelos extraídos, archivos de juego o arte de terceros solo porque estén accesibles en la web.
+La página declara CC BY 4.0 y describe hasta cinco capas recoloreables. Autor indicado: Chrisf. Es útil para probar técnicamente las capas, no como arte final de alta fidelidad: es pixel art de 16×16. Si se descarga e integra, guardar atribución, URL, licencia y fecha de consulta junto al archivo.
 
-## Límite de esta entrega
+## D. Tipos de material: no confundirlos
 
-Este documento registra fuentes encontradas durante la investigación inicial. No afirma que se hayan descargado imágenes, modelos MMD o paquetes de juego. La integración de binarios debe realizarse por una vía que preserve la licencia, la atribución y el origen de cada archivo; el conector de GitHub usado para este cambio solo permite crear archivos de texto, no subir binarios de imágenes/modelos.
+- **Hoja de diseño / concept art:** muestra apariencia, detalles o variantes, pero puede no incluir medidas ni archivos editables.
+- **Modelo MMD / FBX / OBJ / GLB / BLEND:** geometría 3D que puede servir para observar el personaje o generar vistas, según formato, rig, texturas y permisos.
+- **Texturas y mapas:** imágenes aplicadas a una malla; no son por sí solas prendas 2D separadas.
+- **Assets extraídos del juego:** no son automáticamente redistribuibles ni adecuados para publicar en GitHub.
+- **Pieza modular 2D:** PNG con transparencia y encuadre, anclajes, orden de capa y compatibilidad validados.
+- **Referencia de fan:** puede tener condiciones distintas de la obra oficial; verificar la publicación concreta.
+
+## E. Metadatos requeridos por recurso
+
+Registrar URL original, autor si está disponible, fecha de consulta, licencia o permiso conocido, formato, dimensiones, SHA-256, categoría, estado de validación y restricciones de redistribución.
+
+Estados permitidos:
+- `reference_only`
+- `component_candidate`
+- `component_validated`
+- `license_review`
+- `redistribution_approved`
+
+No etiquetar como aprobado un recurso solo porque sea accesible sin iniciar sesión.
+
+## F. Ruta práctica de implementación
+
+1. Descargar y revisar recursos desde las fuentes de origen, empezando por modelos MMD publicados con instrucciones de uso y componentes de prueba con licencia explícita.
+2. Mantener referencias completas en una biblioteca separada de las piezas del ensamblador.
+3. Probar si los modelos 3D compatibles pueden abrirse en Blender y renderizarse con vistas frontal, lateral, posterior y de detalle; guardar la procedencia de cada modelo.
+4. Crear una base de personaje original y prendas originales en una dirección visual anime/ciencia ficción. Usar referencias para guiar la estética, no asumir que un modelo importado se convierte automáticamente en un creador modular.
+5. Exportar renders de referencia y fichas estructuradas del OC desde BotImagen.
+6. Integrar al catálogo 2D solo piezas que tengan transparencia, anclajes y oclusión validados.
+
+## Límite y estado real
+
+La investigación localizó páginas y catálogos públicos, pero no descargó archivos binarios en este commit. El conector de GitHub utilizado para modificar este documento crea archivos de texto; no sube imágenes ni modelos binarios. Para integrar archivos reales hace falta una sesión de repositorio con capacidad de transferencia de binarios, por ejemplo el workspace de desarrollo sincronizado, Git LFS para archivos grandes cuando proceda, o un flujo de descarga controlada que guarde los archivos y sus metadatos antes de hacer commit.
+
+La meta no es acumular enlaces: es conseguir un personaje OC que se pueda editar, vestir, guardar y renderizar desde un flujo 2D/3D verificable.
