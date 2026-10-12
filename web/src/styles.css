@@ -121,3 +121,26 @@
 .modular-composer-preview>div{padding:24px;text-align:center;color:var(--muted,#a7afc5)}
 .modular-warning{font-size:12px;color:#ffc879}
 @media(max-width:760px){.modular-composer-grid{grid-template-columns:1fr}.modular-composer{padding:14px}}
+
+
+/* PNG-to-modular material converter and shared skeletal-stage workflow */
+.modular-converter-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0;padding:13px;border:1px solid rgba(116,225,231,.18);border-radius:12px;background:#0d1424}
+.modular-check{display:flex;align-items:center;gap:8px;min-width:0;color:#bac8dc;font-size:11px;line-height:1.45}
+.modular-check input[type=checkbox]{width:15px;height:15px;flex:0 0 auto;accent-color:#64dfd9}
+.modular-range{display:grid;gap:6px;color:#becbe0;font-size:10px}
+.modular-range>span{display:flex;justify-content:space-between;gap:8px}
+.modular-range b{color:#71e3df}
+.modular-range input[type=range]{width:100%;accent-color:#71e3df}
+.modular-converter-note{padding:10px 12px;border-left:2px solid #64dfd9;background:rgba(113,227,223,.05);color:#aebbd0;font-size:11px;line-height:1.55}
+.modular-source-url{grid-column:1/-1}
+.modular-preview-card .modular-converted-preview{height:170px;max-height:170px;object-fit:contain;border:1px solid #466274;background:#0a1020}
+.modular-preview-card small{color:#8da3bc;font-size:10px;line-height:1.45}
+.modular-asset-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
+.modular-asset-actions .modular-check{padding:5px 0}
+.modular-composition-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:18px;padding:14px;border:1px solid rgba(116,225,231,.24);border-radius:12px;background:rgba(21,31,49,.7)}
+.modular-composition-panel>div>b{font-size:13px;color:#d5e7f5}
+.modular-composition-panel p{margin:5px 0 0;color:#a8b7cd;font-size:11px;line-height:1.5}
+.modular-composition-panel [role=status]{grid-column:1/-1;color:#aebbd0;font-size:11px}
+.modular-composition-preview{grid-column:1/-1;width:100%;max-height:550px;object-fit:contain;border:1px solid #3d4b60;border-radius:10px;background:repeating-conic-gradient(#222a3a 0% 25%,#101725 0% 50%) 50%/20px 20px}
+.modular-composition-panel button:disabled{opacity:.55}
+@media(max-width:650px){.modular-converter-options{grid-template-columns:1fr}.modular-source-url{grid-column:1}.modular-composition-panel{grid-template-columns:1fr}.modular-composition-panel [role=status]{grid-column:1}}

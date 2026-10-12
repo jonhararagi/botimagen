@@ -20,12 +20,16 @@ CATEGORIES = {
     "body", "face", "hair_back", "hair_front", "torso", "arm", "hand",
     "leg", "footwear", "top", "bottom", "coat", "accessory",
 }
-ANCHORS = {"head", "neck", "shoulder_l", "shoulder_r", "waist", "hip", "origin"}
+ANCHORS = {
+    "head", "neck", "shoulder_l", "shoulder_r", "waist", "hip", "origin",
+    "elbow_l", "elbow_r", "hand_l", "hand_r", "knee_l", "knee_r", "ankle_l", "ankle_r",
+}
 ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$")
 DEFAULT_LAYER_ORDER = {
     "hair_back": 10, "body": 20, "leg": 25, "footwear": 28, "torso": 30,
     "arm": 32, "hand": 34, "bottom": 36, "top": 40, "coat": 45,
-    "neck": 48, "face": 50, "accessory": 60, "hair_front": 70,
+    "head": 48, "neck": 49, "face": 50, "eyes": 52, "brows": 54, "mouth": 56,
+    "accessory": 60, "hair_front": 70,
 }
 
 
@@ -95,7 +99,10 @@ def validate_selection(pieces: Iterable[dict[str, Any]]) -> list[dict[str, Any]]
             raise CompositionError(f"Solo puede seleccionarse una pieza de categoría {cat}.")
         categories[cat] = piece
     for piece in clean:
-        if piece["category"] in {"top", "bottom", "coat", "hair_back", "hair_front", "face", "arm", "hand", "leg", "footwear"}:
+        if piece["category"] in {
+            "head", "eyes", "brows", "mouth", "top", "bottom", "coat", "hair_back",
+            "hair_front", "face", "arm", "hand", "leg", "footwear",
+        }:
             body = categories.get("body")
             if body is None:
                 raise CompositionError(f"La pieza {piece['id']} requiere un cuerpo base.")

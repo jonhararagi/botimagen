@@ -67,6 +67,18 @@ class ModularCompositorTests(unittest.TestCase):
             profile = {"recipe_version": version, "recipe": {"marker": version}}
             self.assertEqual(migrate_profile(profile)["recipe"], profile["recipe"])
 
+    def test_new_face_components_are_distinct_ordered_layers(self):
+        from modular_character_compositor import validate_selection
+        selected = validate_selection([
+            piece("base", "body", "base", 20),
+            piece("head", "head", "head", 48),
+            piece("face", "face", "face", 50),
+            piece("eyes", "eyes", "eyes", 52),
+            piece("brows", "brows", "brows", 54),
+            piece("mouth", "mouth", "mouth", 56),
+        ])
+        self.assertEqual([item["category"] for item in selected], ["body", "head", "face", "eyes", "brows", "mouth"])
+
     def test_invalid_category_and_duplicate_piece_ids_rejected(self):
         item = piece("base", "unicorn", "base", 20)
         with self.assertRaises(CompositionError):

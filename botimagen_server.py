@@ -15,7 +15,9 @@ from modular_character_compositor import CompositionError, compose_png, validate
 from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
 from modular_asset_library import read_user_asset
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
-from modular_asset_library import AssetImportError, import_user_asset, list_user_assets, read_user_asset
+from modular_asset_library import (
+    AssetImportError, confirm_user_asset_anchors, import_user_asset, list_user_assets, read_user_asset,
+)
 
 ROOT = Path(__file__).resolve().parent
 ASSET_MANIFEST_PATH = ROOT / "assets_manifest.json"
@@ -348,6 +350,8 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/generate": ("POST",),
             }
             allowed = allowed_by_path.get(path)
+            if path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors"):
+                allowed = ("POST",)
             if allowed is None:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
@@ -459,11 +463,25 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/modular-compose", "/api/modular-cyberstreet/render"}:
+            validate_anchor_route = path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors")
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
                 payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" else MAX_BODY_BYTES)
+                if validate_anchor_route:
+                    if payload != {"confirm": True}:
+                        raise ApiInputError("Se requiere confirm=true después de revisar la pieza en la vista previa.")
+                    asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/validate-anchors").strip("/")
+                    try:
+                        result = confirm_user_asset_anchors(asset_id)
+                    except FileNotFoundError:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
+                        return
+                    except AssetImportError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
+                    return
                 if path == "/api/modular-cyberstreet/render":
                     enabled = payload.get("enabled") if isinstance(payload, dict) else None
                     if not isinstance(enabled, dict) or any(not isinstance(k, str) or not isinstance(v, bool) for k, v in enabled.items()):

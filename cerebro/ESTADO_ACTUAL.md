@@ -529,3 +529,43 @@ QA Windows: `NOT_RUN`.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - TIMER para una próxima pasada de calidad artística modular: estimación provisional de **8–16 horas activas** para desarrollar y conectar más detalle/variantes de rostro, cabello y prendas con pruebas visuales. No es una estimación de finalización de todo BotImagen ni tiempo medido.
 - Siguiente trabajo: ampliar la calidad y el rango de piezas utilizables dentro del personalizador real. Implementar código y recursos directamente; no volver a producir otra auditoría o plan como sustituto del trabajo. Mantener la rama de trabajo, no tocar `main` directamente y no fusionar ni cerrar PRs sin autorización explícita.
+
+
+## BIMG-PNG-TO-MATERIAL-001 · importador de imágenes normales para el esqueleto · 2026-10-12
+
+### Arquitectura práctica acordada
+- El motor Python es el esqueleto/árbitro: valida IDs, dimensiones, categorías, orden de capas y anclajes; compone PNG RGBA mediante `/api/modular-compose`.
+- La interfaz React es el taller visual para importar, preprocesar, previsualizar, confirmar anclajes y componer.
+- `modular_asset_library.py` conserva los bytes originales, SHA-256, procedencia, licencia y metadatos de material. Los originales no se sobrescriben al convertir.
+- Un PNG de personaje completo se acepta directamente como `full_character` y se normaliza a 512×768 conservando su pose como una sola imagen plana. El software no finge que esa imagen ya contiene ropa/cabello separables.
+- Para ropa/cabello/cara intercambiables, el usuario carga piezas separadas o recortadas y las declara `modular_piece`; la conversión calcula anclajes aproximados. Solo después de revisar la vista previa puede confirmar anclajes y usar la pieza en el compositor.
+
+### Implementación publicada en la rama de trabajo
+- Nuevo `web/src/visual/pngToModularAsset.ts`: preprocesador Canvas; PNG/JPEG/WebP hasta 12 MiB/20 MP; escala de análisis limitada; eliminación opcional del fondo plano conectado a las esquinas; recorte por alfa; salida PNG transparente 512×768; controles de escala/desplazamiento; estimaciones de puntos anatómicos normalizados y hash SHA-256 de origen cuando el navegador lo permite.
+- `web/src/visual/ModularAssetLibrary.tsx`: flujo real de elegir imagen, elegir tipo/categoría/pose, conservar archivo fuente, preparar PNG, revisar original y convertido, guardar el material, revisar/confirmar anclajes y componer las piezas guardadas.
+- `modular_asset_library.py`: valida el contrato de conversión; enlaza el resultado con el registro original; preserva estado de anclajes `estimated_not_validated`; añade confirmación explícita `user_confirmed`; evita declarar automáticamente que una heurística encontró una articulación exacta.
+- `botimagen_server.py`: endpoint `POST /api/modular-assets/{id}/validate-anchors` conectado al catálogo persistente. El compositor sigue en el motor existente, sin un segundo motor paralelo.
+- `modular_character_compositor.py`: categorías independientes para cabeza, ojos, cejas y boca; orden de capas ampliado y anclajes de codos, manos, rodillas y tobillos.
+- Pruebas ampliadas para metadatos/validación y smoke de Chromium que convierte una figura sintética, comprueba transparencia y tamaño de salida, conserva la fuente y usa el compositor Python real.
+- CSS de interfaz para controles del importador, vista previa y composición.
+
+### Límites que deben quedar claros en la interfaz
+- Quitar fondo plano no es segmentación semántica. Un fondo degradado, sombras contra el fondo o bordes de color parecido pueden requerir ajuste manual.
+- Un personaje de una sola capa no se convierte mágicamente en anatomía articulada; las zonas ocultas no existen en el PNG y no se inventan.
+- Las posiciones propuestas son **estimaciones**, no detección garantizada de pose. El usuario debe inspeccionarlas visualmente antes de habilitar la pieza como capa.
+- La salida de esta etapa usa un lienzo común 512×768; imágenes de otras poses deben marcarse como frontal/trasera/lateral y no intercambiarse sin revisión.
+
+### Recursos oficiales Honkai Impact 3rd para referencia visual (no copiados al repositorio)
+- Wallpapers/media oficiales: https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper
+- Art Collection Vol. 2, página oficial: https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263
+- Noticia oficial Vol. 2 alternativa: https://honkaiimpact3.hoyoverse.com/m/asia/en-us/news/112262
+- Art Collection Vol. 1: https://honkaiimpact3.hoyoverse.com/global/en-us/news/106541?cate=516
+- Noticias oficiales: https://honkaiimpact3.hoyoverse.com/global/en-us/news
+- Estos enlaces son referencias que el usuario puede abrir y luego importar manualmente en la biblioteca; no se han añadido imágenes oficiales de terceros al repositorio.
+
+### Validación y siguiente trabajo
+- Estado de esta revisión al registrarla: `IMPLEMENTED_PENDING_CI`; no declarar los cambios verificados hasta observar la CI de este HEAD y las capturas de Chromium.
+- El E2E debe cubrir el convertidor, fondo conectado, dimensiones/transparencia, archivo fuente original, conversión como `full_character`, conversión de la misma fuente como pieza de cuerpo y composición real.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- TIMER estimado restante para cerrar y pulir este tramo tras la primera CI: **3–6 horas activas**. Para ampliar a un sistema artístico robusto con segmentación de piezas complejas, más presets y anclajes revisables, estimar por separado; no presentar este timer como la finalización de todo BotImagen.
+- Mantener esta rama, no alterar `main`, no fusionar/cerrar PRs sin autorización y producir cambios de programa/recursos antes que nuevos planes.

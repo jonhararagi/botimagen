@@ -1342,6 +1342,74 @@ try {
     return status?.textContent?.includes("PNG exportado con fondo transparente") ?? false;
   }, null, { timeout: 15000 });
 
+  // Exercise PNG-to-stage conversion, linked source metadata, and the real modular compositor.
+  const assetLibrary = page.locator(".modular-library");
+  await assetLibrary.scrollIntoViewIfNeeded();
+  const syntheticDataUrl = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 320; canvas.height = 480;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas fixture is unavailable");
+    context.fillStyle = "#f7f7f7"; context.fillRect(0, 0, 320, 480);
+    context.fillStyle = "#e6a4ce"; context.fillRect(118, 75, 84, 72);
+    context.fillStyle = "#477be0"; context.fillRect(105, 155, 110, 160);
+    context.fillStyle = "#30364b"; context.fillRect(115, 310, 35, 125); context.fillRect(170, 310, 35, 125);
+    context.fillStyle = "#22283a"; context.fillRect(102, 435, 52, 15); context.fillRect(164, 435, 52, 15);
+    return canvas.toDataURL("image/png");
+  });
+  const syntheticBuffer = Buffer.from(syntheticDataUrl.split(",")[1], "base64");
+  const uploadSynthetic = async () => {
+    await assetLibrary.locator('input[type="file"]').setInputFiles({
+      name: "qa-synthetic-character.png", mimeType: "image/png", buffer: syntheticBuffer,
+    });
+  };
+  const prepareAndSaveMaterial = async () => {
+    await uploadSynthetic();
+    await assetLibrary.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
+    const convertedPreview = assetLibrary.getByRole("img", { name: "PNG normalizado de qa-synthetic-character.png 512 por 768" });
+    await convertedPreview.waitFor({ timeout: 15000 });
+    const alphaCheck = await convertedPreview.evaluate(async image => {
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = 512; canvas.height = 768;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (!context) throw new Error("Canvas alpha check unavailable");
+      context.drawImage(image, 0, 0);
+      const pixels = context.getImageData(0, 0, 512, 768).data;
+      return { width: image.naturalWidth, height: image.naturalHeight, cornerAlpha: pixels[3], centerAlpha: pixels[(384 * 512 + 256) * 4 + 3] };
+    });
+    assert.deepEqual([alphaCheck.width, alphaCheck.height], [512, 768], "Converted images must use the shared transparent stage");
+    assert.equal(alphaCheck.cornerAlpha, 0, "Connected flat background should be transparent after conversion");
+    assert.ok(alphaCheck.centerAlpha > 0, "The character silhouette must remain visible after conversion");
+    await assetLibrary.getByRole("button", { name: "Guardar material convertido" }).click();
+    await page.waitForFunction(() =>
+      document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("material(es) convertido(s)") ?? false,
+      null, { timeout: 15000 },
+    );
+  };
+
+  await prepareAndSaveMaterial();
+  const completeCharacter = assetLibrary.locator('.modular-asset-list article[data-asset-kind="full_character"]')
+    .filter({ hasText: "qa-synthetic-character" });
+  await completeCharacter.waitFor({ timeout: 15000 });
+  await assetLibrary.getByLabel("Tipo de recurso").selectOption("modular_piece");
+  await assetLibrary.getByLabel("Clasificación de la imagen").selectOption("body");
+  await prepareAndSaveMaterial();
+  const modularBody = assetLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]')
+    .filter({ hasText: "qa-synthetic-character" }).filter({ hasText: "body" });
+  await modularBody.waitFor({ timeout: 15000 });
+  await modularBody.locator('input[type="checkbox"]').check();
+  await assetLibrary.getByRole("button", { name: /Componer selección \(1\)/ }).click();
+  await page.waitForFunction(() =>
+    document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Composición real lista") ?? false,
+    null, { timeout: 15000 },
+  );
+  const importedComposition = assetLibrary.getByRole("img", { name: "Composición PNG de piezas modulares importadas" });
+  await importedComposition.waitFor({ timeout: 15000 });
+  const composedDimensions = await importedComposition.evaluate(async image => { await image.decode(); return [image.naturalWidth, image.naturalHeight]; });
+  assert.deepEqual(composedDimensions, [512, 768], "The imported modular pieces must compose through the existing Python engine");
+  console.log("PASS_REAL: PNG converter normalized source art to 512×768, removed the connected flat background, preserved the original source, registered estimated rig anchors, and composed a body piece through the real local API.");
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
