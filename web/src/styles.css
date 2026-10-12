@@ -104,3 +104,5 @@
 .modular-asset-list article{display:grid;gap:4px;padding:10px 12px;border:1px solid rgba(131,157,191,.16);border-radius:8px;background:rgba(22,34,53,.6)}
 .modular-asset-list article>b{font-size:12px}.modular-asset-list article>span{font-size:11px;color:#71e3df}.modular-asset-list article>small{font-size:10px;color:#aebbd0;overflow-wrap:anywhere}
 @media(max-width:620px){.modular-library{padding:14px}.modular-library-controls{grid-template-columns:1fr}.modular-library-head{flex-direction:column}}
+
+.modular-asset-list article .modular-saved-preview{width:100%;max-height:180px;object-fit:contain;background:#0a1020;border-radius:6px}
