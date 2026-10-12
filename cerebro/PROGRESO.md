@@ -1,6 +1,6 @@
 # Progreso global de BotImagen
 
-**Último cálculo:** 2026-10-10  
+**Último cálculo:** 2026-10-12  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
 **Progreso global actual: 63%**
 
@@ -107,3 +107,9 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 
 - **Inspección visual acotada de R1A-REMOTE-02 (2026-10-11):** se revisó una matriz de contacto de seis capturas front/back (fit 50) para `street_bomber`, `tactical_baseball` y `long_coat` desde el artefacto CI #38152019549. Las prendas se mantienen diferenciadas, pero la figura sigue compacta/chibi y la vista posterior esquemática. La revisión de seis capturas no es una inspección individual de los 81 archivos ni una aprobación artística. Próximo objetivo: re-proporción de silueta compartida y continuidad pierna-calzado. El progreso ponderado sigue en **63%**; `WINDOWS_MANUAL_QA: NOT_RUN`.
+
+## BIMG-ENGINE-008-R5 · 2026-10-12
+
+- El arnés SVG y sus pruebas se reforzaron, pero no se cierra ninguna fase de la beta ni se aumenta el porcentaje: el renderer aún no ofrece una superficie anatómica neutra independiente de prendas. La estimación ponderada se mantiene en **62,96 / 100 → 63%**.
+- Evidencia/continuidad: [informe R5](../docs/engineering/BIMG-ENGINE-008-R5-ANATOMICAL-SVG-HARNESS.md). CI exacta y artefactos quedan pendientes de verificar contra el HEAD final. `WINDOWS_MANUAL_QA: NOT_RUN`.
+- TIMER: 2–4 horas estimadas; tiempo real no medido de forma fiable.
