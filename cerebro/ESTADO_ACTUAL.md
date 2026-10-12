@@ -399,7 +399,7 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 ## Checkpoint · BIMG-ART-002-R1 · calidad facial y cabello posterior
 
 - **HEAD inicial:** `5ef17beb774f17d5ae57ada655c949343cee92aa`.
-- **Último HEAD de implementación/pruebas:** `475663832c423c947ff179505b1190496be6e014` (los commits documentales siguientes no deben confundirse con el código validado).
+- **Último HEAD de implementación/pruebas y manifiesto E2E:** `e53235616bf0d58ff623dd4f19e74abdc1a15417` (los commits documentales siguientes no deben confundirse con el código validado).
 - **Cambios:** `character_render_engine.py` mejora los perfiles de forma facial, conecta `nose_style` con el renderer adulto, amplía la resolución de peinados y calcula la caída del cabello trasero según largo y landmarks; `tests/test_character_render_engine.py` añade regresiones de cara/nariz y silueta posterior; `web/browser_smoke.mjs` prepara capturas Chromium de ambos presets frontal/trasera y variantes de cara, nariz, corte, color y largo.
 - **CI exacta:** PENDING al escribir este checkpoint; no afirmar PASS hasta que la ejecución corresponda al HEAD final.
 - **Capturas:** la prueba E2E prepara PNG y un manifiesto con `GITHUB_SHA`; artefacto e inspección humana pendientes.
