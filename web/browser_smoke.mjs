@@ -1144,11 +1144,13 @@ try {
   await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
   await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousStreetSvg);
   await page.getByLabel("Fondo del estudio").selectOption("cyber-grid");
+  await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "cyber-grid");
   const cyberGridBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await selectProductView("frontal", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-front-cyber-grid.png"), fullPage: true });
   await selectProductView("trasera", "Trasera");
   await page.getByLabel("Fondo del estudio").selectOption("dusk-orbit");
+  await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "dusk-orbit");
   const duskOrbitBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-back-dusk-orbit.png"), fullPage: true });
   const previousPresetSvg = await productImage.getAttribute("src");
@@ -1156,6 +1158,7 @@ try {
   await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
   await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousPresetSvg);
   await page.getByLabel("Fondo del estudio").selectOption("aurora-city");
+  await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "aurora-city");
   const auroraCityBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await selectProductView("frontal", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-neon-archivist-front.png"), fullPage: true });
