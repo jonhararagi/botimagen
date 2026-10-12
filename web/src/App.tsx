@@ -300,12 +300,17 @@ export default function App(){
      signal:controller.signal
     });
     const result=await jsonResponse<{svg:string;renderer:string;view:string}>(response);
+    const requestedView=normalizeVisualRecipe(visualRecipe).view;
+    const svgViewMatch=typeof result.svg==="string"?result.svg.match(/\\bdata-view="(front|back)"/):null;
     if(typeof result.svg!=="string"||!result.svg.startsWith('<svg class="parametric-anime-svg"')||result.svg.length>262144){
      throw new Error("El motor devolvió una salida SVG incompatible.");
     }
+    if(result.view!==requestedView||svgViewMatch?.[1]!==requestedView){
+     throw new Error("La orientación solicitada no coincide con la orientación declarada por el SVG del motor.");
+    }
     if(disposed)return;
     setRenderedSvg(result.svg);
-    setRenderedCharacterState({hair:values.hair??"",eyes:values.eyes??"",expression:values.expression??"",outfit:values.outfit??"",view:normalizeVisualRecipe(visualRecipe).view});
+    setRenderedCharacterState({hair:values.hair??"",eyes:values.eyes??"",expression:values.expression??"",outfit:values.outfit??"",view:result.view});
     setRenderState(result.renderer==="parametric-anime-svg-v1"?"MOTOR ANIME LOCAL":result.renderer);
    }catch(error){
     if(disposed||controller.signal.aborted)return;
