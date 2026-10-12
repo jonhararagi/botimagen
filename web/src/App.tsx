@@ -299,7 +299,7 @@ export default function App(){
      body:JSON.stringify({selections:values,visual_recipe:normalizeVisualRecipe(visualRecipe)}),
      signal:controller.signal
     });
-    const result=await jsonResponse<{svg:string;renderer:string;view:string}>(response);
+    const result=await jsonResponse<{svg:string;renderer:string;view:"front"|"back"}>(response);
     const requestedView=normalizeVisualRecipe(visualRecipe).view;
     const svgViewMatch=typeof result.svg==="string"?result.svg.match(/\bdata-view="(front|back)"/):null;
     if(typeof result.svg!=="string"||!result.svg.startsWith('<svg class="parametric-anime-svg"')||result.svg.length>262144){
