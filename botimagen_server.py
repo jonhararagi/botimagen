@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
-from modular_asset_library import AssetImportError, import_user_asset, list_user_assets
+from modular_asset_library import AssetImportError, import_user_asset, list_user_assets, read_user_asset
 
 ROOT = Path(__file__).resolve().parent
 ASSET_MANIFEST_PATH = ROOT / "assets_manifest.json"
@@ -380,6 +380,24 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                     self._send_json(HTTPStatus.OK, list_user_assets())
                 except AssetImportError as exc:
                     self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            if path.startswith("/api/modular-assets/") and path.endswith("/image"):
+                asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/image").strip("/")
+                try:
+                    image_bytes, mime_type = read_user_asset(asset_id)
+                except FileNotFoundError:
+                    self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
+                    return
+                except AssetImportError as exc:
+                    self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                    return
+                self.send_response(HTTPStatus.OK.value)
+                self.send_header("Content-Type", mime_type)
+                self.send_header("Content-Length", str(len(image_bytes)))
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.end_headers()
+                self.wfile.write(image_bytes)
                 return
             if path == "/api/profiles":
                 self._list_profiles()
