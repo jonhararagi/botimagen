@@ -13,6 +13,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install local PNG composition dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-engine.txt
+
       - name: Validate Python syntax
         run: python -m py_compile app.py doctor.py character_generator.py botimagen_server.py tests/test_character_generator.py tests/test_seed_reproducibility.py tests/test_visual_style_contract.py tests/test_local_api.py tests/test_web_field_coverage.py tests/test_visual_recipe_contract.py tests/test_visual_body_landmarks.py character_render_engine.py tests/test_character_render_engine.py modular_asset_library.py tests/test_modular_asset_library.py tests/test_modular_character_compositor.py tests/test_cyberstreet_svg_compositor.py modular_character_compositor.py cyberstreet_svg_compositor.py vendor/anime_character_creator/character.py vendor/anime_character_creator/skeleton.py vendor/anime_character_creator/colorutil.py vendor/anime_character_creator/__init__.py
 

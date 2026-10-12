@@ -18,7 +18,7 @@ La aplicación funciona como una pequeña estación de trabajo: muestra el contr
 - Tkinter/Tk, disponible con la instalación normal de Python para Windows
 - Git for Windows, si se quiere usar `GIT STATUS`/`GIT PUSH`
 
-No necesita instalar paquetes de PyPI ni Node.js.
+La aplicación de escritorio Tkinter no necesita instalar paquetes de PyPI ni Node.js. El motor web de personajes por capas sí utiliza Pillow para componer PNG transparentes; instala esa dependencia una sola vez con `py -m pip install -r requirements-engine.txt`. La conversión inicial de imágenes se ejecuta localmente en el navegador.
 
 La documentación oficial de Python confirma que Tkinter está disponible en Windows y forma parte de la biblioteca estándar. La instalación oficial de Git for Windows proporciona Git para la consola y GUI.
 

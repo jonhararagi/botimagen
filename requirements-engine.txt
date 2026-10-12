@@ -1,0 +1,3 @@
+# Dependency for the local Python engine's transparent PNG layer compositor.
+# The standalone Tkinter intake tool does not need this package.
+Pillow>=10.0.0
