@@ -3539,7 +3539,7 @@ _CHIN_SHADOW_VALUE = 0.88
 
 def _chin_shadow(sk: Skeleton, p: CharacterParams, neck: str) -> str:
     """The band of shadow under the jaw, clipped to the neck's skin `neck`."""
-    start, segments = _head_shape(sk.face_build)
+    start, segments = _head_shape(sk.face_build, sk.face_shape)
     d = _curve(sk.head_cx, sk.head_cy + _CHIN_SHADOW_DROP * sk.head_r, sk.head_r, start, segments)
     tone = shade(p.skin_tone, value_factor=_CHIN_SHADOW_VALUE)
     return (
@@ -11808,33 +11808,45 @@ def _face_track(
     return pts
 
 
-def _head_shape(build: float) -> tuple[Point, list[Segment]]:
-    """The skull: a circle at the chibi end, a narrower jawed oval at the adult end.
+def _head_shape(build: float, face_shape: str = "equilibrada") -> tuple[Point, list[Segment]]:
+    """Build the skull contour, then apply a restrained catalogued adult face shape.
 
-    Eight quadratics that trace a unit circle when nothing narrows or tapers them,
-    so the chibi keeps the round head it always had, and the head loses width and
-    gains a jaw as the build gets taller. A plain circle is fine at 2.4 heads and
-    reads as a ball on a stick at 7, which is what this is for.
-
-    Two knobs rather than one, because the canon needs both. Against
-    `ref/satoko-real.jpg`, normalised on figure height and read at matched depths
-    above each figure's own drawn chin, the canon jaw runs 0.095, 0.081 and 0.061 H
-    and the old shape ran 0.104, 0.085 and 0.059: near enough that no amount of
-    taper was the answer, and a taper strong enough to change the look pulled the
-    jaw to 0.087, 0.071 and 0.050, out the other side. Narrowing the skull 10% and
-    tapering it *less* holds the jaw at 0.094, 0.079 and 0.056 while taking the
-    width out of the cheeks, which is where the roundness actually was.
-
-    The cheek itself cannot be measured against the canon: their hair lies across
-    the temples and ours stands off them, so what is visible there is a hair
-    difference wearing a face's clothes. That half was judged on the strips
-    (`out/62/round2_satoko.png`, `round2_satoshi.png`).
+    The historical neutral contour remains byte-identical. Other profiles reshape
+    the cheek and lower-jaw landmarks in the same normalized head-radius frame;
+    they do not scale the eyes or change the character's body proportions.
     """
-    # Control-point radius that makes a quadratic chain trace a circle.
     k = 1 / math.cos(math.pi / _HEAD_SEGMENTS)
     step = 360 / _HEAD_SEGMENTS
-    anchors = [_head_pt(i * step, 1.0, build) for i in range(_HEAD_SEGMENTS)]
-    controls = [_head_pt((i + 0.5) * step, k, build) for i in range(_HEAD_SEGMENTS)]
+
+    def contour_point(point: Point) -> Point:
+        x, y = point
+        lower = max(0.0, min(1.0, (y - 0.08) / 0.92))
+        cheek = max(0.0, 1.0 - abs(y - 0.18) / 0.24)
+        if face_shape == "suave":
+            x *= 1.0 + 0.035 * lower
+        elif face_shape == "afilada":
+            x *= 1.0 - 0.105 * lower
+        elif face_shape == "corazon":
+            x *= (1.0 + 0.035 * cheek) * (1.0 - 0.075 * lower)
+        elif face_shape == "diamante":
+            x *= (1.0 + 0.085 * cheek) * (1.0 - 0.13 * lower)
+        elif face_shape == "mandibula_suave":
+            x *= 1.0 + 0.075 * lower
+        elif face_shape == "menton_corto":
+            if y > 0.34:
+                y = 0.34 + (y - 0.34) * 0.80
+            x *= 1.0 + 0.025 * lower
+        elif face_shape == "menton_fino":
+            x *= 1.0 - 0.15 * lower
+        elif face_shape == "rostro_alargado":
+            if y > 0.08:
+                y = 0.08 + (y - 0.08) * 1.10
+        elif face_shape == "pomulos_definidos":
+            x *= (1.0 + 0.075 * cheek) * (1.0 - 0.065 * lower)
+        return x, y
+
+    anchors = [contour_point(_head_pt(i * step, 1.0, build)) for i in range(_HEAD_SEGMENTS)]
+    controls = [contour_point(_head_pt((i + 0.5) * step, k, build)) for i in range(_HEAD_SEGMENTS)]
     return anchors[0], [
         (controls[i], anchors[(i + 1) % _HEAD_SEGMENTS]) for i in range(_HEAD_SEGMENTS)
     ]
