@@ -10,6 +10,7 @@ import neonArchivistPreset from "../../assets/characters/neon-archivist.json";
 import { DEFAULT_VISUAL_RECIPE, normalizeVisualRecipe, VisualCharacterRenderer, VisualStyleLab } from "./visual/VisualCharacterRenderer";
 import type { VisualRecipe } from "./visual/VisualCharacterRenderer";
 import { ModularAssetLibrary } from "./visual/ModularAssetLibrary";
+import { ModularCharacterComposer } from "./visual/ModularCharacterComposer";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
 type FieldId = string;
@@ -352,7 +353,7 @@ export default function App(){
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>{renderState}</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><ModularAssetLibrary/><div className="roadmap"><b><img className="studio-library-mark" src={chromapatchBadge} alt="" /> Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
+     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><ModularAssetLibrary/><ModularCharacterComposer/><div className="roadmap"><b><img className="studio-library-mark" src={chromapatchBadge} alt="" /> Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">
