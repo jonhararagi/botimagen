@@ -483,6 +483,9 @@ def render_profile_svg(selections: Any, visual_recipe: Any = None) -> str:
     hair_arrangement=values.get("hair_arrangement","suelto")
     heads=_head_count(values)
     maturity=_face_maturity(values)
+    face_shape=values.get("face_shape","equilibrada")
+    if face_shape not in {"suave","equilibrada","afilada","corazon","diamante","mandibula_suave","menton_corto","menton_fino","rostro_alargado","pomulos_definidos"}:
+        face_shape="equilibrada"
     params=CharacterParams(
         skin_tone=skin,hair_color=hair,hair_tip_color=tip,hair_length=hair_length,
         hairstyle=hairstyle,eye_color=eye,
@@ -506,14 +509,14 @@ def render_profile_svg(selections: Any, visual_recipe: Any = None) -> str:
         hip_half_w=skeleton.hip_half_w*hips,arm_half_w=skeleton.arm_half_w*limbs,
         leg_half_w=skeleton.leg_half_w*limbs,arm_x=skeleton.arm_x*shoulder,
         waist_y=skeleton.waist_y+waist_delta,hip_y=skeleton.hip_y+waist_delta*.65,
-        face_maturity=maturity,limb_taper=.62,
+        face_maturity=maturity,limb_taper=.62,face_shape=face_shape,
     )
     svg=render_character(params,skeleton)
     underlays=_underlays(values,recipe,params,skeleton)
     svg=svg.replace("</svg>",_overlays(values,recipe,params,skeleton)+"</svg>")
     attrs=(f'class="parametric-anime-svg" data-renderer="{RENDERER_ID}" data-view="{recipe["view"]}" data-head-count="{heads:.2f}" data-face-maturity="{maturity:.2f}" '
            f'data-hair-color="{hair}" data-skin-color="{skin}" data-eye-color="{eye}" '
-           f'data-face-shape="{values.get("face_shape") in {"suave","equilibrada","afilada","corazon","diamante","mandibula_suave","menton_corto","menton_fino","rostro_alargado","pomulos_definidos"} and values.get("face_shape") or "equilibrada"}" '
+           f'data-face-shape="{face_shape}" '
            f'data-nose-style="{values.get("nose_style") in {"minima","pequena_redondeada","puente_sutil","punta_definida","triangular_suave","sombra_minima","linea_corta","puente_recto","nariz_curva_sutil","perfil_anguloso"} and values.get("nose_style") or "minima"}" '
            f'data-fabric-base="{recipe["garment_base_color"]}" data-fabric-panel="{recipe["garment_panel_color"]}" '
            f'data-fabric-accent="{recipe["garment_accent_color"]}"')
