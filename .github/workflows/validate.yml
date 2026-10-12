@@ -19,6 +19,9 @@ jobs:
       - name: Validate asset manifest
         run: python tests/validate_manifest.py
 
+      - name: Validate local visual asset catalog and provenance
+        run: python tools/assets/validate_visual_asset_catalog.py
+
       - name: Validate character generator
         run: |
           python tests/test_character_generator.py

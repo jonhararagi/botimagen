@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "catalog_id": "botimagen-local-visual-assets-v1",
+  "description": "Biblioteca local inicial del estudio visual. Todos los recursos son archivos versionados; los presets de personaje son datos editables, no ilustraciones rasterizadas.",
+  "assets": [
+    {
+      "id": "background.cyber-grid",
+      "path": "assets/backgrounds/cyber-grid.svg",
+      "kind": "background",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Fondo sci-fi del lienzo principal; vector local offline-first."
+    },
+    {
+      "id": "background.dusk-orbit",
+      "path": "assets/backgrounds/dusk-orbit.svg",
+      "kind": "background",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Fondo espacial cálido alternativo para vistas frontal/posterior."
+    },
+    {
+      "id": "background.aurora-city",
+      "path": "assets/backgrounds/aurora-city.svg",
+      "kind": "background",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Fondo urbano futurista con aurora tenue."
+    },
+    {
+      "id": "ui.studio-badge",
+      "path": "assets/ui/studio-badge.svg",
+      "kind": "ui",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Marca visual local para controles de biblioteca y fondo."
+    },
+    {
+      "id": "ui.chromapatch-star",
+      "path": "assets/ui/chromapatch-star.svg",
+      "kind": "ui",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Icono del módulo CyberStreet/Chromapatch."
+    },
+    {
+      "id": "character.street-sentinel",
+      "path": "assets/characters/street-sentinel.json",
+      "kind": "character-preset",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Preset de datos editable; el motor Python genera la ilustración desde selecciones y receta."
+    },
+    {
+      "id": "character.neon-archivist",
+      "path": "assets/characters/neon-archivist.json",
+      "kind": "character-preset",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/pull/11",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · recurso original creado para este repositorio",
+      "purpose": "Preset de datos editable; no es una ilustración fija ni un PNG de terceros."
+    }
+  ]
+}

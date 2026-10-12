@@ -154,3 +154,8 @@ No decir BETA READY hasta que:
 - copiar personajes existentes;
 - modelo 3D o rigging real;
 - prometer precisión perfecta de cada prompt en cualquier generador.
+
+
+## BIMG-PRODUCT-001-R1 · estudio visual integrado
+
+La biblioteca inicial usa recursos SVG/JSON locales con identificadores estables y procedencia/licencia verificable. El SVG visible de producto procede exclusivamente del motor Python local; el componente React previo queda como fixture QA oculto para conservar pruebas geométricas existentes. El selector de fondos se empaqueta localmente y funciona offline. Los presets JSON están conectados al editor y sus cambios vuelven a renderizarse con el motor Python. La aceptación sigue condicionada a CI del HEAD final, inspección de capturas reales y QA física Windows, que no se simula.

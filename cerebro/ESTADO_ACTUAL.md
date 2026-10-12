@@ -380,3 +380,14 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - Defectos confirmados: proporción chibi, ojos/rostro demasiado infantiles, cola superpuesta sobre el vestuario y patrón brillante como cuadrícula encima del abrigo.
 - Corrección publicada en la rama visual: proporciones adultas, madurez facial 1,0, mapeo visual de flequillo/textura/boca/cejas, colas en capa posterior y patrón más pequeño/tenue.
 - El criterio artístico sigue PARTIAL hasta revisar nuevas capturas. QA Windows/Chrome/Edge sigue NOT_RUN.
+
+
+## BIMG-PRODUCT-001-R1 · biblioteca visual local y fuente única (2026-10-12)
+
+- Preflight ejecutado: rama visual en `83afce5d3a7e27aeb9d09808f0c646b5f1a45cfd`; `main` en `b508cfe7d3216eda801438d46dff8873842cea86`; PR #11 y PR #14 abiertos, sin fusionar. Cambios autorizados únicamente sobre la rama visual de PR #11.
+- Fuente de verdad visible: `POST /api/render/character` y `character_render_engine.py` generan el SVG presentado por `img.server-character-art`. `VisualCharacterRenderer` se conserva oculto y marcado como fixture de QA, no como segunda ilustración de producto.
+- Selector de tres fondos SVG locales originales (Cyber Grid, Dusk Orbit, Aurora City), empaquetados por Vite y persistidos como preferencia de estudio en localStorage. El fondo no modifica IDs de catálogo, receta de personaje ni contrato de perfiles.
+- Biblioteca inicial: `assets/backgrounds/`, `assets/characters/`, `assets/ui/`, `assets/licenses/`, `assets/visual_asset_catalog.json` y `tools/assets/validate_visual_asset_catalog.py`. El validador comprueba IDs únicos, metadatos de origen/licencia/atribución, rutas relativas contenidas, archivos presentes y SHA-256 si se declara.
+- Los recursos visuales incorporados en esta entrega son originales del proyecto en SVG/JSON. No se copian imágenes de terceros sin licencia individual verificada. La licencia MIT del código en `vendor/anime_character_creator/` sigue separada de cualquier licencia de imagen.
+- Pendiente: CI exacta del nuevo HEAD, inspección de capturas Chromium del mismo SHA y QA física Windows/Chrome/Edge. `WINDOWS_MANUAL_QA: NOT_RUN`. No declarar aprobación artística antes de inspeccionar los PNG reales.
+- Beta global conservada en 63%; no se recalcula por documentación ni por contar archivos.

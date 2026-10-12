@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
+import cyberGridBackground from "../../assets/backgrounds/cyber-grid.svg";
+import duskOrbitBackground from "../../assets/backgrounds/dusk-orbit.svg";
+import auroraCityBackground from "../../assets/backgrounds/aurora-city.svg";
+import studioBadge from "../../assets/ui/studio-badge.svg";
+import chromapatchBadge from "../../assets/ui/chromapatch-star.svg";
+import streetSentinelPreset from "../../assets/characters/street-sentinel.json";
+import neonArchivistPreset from "../../assets/characters/neon-archivist.json";
 import { DEFAULT_VISUAL_RECIPE, normalizeVisualRecipe, VisualCharacterRenderer, VisualStyleLab } from "./visual/VisualCharacterRenderer";
 import type { VisualRecipe } from "./visual/VisualCharacterRenderer";
 
@@ -11,6 +18,15 @@ type Field = { id:FieldId; group:Group; label:string; initial:string; fixed:bool
 type GeneratedCharacter = { version:number; style_id:string; style_name:string; profile:Record<string,string>; labels:Record<string,string>; rationale:string; style_direction:string; prompt:string; negative_prompt:string; seed:number|null; coherence:number; surprise:boolean; visual_recipe?:VisualRecipe };
 type SavedProfileSummary = { id:string; name:string; saved_at:string; style_id:string; seed:number|null };
 type SavedProfileRecord = { id:string; name:string; saved_at:string; style_id:string; seed:number|null; profile:{ selections?:Record<string,string>; generated?:GeneratedCharacter; seed?:number|null; coherence?:number; style_id?:string; visual_recipe?:VisualRecipe } };
+
+type StudioBackgroundId = "cyber-grid" | "dusk-orbit" | "aurora-city";
+type CharacterPreset = { id:string; name:string; description:string; seed:number; selections:Record<string,string>; visual_recipe:VisualRecipe };
+const studioBackgrounds: Record<StudioBackgroundId, { label: string; url: string }> = {
+ "cyber-grid": { label: "Cyber Grid · laboratorio", url: cyberGridBackground },
+ "dusk-orbit": { label: "Dusk Orbit · atardecer", url: duskOrbitBackground },
+ "aurora-city": { label: "Aurora City · neón", url: auroraCityBackground },
+};
+const characterPresets: CharacterPreset[] = [streetSentinelPreset as unknown as CharacterPreset, neonArchivistPreset as unknown as CharacterPreset];
 
 const fields:Field[]=[
  {id:"personality",group:"identity",label:"Personalidad",initial:"alegre",fixed:false,note:"Preferencia de carácter que orienta las afinidades del motor."},
@@ -104,6 +120,8 @@ export default function App(){
  const [coherence,setCoherence]=useState(.82);
  const [generated,setGenerated]=useState<GeneratedCharacter|null>(null);
  const [visualRecipe,setVisualRecipe]=useState<VisualRecipe>({...DEFAULT_VISUAL_RECIPE});
+ const [studioBackground,setStudioBackground]=useState<StudioBackgroundId>(()=>{try{const saved=window.localStorage.getItem("botimagen.studioBackground");return saved && saved in studioBackgrounds ? saved as StudioBackgroundId : "cyber-grid"}catch{return "cyber-grid"}});
+ const [selectedCharacterPreset,setSelectedCharacterPreset]=useState("street-sentinel");
  const [renderedSvg,setRenderedSvg]=useState<string|null>(null);
  const [renderState,setRenderState]=useState("Preparando motor anime local…");
  const [status,setStatus]=useState("Conectando con el motor local de BotImagen…");
@@ -115,6 +133,8 @@ export default function App(){
  const [savedProfiles,setSavedProfiles]=useState<SavedProfileSummary[]>([]);
  const [loadingProfiles,setLoadingProfiles]=useState(false);
  const [duplicatingProfile,setDuplicatingProfile]=useState<string|null>(null);
+
+ useEffect(()=>{try{window.localStorage.setItem("botimagen.studioBackground",studioBackground)}catch{/* Private browsing may disable local storage; the selected background still works for this session. */}},[studioBackground]);
 
  useEffect(()=>{
   const controller=new AbortController();
@@ -156,6 +176,15 @@ export default function App(){
  function updateVisualRecipe(next:VisualRecipe){setVisualRecipe(normalizeVisualRecipe(next));setDraftDirty(true);setSaved(false);setStatus("Receta visual editada. Genera el perfil para sincronizar receta y prompt antes de guardar.");}
 
  function setValue(id:FieldId,value:string){setValues(p=>({...p,[id]:value}));setDraftDirty(true);setSaved(false);setStatus("Diseño editado. Pulsa «Generar perfil» para actualizar el resultado oficial.")}
+ function applyCharacterPreset(){
+  const preset=characterPresets.find(item=>item.id===selectedCharacterPreset);
+  if(!preset||!catalog){setStatus("El catálogo local debe estar disponible para aplicar un preset.");return}
+  const nextValues={...values};const nextFixed={...fixed};
+  for(const [id,value] of Object.entries(preset.selections)){
+   if(fields.some(field=>field.id===id)&&catalog.categories[id]?.some(option=>option.id===value)){nextValues[id]=value;nextFixed[id]=true}
+  }
+  setValues(nextValues);setFixed(nextFixed);setVisualRecipe(normalizeVisualRecipe(preset.visual_recipe));setSeed(String(preset.seed));setDraftDirty(true);setSaved(false);setStatus("Preset "+preset.name+" cargado. Genera el perfil para sincronizar prompt y guardado oficial.");
+ }
  function toggleFixed(id:FieldId){const willFix=!fixed[id];setFixed(p=>({...p,[id]:willFix}));setDraftDirty(true);setSaved(false);setStatus(willFix?"Campo fijado manualmente.":"Campo marcado AUTO; el motor elegirá una opción oficial al generar.")}
  async function generateProfile(){
   if(!catalog){setStatus("El catálogo aún no está disponible. Inicia el servicio local y recarga.");return}
@@ -303,16 +332,18 @@ export default function App(){
    <div className="workspace">
     <section className="preview-area">
      <div className="kicker"><span><i>01</i> LIENZO DEL PERSONAJE</span><small>PREVIEW <i/></small></div>
-     <div className="canvas" style={stageVars}>
-      <div className="grid-bg"/><div className="halo halo-a"/><div className="halo halo-b"/>
+     <div className="character-preset-picker"><label htmlFor="character-preset-select"><img src={studioBadge} alt="" /> PRESET DE PERSONAJE</label><select id="character-preset-select" aria-label="Preset de personaje" value={selectedCharacterPreset} onChange={event=>setSelectedCharacterPreset(event.target.value)}>{characterPresets.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><button type="button" className="btn muted" onClick={applyCharacterPreset} disabled={!catalog||generating}>Aplicar preset</button><small>{characterPresets.find(item=>item.id===selectedCharacterPreset)?.description}</small></div>
+     <div className="studio-background-picker"><label htmlFor="studio-background-select"><img src={studioBadge} alt="" /> FONDO DEL ESTUDIO</label><select id="studio-background-select" aria-label="Fondo del estudio" value={studioBackground} onChange={event=>setStudioBackground(event.target.value as StudioBackgroundId)}>{Object.entries(studioBackgrounds).map(([id,item])=><option key={id} value={id}>{item.label}</option>)}</select><small>Recursos SVG locales · funciona sin red</small></div>
+     <div className="canvas" style={stageVars} data-studio-background={studioBackground}>
+      <div className="studio-background" aria-hidden="true" style={{backgroundImage:`url("${studioBackgrounds[studioBackground].url}")`}}/><div className="grid-bg"/><div className="halo halo-a"/><div className="halo halo-b"/>
       <div className="canvas-labels"><span>BW / DESIGN STUDY</span><span>#{(Number.parseInt(seed,10)||314159).toString().padStart(6,"0").slice(-6)}</span></div><div className="watermark">CHARACTER<br/>PROTOTYPE</div>
-      <VisualCharacterRenderer values={values} recipe={visualRecipe}/>
-      {renderedSvg&&<img className="server-character-art" data-renderer="parametric-anime-svg-v1" alt="Personaje dibujado por el motor anime local" src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderedSvg)}`}/>}
+      <div className="legacy-renderer-fixture" aria-hidden="true" data-renderer-role="qa-fixture-not-product-preview"><VisualCharacterRenderer values={values} recipe={visualRecipe}/></div>
+      {renderedSvg&&<img className="server-character-art" data-renderer="parametric-anime-svg-v1" alt={`Personaje generado por el motor Python local, vista ${visualRecipe.view === "back" ? "trasera" : "frontal"}`} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderedSvg)}`}/>}
       <div className="side-mark left"><span>01</span>IDENTITY</div><div className="side-mark right"><span>02</span>SILHOUETTE</div>
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>{renderState}</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><div className="roadmap"><b>✦ Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
+     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><div className="roadmap"><b><img className="studio-library-mark" src={chromapatchBadge} alt="" /> Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">

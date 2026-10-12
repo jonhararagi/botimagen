@@ -1125,6 +1125,40 @@ try {
   };
   await writeFile(resolve(visualQaDir, "visual-slice-manifest.json"), JSON.stringify(sliceManifest, null, 2));
 
+  // Product-facing screenshots use only the Python SVG rendered in the main canvas.
+  await page.getByLabel("Preset de personaje").selectOption("street-sentinel");
+  await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
+  await page.getByLabel("Fondo del estudio").selectOption("cyber-grid");
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector("img.server-character-art")?.getAttribute("alt")?.includes("frontal"));
+  await page.screenshot({ path: resolve(visualQaDir, "product-studio-front-cyber-grid.png"), fullPage: true });
+  await page.getByRole("button", { name: "Trasera", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector("img.server-character-art")?.getAttribute("alt")?.includes("trasera"));
+  await page.getByLabel("Fondo del estudio").selectOption("dusk-orbit");
+  await page.screenshot({ path: resolve(visualQaDir, "product-studio-back-dusk-orbit.png"), fullPage: true });
+  const previousPresetSvg = await page.locator("img.server-character-art").getAttribute("src");
+  await page.getByLabel("Preset de personaje").selectOption("neon-archivist");
+  await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
+  await page.getByLabel("Fondo del estudio").selectOption("aurora-city");
+  await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousPresetSvg);
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector("img.server-character-art")?.getAttribute("alt")?.includes("frontal"));
+  await page.screenshot({ path: resolve(visualQaDir, "product-studio-neon-archivist-front.png"), fullPage: true });
+  const productStudioManifest = {
+    source: "Live BotImagen React app with POST /api/render/character SVG as the only visible character renderer",
+    renderer: "parametric-anime-svg-v1",
+    presets: ["street-sentinel", "neon-archivist"],
+    backgrounds: ["cyber-grid", "dusk-orbit", "aurora-city"],
+    captures: ["product-studio-front-cyber-grid.png", "product-studio-back-dusk-orbit.png", "product-studio-neon-archivist-front.png"],
+    legacyRenderer: "Hidden QA fixture only; not part of the visible product preview",
+    physicalWindowsQA: "NOT_RUN",
+  };
+  await writeFile(resolve(visualQaDir, "product-studio-manifest.json"), JSON.stringify(productStudioManifest, null, 2));
+  assert.equal(await page.locator(".canvas").getAttribute("data-studio-background"), "aurora-city", "The local background picker must update the actual studio canvas");
+  assert.ok(await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage.includes("aurora-city")), "The selected background must resolve to a bundled local SVG asset");
+  assert.equal(await page.locator(".legacy-renderer-fixture").evaluate(el => getComputedStyle(el).visibility), "hidden", "The legacy React renderer must be a hidden QA fixture, not a second visible character");
+  assert.equal(await page.locator("img.server-character-art").getAttribute("data-renderer"), "parametric-anime-svg-v1", "The visible product character must come from the local Python renderer");
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });

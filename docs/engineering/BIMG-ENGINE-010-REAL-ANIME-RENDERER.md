@@ -35,3 +35,12 @@ La geometría adicional de orejas, cuernos, colas, marcas y detalles CyberStreet
 La primera captura real de Chromium reveló que la integración seguía demasiado chibi. Esta corrección aborda defectos observados, no solo la compilación: sube la proporción corporal objetivo a 6,0–7,15 cabezas, eleva la madurez facial de base a 1,0, reduce ojos/iris, conecta flequillo/textura/boca/cejas a las opciones seleccionadas, coloca colas/coletas en el fondo de SVG y limita el patrón CyberStreet a un panel central tenue.
 
 La aceptación artística continúa en PARTIAL hasta inspeccionar las nuevas capturas. CI verde no significa diseño aprobado.
+
+
+## BIMG-PRODUCT-001-R1 · biblioteca local y renderer visible único
+
+La vista previa de producto tiene una única fuente visible: el SVG validado que devuelve `POST /api/render/character`. El antiguo `VisualCharacterRenderer` permanece como fixture QA oculto para los tests geométricos, sin dibujar un segundo personaje. El lienzo permite elegir entre tres fondos SVG locales empaquetados por Vite; la preferencia se conserva localmente. Dos presets JSON se cargan desde recursos locales, aplican selecciones verificadas contra el catálogo y la receta CyberStreet, y se representan mediante el motor Python.
+
+La biblioteca inicial añade tres fondos originales, dos emblemas UI y dos presets JSON, todos con ID estable, ruta local, autor/procedencia, URL de origen, licencia, atribución y finalidad. Un validador comprueba que cada ruta exista dentro del repositorio. Los recursos son originales del proyecto; no se incorporan imágenes de terceros sin licencia individual verificada. La licencia MIT del código de `vendor/anime_character_creator/` sigue siendo independiente.
+
+**Aceptación pendiente:** CI del SHA final, inspección de los artefactos Chromium de ese mismo SHA y revisión artística humana. `WINDOWS_MANUAL_QA: NOT_RUN` hasta ejecutar Chrome/Edge físicamente en Windows. No se eleva el progreso beta por el mero recuento de archivos.
