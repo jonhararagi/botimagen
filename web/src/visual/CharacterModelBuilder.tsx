@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent } from "react";
 
 type LibraryAsset = {
   id:string; label:string; category:string; kind:string; filename:string; source_filename?:string;
@@ -132,7 +131,7 @@ export function CharacterModelBuilder() {
     return ()=>{cancelled=true;};
   },[model?.id,model?.revision,editingLayerId]);
   useEffect(()=>{if(polygonPoints.length)drawMaskPreview();},[polygonPoints]);
-  const canvasPoint=(event:ReactPointerEvent<HTMLCanvasElement>)=>{
+  const canvasPoint=(event:{clientX:number;clientY:number;currentTarget:HTMLCanvasElement})=>{
     const rect=event.currentTarget.getBoundingClientRect();
     return {x:Math.max(0,Math.min(511,(event.clientX-rect.left)*512/rect.width)),y:Math.max(0,Math.min(767,(event.clientY-rect.top)*768/rect.height))};
   };
