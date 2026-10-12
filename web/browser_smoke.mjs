@@ -1702,6 +1702,7 @@ try {
     await image.decode(); return [image.naturalWidth, image.naturalHeight];
   });
   assert.deepEqual(sourceUnderMask, [512, 768], "The editable mask must be displayed over the actual source image");
+  await maskEditor.scrollIntoViewIfNeeded();
   const maskBox = await maskCanvas.boundingBox();
   assert.ok(maskBox, "The mask editor must show the source image with a real canvas overlay");
   await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
