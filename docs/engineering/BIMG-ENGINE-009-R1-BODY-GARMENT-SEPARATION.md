@@ -12,7 +12,7 @@
 
 Se añadió una fuente geométrica explícita para torso, pelvis, piernas y pies que no depende de IDs de vestuario ni de los controles de largo de torso y ajuste de cintura. El renderer dibuja esa base como una capa semántica `body-base`; la composición de prendas preexistente continúa por encima de la base. Cuello, brazos y manos se calculan con landmarks fijados para la vista corporal, en vez de reutilizar el ajuste variable de la prenda.
 
-El resultado es **PARTIAL**, no PASS: la separación estructural está implementada, pero la geometría base es deliberadamente mínima y requiere inspección de las capturas y revisión artística antes de considerar fiable una referencia anatómica para calibración. No se ajustaron deliberadamente las proporciones de producción ni los valores de `bodyLandmarks.ts`.
+El resultado es **PARTIAL**, no PASS: la separación estructural está implementada y las capturas de frente/espalda fueron inspeccionadas. La geometría base es deliberadamente mínima y esquemática; el contorno de hombros/torso es angular y requiere revisión artística antes de considerar fiable una referencia para calibración. No se ajustaron deliberadamente las proporciones de producción ni los valores de `bodyLandmarks.ts`.
 
 ## Diseño y procedencia
 
