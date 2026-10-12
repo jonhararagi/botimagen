@@ -99,4 +99,4 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - La aceptación requiere CI del SHA final y pruebas del módulo/API. La prueba física en Windows continúa separada.
 
 
-- Seguimiento BIMG-ANALYSIS-001: CI #358 detectó una expectativa incorrecta en el fixture sintético de bordes; el contador ponderado de beta permanece **63%**. La corrección del fixture debe pasar la siguiente CI antes de aceptar la prueba de concepto.
+- Seguimiento BIMG-ANALYSIS-001: CI #358 detectó una expectativa incorrecta en el fixture sintético de bordes; se corrigió el fixture y el ejemplo contractual. CI #360 PASS_REAL en SHA `ebcaea3ab662f80d5390c4c47c6331a2bf64a8ff` ejecutó análisis, generador, API, build web y smoke Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38207939186. El contador ponderado de beta permanece **63%**.

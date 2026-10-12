@@ -305,4 +305,4 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - Progreso ponderado de la beta local: sin cambio; esta línea opcional posterior no añade puntos al denominador.
 
 
-- Seguimiento CI: la ejecución inicial #358 encontró que el fixture RGBA de prueba tocaba el borde inferior aunque la aserción esperaba que no. Se corrigieron las dimensiones esperadas del fixture y el ejemplo contractual a 4×4; no era un fallo de cálculo del analizador. Se requiere verificar el nuevo SHA en CI.
+- Seguimiento CI: la ejecución inicial #358 encontró que el fixture RGBA de prueba tocaba el borde inferior aunque la aserción esperaba que no. Se corrigieron las dimensiones esperadas del fixture y el ejemplo contractual a 4×4; no era un fallo de cálculo del analizador. CI #360 terminó PASS_REAL para SHA `ebcaea3ab662f80d5390c4c47c6331a2bf64a8ff`, incluyendo generador, API, módulo de análisis, build web y smoke Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38207939186.
