@@ -6,6 +6,7 @@ import json
 import re
 import struct
 import uuid
+import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -30,12 +31,40 @@ class AssetImportError(ValueError):
 def _image_dimensions(data: bytes, mime: str) -> tuple[int, int]:
     """Read dimensions from a recognized image header without trusting the filename."""
     if mime == "image/png":
-        if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
+        if len(data) < 45 or data[:8] != b"\x89PNG\r\n\x1a\n":
             raise AssetImportError("El contenido no es un PNG válido.")
-        return struct.unpack(">II", data[16:24])
+        offset, seen_header, seen_data, seen_end = 8, False, False, False
+        width = height = 0
+        while offset + 12 <= len(data):
+            length = int.from_bytes(data[offset:offset + 4], "big")
+            chunk_type = data[offset + 4:offset + 8]
+            end = offset + 12 + length
+            if end > len(data):
+                raise AssetImportError("El PNG está truncado.")
+            chunk_data = data[offset + 8:offset + 8 + length]
+            expected_crc = int.from_bytes(data[offset + 8 + length:end], "big")
+            actual_crc = zlib.crc32(chunk_type + chunk_data) & 0xFFFFFFFF
+            if expected_crc != actual_crc:
+                raise AssetImportError("El PNG contiene un CRC inválido.")
+            if not seen_header:
+                if chunk_type != b"IHDR" or length != 13:
+                    raise AssetImportError("Cabecera PNG inválida.")
+                width, height = struct.unpack(">II", chunk_data[:8])
+                seen_header = True
+            if chunk_type == b"IDAT":
+                seen_data = True
+            if chunk_type == b"IEND":
+                if length != 0 or end != len(data):
+                    raise AssetImportError("Final PNG inválido o datos sobrantes.")
+                seen_end = True
+                break
+            offset = end
+        if not (seen_header and seen_data and seen_end):
+            raise AssetImportError("El PNG está incompleto.")
+        return width, height
     if mime == "image/webp":
-        if len(data) < 30 or data[:4] != b"RIFF" or data[8:12] != b"WEBP":
-            raise AssetImportError("El contenido no es un WebP válido.")
+        if len(data) < 30 or data[:4] != b"RIFF" or data[8:12] != b"WEBP" or int.from_bytes(data[4:8], "little") + 8 != len(data):
+            raise AssetImportError("El contenido WebP es inválido o está truncado.")
         chunk = data[12:16]
         if chunk == b"VP8X":
             width = 1 + int.from_bytes(data[24:27], "little")
@@ -48,8 +77,8 @@ def _image_dimensions(data: bytes, mime: str) -> tuple[int, int]:
             return 1 + (((b2 & 0x3F) << 8) | b1), 1 + (((b4 & 0x0F) << 10) | (b3 << 2) | ((b2 & 0xC0) >> 6))
         raise AssetImportError("Cabecera WebP no compatible o incompleta.")
     if mime == "image/jpeg":
-        if len(data) < 4 or data[:2] != b"\xff\xd8":
-            raise AssetImportError("El contenido no es un JPEG válido.")
+        if len(data) < 6 or data[:2] != b"\xff\xd8" or not data.endswith(b"\xff\xd9"):
+            raise AssetImportError("El contenido JPEG es inválido o está truncado.")
         i = 2
         sof = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
         while i + 4 <= len(data):
@@ -142,16 +171,16 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
         raise AssetImportError("Hay campos de importación no reconocidos.")
     filename = _safe_display_name(payload.get("filename"))
     mime = payload.get("mime_type")
-    if mime not in SUPPORTED_MIME:
+    if not isinstance(mime, str) or mime not in SUPPORTED_MIME:
         raise AssetImportError("Formato MIME no admitido. Usa PNG, JPEG o WebP.")
     category = payload.get("category", "reference")
-    if category not in CATEGORIES:
+    if not isinstance(category, str) or category not in CATEGORIES:
         raise AssetImportError("Categoría de asset no admitida.")
     label = payload.get("label", Path(filename).stem)
     if not isinstance(label, str) or not label.strip() or len(label.strip()) > 100:
         raise AssetImportError("La etiqueta debe tener entre 1 y 100 caracteres.")
     view = payload.get("view", "unknown")
-    if view not in {"front", "back", "side", "unknown"}:
+    if not isinstance(view, str) or view not in {"front", "back", "side", "unknown"}:
         raise AssetImportError("Vista no admitida.")
     encoded = payload.get("data_base64")
     if not isinstance(encoded, str) or len(encoded) > ((MAX_IMAGE_BYTES + 2) // 3) * 4 + 8:
@@ -175,7 +204,7 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
     if source_url and not source_url.startswith(("https://", "http://")):
         raise AssetImportError("source_url debe ser una URL HTTP(S) o estar vacío.")
     kind = payload.get("kind", "reference")
-    if kind not in {"modular_piece", "full_character", "reference", "portrait"}:
+    if not isinstance(kind, str) or kind not in {"modular_piece", "full_character", "reference", "portrait"}:
         raise AssetImportError("Tipo de recurso no válido.")
     root = Path(library_root) if library_root else DEFAULT_LIBRARY_ROOT
     root.mkdir(parents=True, exist_ok=True)
