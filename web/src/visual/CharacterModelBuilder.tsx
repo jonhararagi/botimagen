@@ -60,6 +60,7 @@ export function CharacterModelBuilder() {
   const [brushSize,setBrushSize]=useState(18);
   const [polygonPoints,setPolygonPoints]=useState<Array<{x:number;y:number}>>([]);
   const [maskDirty,setMaskDirty]=useState(false);
+  const [maskReady,setMaskReady]=useState(false);
   const previewCanvasRef=useRef<HTMLCanvasElement|null>(null);
   const maskCanvasRef=useRef<HTMLCanvasElement|null>(null);
   const sourceImageRef=useRef<HTMLImageElement|null>(null);
@@ -111,6 +112,7 @@ export function CharacterModelBuilder() {
   useEffect(()=>{
     if(!model||!editingLayerId)return;
     let cancelled=false;
+    setMaskReady(false);
     const source=new Image(),layer=new Image();
     source.onload=()=>{if(cancelled)return;sourceImageRef.current=source;};
     layer.onload=()=>{
@@ -122,7 +124,7 @@ export function CharacterModelBuilder() {
       tempCtx.drawImage(layer,0,0,512,768);
       const rgba=tempCtx.getImageData(0,0,512,768),mask=maskCtx.createImageData(512,768);
       for(let i=0;i<rgba.data.length;i+=4){const value=rgba.data[i+3];mask.data[i]=value;mask.data[i+1]=value;mask.data[i+2]=value;mask.data[i+3]=255;}
-      maskCtx.putImageData(mask,0,0);maskHistoryRef.current=[];setMaskDirty(false);setPolygonPoints([]);
+      maskCtx.putImageData(mask,0,0);maskHistoryRef.current=[];setMaskDirty(false);setPolygonPoints([]);setMaskReady(true);
       if(source.complete&&source.naturalWidth)drawMaskPreview();
       else source.onload=()=>{if(!cancelled){sourceImageRef.current=source;drawMaskPreview();}};
     };
@@ -413,7 +415,7 @@ export function CharacterModelBuilder() {
             <div className="model-builder-form-row"><label>Herramienta<select value={maskTool} onChange={event=>setMaskTool(event.target.value as typeof maskTool)}><option value="add">Pincel: sumar</option><option value="erase">Pincel: borrar</option><option value="polygon-add">Polígono: sumar</option><option value="polygon-erase">Polígono: borrar</option></select></label>
               <label>Tamaño del pincel<input type="range" min="2" max="72" value={brushSize} onChange={event=>setBrushSize(Number(event.target.value))}/></label></div>
             <div style={{position:"relative",width:"min(100%, 320px)",margin:"0 auto",background:"#151522",borderRadius:"8px",overflow:"hidden"}}>
-              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" style={{display:"block",width:"100%",height:"auto",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} />
+              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" data-mask-ready={maskReady?"true":"false"} style={{display:"block",width:"100%",height:"auto",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} />
               <canvas ref={maskCanvasRef} width={512} height={768} aria-hidden="true" style={{position:"absolute",left:"-10000px",top:0,pointerEvents:"none"}} />
             </div>
             {maskTool.startsWith("polygon")&&<p>{polygonPoints.length} puntos marcados. Haz clic en la imagen para añadir vértices.</p>}
@@ -423,7 +425,7 @@ export function CharacterModelBuilder() {
               <button type="button" className="model-builder-secondary" disabled={busy||!polygonPoints.length} onClick={()=>setPolygonPoints([])}>Cancelar polígono</button>
             </div>
             <div className="model-builder-action-row">
-              <button type="button" className="model-builder-primary" disabled={busy||!maskDirty} onClick={saveMask}>Guardar máscara corregida</button>
+              <button type="button" className="model-builder-primary" disabled={busy||!maskDirty||!maskReady} onClick={saveMask}>Guardar máscara corregida</button>
               <button type="button" className="model-builder-secondary" disabled={busy} onClick={resetMask}>Restaurar máscara original</button>
               <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>setEditingLayerId("")}>Cerrar editor</button>
             </div>
