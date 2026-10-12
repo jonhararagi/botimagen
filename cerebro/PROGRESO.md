@@ -124,4 +124,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 - Biblioteca inicial versionada con recursos locales originales, catálogo y validador de procedencia/licencias/rutas.
 - El estudio permite cargar dos presets editables y cambiar entre tres fondos locales sin red; la única ilustración visible del personaje procede del motor Python. El renderer React histórico queda como fixture oculto de QA.
-- El progreso global permanece en **63%** hasta revisar CI del SHA final y las capturas de ese mismo SHA. QA física Windows continúa `NOT_RUN`.
+- CI #377 pasó en `fee1524ae241857d8b51bb319f954a21956c8795`: validación Python, catálogo/procedencia, contrato del motor, build React/TypeScript y smoke Chromium E2E. Evidencia: https://github.com/jonhararagi/botimagen/actions/runs/38248187422.
+- Artefacto Chromium del mismo SHA: [botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38248187422/artifacts/11746755371). Contiene capturas del estudio frontal/posterior y presets; no se pudo descargar desde la sesión actual para inspección visual humana, así que la aceptación artística permanece `PARTIAL`.
+- La biblioteca local inicial y el selector de fondos ya están conectados al editor; la biblioteca de referencias indexada, el intake completo y la QA física siguen pendientes. El progreso global permanece en **63%** para no inflarlo por documentación/recursos solamente. `WINDOWS_MANUAL_QA: NOT_RUN`.
