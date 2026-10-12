@@ -656,63 +656,18 @@ try {
     path: resolve(visualQaDir, name + ".png"),
   });
 
-  // BIMG-ENGINE-008: temporary neutral-body inspection fixture.
-  // This stylesheet is test-only and is removed before normal garment QA continues.
-  // The torso/lower-body surfaces are recolored as skin to expose their current path geometry;
-  // this is not a production anatomy asset or an artistic approval.
+  // BIMG-ENGINE-009: inspect independent body geometry with clothing and cosmetics hidden.
   const neutralStyleId = "bimg-neutral-body-qa-only";
   await page.getByRole("button", { name: "Frontal", exact: true }).click();
   await page.evaluate(styleId => {
     const style = document.createElement("style");
     style.id = styleId;
-    style.textContent = `
-      .visual-character-svg [data-layer-id="ground-shadow"],
-      .visual-character-svg [data-layer-id="hair-back"],
-      .visual-character-svg .character-hands,
-      .visual-character-svg .garment-sleeves,
-      .visual-character-svg [data-layer-id="base-sleeves"],
-      .visual-character-svg .garment-torso-panels,
-      .visual-character-svg [fill^="url(#cw-pattern-"],
-      .visual-character-svg [fill^="url(#cw-gloss-"],
-      .visual-character-svg [data-layer-id="outfit"],
-      .visual-character-svg [data-layer-id="outer-layer"],
-      .visual-character-svg [data-layer-id="footwear"],
-      .visual-character-svg [data-layer-id="chromapatch"],
-      .visual-character-svg > path:not([data-layer-id]),
-      .visual-character-svg > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"]) {
-        display: none !important;
-      }
-      .visual-character-svg .garment-torso-main,
-      .visual-character-svg .character-lower-body,
-      .visual-character-svg .character-leg-silhouette {
-        fill: var(--skin) !important;
-        stroke: #382b36 !important;
-        stroke-width: 1.5 !important;
-      }
-    `;
+    style.textContent = `.visual-character-svg [data-layer-id="ground-shadow"], .visual-character-svg [data-layer-id="hair-back"], .visual-character-svg .garment-sleeves, .visual-character-svg [data-layer-id="base-sleeves"], .visual-character-svg .garment-torso-main, .visual-character-svg .garment-torso-panels, .visual-character-svg [data-layer-id="lower-body"], .visual-character-svg [data-layer-id="footwear"], .visual-character-svg [data-layer-id="outfit"], .visual-character-svg [data-layer-id="outer-layer"], .visual-character-svg [data-layer-id="surface-details"], .visual-character-svg [data-layer-id="chromapatch"], .visual-character-svg > path:not([data-layer-id]), .visual-character-svg > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"]) { display:none !important; }`;
     document.head.appendChild(style);
-    // Apply the same hiding directly to the rendered SVG as a guard against selector/style-order differences.
     const svg = document.querySelector(".visual-character-svg");
     if (!svg) throw new Error("Neutral QA fixture could not find the rendered SVG");
-    const hiddenSelectors = [
-      '[data-layer-id="ground-shadow"]', '[data-layer-id="hair-back"]',
-      ".character-hands", ".garment-sleeves", '[data-layer-id="base-sleeves"]',
-      ".garment-torso-panels", '[fill^="url(#cw-pattern-"]', '[fill^="url(#cw-gloss-"]',
-      '[data-layer-id="outfit"]', '[data-layer-id="outer-layer"]',
-      '[data-layer-id="footwear"]', '[data-layer-id="chromapatch"]',
-      ':scope > path:not([data-layer-id])',
-      ':scope > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"])',
-    ];
-    for (const selector of hiddenSelectors) {
-      for (const element of svg.querySelectorAll(selector)) element.style.setProperty("display", "none", "important");
-    }
-    for (const selector of [".garment-torso-main", ".character-lower-body", ".character-leg-silhouette"]) {
-      const element = svg.querySelector(selector);
-      if (element) {
-        element.style.setProperty("fill", "var(--skin)", "important");
-        element.style.setProperty("stroke", "#382b36", "important");
-        element.style.setProperty("stroke-width", "1.5", "important");
-      }
+    for (const selector of ['[data-layer-id="ground-shadow"]','[data-layer-id="hair-back"]',".garment-sleeves",'[data-layer-id="base-sleeves"]',".garment-torso-main",".garment-torso-panels",'[data-layer-id="lower-body"]','[data-layer-id="footwear"]','[data-layer-id="outfit"]','[data-layer-id="outer-layer"]','[data-layer-id="surface-details"]','[data-layer-id="chromapatch"]',':scope > path:not([data-layer-id])',':scope > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"])']) {
+      for (const el of svg.querySelectorAll(selector)) el.style.setProperty("display","none","important");
     }
   }, neutralStyleId);
   const neutralBounds = async () => page.locator(".visual-character-svg").evaluate(svg => {
@@ -726,25 +681,26 @@ try {
       head: box('ellipse[fill^="url(#cw-skin-"]'),
       neck: box('[data-layer-id="neck"]'),
       arms: box(".character-arm-skin"),
-      torso: box(".garment-torso-main"),
-      pelvis: box(".character-lower-body"),
-      legs: box(".character-leg-silhouette"),
+      torso: box('[data-layer-id="body-base"] [data-body-region="torso"]'),
+      pelvis: box('[data-layer-id="body-base"] [data-body-region="pelvis"]'),
+      legs: box('[data-layer-id="body-base"] [data-body-region="legs"]'),
+      feet: box('[data-layer-id="body-base"] [data-body-region="feet"]'),
     };
   });
   const neutralManifest = {
-    schemaVersion: 2,
-    status: "PARTIAL_NOT_A_NEUTRAL_ANATOMY_REFERENCE",
+    schemaVersion: 3,
+    status: "BODY_BASE_GEOMETRY_PRESENT_ART_REVIEW_REQUIRED",
     source: "VisualCharacterRenderer component rendered by Chromium against the live Vite app; QA-only CSS applied to the actual SVG DOM",
     viewBox: "0 0 340 490",
     viewport: { width: 340, height: 490, units: "SVG user units; screenshot raster is generated by Playwright" },
     captures: [],
     measurements: {},
-    measurementMethod: "SVGGeometryElement.getBBox() on existing rendered paths; bounds normalized to the union of measured path boxes. These are path bounds, not anatomical contour measurements.",
+    measurementMethod: "SVGGeometryElement.getBBox() on explicitly tagged body-base and skin paths; raw SVG bounds retained and normalized to union height. Boxes describe path extents, not clinical anatomical measurements.",
     limitations: [
       "The fixture hides hair, face details, garment details, outer layers, accessories, footwear and ground shadow only during capture.",
-      "The visible torso path is garment-torso-main and the pelvis/leg paths are clothing-style geometry. Recoloring them as skin changes paint only, not geometry or semantic meaning.",
+      "Torso, pelvis, legs and feet use getBodyBaseGeometry(view), independent of garment selection and fit sliders.",
       "Therefore torso, chest, waist, pelvis, leg length, knee, ankle, foot and joint-continuity values are proxies or unavailable, not observed neutral anatomy.",
-      "The renderer has no independent, continuous neutral-body surface for both views. These captures cannot authorize anatomical edits.",
+      "The independent body base is a geometric foundation but requires human art review before proportion calibration.",
       "No production renderer geometry, public API, catalog, recipe or bodyLandmarks.ts values are changed by the fixture."
     ]
   };
@@ -752,7 +708,7 @@ try {
     await page.getByRole("button", { name: view === "front" ? "Frontal" : "Trasera", exact: true }).click();
     const svg = page.locator(".visual-character-svg");
     const bounds = await neutralBounds();
-    for (const part of ["head", "neck", "arms", "torso", "pelvis", "legs"]) {
+    for (const part of ["head", "neck", "arms", "torso", "pelvis", "legs", "feet"]) {
       assert.ok(bounds[part] && bounds[part].width > 0 && bounds[part].height > 0,
         "Reference fixture must expose a source-rendered " + part + " path in " + view + " view");
     }
@@ -764,13 +720,14 @@ try {
       );
       return {
         hair: hidden('[data-layer-id="hair-back"]'),
-        outfit: hidden('[data-layer-id="outfit"]'),
+        outfit: hidden('[data-layer-id="outfit"]') && hidden(".garment-torso-main") && hidden('[data-layer-id="lower-body"]'),
         outerLayer: hidden('[data-layer-id="outer-layer"]'),
         footwear: hidden('[data-layer-id="footwear"]'),
-        chromapatch: hidden('[data-layer-id="chromapatch"]')
+        chromapatch: hidden('[data-layer-id="chromapatch"]'),
+        bodyBaseVisible: Array.from(node.querySelectorAll('[data-layer-id="body-base"] [data-body-region]')).length === 4 && Array.from(node.querySelectorAll('[data-layer-id="body-base"] [data-body-region]')).every(el => getComputedStyle(el).display !== "none")
       };
     });
-    assert.deepEqual(hiddenLayerAudit, { hair: true, outfit: true, outerLayer: true, footwear: true, chromapatch: true },
+    assert.deepEqual(hiddenLayerAudit, { hair: true, outfit: true, outerLayer: true, footwear: true, chromapatch: true, bodyBaseVisible: true },
       "Cosmetic SVG layers must be explicitly hidden in the reference capture");
     const allBoxes = Object.values(bounds).filter(Boolean);
     const top = Math.min(...allBoxes.map(box => box.y));
@@ -784,8 +741,8 @@ try {
         width_over_union_height: Number((box.width / totalHeight).toFixed(5)),
         y_from_union_top_over_height: Number(((box.y - top) / totalHeight).toFixed(5)),
         height_over_union_height: Number((box.height / totalHeight).toFixed(5)),
-        semanticStatus: ["head", "neck", "arms"].includes(part) ? "source_path_bbox_proxy" : "garment_path_proxy_not_anatomy",
-        confidence: ["head", "neck", "arms"].includes(part) ? "low_to_medium_for_path_extent_only" : "not_valid_for_anatomical_measurement"
+        semanticStatus: ["torso", "pelvis", "legs", "feet"].includes(part) ? "independent_body_base_path_bbox" : "source_path_bbox_proxy",
+        confidence: ["torso", "pelvis", "legs", "feet"].includes(part) ? "geometry_extent_only_requires_art_review" : "low_to_medium_for_path_extent_only"
       } : null
     ]));
     const name = "neutral-body-" + view;
@@ -798,6 +755,7 @@ try {
       layerAudit: hiddenLayerAudit
     };
   }
+  await writeFile(resolve(visualQaDir, "neutral-body-manifest.json"), JSON.stringify(neutralManifest, null, 2));
   await page.evaluate(styleId => document.getElementById(styleId)?.remove(), neutralStyleId);
   await page.getByRole("button", { name: "Frontal", exact: true }).click();
   const setVisualRange = async (label, value) => {
