@@ -301,7 +301,7 @@ export default function App(){
     });
     const result=await jsonResponse<{svg:string;renderer:string;view:string}>(response);
     const requestedView=normalizeVisualRecipe(visualRecipe).view;
-    const svgViewMatch=typeof result.svg==="string"?result.svg.match(/\\bdata-view="(front|back)"/):null;
+    const svgViewMatch=typeof result.svg==="string"?result.svg.match(/\bdata-view="(front|back)"/):null;
     if(typeof result.svg!=="string"||!result.svg.startsWith('<svg class="parametric-anime-svg"')||result.svg.length>262144){
      throw new Error("El motor devolvió una salida SVG incompatible.");
     }
