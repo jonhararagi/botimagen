@@ -874,19 +874,23 @@ def _save_layer_category(
     model_id: str,
     layer_id: str,
     label: str,
-    category: str,
+    category: str | None,
     models_root: Path | None = None,
 ) -> dict[str, Any]:
-    """Not used by the public API yet; kept internal for schema stability."""
     model = read_character_model(model_id, models_root)
-    if category not in ALLOWED_CATEGORIES or not isinstance(label, str) or not label.strip():
-        raise CharacterModelError("La etiqueta o categoría de la región no es válida.")
+    if category not in ALLOWED_CATEGORIES and category is not None:
+        raise CharacterModelError("La categoría de la región no es válida.")
+    if not isinstance(label, str) or not label.strip() or len(label.strip()) > 100:
+        raise CharacterModelError("La etiqueta de la región debe tener entre 1 y 100 caracteres.")
+    if not LAYER_ID_RE.fullmatch(layer_id):
+        raise CharacterModelError("La región no existe.")
     layer = next((item for item in model["layers"] if item.get("id") == layer_id), None)
     if layer is None:
         raise CharacterModelError("La región no existe.")
-    layer["label"] = label.strip()[:100]
+    layer["label"] = label.strip()
     layer["semantic_category"] = category
-    model["revision"] += 1
+    layer["role"] = category if category else "candidate_region"
+    model["revision"] = int(model.get("revision", 1)) + 1
     model["updated_at"] = _now()
     folder = _safe_model_folder(model_id, Path(models_root) if models_root else DEFAULT_MODELS_ROOT)
     temp = folder / "model.json.tmp"
