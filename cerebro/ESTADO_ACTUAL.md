@@ -489,7 +489,7 @@ El usuario está cansado de recibir únicamente documentos y planes. Cada tarea 
 Cada prompt de BotImagen incluye estimación del tiempo restante en horas/días. Para integrar y validar el paquete actual: estimación provisional de 6–12 horas activas; tiempo medido `NOT_MEASURED`. No presentar esa cifra como tiempo de finalización de todo BotImagen.
 Estado actual: `IN_PROGRESS / NOT_VALIDATED_IN_EDITOR`.
 CI del HEAD `210f9530ba305a034564217d44ab2d241ee1a693`: no hay checks confirmados en la consulta actual.
-QA visual del paquete en el compositor real: `NOT_RUN`.
+QA visual humana del paquete en el compositor real: `NOT_RUN`.
 QA Windows: `NOT_RUN`.
 
 
@@ -500,6 +500,19 @@ QA Windows: `NOT_RUN`.
 - `web/src/visual/ModularCharacterComposer.tsx` ahora consume ese endpoint, renderiza las cuatro piezas SVG reales, conecta guardar/restaurar con `/api/profiles` y rasteriza la composición actual a PNG transparente 512×768 mediante Canvas del navegador.
 - Se añadió `tests/test_cyberstreet_svg_compositor.py` y la validación de sintaxis correspondiente en CI.
 - Commits de implementación publicados en la rama de trabajo: `43d85cb5767800d5ddb043347b10717211b8ef4c`, `1590adb4c628bac2ed76cb0a2647fb327e624263`, `7ae0eda3756ba3dce05f2153141e04dc2f84c2fb`, `41fac9c30dd6003810f92673301ec589ebefcf5f`, `cd9084893f2bef0501b1f640f278c72e60b9bb08`.
-- Estado de pruebas al registrar esta ficha: CI #442 está en ejecución; sus resultados aún no se consideran aprobados. No se ha ejecutado QA visual manual ni QA física de Windows en esta sesión.
+- Estado de pruebas al registrar esta ficha: CI #442 estaba en ejecución; los fallos detectados y sus correcciones se registran en la verificación final siguiente. No se ha ejecutado QA física de Windows.
 - Limitación conocida: los anclajes originales siguen siendo preliminares. La integración compone las piezas en el lienzo compartido y no declara corregida/validada su anatomía artística. La exportación PNG depende del soporte SVG/Canvas del navegador.
 - TIMER: estimación provisional de 6–12 horas activas para el tramo; tiempo real medido `NOT_MEASURED`.
+
+
+### BIMG-MODULAR-INTEGRATION-REAL-003 · verificación final de la integración
+
+- **HEAD de código verificado:** `3bdc96513f52467dd80ba2a8aeee4bc9e01c7781`.
+- **CI exacta del HEAD:** [Validate BotImagen #457 · SUCCESS](https://github.com/jonhararagi/botimagen/actions/runs/38279676595). Pasaron sintaxis Python, biblioteca modular, los cuatro tests nuevos del compositor SVG, suite Python/API, `npm ci`, build React/TypeScript y smoke E2E Chromium.
+- **Evidencia de navegador:** [artefacto botimagen-visual-garment-qa · run #457](https://github.com/jonhararagi/botimagen/actions/runs/38279676595/artifacts/11760567894). El smoke guarda `cyberstreet-modular-full.png` y `cyberstreet-modular-no-hair.png`, verifica que el preview es una imagen 512×768, que desactivar cabello cambia el SVG renderizado, que el perfil se guarda/restaura mediante la API existente y que se ejecuta la exportación PNG. Las capturas se generaron, pero no se hizo inspección artística humana independiente en esta sesión.
+- **Correcciones halladas durante CI:** #442 detectó el import path de la nueva prueba; se corrigió. La primera ampliación de Chromium reveló colisión de selectores globales `.prompt-actions` y una aserción de restauración que no esperaba el render asíncrono; se aislaron los controles del panel de prompts y se hizo esperar la composición restaurada. CI #457 pasa con esas correcciones.
+- Se añadieron nombres de capas en español y se habilitó CI por push en esta rama de trabajo.
+- **Limitaciones abiertas:** el paquete conserva anclajes preliminares; el compositor no infiere anatomía ni certifica calidad artística. No se declara QA física Windows. La inspección visual humana de las capturas permanece pendiente.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- TIMER estimado para este tramo: 6–12 horas activas. Tiempo real medido: `NOT_MEASURED`.
+- Siguiente acción: revisar las dos capturas del artefacto; si la alineación es aceptable, calibrar anclajes y ampliar el E2E para chaqueta/falda y migración de perfiles legacy.
