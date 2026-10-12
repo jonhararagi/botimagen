@@ -373,7 +373,7 @@ export function CharacterModelBuilder() {
         <label className="model-builder-search">Filtrar recursos<input value={filter} onChange={event=>setFilter(event.target.value)} placeholder="Nombre, archivo o categoría…" /></label>
         <button type="button" className="model-builder-secondary" disabled={busy} onClick={refreshLibrary}>Actualizar biblioteca local</button>
         <div className="model-builder-asset-list">
-          {filteredAssets.map(asset=><label className={selectedIds.includes(asset.id)?"model-builder-asset selected":"model-builder-asset"} key={asset.id}>
+          {filteredAssets.map(asset=><label data-asset-id={asset.id} className={selectedIds.includes(asset.id)?"model-builder-asset selected":"model-builder-asset"} key={asset.id}>
             <input type="checkbox" checked={selectedIds.includes(asset.id)} onChange={()=>toggleAsset(asset.id)} />
             <span className="model-builder-asset-copy"><strong>{asset.label||asset.filename}</strong><small>{asset.source_filename||asset.filename} · {friendlyKind(asset.kind)} · {asset.category}</small></span>
             {asset.id===baseAssetId&&<span className="model-builder-base-tag">BASE</span>}
