@@ -11,6 +11,8 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
+from modular_character_compositor import CompositionError, compose_png, validate_selection
+from modular_asset_library import read_user_asset
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
 from modular_asset_library import AssetImportError, import_user_asset, list_user_assets, read_user_asset
 
@@ -339,6 +341,7 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/catalog": ("GET",),
                 "/api/assets/contracts": ("GET",),
                 "/api/modular-assets": ("GET", "POST"),
+                "/api/modular-compose": ("POST",),
                 "/api/profiles": ("GET", "POST"),
                 "/api/generate": ("POST",),
             }
@@ -447,11 +450,24 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets"}:
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/modular-compose"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
                 payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" else MAX_BODY_BYTES)
+                if path == "/api/modular-compose":
+                    pieces = payload.get("pieces") if isinstance(payload, dict) else None
+                    size = payload.get("canvas_size", [1024, 1024]) if isinstance(payload, dict) else [1024, 1024]
+                    if not isinstance(pieces, list) or not isinstance(size, list) or len(size) != 2:
+                        raise ApiInputError("Se requieren pieces (lista) y canvas_size [ancho, alto].")
+                    try:
+                        selected = validate_selection(pieces)
+                        image = compose_png(selected, lambda asset_id: read_user_asset(asset_id)[0], tuple(size))
+                    except (CompositionError, AssetImportError, FileNotFoundError, TypeError, ValueError) as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    import base64
+                    self._send_json(HTTPStatus.OK, {"schema_version": 1, "mime_type": "image/png", "width": size[0], "height": size[1], "png_base64": base64.b64encode(image).decode("ascii")})
+                    return
                 if path == "/api/modular-assets":
                     try:
                         result = import_user_asset(payload)
