@@ -744,9 +744,11 @@ def edit_character_model_layer(
     try:
         raw_mask = base64.b64decode(mask_png_base64, validate=True)
         with Image.open(io.BytesIO(raw_mask)) as opened:
-            opened.load()
+            # Reject a wrong format/canvas from its header before decoding pixels.
+            # This keeps dimension-contract errors stable even for malformed IDAT data.
             if opened.format != "PNG" or opened.size != CANVAS_SIZE:
                 raise CharacterModelError("La máscara debe ser un PNG de 512×768.")
+            opened.load()
             mask = opened.convert("L")
     except CharacterModelError:
         raise
