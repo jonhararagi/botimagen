@@ -655,6 +655,78 @@ try {
   const captureVisual = async name => page.locator(".canvas").screenshot({
     path: resolve(visualQaDir, name + ".png"),
   });
+
+  // BIMG-ENGINE-008: temporary neutral-body inspection fixture.
+  // This stylesheet is test-only and is removed before normal garment QA continues.
+  // The torso/lower-body surfaces are recolored as skin to expose their current path geometry;
+  // this is not a production anatomy asset or an artistic approval.
+  const neutralStyleId = "bimg-neutral-body-qa-only";
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  await page.evaluate(styleId => {
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      .visual-character-svg [data-layer-id="ground-shadow"],
+      .visual-character-svg [data-layer-id="hair-back"],
+      .visual-character-svg .character-hands,
+      .visual-character-svg .garment-sleeves,
+      .visual-character-svg .garment-torso-panels,
+      .visual-character-svg [fill^="url(#cw-pattern-"],
+      .visual-character-svg [fill^="url(#cw-gloss-"],
+      .visual-character-svg [data-layer-id="outfit"],
+      .visual-character-svg [data-layer-id="outer-layer"],
+      .visual-character-svg [data-layer-id="footwear"],
+      .visual-character-svg [data-layer-id="chromapatch"],
+      .visual-character-svg > path:not([data-layer-id]),
+      .visual-character-svg > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"]) {
+        display: none !important;
+      }
+      .visual-character-svg .garment-torso-main,
+      .visual-character-svg .character-lower-body,
+      .visual-character-svg .character-leg-silhouette {
+        fill: var(--skin) !important;
+        stroke: #382b36 !important;
+        stroke-width: 1.5 !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }, neutralStyleId);
+  const neutralBounds = async () => page.locator(".visual-character-svg").evaluate(svg => {
+    const box = selector => {
+      const element = svg.querySelector(selector);
+      if (!element) return null;
+      const bounds = element.getBBox();
+      return { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height };
+    };
+    return {
+      head: box('ellipse[fill^="url(#cw-skin-"]'),
+      neck: box('[data-layer-id="neck"]'),
+      arms: box(".character-arm-skin"),
+      torso: box(".garment-torso-main"),
+      pelvis: box(".character-lower-body"),
+      legs: box(".character-leg-silhouette"),
+    };
+  });
+  const neutralManifest = { source: "real BotImagen renderer in Chromium with temporary QA-only CSS", viewBox: "0 0 340 490", captures: [], measurements: {}, limitations: [
+    "The fixture hides hair, face details, garments, accessories, footwear and shadows only during capture.",
+    "The existing garment-torso and lower-body paths are recolored as skin for inspection; this exposes current geometry but is not a production neutral-body asset.",
+    "Bounding boxes describe SVG path geometry, not measured anatomy or a final proportion recommendation."
+  ] };
+  for (const view of ["front", "back"]) {
+    await page.getByRole("button", { name: view === "front" ? "Frontal" : "Trasera", exact: true }).click();
+    const bounds = await neutralBounds();
+    for (const part of ["head", "neck", "arms", "torso", "pelvis", "legs"]) {
+      assert.ok(bounds[part] && bounds[part].width > 0 && bounds[part].height > 0,
+        "Neutral QA fixture must expose a measurable " + part + " path in " + view + " view");
+    }
+    const name = "neutral-body-" + view;
+    await captureVisual(name);
+    neutralManifest.captures.push(name + ".png");
+    neutralManifest.measurements[view] = bounds;
+  }
+  await writeFile(resolve(visualQaDir, "neutral-body-manifest.json"), JSON.stringify(neutralManifest, null, 2));
+  await page.evaluate(styleId => document.getElementById(styleId)?.remove(), neutralStyleId);
+  await page.getByRole("button", { name: "Frontal", exact: true }).click();
   const setVisualRange = async (label, value) => {
     const slider = page.locator('input[type="range"][aria-label="' + label + '"]');
     await slider.evaluate((element, nextValue) => {
