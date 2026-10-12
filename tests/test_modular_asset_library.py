@@ -1,7 +1,10 @@
 import base64
 import unittest
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from modular_asset_library import AssetImportError, import_user_asset, list_user_assets
 
