@@ -1177,11 +1177,23 @@ try {
     const select = field.locator("select");
     const before = await productImage.getAttribute("src");
     await select.selectOption(value);
-    await page.waitForFunction(
-      previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous,
-      before,
-      { timeout: 15000 },
-    );
+    assert.equal(await select.inputValue(), value, "The requested art control value must be selected: " + id + "=" + value);
+    try {
+      await page.waitForFunction(
+        previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous,
+        before,
+        { timeout: 2500 },
+      );
+    } catch {
+      // Some locked controls only mark the draft as pending. Explicitly request a
+      // render so this visual capture proves the selected state reached Python.
+      await page.getByRole("button", { name: /Generar perfil con motor local/i }).click();
+      await page.waitForFunction(
+        previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous,
+        before,
+        { timeout: 15000 },
+      );
+    }
   };
   await selectProductView("front", "Frontal");
   await page.getByRole("tab", { name: /Cara/i }).click();
