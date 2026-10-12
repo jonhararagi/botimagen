@@ -82,7 +82,9 @@ def _image_dimensions(data: bytes, mime: str) -> tuple[int, int]:
 def _safe_display_name(name: Any) -> str:
     if not isinstance(name, str):
         raise AssetImportError("El nombre de archivo debe ser texto.")
-    leaf = name.replace("\\", "/").split("/")[-1]
+    if "/" in name or chr(92) in name or name in {".", ".."}:
+        raise AssetImportError("No se admiten rutas en el nombre del archivo.")
+    leaf = name
     leaf = re.sub(r"[^A-Za-z0-9._ -]", "_", leaf).strip(" .")
     if not leaf or leaf in {".", ".."} or len(leaf) > 120:
         raise AssetImportError("Nombre de archivo no válido.")
