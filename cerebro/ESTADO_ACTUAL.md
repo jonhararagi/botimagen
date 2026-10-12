@@ -97,7 +97,8 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 ## Validación estricta del campo de semilla · CI #136/#137
 
 - Se detectó que `Number.parseInt("12-3", 10)` devuelve `12` y aceptaba la entrada sin avisar. La UI ahora valida la cadena con un patrón de entero estricto y después verifica `Number.isSafeInteger` antes de enviar la semilla.
-- El campo amplió su límite de edición a 17 caracteres para incluir el signo negativo y el rango completo de enteros seguros de JavaScript, en lugar de limitar arbitrariamente a 15.- **CI #136 PASS_REAL** probó el rechazo del formato malformado `12-3` y recuperación mediante una semilla válida: https://github.com/jonhararagi/botimagen/actions/runs/37950027112.
+- El campo amplió su límite de edición a 17 caracteres para incluir el signo negativo y el rango completo de enteros seguros de JavaScript, en lugar de limitar arbitrariamente a 15.
+- **CI #136 PASS_REAL** probó el rechazo del formato malformado `12-3` y recuperación mediante una semilla válida: https://github.com/jonhararagi/botimagen/actions/runs/37950027112.
 - **CI #137 PASS_REAL** añade pruebas de navegador para el máximo seguro `9007199254740991` (aceptado) y el entero siguiente `9007199254740992` (rechazado sin redondear), además del caso malformado. Toda la batería Python/API, cobertura UI, `npm ci`, build y Chromium E2E pasa: https://github.com/jonhararagi/botimagen/actions/runs/37950307373.
 - La corrección es de calidad de entrada y reproducibilidad. No altera la estimación de fases ni el total: **58,65 / 100 → 59%**.
 - **TIMER:** 30–60 minutos estimados de trabajo de implementación y pruebas. El smoke test físico en Windows sigue `NOT_RUN`.
@@ -197,6 +198,7 @@ Entrega BIMG-001 persistida en main: HEAD AFTER 33de0c8fd08448e2767a6fa9fb0efe52
 - `tests/test_web_field_coverage.py` valida estáticamente estos guardarraíles y conserva la comprobación de las 47 categorías/8 pestañas. Es cobertura de contrato fuente, no sustituye el test de navegador.
 - **CI #100: PASS_REAL**, con pruebas Python, contrato de editor, `npm ci` y build React/TypeScript: https://github.com/jonhararagi/botimagen/actions/runs/37925030261.
 - TIMER de la mejora: 30–60 minutos estimados. El total ponderado sigue siendo **49,2 / 100 → 49%** porque la QA real en navegador/Windows sigue pendiente.
+
 ## Última mejora semántica AUTO capilar · catálogo v8
 
 - Se actualizó `character_rules.json` de v7 a v8. Continúa con 47 categorías; no se cambiaron IDs ni se añadieron categorías de interfaz.
@@ -295,7 +297,8 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 
 - Rama aislada \`feature/bimg-analysis-001-contract-poc\`, creada desde el HEAD verificado de \`main\`.
 - Capacidad opcional separada de \`CharacterGenerator\`: \`image_analysis.py\`, contrato en \`docs/engineering/BIMG-ANALYSIS-001-CONTRACT-POC.md\` y ruta binaria \`POST /api/analyze\`.
-- Entrada explícita de bytes, sin rutas de disco; límite propio de 12 MiB, 8192 px por lado, 20 MP y formatos PNG/JPEG/WebP. El límite JSON de 64 KiB permanece intacto.- Pillow queda fijado en \`requirements-analysis.txt\`; CI instala la dependencia y ejecuta tests del módulo. La ruta valida MIME/formato y restringe Origin a puertos locales de BotImagen.
+- Entrada explícita de bytes, sin rutas de disco; límite propio de 12 MiB, 8192 px por lado, 20 MP y formatos PNG/JPEG/WebP. El límite JSON de 64 KiB permanece intacto.
+- Pillow queda fijado en \`requirements-analysis.txt\`; CI instala la dependencia y ejecuta tests del módulo. La ruta valida MIME/formato y restringe Origin a puertos locales de BotImagen.
 - Se miden metadatos y, si hay alfa, distribución, caja delimitadora, ocupación rectangular y contacto con bordes. Sin alfa devuelve \`NOT_SUPPORTED\`; alfa completamente cero produce \`EMPTY_CONTENT\`.
 - Tests sintéticos con resultados conocidos y test HTTP sobre \`references/dataset-cuerpos/0.png\` existente. La licencia/procedencia de ese dataset sigue pendiente de revisión.
 - La interfaz React no se modifica ni anuncia análisis disponible. QA física Windows: \`NOT_RUN\`.
@@ -318,8 +321,8 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 ## BIMG-ANALYSIS-001-R2 · cierre documental verificado · 2026-10-12
 
 - **HEAD BEFORE verificado:** `27a904236b1c6591127556d98d6ec5069740d483`. PR #14 (`feature/bimg-analysis-001-contract-poc`) estaba abierto y sin fusionar; `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86`. PR #11 permanece abierto, independiente y sin fusionar.
-- **Cierre de R1 confirmado:** CI #363 terminó `SUCCESS` sobre el SHA `27a904236b1c6591127556d98d6ec5069740d483`: https://github.com/jonhararagi/botimagen/actions/runs/38210460520. La evidencia corresponde al código de R1, no al nuevo commit documental de R2.
-- **Cambio R2 exclusivamente documental:** esta sección registra la CI #363 como aprobada, separa la validación automatizada de la QA física en Windows y aclara el alcance real. No se modifican código, pruebas, contratos ni dependencias.
+- **Cierre de R1 confirmado:** CI #363 terminó `SUCCESS` sobre el SHA `27a904236b1c6591127556d98d6ec5069740d483`: https://github.com/jonhararagi/botimagen/actions/runs/38210460520. Esta evidencia corresponde al código de R1, no al nuevo commit documental de R2.
+- **Cambio R2 exclusivamente documental:** se registra la CI #363 como aprobada, se separa la validación automatizada de la QA física en Windows y se aclara el alcance real. No se modifican código, pruebas, contratos ni dependencias.
 - **Estado técnico:** `APPROVED` para la corrección R1 y sus validaciones automatizadas. `WINDOWS_MANUAL_QA: NOT_RUN`. La CI no certifica comportamiento en Windows ni aprobación artística.
 - **No implementado por esta tarea:** análisis semántico o anatómico, integración del analizador en React y generación de imágenes. La procedencia/licencia de `references/dataset-cuerpos/0.png` sigue pendiente.
 - **Progreso ponderado de la beta local:** **63%**, sin cambios según la fórmula vigente de `cerebro/PROGRESO.md`.
