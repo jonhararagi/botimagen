@@ -394,3 +394,17 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - Corrección guiada por QA: el selector de fondo ahora remonta la capa visual con la clave del recurso; Chromium comprueba que los tres fondos locales produzcan imágenes CSS distintas. La vista de producto sigue usando únicamente el SVG del motor Python; el renderer React anterior permanece como fixture invisible.
 - `WINDOWS_MANUAL_QA: NOT_RUN`. La aceptación artística final sigue `PARTIAL` hasta inspeccionar las capturas y ejecutar Chrome/Edge físicamente en Windows. No confundir CI Linux con QA física.
 - Beta global conservada en **63%**: no se aumenta por documentación o por el mero recuento de recursos. La biblioteca local inicial no sustituye todavía a la biblioteca de referencias indexada ni al intake completo.
+
+
+## Checkpoint · BIMG-ART-002-R1 · calidad facial y cabello posterior
+
+- **HEAD inicial:** `5ef17beb774f17d5ae57ada655c949343cee92aa`.
+- **Último HEAD de implementación/pruebas:** `475663832c423c947ff179505b1190496be6e014` (los commits documentales siguientes no deben confundirse con el código validado).
+- **Cambios:** `character_render_engine.py` mejora los perfiles de forma facial, conecta `nose_style` con el renderer adulto, amplía la resolución de peinados y calcula la caída del cabello trasero según largo y landmarks; `tests/test_character_render_engine.py` añade regresiones de cara/nariz y silueta posterior; `web/browser_smoke.mjs` prepara capturas Chromium de ambos presets frontal/trasera y variantes de cara, nariz, corte, color y largo.
+- **CI exacta:** PENDING al escribir este checkpoint; no afirmar PASS hasta que la ejecución corresponda al HEAD final.
+- **Capturas:** la prueba E2E prepara PNG y un manifiesto con `GITHUB_SHA`; artefacto e inspección humana pendientes.
+- **Límites:** la vista posterior continúa siendo una aproximación 2D; no todos los IDs de peinado tienen todavía una geometría individual. No se ha inspeccionado manualmente el artefacto nuevo. `WINDOWS_MANUAL_QA: NOT_RUN`.
+- **PR #11:** abierto, sin merge. **PR #14:** abierto e independiente, sin cambios. **main:** permanece en `b508cfe7d3216eda801438d46dff8873842cea86`.
+- **Estado de tarea:** PARTIAL. Progreso global de beta sin cambios: **63%**.
+- **TIMER:** estimación inicial 10–16 horas activas; tiempo real `NOT_MEASURED`.
+- Informe: [BIMG-ART-002-R1](../docs/engineering/BIMG-ART-002-R1.md).
