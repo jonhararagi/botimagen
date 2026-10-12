@@ -4,8 +4,8 @@
 **Rama autorizada:** `feature/bimg-engine-001-cyberstreet-visual-renderer`  
 **PR:** https://github.com/jonhararagi/botimagen/pull/11  
 **HEAD inicial comprobado:** `5ef17beb774f17d5ae57ada655c949343cee92aa`  
-**Último commit de código/pruebas y manifiesto E2E:** `e53235616bf0d58ff623dd4f19e74abdc1a15417`  
-**CI del SHA final:** PENDING, no declarar aprobado hasta obtener resultado asociado al HEAD exacto. El smoke de este commit captura ambas vistas de los dos presets y variantes faciales/capilares.  
+**Último commit de código/pruebas y manifiesto E2E:** `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`  
+**CI de implementación:** #399 SUCCESS, asociada al HEAD de rama `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`: https://github.com/jonhararagi/botimagen/actions/runs/38253325201. La CI del SHA final después de estos cambios documentales queda pendiente.  
 **Tiempo real medido:** NOT_MEASURED  
 **WINDOWS_MANUAL_QA:** NOT_RUN
 
@@ -28,6 +28,30 @@
 - `web/browser_smoke.mjs` amplía las capturas Chromium con la vista posterior de Neon Archivist y variantes reales de cara, nariz, corte, color y largo de cabello.
 - `product-studio-manifest.json` identifica el SHA de GitHub Actions cuando está disponible, registra las variantes y enlaza la referencia anterior de BIMG-PRODUCT-001-R1.
 - El smoke existente mantiene las capturas de Street Sentinel frontal/trasera y la matriz de prendas bomber, equipamiento táctico y abrigo largo, además de los extremos de los controles de ajuste.
+
+
+
+### Anatomía facial y volumen de prendas
+- Se extendió el esqueleto vendorizado con `face_shape` opcional, conservando `equilibrada` como geometría histórica por defecto. La función de contorno ahora transforma pómulos, mandíbula o mentón según el perfil elegido; el control ya no cambia solo metadatos o posición de ojos/boca.
+- El motor añade paneles de sombra ajustados a la silueta y costuras específicas para capas largas, bomber y equipamiento táctico. En vista posterior hay sombras laterales dentro del panel de prenda.
+- Se añadieron pruebas de regresión para demostrar que el contorno real de la mandíbula cambia y que las prendas producen las capas de volumen/costura esperadas.
+
+## Revisión visual de capturas (artefacto CI #399)
+
+Artefacto: https://github.com/jonhararagi/botimagen/actions/runs/38253325201/artifacts/11748818282
+
+PNG inspeccionados del artefacto real de Chromium:
+- `product-studio-front-cyber-grid.png`
+- `product-studio-back-dusk-orbit.png`
+- `product-studio-neon-archivist-front.png`
+- `product-studio-neon-archivist-back.png`
+- `art-face-diamond-straight-bridge.png`
+- `art-long-straight-pink.png`
+- `art-long-straight-extra-long.png`
+
+Comparación visual realizada contra el artefacto anterior de CI #378. Se aprecia una silueta posterior de cabello mucho más larga y ligada al largo configurado, una variación real del contorno mandibular, diferencias de corte/color/largo y un sombreado/costuras de prendas algo más legibles. No obstante, la mejora frontal de volumen es moderada y la figura conserva una pose bastante rígida; las manos siguen pequeñas a escala de interfaz y varios peinados aún reutilizan familias geométricas. Estos defectos impiden dar por aceptado el salto artístico completo: el estado se mantiene **PARTIAL**.
+
+**Nota del manifiesto:** `sourceSha` en Chromium refleja `GITHUB_SHA` del evento de CI (la revisión que ejecutó el workflow); la asociación de GitHub Actions identifica el HEAD de la rama por separado. `WINDOWS_MANUAL_QA: NOT_RUN`.
 
 ## Evidencia y límites
 
