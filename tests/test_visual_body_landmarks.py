@@ -83,7 +83,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn('neutral-body-front', SMOKE)
         self.assertIn('neutral-body-back', SMOKE)
         self.assertIn('neutral-body-manifest.json', SMOKE)
-        self.assertIn('data-layer-id="neck"', SMOKE)
+        self.assertIn("box('[data-layer-id=\"neck\"]')", SMOKE)
         self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
         self.assertIn('not a production anatomy asset', SMOKE.lower())
 
