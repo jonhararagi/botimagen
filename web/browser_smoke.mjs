@@ -670,6 +670,7 @@ try {
       .visual-character-svg [data-layer-id="hair-back"],
       .visual-character-svg .character-hands,
       .visual-character-svg .garment-sleeves,
+      .visual-character-svg [data-layer-id="base-sleeves"],
       .visual-character-svg .garment-torso-panels,
       .visual-character-svg [fill^="url(#cw-pattern-"],
       .visual-character-svg [fill^="url(#cw-gloss-"],
@@ -720,7 +721,7 @@ try {
         "Neutral QA fixture must expose a measurable " + part + " path in " + view + " view");
     }
     const name = "neutral-body-" + view;
-    await captureVisual(name);
+    await page.locator(".visual-character-svg").screenshot({ path: resolve(visualQaDir, name + ".png") });
     neutralManifest.captures.push(name + ".png");
     neutralManifest.measurements[view] = bounds;
   }
