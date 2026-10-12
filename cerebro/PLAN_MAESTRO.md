@@ -154,3 +154,11 @@ No decir BETA READY hasta que:
 - copiar personajes existentes;
 - modelo 3D o rigging real;
 - prometer precisión perfecta de cada prompt en cualquier generador.
+
+
+## Línea posterior y opcional · BIMG-ANALYSIS-001
+
+**Estado:** línea incremental opcional, independiente del editor y fuera del porcentaje ponderado de la beta.  
+**TIMER:** 4–6 horas para contrato y prueba de concepto.  
+**Alcance:** metadatos y transparencia medible localmente; sin IA semántica ni diagnóstico anatómico; no altera \`Editor → CharacterGenerator → perfil y prompt → guardado local\`.  
+**Aceptación:** contrato versionado, límites de entrada, mediciones deterministas sobre píxeles reales, errores estructurados, tests con fixtures y una imagen real, CI del SHA final y limitaciones documentadas. La existencia de la API no implica integración de UI.

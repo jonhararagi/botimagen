@@ -291,3 +291,15 @@ Actualizar esta ficha al final de cada tarea con HEAD BEFORE/AFTER, commit, arch
 - **CI #190 PASS_REAL** añade la auditoría de etiquetas en ocho pestañas. Generador, API local, cobertura del editor, npm ci, build web y Chromium E2E completados: https://github.com/jonhararagi/botimagen/actions/runs/38022168780.
 - **TIMER:** 5–10 minutos de trabajo incremental y verificación. La cobertura E2E se amplió, pero no se cierra una fase de producto por pruebas solas. Progreso ponderado mantenido en **62,16 / 100 → 62%**. QA física en Windows, Chrome/Edge instalado y medidas de rendimiento continúan NOT_RUN.
 
+
+
+## BIMG-ANALYSIS-001 · Contrato y prueba de concepto (2026-10-12)
+
+- Rama aislada \`feature/bimg-analysis-001-contract-poc\`, creada desde el HEAD verificado de \`main\`.
+- Capacidad opcional separada de \`CharacterGenerator\`: \`image_analysis.py\`, contrato en \`docs/engineering/BIMG-ANALYSIS-001-CONTRACT-POC.md\` y ruta binaria \`POST /api/analyze\`.
+- Entrada explícita de bytes, sin rutas de disco; límite propio de 12 MiB, 8192 px por lado, 20 MP y formatos PNG/JPEG/WebP. El límite JSON de 64 KiB permanece intacto.
+- Pillow queda fijado en \`requirements-analysis.txt\`; CI instala la dependencia y ejecuta tests del módulo. La ruta valida MIME/formato y restringe Origin a puertos locales de BotImagen.
+- Se miden metadatos y, si hay alfa, distribución, caja delimitadora, ocupación rectangular y contacto con bordes. Sin alfa devuelve \`NOT_SUPPORTED\`; alfa completamente cero produce \`EMPTY_CONTENT\`.
+- Tests sintéticos con resultados conocidos y test HTTP sobre \`references/dataset-cuerpos/0.png\` existente. La licencia/procedencia de ese dataset sigue pendiente de revisión.
+- La interfaz React no se modifica ni anuncia análisis disponible. QA física Windows: \`NOT_RUN\`.
+- Progreso ponderado de la beta local: sin cambio; esta línea opcional posterior no añade puntos al denominador.

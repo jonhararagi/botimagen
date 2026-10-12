@@ -90,3 +90,10 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Investigación comparativa BIMG-RESEARCH-002 sobre intake local: MDN/W3C (validación de archivos y ciclo de vida de object URLs) y reportes públicos de Filerobot Image Editor. Decisiones y casos de prueba propuestos para BIMG-008 quedan en `cerebro/INVESTIGACION_COMPARATIVA.md`; no se ejecutó un benchmark ni cambió el progreso: **62,16 / 100 → 62%**.
 
 - CI #179 PASS_REAL: PR #2 fusiona la regresión de reproducibilidad de semilla. El payload completo se repite exactamente con cinco semillas y ambos modos `surprise`; también pasan generador, API, build web y Chromium E2E: https://github.com/jonhararagi/botimagen/actions/runs/38013431814. Es cobertura de calidad, no cierre de fase: progreso ponderado sin cambio, **62,16 / 100 → 62%**. QA física Windows sigue NOT_RUN.
+
+
+## Línea opcional posterior a la beta · BIMG-ANALYSIS-001 (2026-10-12)
+
+- Estado: contrato y prueba de concepto local de métricas de píxeles, independiente del editor y del generador.
+- No forma parte del denominador de la beta local-first. **El porcentaje de beta permanece en 63%** hasta que exista evidencia que cierre criterios de alguna fase ponderada.
+- La aceptación requiere CI del SHA final y pruebas del módulo/API. La prueba física en Windows continúa separada.

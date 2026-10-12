@@ -11,6 +11,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from character_generator import CharacterGenerator, TRAIT_KEYS
+from image_analysis import MAX_INPUT_BYTES, ImageAnalysisError, analyze_image
 
 ROOT = Path(__file__).resolve().parent
 ASSET_MANIFEST_PATH = ROOT / "assets_manifest.json"
@@ -260,16 +261,15 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 "/api/assets/contracts": ("GET",),
                 "/api/profiles": ("GET", "POST"),
                 "/api/generate": ("POST",),
+                "/api/analyze": ("POST",),
             }
             allowed = allowed_by_path.get(path)
             if allowed is None:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
-            self._send_json(
-                HTTPStatus.METHOD_NOT_ALLOWED,
-                {"error": "Método HTTP no permitido para este endpoint."},
-                {"Allow": ", ".join(allowed)},
-            )
+            error = ({"error": {"code": "METHOD_NOT_ALLOWED", "message": "Método HTTP no permitido para este endpoint."}}
+                     if path == "/api/analyze" else {"error": "Método HTTP no permitido para este endpoint."})
+            self._send_json(HTTPStatus.METHOD_NOT_ALLOWED, error, {"Allow": ", ".join(allowed)})
 
         def do_PUT(self) -> None:
             self._method_not_allowed()
@@ -342,6 +342,9 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             if path == "/api/assets/contracts":
                 self._method_not_allowed()
                 return
+            if path == "/api/analyze":
+                self._post_analyze_image()
+                return
             if path not in {"/api/generate", "/api/profiles"}:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
@@ -359,6 +362,52 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
                 self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "No se pudo guardar el perfil en el disco local."})
             except Exception:
                 self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "El motor local no pudo completar la solicitud."})
+
+        def _post_analyze_image(self) -> None:
+            origin = self.headers.get("Origin")
+            if origin:
+                parsed = urlsplit(origin)
+                try:
+                    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+                except ValueError:
+                    port = -1
+                allowed = {
+                    ("localhost", 8765), ("127.0.0.1", 8765),
+                    ("localhost", 5173), ("127.0.0.1", 5173),
+                    ("localhost", 4173), ("127.0.0.1", 4173),
+                }
+                if parsed.scheme not in {"http", "https"} or (parsed.hostname, port) not in allowed:
+                    self._send_json(HTTPStatus.FORBIDDEN, {"error": {
+                        "code": "ORIGIN_NOT_ALLOWED", "message": "Origen de navegador no permitido."
+                    }})
+                    return
+            content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+            if content_type not in {"image/png", "image/jpeg", "image/webp"}:
+                self._send_json(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, {"error": {
+                    "code": "UNSUPPORTED_MEDIA_TYPE", "message": "Usa Content-Type image/png, image/jpeg o image/webp."
+                }})
+                return
+            try:
+                try:
+                    length = int(self.headers.get("Content-Length") or "")
+                except ValueError as exc:
+                    raise ImageAnalysisError("INVALID_CONTENT_LENGTH", "Se requiere Content-Length válido.", 400) from exc
+                if length < 0:
+                    raise ImageAnalysisError("INVALID_CONTENT_LENGTH", "Longitud de solicitud inválida.", 400)
+                if length == 0:
+                    raise ImageAnalysisError("EMPTY_BODY", "El archivo de imagen está vacío.", 400)
+                if length > MAX_INPUT_BYTES:
+                    raise ImageAnalysisError("FILE_TOO_LARGE", "La imagen supera el límite de 12 MiB.", 413)
+                data = self.rfile.read(length)
+                if len(data) != length:
+                    raise ImageAnalysisError("INVALID_IMAGE", "El cuerpo de imagen está incompleto.", 422)
+                self._send_json(HTTPStatus.OK, analyze_image(data, content_type))
+            except ImageAnalysisError as exc:
+                self._send_json(HTTPStatus(exc.status), {"error": {"code": exc.code, "message": str(exc)}})
+            except Exception:
+                self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": {
+                    "code": "ANALYSIS_FAILED", "message": "El análisis local no pudo completar la solicitud."
+                }})
 
         def _save_profile(self, payload: Any) -> dict[str, Any]:
             if not isinstance(payload, dict):
