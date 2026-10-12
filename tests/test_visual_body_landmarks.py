@@ -27,7 +27,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn("waistHalf * 0.72", LANDMARKS)
 
     def test_renderer_consumes_shared_landmarks_for_svg_geometry(self):
-        self.assertIn('import { getBodyLandmarks, svgLayerIndex } from "./bodyLandmarks"', RENDERER)
+        self.assertIn('import { getBodyBaseGeometry, getBodyLandmarks, svgLayerIndex } from "./bodyLandmarks"', RENDERER)
         self.assertIn("getBodyLandmarks(r.view, hemY, waistHalf)", RENDERER)
         self.assertIn("landmarks.torsoShoulderLeft.x", RENDERER)
         self.assertIn("landmarks.hemRight.y", RENDERER)
@@ -69,7 +69,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
                          "handLeft", "handRight", "pelvisLeft", "pelvisCenter",
                          "pelvisRight", "kneeLeft", "kneeRight", "ankleLeft",
                          "ankleRight", "footLeft", "footRight"):
-            self.assertIn(f"landmarks.{landmark}.", RENDERER)
+            self.assertTrue(f"landmarks.{landmark}." in RENDERER or f"bodyLandmarks.{landmark}." in RENDERER)
         self.assertIn("d={armSkinPath}", RENDERER)
         self.assertIn("d={lowerBodyPath}", RENDERER)
         self.assertIn("d={legSilhouettePath}", RENDERER)
