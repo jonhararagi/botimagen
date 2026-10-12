@@ -1184,9 +1184,11 @@ try {
     );
   };
   await selectProductView("front", "Frontal");
+  await page.getByRole("tab", { name: /Cara/i }).click();
   await selectVisualTrait("face_shape", "diamante");
   await selectVisualTrait("nose_style", "puente_recto");
   await page.screenshot({ path: resolve(visualQaDir, "art-face-diamond-straight-bridge.png"), fullPage: true });
+  await page.getByRole("tab", { name: /Cabello/i }).click();
   await selectVisualTrait("hairstyle", "hime_cut");
   await selectVisualTrait("hair", "turquesa");
   await page.screenshot({ path: resolve(visualQaDir, "art-hime-cut-turquoise.png"), fullPage: true });
