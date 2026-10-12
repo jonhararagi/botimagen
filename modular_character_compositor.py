@@ -17,8 +17,8 @@ from typing import Any, Iterable
 SCHEMA_VERSION = 1
 PROFILE_SCHEMA_VERSION = 1
 CATEGORIES = {
-    "body", "face", "hair_back", "hair_front", "torso", "arm", "hand",
-    "leg", "footwear", "top", "bottom", "coat", "accessory",
+    "body", "head", "face", "eyes", "brows", "mouth", "hair_back", "hair_front",
+    "torso", "arm", "hand", "leg", "footwear", "top", "bottom", "coat", "accessory",
 }
 ANCHORS = {
     "head", "neck", "shoulder_l", "shoulder_r", "waist", "hip", "origin",
