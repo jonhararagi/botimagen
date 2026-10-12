@@ -864,7 +864,7 @@ def _write_model_json(model: dict[str, Any], folder: Path) -> None:
     temp = folder / "model.json.tmp"
     with temp.open("w", encoding="utf-8") as handle:
         json.dump(model, handle, ensure_ascii=False, indent=2)
-        handle.write("\\n")
+        handle.write("\n")
     temp.replace(folder / "model.json")
 
 
