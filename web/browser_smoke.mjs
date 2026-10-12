@@ -1428,8 +1428,13 @@ try {
   await modularBody.locator('input[type="checkbox"]').check();
   await assetLibrary.getByRole("button", { name: /Componer selección \(1\)/ }).click();
   await page.waitForFunction(() =>
-    document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Composición real lista") ?? false,
+    Boolean(document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.trim()),
     null, { timeout: 15000 },
+  );
+  const actualComposeStatus = (await assetLibrary.locator('[data-testid="modular-compose-status"]').textContent())?.trim() ?? "";
+  assert.ok(
+    actualComposeStatus.includes("Composición real lista"),
+    `Imported composition failed: ${actualComposeStatus || "(empty status)"}`,
   );
   const importedComposition = assetLibrary.getByRole("img", { name: "Composición PNG de piezas modulares importadas" });
   await importedComposition.waitFor({ timeout: 15000 });
