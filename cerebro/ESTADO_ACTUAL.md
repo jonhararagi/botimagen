@@ -438,7 +438,7 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 ## Objetivo de producto confirmado por el usuario
 BotImagen es un editor visual offline-first y un creador modular de personajes originales. No es principalmente un generador libre de imágenes por IA ni una fábrica de prompts. El usuario debe poder construir y editar el personaje elegido dentro del programa: anatomía, rostro, cabello, prendas, accesorios, colores y capas; guardar perfiles OC; importar imágenes; exportar la imagen final y fichas de referencia consistentes.
 
-Dirección artística: anime elaborado de alta calidad, ciencia ficción/cyberpunk y ropa con volumen/detalles. Honkai Impact 3rd es referencia de calidad, siluetas, materiales y diseño, no el personaje a copiar. Referencias, modelos y componentes importados deben estar separados y con procedencia/licencia registrada. Una ilustración plana no se convierte automáticamente en capas editables.
+Dirección artística: anime elaborado de alta calidad, ciencia ficción/cyberpunk y ropa con volumen/detalles. Honkai: Star Rail se prueba como material visual real dentro del importador en una rama privada. Los recursos de juego se separan y mantienen procedencia; una ilustración plana no se convierte automáticamente en prendas completas ni reconstruye lo que está oculto.
 
 ## Estado real confirmado en GitHub
 - Repositorio: https://github.com/jonhararagi/botimagen
@@ -460,7 +460,7 @@ En `assets/modular/oc-cyberstreet/`:
 
 Los cuatro SVG comparten un lienzo transparente de 512×768. El manifiesto declara anclajes y orden de capas preliminares. Las piezas son vectores originales de arranque, no arte final de calidad profesional. Su estado es `component_candidate`; todavía no se ha probado que estén ensambladas por el compositor/renderer real, que encajen anatómicamente, que se puedan cambiar desde controles reales o que exporten correctamente.
 
-El catálogo `assets/visual_asset_catalog.json` contiene las cuatro entradas `character-part.oc-cyberstreet.*`. Existe investigación de referencias en `docs/art-research/HONKAI_REFERENCE_SOURCES.md`, pero **no se descargaron modelos MMD ni ilustraciones de Honkai** en esos commits. No afirmar lo contrario.
+El catálogo `assets/visual_asset_catalog.json` contiene las cuatro entradas `character-part.oc-cyberstreet.*`. La prueba posterior importa el PNG vertical de Firefly en el repositorio privado de referencias; el archivo y su recorte no se copian al repositorio público. No afirmar que la rama pública lleva ilustraciones del juego.
 
 ## Regla de trabajo obligatoria para todos los bots
 El usuario está cansado de recibir únicamente documentos y planes. Cada tarea debe IMPLEMENTAR funcionalidad o arte real en la misma ejecución. No terminar después de una auditoría, un plan, un índice de enlaces o un mockup.
@@ -555,13 +555,10 @@ QA Windows: `NOT_RUN`.
 - Las posiciones propuestas son **estimaciones**, no detección garantizada de pose. El usuario debe inspeccionarlas visualmente antes de habilitar la pieza como capa.
 - La salida de esta etapa usa un lienzo común 512×768; imágenes de otras poses deben marcarse como frontal/trasera/lateral y no intercambiarse sin revisión.
 
-### Recursos oficiales Honkai Impact 3rd para referencia visual (no copiados al repositorio)
-- Wallpapers/media oficiales: https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper
-- Art Collection Vol. 2, página oficial: https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263
-- Noticia oficial Vol. 2 alternativa: https://honkaiimpact3.hoyoverse.com/m/asia/en-us/news/112262
-- Art Collection Vol. 1: https://honkaiimpact3.hoyoverse.com/global/en-us/news/106541?cate=516
-- Noticias oficiales: https://honkaiimpact3.hoyoverse.com/global/en-us/news
-- Estos enlaces son referencias que el usuario puede abrir y luego importar manualmente en la biblioteca; no se han añadido imágenes oficiales de terceros al repositorio.
+### Flujo de referencias visuales reales
+- La interfaz no muestra un panel de enlaces a páginas de juegos. La prueba automatizada importa directamente imágenes desde el repositorio privado de referencias y valida el resultado del convertidor.
+- El archivo visual de Firefly se mantiene solo en la rama privada de prueba, con procedencia registrada; no forma parte del catálogo ni de los artefactos públicos de BotImagen.
+- La prueba valida la importación normalizada y la máscara manual; no afirma que exista segmentación automática de ropa ni que se reconstruyan partes ocultas.
 
 ### Validación y siguiente trabajo
 - Estado de esta revisión al registrarla: `IMPLEMENTED_PENDING_CI`; no declarar los cambios verificados hasta observar la CI de este HEAD y las capturas de Chromium.
@@ -583,7 +580,7 @@ QA Windows: `NOT_RUN`.
 - WINDOWS_MANUAL_QA: NOT_RUN; TIME_MEASURED: NOT_MEASURED.
 - main comprobada sin cambios (b508cfe7d3216eda801438d46dff8873842cea86). PR #11 permanece abierta/sin fusionar y PR #14 permanece independiente.
 - TIMER para ampliar la siguiente fase artística (mejor segmentación asistida, biblioteca extensa de piezas, mayor riqueza visual y anclajes editables): estimación inicial **8–16 horas activas** según alcance; no es una estimación de finalización de todo BotImagen.
-- Referencias oficiales para el usuario: wallpapers/media https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper ; Art Collection Vol. 2 https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263 ; Art Collection Vol. 1 https://honkaiimpact3.hoyoverse.com/global/en-us/news/106541?cate=516 ; noticias oficiales https://honkaiimpact3.hoyoverse.com/global/en-us/news . No se incorporaron imágenes oficiales al repositorio; importarlas de forma manual y mantener su procedencia/licencia.
+- Se retiraron los enlaces externos de la UI. El flujo de pruebas usa un archivo real de Firefly almacenado solamente en el repositorio privado de referencias; mantener procedencia y no copiar el archivo o el derivado al repo público.
 
 
 ## BIMG-PNG-TO-RIG-001 · importador PNG con esqueleto ajustable y encaje automático · 2026-10-12
@@ -618,16 +615,13 @@ QA Windows: `NOT_RUN`.
 - Extensión del importador PNG/biblioteca modular existente, sin crear un motor paralelo.
 - En cada vista previa, el usuario puede pulsar **Dibujar contorno de pieza** y marcar con clics el polígono que rodea una parte visible. Al preparar el material, el navegador aplica una máscara alfa real: el exterior del polígono queda transparente. La pieza se normaliza y se registra en el catálogo mediante los mismos endpoints y el mismo compositor.
 - `web/src/visual/pngToModularAsset.ts`: recibe puntos normalizados, valida la geometría, recorta el alfa antes de calcular los límites de contenido y registra `cutout_applied` más las coordenadas del contorno junto al hash/dimensiones de la fuente original.
-- `web/src/visual/ModularAssetLibrary.tsx`: incorpora el editor de polígono a la tarjeta del recurso, conserva la fuente original, guarda la pieza recortada como material independiente y muestra si se aplicó un recorte. Incluye enlaces de referencia al sitio oficial de Honkai Impact 3rd.
+- `web/src/visual/ModularAssetLibrary.tsx`: incorpora el editor de polígono a la tarjeta del recurso, conserva la fuente original, guarda la pieza recortada como material independiente y muestra si se aplicó un recorte. La UI ya no muestra paneles de enlaces externos.
 - `modular_asset_library.py`: admite los nuevos metadatos con validación estricta y conserva compatibilidad con conversiones antiguas sin el campo `cutout_applied`.
 - `tests/test_modular_asset_library.py`: añade cobertura para persistencia y validación del polígono de recorte.
-- `web/browser_smoke.mjs`: añade E2E que sube una imagen de prueba, delimita la zona de ropa, comprueba que cabeza/piernas quedan fuera, verifica alfa transparente, guarda la pieza como `clothing_top`, confirma anclajes y la compone con el cuerpo. También comprueba que el importador presenta los enlaces oficiales de referencia.
+- `web/browser_smoke.mjs`: añade E2E que sube una imagen de prueba, delimita la zona de ropa, comprueba que cabeza/piernas quedan fuera, verifica alfa transparente, guarda la pieza como `clothing_top`, confirma anclajes y la compone con el cuerpo. El smoke verifica la conversión, la máscara alfa y la composición, sin depender de enlaces externos.
 - CSS añadido para trabajar con el contorno en la vista previa grande y visualizar puntos y máscara.
 - **Límite funcional explícito:** esto es segmentación asistida manual, no IA de segmentación semántica. Funciona mejor cuando la parte visible tiene un borde identificable. Un PNG plano no contiene los píxeles de prendas o pelo ocultos; para esas piezas hacen falta referencias adicionales, recortes dibujados por separado o recursos independientes.
-- Fuentes oficiales enlazadas en la UI:
-  - Wallpapers y galería oficial: https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper
-  - Art Collection Vol. I / noticia oficial: https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540
-  - Art Collection Vol. II: https://honkaiimpact3.hoyoverse.com/global/en-us/news/112510
+- Los enlaces de páginas externas se retiraron de la interfaz. Los recursos de prueba se cargan como archivos reales desde una rama privada y sus resultados se verifican con Chromium.
 - Estado al publicar la primera implementación: pendiente de CI. **Verificación final registrada abajo tras integrar el editor visual faltante y repetir la ejecución completa.**
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - TIMER estimado para cerrar esta integración y corregir los fallos de CI/E2E que aparezcan: **2–4 horas activas**; no es tiempo medido ni una estimación de finalización de todo BotImagen.
@@ -643,3 +637,19 @@ QA Windows: `NOT_RUN`.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - **Siguiente fase estimada:** 8–16 horas activas para mejorar la calidad visual y acelerar la segmentación asistida/creación de variantes. Es estimación, no tiempo medido ni promesa de finalización de todo BotImagen.
 - `main` permanece sin cambios; PR #11 continúa abierta y PR #14 se mantiene independiente. Seguir implementando sobre esta rama, no sustituir desarrollo por documentos.
+
+
+## BIMG-REAL-REFERENCE-IMPORT-002 · materiales privados y Firefly real probados · 2026-10-12
+
+- **Prueba privada exitosa, run #10:** https://github.com/jonhararagi/botimagen-referencias-privadas/actions/runs/38296646209. Artefacto de informe solamente (sin imágenes fuente ni recortes): ID `11768523241`.
+- Las 14 imágenes `referencias/16.png` a `referencias/29.png` pasaron por el importador real del editor. Todas se normalizaron a `512×768`; las cuatro esquinas del PNG convertido dieron alfa `0`. La tasa de píxeles visibles varió por imagen, lo que confirma que son poses/crops de distinto encuadre, no prendas modulares.
+- El recurso real de Firefly `image/character_preview/1310.png` se guardó solo en la rama privada `test/reference-import-bimg-001` como fixture de prueba, con su procedencia anotada. No está en este repo público ni en su catálogo.
+- La importación de Firefly produjo un sprite de referencia `512×768`, alfa visible `0.5266`, límites `x=28,y=81,w=456,h=606`. El recorte manual de atuendo guardado como candidato `clothing_top` mide `176×210`, con cobertura alfa `0.0779` y esquinas transparentes.
+- Diagnóstico y corrección: el primer test generó erróneamente una franja `248×50` porque los últimos cuatro clics del test quedaban fuera del viewport. El test ahora centra el lienzo completo con `scrollIntoViewIfNeeded`; el informe final registra los 8 puntos del contorno. No fue un fallo del material ni una conversión semántica automática.
+- `web/src/visual/ModularAssetLibrary.tsx` transforma ahora coordenadas de clic mediante `getScreenCTM().inverse()` y conserva la proporción del `viewBox` (`width`/`height` explícitos).
+- **UI limpia:** se retiró el panel de enlaces externos a páginas de juegos. El material se valida cargando directamente el PNG real; se añadió una aserción en el smoke para impedir que vuelva el panel de links.
+- **CI pública del código/lasso:** CI #504 y PR CI #505 SUCCESS en commit `770ead684c6ca27c1f10a7771ccae861579ec0ca`; el build, el smoke Chromium y la composición de piezas pasan. El cambio de retirada de enlaces y la aserción anti-links documentados aquí quedan pendientes de la siguiente CI.
+- **Límite honesto:** Firefly es un recorte vertical con torso, no un rig de cuerpo completo. El `clothing_top` es un candidato extraído con polígono manual de píxeles visibles; no se afirma que el programa detecte o separe automáticamente todo el atuendo, que reconstruya la parte posterior ni los píxeles ocultos.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- Timer estimado para la siguiente fase de segmentación más automática, ajuste de capas/anclajes y más variantes de prendas: **8–16 horas activas**, no es tiempo medido ni tiempo restante total del proyecto.
+- `main` sigue intacta (`b508cfe7d3216eda801438d46dff8873842cea86`); PR #11 sigue abierta/sin fusionar y PR #14 sigue independiente.

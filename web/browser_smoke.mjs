@@ -1452,8 +1452,7 @@ try {
   // Exercise PNG-to-stage conversion, linked source metadata, and the real modular compositor.
   const assetLibrary = page.locator(".modular-library");
   await assetLibrary.scrollIntoViewIfNeeded();
-  assert.equal(await assetLibrary.locator('a[href="https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper"]').count(), 1, "The importer should expose the official Honkai wallpaper reference");
-  assert.equal(await assetLibrary.locator('a[href="https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540"]').count(), 1, "The importer should expose an official Honkai art collection reference");
+  assert.equal(await assetLibrary.locator(".modular-reference-links").count(), 0, "The importer must not show external game-page link panels");
   // Reset controls changed by the earlier two-sided rig test so this legacy full-character case is isolated.
   await assetLibrary.getByLabel("Tipo de recurso").selectOption("full_character");
   await assetLibrary.getByLabel("Clasificación de la imagen").selectOption("portrait");

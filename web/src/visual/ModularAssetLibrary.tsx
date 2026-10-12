@@ -382,13 +382,6 @@ export function ModularAssetLibrary() {
     </div>
 
     <p className="modular-converter-note"><b>Regla rápida:</b> importa un PNG entero para conservarlo como personaje o referencia, o elige «Pieza separada» y dibuja el contorno de una zona visible para obtener una capa con transparencia. El programa no recupera zonas que otra prenda tapa.</p>
-    <div className="modular-reference-links" aria-label="Fuentes oficiales de referencia visual">
-      <b>Referencias oficiales de Honkai Impact 3rd</b>
-      <span>Úsalas como guía de silueta, materiales y detalles. Descarga e importa las imágenes que quieras probar y anota su procedencia.</span>
-      <a href="https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper" target="_blank" rel="noopener noreferrer">Abrir wallpapers oficiales ↗</a>
-      <a href="https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540" target="_blank" rel="noopener noreferrer">Art Collection Vol. I · noticia oficial ↗</a>
-      <a href="https://honkaiimpact3.hoyoverse.com/global/en-us/news/112510" target="_blank" rel="noopener noreferrer">Art Collection Vol. II · página oficial ↗</a>
-    </div>
     <div className="modular-dropzone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();selectFiles(e.dataTransfer.files);}}>
       <strong>Arrastra imágenes aquí</strong><span>PNG, JPEG o WebP · máximo 12 MiB y 20 megapíxeles por archivo</span>
       <button type="button" className="btn muted" onClick={()=>input.current?.click()}>Seleccionar imágenes</button>
