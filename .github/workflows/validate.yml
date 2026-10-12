@@ -19,6 +19,9 @@ jobs:
       - name: Validate modular asset library
         run: python tests/test_modular_asset_library.py
 
+      - name: Validate CyberStreet SVG compositor
+        run: python tests/test_cyberstreet_svg_compositor.py
+
       - name: Validate asset manifest
         run: python tests/validate_manifest.py
 
