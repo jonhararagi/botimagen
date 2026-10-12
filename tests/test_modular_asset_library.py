@@ -65,4 +65,4 @@ def test_corrupt_catalog_is_not_overwritten(tmp_path):
     (tmp_path / "catalog.json").write_text("{broken", encoding="utf-8")
     with pytest.raises(AssetImportError):
         import_user_asset(payload(), tmp_path)
-    assert json.loads if (tmp_path / "catalog.json").read_text(encoding="utf-8") == "{broken" else False
+    assert (tmp_path / "catalog.json").read_text(encoding="utf-8") == "{broken"
