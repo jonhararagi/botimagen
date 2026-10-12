@@ -1452,6 +1452,11 @@ try {
   // Exercise PNG-to-stage conversion, linked source metadata, and the real modular compositor.
   const assetLibrary = page.locator(".modular-library");
   await assetLibrary.scrollIntoViewIfNeeded();
+  // Reset controls changed by the earlier two-sided rig test so this legacy full-character case is isolated.
+  await assetLibrary.getByLabel("Tipo de recurso").selectOption("full_character");
+  await assetLibrary.getByLabel("Clasificación de la imagen").selectOption("portrait");
+  await assetLibrary.getByLabel("Vista de la imagen").selectOption("front");
+  await assetLibrary.getByLabel("Vista para componer").selectOption("front");
   const syntheticDataUrl = await page.evaluate(() => {
     const canvas = document.createElement("canvas");
     canvas.width = 320; canvas.height = 480;
