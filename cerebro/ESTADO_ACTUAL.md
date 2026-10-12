@@ -429,3 +429,65 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - Recursos artísticos: no se afirma que las ilustraciones de referencia sean piezas separadas ni compatibles. La anatomía, los anclajes y el encaje visual requieren recursos PNG segmentados y QA.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; tiempo real medido: `NOT_MEASURED`.
 - Estimación restante revisada: **8–16 horas activas** para corregir integración/CI, completar persistencia de perfiles y exportación robusta, pruebas E2E y revisión visual; la producción/calibración de piezas artísticas se estima aparte según el número y complejidad de piezas.
+
+
+---
+
+# Continuidad activa · 2026-10-12 · NO PERDER ESTE ESTADO
+
+## Objetivo de producto confirmado por el usuario
+BotImagen es un editor visual offline-first y un creador modular de personajes originales. No es principalmente un generador libre de imágenes por IA ni una fábrica de prompts. El usuario debe poder construir y editar el personaje elegido dentro del programa: anatomía, rostro, cabello, prendas, accesorios, colores y capas; guardar perfiles OC; importar imágenes; exportar la imagen final y fichas de referencia consistentes.
+
+Dirección artística: anime elaborado de alta calidad, ciencia ficción/cyberpunk y ropa con volumen/detalles. Honkai Impact 3rd es referencia de calidad, siluetas, materiales y diseño, no el personaje a copiar. Referencias, modelos y componentes importados deben estar separados y con procedencia/licencia registrada. Una ilustración plana no se convierte automáticamente en capas editables.
+
+## Estado real confirmado en GitHub
+- Repositorio: https://github.com/jonhararagi/botimagen
+- Rama de trabajo activa: `feature/bimg-engine-001-cyberstreet-visual-renderer`
+- `main` no debe modificarse directamente.
+- HEAD al escribir esta actualización: `210f9530ba305a034564217d44ab2d241ee1a693`.
+- PR #11 sigue abierto/sin fusionar; PR #14 debe conservarse independiente. No fusionar/cerrar PRs sin autorización explícita y revisar el estado real antes de cualquier operación.
+- Commit `20dea59b7bfcde70869bd9a2d4229847802d0eac`: añade paquete SVG original CyberStreet.
+- Commit `210f9530ba305a034564217d44ab2d241ee1a693`: registra cuatro componentes en el catálogo visual.
+
+## Archivos gráficos que existen ahora
+En `assets/modular/oc-cyberstreet/`:
+- `base-body.svg`
+- `hair-midnight-cyan.svg`
+- `top-neon-jacket.svg`
+- `skirt-tech-pleated.svg`
+- `manifest.json`
+- `README.md`
+
+Los cuatro SVG comparten un lienzo transparente de 512×768. El manifiesto declara anclajes y orden de capas preliminares. Las piezas son vectores originales de arranque, no arte final de calidad profesional. Su estado es `component_candidate`; todavía no se ha probado que estén ensambladas por el compositor/renderer real, que encajen anatómicamente, que se puedan cambiar desde controles reales o que exporten correctamente.
+
+El catálogo `assets/visual_asset_catalog.json` contiene las cuatro entradas `character-part.oc-cyberstreet.*`. Existe investigación de referencias en `docs/art-research/HONKAI_REFERENCE_SOURCES.md`, pero **no se descargaron modelos MMD ni ilustraciones de Honkai** en esos commits. No afirmar lo contrario.
+
+## Regla de trabajo obligatoria para todos los bots
+El usuario está cansado de recibir únicamente documentos y planes. Cada tarea debe IMPLEMENTAR funcionalidad o arte real en la misma ejecución. No terminar después de una auditoría, un plan, un índice de enlaces o un mockup.
+
+1. Inspeccionar el HEAD real, rama, PR, arquitectura y pruebas antes de modificar.
+2. Identificar el renderer/compositor real y conectar allí las piezas. No crear un segundo renderer paralelo ni rehacer todo el proyecto.
+3. Modificar archivos de aplicación, motor, recursos, perfiles y pruebas que hagan falta; conservar APIs, IDs, perfiles, recetas v1/v2/v3, Style Lab, NanoWear, Chromapatch y prendas/funciones existentes.
+4. Integrar el paquete modular en la interfaz real: activar/desactivar cabello y prendas, componer las capas sobre el mismo cuerpo, mantener transparencia/orden y persistir las elecciones en el perfil OC existente.
+5. Probar el render y la exportación PNG reales. Añadir pruebas para manifest/rutas, composición y persistencia. Ejecutar tests y Chromium/browser smoke si el entorno lo permite.
+6. Revisar captura visual real; corregir desalineaciones detectadas. No marcar `component_validated` sin evidencia visual.
+7. Si existe un bloqueo ambiental, completar y probar el máximo tramo posible y describir el bloqueo concreto, sin fingir que se ejecutó lo que no se ejecutó.
+8. Actualizar esta ficha con archivos modificados, commits/HEAD, pruebas y resultados, evidencia visual, limitaciones y siguiente acción. Dejar el siguiente prompt preparado, pero nunca usarlo como sustituto del trabajo actual.
+9. No hacer preguntas innecesarias al usuario cuando se pueda tomar una decisión técnica razonable y reversible.
+10. El progreso se mide por funcionalidad visible y comprobada, no por longitud de documentación ni por cantidad de archivos vacíos.
+
+## Criterios de aceptación para el próximo tramo
+- El personaje compuesto aparece en el editor usando el renderer real.
+- Cuerpo, cabello, chaqueta y falda usan las piezas del paquete, con capas y transparencia correctas.
+- El usuario puede cambiar/activar/desactivar como mínimo cabello y prendas con controles reales.
+- Las selecciones se guardan y recuperan con el sistema de perfiles existente.
+- La exportación PNG genera la composición, no un placeholder.
+- Tests automatizados y una evidencia de navegador real o bloqueo documentado.
+- Corregir los problemas encontrados antes de cerrar la tarea.
+
+## Timer y estado de QA
+Cada prompt de BotImagen incluye estimación del tiempo restante en horas/días. Para integrar y validar el paquete actual: estimación provisional de 6–12 horas activas; tiempo medido `NOT_MEASURED`. No presentar esa cifra como tiempo de finalización de todo BotImagen.
+Estado actual: `IN_PROGRESS / NOT_VALIDATED_IN_EDITOR`.
+CI del HEAD `210f9530ba305a034564217d44ab2d241ee1a693`: no hay checks confirmados en la consulta actual.
+QA visual del paquete en el compositor real: `NOT_RUN`.
+QA Windows: `NOT_RUN`.
