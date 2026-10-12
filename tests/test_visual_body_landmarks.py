@@ -84,7 +84,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn('neutral-body-manifest.json', SMOKE)
         self.assertIn("box('[data-layer-id=\"neck\"]')", SMOKE)
         self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
-        self.assertIn('not a production anatomy asset', SMOKE.lower())
+        self.assertIn('PARTIAL_NOT_A_NEUTRAL_ANATOMY_REFERENCE', SMOKE)\n        self.assertIn('normalizedPathBounds', SMOKE)\n        self.assertIn('garment_path_proxy_not_anatomy', SMOKE)\n        self.assertIn('Cosmetic SVG layers must be explicitly hidden', SMOKE)
 
     def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
         self.assertIn('querySelectorAll("[data-layer-id][data-layer-order]")', SMOKE)
