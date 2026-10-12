@@ -712,9 +712,42 @@ try {
       "No production renderer geometry, public API, catalog, recipe or bodyLandmarks.ts values are changed by the fixture."
     ]
   };
+  const applyNeutralVisibility = async () => page.locator(".visual-character-svg").evaluate(svg => {
+    const marker = "data-bimg-neutral-original-style";
+    const hide = element => {
+      if (element.hasAttribute(marker)) return;
+      const original = element.getAttribute("style");
+      element.setAttribute(marker, original === null ? "__NO_STYLE__" : original);
+      element.style.setProperty("display", "none", "important");
+    };
+    for (const selector of [
+      '[data-layer-id="ground-shadow"]','[data-layer-id="hair-back"]',
+      '[data-layer-id="base-sleeves"]','[data-layer-id="base-torso"]',
+      '[data-layer-id="lower-body"]','[data-layer-id="footwear"]',
+      '[data-layer-id="outfit"]','[data-layer-id="outer-layer"]',
+      '[data-layer-id="surface-details"]','[data-layer-id="chromapatch"]',
+      '.garment-sleeves','.garment-torso-main','.garment-torso-panels',
+      '.character-lower-body','.character-leg-silhouette','.character-footwear-base',
+    ]) for (const element of svg.querySelectorAll(selector)) hide(element);
+    for (const element of Array.from(svg.children)) {
+      if (element.tagName.toLowerCase() === "defs" || element.hasAttribute("data-layer-id")) continue;
+      if (element.tagName.toLowerCase() === "ellipse" && (element.getAttribute("fill") ?? "").startsWith("url(#cw-skin-")) continue;
+      hide(element);
+    }
+  });
+  const restoreNeutralVisibility = async () => page.locator(".visual-character-svg").evaluate(svg => {
+    const marker = "data-bimg-neutral-original-style";
+    for (const element of svg.querySelectorAll("[" + marker + "]")) {
+      const original = element.getAttribute(marker);
+      if (original === "__NO_STYLE__") element.removeAttribute("style");
+      else if (original !== null) element.setAttribute("style", original);
+      element.removeAttribute(marker);
+    }
+  });
   for (const view of ["front", "back"]) {
     await page.getByRole("button", { name: view === "front" ? "Frontal" : "Trasera", exact: true }).click();
     const svg = page.locator(".visual-character-svg");
+    await applyNeutralVisibility();
     const bounds = await neutralBounds();
     for (const part of ["head", "neck", "arms", "torso", "pelvis", "legs", "feet"]) {
       assert.ok(bounds[part] && bounds[part].width > 0 && bounds[part].height > 0,
@@ -755,6 +788,7 @@ try {
     ]));
     const name = "neutral-body-" + view;
     await svg.screenshot({ path: resolve(visualQaDir, name + ".png") });
+    await restoreNeutralVisibility();
     neutralManifest.captures.push(name + ".png");
     neutralManifest.measurements[view] = {
       sourceBoundsSvgUnits: bounds,
