@@ -627,7 +627,19 @@ QA Windows: `NOT_RUN`.
 - Fuentes oficiales enlazadas en la UI:
   - Wallpapers y galería oficial: https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper
   - Art Collection Vol. I / noticia oficial: https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540
-  - Art Collection Vol. II: https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263
-- Estado al publicar: `IMPLEMENTED_PENDING_CI`. No declarar esta mejora lista hasta que pasen los tests Python, el build TypeScript/React y el E2E de Chromium del HEAD de código que incluye el lasso. Inspeccionar el artefacto de Chromium posterior.
+  - Art Collection Vol. II: https://honkaiimpact3.hoyoverse.com/global/en-us/news/112510
+- Estado al publicar la primera implementación: pendiente de CI. **Verificación final registrada abajo tras integrar el editor visual faltante y repetir la ejecución completa.**
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - TIMER estimado para cerrar esta integración y corregir los fallos de CI/E2E que aparezcan: **2–4 horas activas**; no es tiempo medido ni una estimación de finalización de todo BotImagen.
+
+### BIMG-PNG-LASSO-001 · verificación final · 2026-10-12
+
+- **Commit de código validado:** [7a8f6737](https://github.com/jonhararagi/botimagen/commit/7a8f6737f839d0add47e5d51ed53c6658b408243).
+- **CI #498 · SUCCESS:** https://github.com/jonhararagi/botimagen/actions/runs/38290777438. La ejecución exacta pasó validación de sintaxis Python, 9 tests de la biblioteca de assets, 11 tests del compositor de personaje, compositor CyberStreet SVG, manifiesto/catálogo, suites Python/API existentes, instalación npm, build TypeScript/React y smoke test E2E de Chromium.
+- **El smoke E2E usa el editor visible**: sube una imagen de prueba, dibuja una máscara poligonal alrededor de la prenda, confirma que la salida normalizada es 512×768, que las esquinas/cabeza/piernas quedan transparentes y que la zona de ropa permanece. Después guarda la pieza como `clothing_top`, confirma sus anclajes y la compone con un cuerpo usando el compositor Python real.
+- **Artefacto generado:** https://github.com/jonhararagi/botimagen/actions/runs/38290777438/artifacts/11766485829. También se revisaron las capturas CyberStreet generales de la suite; mantienen la cara visible sin cabello y muestran las capas del personaje sobre el lienzo transparente.
+- **Enlaces oficiales de Honkai dentro del importador:** wallpapers/galería, noticia oficial de Art Collection Vol. I y noticia oficial asociada a Art Collection Vol. II. No se han copiado recursos de Honkai al repositorio; el usuario puede abrirlos, descargar una referencia y probar la importación local.
+- **Límite funcional:** el lasso es una máscara manual para píxeles visibles, no una IA de segmentación semántica. No reconstruye ropa, cabello ni cuerpo que están ocultos detrás de otras zonas del PNG.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- **Siguiente fase estimada:** 8–16 horas activas para mejorar la calidad visual y acelerar la segmentación asistida/creación de variantes. Es estimación, no tiempo medido ni promesa de finalización de todo BotImagen.
+- `main` permanece sin cambios; PR #11 continúa abierta y PR #14 se mantiene independiente. Seguir implementando sobre esta rama, no sustituir desarrollo por documentos.
