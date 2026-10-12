@@ -336,6 +336,14 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
         hemw = max(ww,sk.hip_half_w*.78) if bottom>sk.hip_y else ww
         cloth = p.outfit.coat_color or p.outfit.tunic_color or base
         parts.append(f'<path class="back-clothing-panel" d="M{cx-sw:.1f} {sk.shoulder_y:.1f} Q{cx:.1f} {sk.shoulder_y-r*.24:.1f} {cx+sw:.1f} {sk.shoulder_y:.1f} L{cx+ww:.1f} {sk.waist_y:.1f} L{cx+hemw:.1f} {bottom:.1f} Q{cx:.1f} {bottom+r*.05:.1f} {cx-hemw:.1f} {bottom:.1f} L{cx-ww:.1f} {sk.waist_y:.1f} Z" fill="{cloth}" stroke="#0d0d0d" stroke-width="{max(1.2,r*.026):.1f}"/>')
+        shade=_shade(cloth,.66)
+        for side in (-1,1):
+            shadow_d=(f"M{cx+side*sw*.88:.1f} {sk.shoulder_y+r*.12:.1f} "
+                      f"Q{cx+side*sw*.94:.1f} {sk.shoulder_y+r*.42:.1f} {cx+side*ww*.76:.1f} {sk.waist_y:.1f} "
+                      f"L{cx+side*hemw*.76:.1f} {bottom-r*.02:.1f} "
+                      f"Q{cx+side*hemw*.61:.1f} {bottom-r*.04:.1f} {cx+side*hemw*.48:.1f} {bottom-r*.05:.1f} "
+                      f"L{cx+side*ww*.48:.1f} {sk.waist_y-r*.02:.1f} Z")
+            parts.append(f'<path class="back-garment-shadow" d="{shadow_d}" fill="{shade}" opacity=".30"/>')
         parts.append(f'<path d="M{cx:.1f} {sk.shoulder_y+r*.03:.1f} L{cx:.1f} {bottom-r*.04:.1f} M{cx-sw*.66:.1f} {sk.shoulder_y+r*.30:.1f} Q{cx:.1f} {sk.shoulder_y+r*.46:.1f} {cx+sw*.66:.1f} {sk.shoulder_y+r*.30:.1f}" fill="none" stroke="{accent}" stroke-width="{max(1.2,r*.025):.1f}" opacity=".85"/>')
         hair_length=HAIR_LENGTHS.get(values.get("hair_length","medio"),.38)
         hair_style=values.get("hairstyle","long_flowing")
@@ -392,6 +400,39 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
             if pattern=="gradient":
                 lines.append(f'<path d="M{cx-width_bottom*.28:.1f} {top+r*.06:.1f} L{cx+width_bottom*.28:.1f} {bottom-r*.06:.1f}" stroke="{panel}" stroke-width="{max(1.4,r*.03):.1f}" opacity=".48"/>')
             parts.append(f'<g class="cyberpunk-fabric-details" clip-path="url(#{clip})">{"".join(lines)}</g>')
+        # Shape-following shade panels give the selected garment a front-facing
+        # light direction without replacing the underlying anatomy or garment IDs.
+        garment_id=values.get("outfit","tactical_baseball")
+        outer_active=p.outfit.coat_color is not None
+        cloth=p.outfit.coat_color or p.outfit.tunic_color or base
+        cloth_shadow=_shade(cloth,.64)
+        garment_top=sk.shoulder_y+r*.18
+        garment_bottom=(sk.shoulder_y+(sk.ankle_y-sk.shoulder_y)*p.outfit.coat_length
+                        if outer_active else sk.waist_y+r*.12)
+        garment_sw=sk.shoulder_half_w*.70
+        garment_ww=sk.waist_half_w*.70
+        garment_hemw=max(garment_ww,sk.hip_half_w*.66) if garment_bottom>sk.hip_y else garment_ww
+        volume=[]
+        for side in (-1,1):
+            shadow_d=(f"M{cx+side*garment_sw:.1f} {garment_top:.1f} "
+                      f"Q{cx+side*garment_sw*.92:.1f} {sk.shoulder_y+r*.38:.1f} {cx+side*garment_ww*.76:.1f} {sk.waist_y:.1f} "
+                      f"L{cx+side*garment_hemw*.76:.1f} {garment_bottom:.1f} "
+                      f"L{cx+side*garment_hemw*.50:.1f} {garment_bottom-r*.02:.1f} "
+                      f"L{cx+side*garment_ww*.48:.1f} {sk.waist_y-r*.02:.1f} Z")
+            volume.append(f'<path d="{shadow_d}" fill="{cloth_shadow}" opacity=".30"/>')
+        parts.append('<g class="garment-volume-shading">'+"".join(volume)+"</g>")
+        seam_color=_shade(cloth,1.28)
+        seam_width=max(1.0,r*.018)
+        if outer_active and (p.outfit.coat_length>=.60 or garment_id in {"support_coat","elegant_command"}):
+            parts.append(f'<g class="garment-tailored-seams" fill="none" stroke="{seam_color}" stroke-width="{seam_width:.1f}" stroke-linecap="round" opacity=".72"><path d="M{cx-garment_sw*.42:.1f} {garment_top+r*.02:.1f} L{cx-garment_ww*.48:.1f} {sk.waist_y:.1f} L{cx-garment_hemw*.50:.1f} {garment_bottom-r*.08:.1f}"/><path d="M{cx+garment_sw*.42:.1f} {garment_top+r*.02:.1f} L{cx+garment_ww*.48:.1f} {sk.waist_y:.1f} L{cx+garment_hemw*.50:.1f} {garment_bottom-r*.08:.1f}"/><path d="M{cx:.1f} {garment_top+r*.04:.1f} L{cx:.1f} {garment_bottom-r*.06:.1f}"/></g>')
+            for i in range(3):
+                by=sk.shoulder_y+r*(.55+i*.28)
+                if by<garment_bottom-r*.10:
+                    parts.append(f'<circle class="garment-button" cx="{cx+r*.10:.1f}" cy="{by:.1f}" r="{max(1.1,r*.018):.1f}" fill="{accent}" stroke="{cloth_shadow}" stroke-width="{max(.6,r*.008):.1f}"/>')
+        elif outer_active:
+            parts.append(f'<g class="garment-bomber-seams" fill="none" stroke="{seam_color}" stroke-width="{seam_width:.1f}" stroke-linecap="round" opacity=".72"><path d="M{cx-garment_sw*.45:.1f} {garment_top+r*.02:.1f} L{cx-garment_ww*.55:.1f} {sk.waist_y-r*.03:.1f}"/><path d="M{cx+garment_sw*.45:.1f} {garment_top+r*.02:.1f} L{cx+garment_ww*.55:.1f} {sk.waist_y-r*.03:.1f}"/><path d="M{cx:.1f} {garment_top:.1f} L{cx:.1f} {min(garment_bottom,sk.waist_y+r*.06):.1f}"/><path d="M{cx-garment_ww*.58:.1f} {sk.waist_y-r*.01:.1f} Q{cx:.1f} {sk.waist_y+r*.05:.1f} {cx+garment_ww*.58:.1f} {sk.waist_y-r*.01:.1f}"/></g>')
+        elif garment_id in {"tactical_baseball","baseball_tech_suit","combat_jacket"}:
+            parts.append(f'<path class="garment-tactical-yoke" d="M{cx-garment_sw*.76:.1f} {garment_top+r*.12:.1f} Q{cx:.1f} {garment_top+r*.30:.1f} {cx+garment_sw*.76:.1f} {garment_top+r*.12:.1f}" fill="none" stroke="{accent}" stroke-width="{seam_width:.1f}" opacity=".62"/>')
         if detail>=18 and recipe["nanowear_state"]!="everyday":
             y=sk.shoulder_y+r*.12
             for side in (-1,1):
