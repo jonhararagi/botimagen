@@ -79,6 +79,50 @@
       "attribution_required": true,
       "attribution": "BotImagen Studio · recurso original creado para este repositorio",
       "purpose": "Preset de datos editable; no es una ilustración fija ni un PNG de terceros."
+    },
+    {
+      "id": "character-part.oc-cyberstreet.base-body",
+      "path": "assets/modular/oc-cyberstreet/base-body.svg",
+      "kind": "modular-component",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+      "purpose": "Neutral front-view body base for the original CyberStreet OC layer stack."
+    },
+    {
+      "id": "character-part.oc-cyberstreet.hair-midnight-cyan",
+      "path": "assets/modular/oc-cyberstreet/hair-midnight-cyan.svg",
+      "kind": "modular-component",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+      "purpose": "Detachable midnight/cyan anime hair component aligned to the head anchor."
+    },
+    {
+      "id": "character-part.oc-cyberstreet.top-neon-jacket",
+      "path": "assets/modular/oc-cyberstreet/top-neon-jacket.svg",
+      "kind": "modular-component",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+      "purpose": "Detachable neon street jacket for the CyberStreet OC layer stack."
+    },
+    {
+      "id": "character-part.oc-cyberstreet.skirt-tech-pleated",
+      "path": "assets/modular/oc-cyberstreet/skirt-tech-pleated.svg",
+      "kind": "modular-component",
+      "author": "BotImagen Studio",
+      "source_url": "https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet",
+      "license": "LicenseRef-BotImagen-Original-Assets",
+      "attribution_required": true,
+      "attribution": "BotImagen Studio · piezas vectoriales originales creadas para este repositorio",
+      "purpose": "Detachable pleated techwear skirt for the CyberStreet OC layer stack."
     }
   ]
 }
