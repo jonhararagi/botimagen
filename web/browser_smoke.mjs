@@ -30,11 +30,29 @@ function pngChunk(type, data) {
   return Buffer.concat([length, name, data, checksum]);
 }
 function makeQaPng() {
+  const width = 320, height = 480;
+  const rowBytes = width * 4;
+  const raw = Buffer.alloc((rowBytes + 1) * height);
+  for (let y = 0; y < height; y++) {
+    const rowStart = y * (rowBytes + 1);
+    raw[rowStart] = 0; // PNG filter: None
+    for (let x = 0; x < width; x++) {
+      let r = 247, g = 247, b = 247, a = 255;
+      if (x >= 118 && x < 202 && y >= 75 && y < 147) { r = 230; g = 164; b = 206; }
+      if (x >= 105 && x < 215 && y >= 155 && y < 315) { r = 71; g = 123; b = 224; }
+      if (((x >= 115 && x < 150) || (x >= 170 && x < 205)) && y >= 310 && y < 435) { r = 48; g = 54; b = 75; }
+      if (((x >= 102 && x < 154) || (x >= 164 && x < 216)) && y >= 435 && y < 451) { r = 34; g = 40; b = 58; }
+      const pixel = rowStart + 1 + x * 4;
+      raw[pixel] = r; raw[pixel + 1] = g; raw[pixel + 2] = b; raw[pixel + 3] = a;
+    }
+  }
   const signature = Buffer.from([137,80,78,71,13,10,26,10]);
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(1, 0); ihdr.writeUInt32BE(1, 4);
+  ihdr.writeUInt32BE(width, 0); ihdr.writeUInt32BE(height, 4);
   ihdr[8] = 8; ihdr[9] = 6;
-  return Buffer.concat([signature, pngChunk("IHDR", ihdr), pngChunk("IDAT", deflateSync(Buffer.from([0,0,0,0,0]))), pngChunk("IEND", Buffer.alloc(0))]);
+  return Buffer.concat([
+    signature, pngChunk("IHDR", ihdr), pngChunk("IDAT", deflateSync(raw)), pngChunk("IEND", Buffer.alloc(0)),
+  ]);
 }
 
 const children = [];
@@ -151,7 +169,7 @@ try {
   await savedAsset.waitFor({ state: "visible", timeout: 10000 });
   const savedImage = savedAsset.locator("img.modular-saved-preview");
   await page.waitForFunction(
-    image => image instanceof HTMLImageElement && image.complete && image.naturalWidth === 1,
+    image => image instanceof HTMLImageElement && image.complete && image.naturalWidth === 320,
     await savedImage.elementHandle(),
     { timeout: 10000 },
   );
