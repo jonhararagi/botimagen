@@ -84,6 +84,8 @@ def validate_piece(piece: dict[str, Any]) -> dict[str, Any]:
         raise CompositionError("layer_order debe ser un entero.")
     if not isinstance(piece.get("anchors_validated", False), bool):
         raise CompositionError("anchors_validated debe ser booleano.")
+    if not isinstance(piece.get("align_to_body", False), bool):
+        raise CompositionError("align_to_body debe ser booleano.")
     return {**piece, "layer_order": order}
 
 
@@ -112,6 +114,30 @@ def validate_selection(pieces: Iterable[dict[str, Any]]) -> list[dict[str, Any]]
     return sorted(clean, key=lambda p: (p["layer_order"], p["id"]))
 
 
+def fit_transform_to_body(piece: dict[str, Any], body: dict[str, Any]) -> dict[str, float]:
+    """Fit a piece to a body by shared normalized landmarks (independent X/Y scales)."""
+    source = piece.get("anchors", {})
+    target = body.get("anchors", {})
+    shared = sorted(set(source) & set(target))
+    if not shared:
+        raise CompositionError(f"La pieza {piece.get('id')} no comparte anclajes con el cuerpo base.")
+    src = [(float(source[name]["x"]), float(source[name]["y"])) for name in shared]
+    dst = [(float(target[name]["x"]), float(target[name]["y"])) for name in shared]
+    def fit_axis(values: list[float], targets: list[float]) -> tuple[float, float]:
+        mean_source = sum(values) / len(values)
+        mean_target = sum(targets) / len(targets)
+        variance = sum((value - mean_source) ** 2 for value in values)
+        if variance < 1e-8:
+            scale = 1.0
+        else:
+            covariance = sum((value - mean_source) * (goal - mean_target) for value, goal in zip(values, targets))
+            scale = max(0.4, min(2.5, covariance / variance))
+        offset = sum(goal - value * scale for value, goal in zip(values, targets)) / len(values)
+        return scale, offset
+    scale_x, offset_x = fit_axis([point[0] for point in src], [point[0] for point in dst])
+    scale_y, offset_y = fit_axis([point[1] for point in src], [point[1] for point in dst])
+    return {"scale_x": scale_x, "scale_y": scale_y, "x": offset_x, "y": offset_y}
+
 def compose_png(
     pieces: Iterable[dict[str, Any]],
     resource_loader,
@@ -134,6 +160,13 @@ def compose_png(
     selected = validate_selection(pieces)
     if not selected:
         raise CompositionError("Selecciona al menos una pieza.")
+    body = next((piece for piece in selected if piece["category"] == "body"), None)
+    needs_anchor_fit = any(piece.get("align_to_body", False) for piece in selected if piece["category"] != "body")
+    if needs_anchor_fit:
+        if body is None:
+            raise CompositionError("El encaje automático requiere una pieza body como esqueleto base.")
+        if not body.get("anchors_validated", False):
+            raise CompositionError("Revisa y confirma los anclajes del cuerpo base antes de encajar prendas automáticamente.")
     canvas = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
     for piece in selected:
         if require_validated_anchors and piece["category"] != "body" and not piece.get("anchors_validated", False):
@@ -150,6 +183,17 @@ def compose_png(
         if image.size != (piece["dimensions"]["width"], piece["dimensions"]["height"]):
             raise CompositionError(f"Las dimensiones del recurso {piece['id']} no coinciden con su contrato.")
         transform = piece.get("transform", {})
+        if piece.get("align_to_body", False) and piece["category"] != "body":
+            if body is None:
+                raise CompositionError("El encaje automático requiere el cuerpo base.")
+            fitted = fit_transform_to_body(piece, body)
+            transform = {
+                **transform,
+                "scale_x": fitted["scale_x"] * transform.get("scale_x", 1),
+                "scale_y": fitted["scale_y"] * transform.get("scale_y", 1),
+                "x": fitted["x"] + transform.get("x", 0),
+                "y": fitted["y"] + transform.get("y", 0),
+            }
         sw = max(1, round(image.width * transform.get("scale_x", 1)))
         sh = max(1, round(image.height * transform.get("scale_y", 1)))
         if (sw, sh) != image.size:

@@ -470,11 +470,15 @@ def make_handler(generator: CharacterGenerator, profiles_path: Path | None = Non
             try:
                 payload = self._read_json(max_bytes=MAX_IMPORT_BODY_BYTES if path == "/api/modular-assets" else MAX_BODY_BYTES)
                 if validate_anchor_route:
-                    if payload != {"confirm": True}:
-                        raise ApiInputError("Se requiere confirm=true después de revisar la pieza en la vista previa.")
+                    if (
+                        not isinstance(payload, dict)
+                        or payload.get("confirm") is not True
+                        or set(payload) - {"confirm", "anchors"}
+                    ):
+                        raise ApiInputError("Se requiere confirm=true y, opcionalmente, el mapa de anclajes ajustados.")
                     asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/validate-anchors").strip("/")
                     try:
-                        result = confirm_user_asset_anchors(asset_id)
+                        result = confirm_user_asset_anchors(asset_id, anchors=payload.get("anchors"))
                     except FileNotFoundError:
                         self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
                         return

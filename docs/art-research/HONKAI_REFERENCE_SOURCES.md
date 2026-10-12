@@ -69,3 +69,31 @@ No etiquetar como aprobado un recurso solo porque sea accesible sin iniciar sesi
 La investigación localizó páginas y catálogos públicos, pero no descargó archivos binarios en este commit. El conector de GitHub utilizado para modificar este documento crea archivos de texto; no sube imágenes ni modelos binarios. Para integrar archivos reales hace falta una sesión de repositorio con capacidad de transferencia de binarios, por ejemplo el workspace de desarrollo sincronizado, Git LFS para archivos grandes cuando proceda, o un flujo de descarga controlada que guarde los archivos y sus metadatos antes de hacer commit.
 
 La meta no es acumular enlaces: es conseguir un personaje OC que se pueda editar, vestir, guardar y renderizar desde un flujo 2D/3D verificable.
+
+
+## G. Enlaces directos para buscar arte oficial de Honkai Impact 3rd
+
+Estos enlaces permiten localizar imágenes para descargar manualmente y añadir como **referencias locales** a la biblioteca de BotImagen:
+
+- [Directorio oficial de personajes / Valkyries](https://honkaiimpact3.hoyoverse.com/global/en-us/valkyries)
+- [Sitio oficial internacional](https://honkaiimpact3.hoyoverse.com/global/en-us/home)
+- [Galería oficial de wallpapers (ruta histórica del sitio de Honkai)](https://honkaiimpact3.mihoyo.com/global/en-us/media/wallpaper)
+- [Anuncio oficial de Honkai Impact 3rd Art Collection Vol. 2](https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263)
+- [Índice de modelos MMD con enlaces a publicaciones oficiales de HoYoverse](https://www.hoyolab.com/article/9153161) · índice comunitario para localizar descargas y sus condiciones, no un paquete de assets ya preparado para BotImagen.
+
+Ejemplos de archivos servidos desde el CDN de HoYoverse encontrados durante la búsqueda (enlaces directos de imagen; pueden cambiar o dejar de estar disponibles):
+
+- [Imagen CDN HoYoverse 1](https://fastcdn.hoyoverse.com/static-resource-v2/2024/02/26/38fb67a9535b8fc8665dbbfb416c07ad_1746331783350114280.png)
+- [Imagen CDN HoYoverse 2](https://fastcdn.hoyoverse.com/content-v2/bh3/160559/da62028f2941558fd732393ce207ece1_8319622304025643387.png?x-oss-process=image/resize,w_475)
+- [Imagen CDN HoYoverse 3](https://fastcdn.hoyoverse.com/content-v2/bh3/164923/57a94bf80cabfa357e8b69a9fb4718b1_3725007893788408871.png?x-oss-process=image/resize,w_475)
+- [Imagen CDN HoYoverse 4](https://fastcdn.hoyoverse.com/content-v2/bh3/125663/bc499334cd98a231d87a029094143c89_6791956899214710392.png?x-oss-process=image/resize,w_475)
+- [Imagen CDN HoYoverse 5](https://fastcdn.hoyoverse.com/content-v2/bh3/126515/6638c6f155b5851d3f1ed3e4e6123262_4052531512744235568.png?x-oss-process=image/resize,w_475)
+
+### Cómo meter estas imágenes al editor
+
+1. Abre una imagen o el directorio oficial, descarga la referencia en tu PC y, en BotImagen, selecciona **Referencia / clasificar después** o **Personaje completo** y define si la vista es frontal o trasera.
+2. Para crear una pieza que se pueda quitar y cambiar (chaqueta, falda, cabello), necesitas una imagen de esa pieza recortada por separado y con fondo transparente. Cárgala como **Pieza separada**, elige su categoría y ajusta los puntos magenta del esqueleto en la vista previa.
+3. Confirma primero las articulaciones del cuerpo base; luego confirma las de cada prenda. El compositor puede entonces usar los anclajes coincidentes para ajustar escala y posición al cuerpo.
+4. Mantén estas imágenes como referencias locales y conserva su URL de procedencia. No se han descargado ni copiado al repositorio los binarios de Honkai; los enlaces anteriores son para que el usuario encuentre y añada las referencias que elija.
+
+Las páginas oficiales y el CDN pueden ofrecer imágenes cuya descarga esté disponible sin que por ello la imagen se convierta automáticamente en un componente separable o en un asset con permiso general de redistribución.

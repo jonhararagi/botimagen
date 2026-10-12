@@ -27,6 +27,48 @@ const layerOrder:Record<string,number> = {
   face:50, eyes:52, brows:54, mouth:56, accessory_back:58, accessory_front:60, hair_front:70,
 };
 
+
+const anchorLabels:Record<string,string> = {
+  origin:"Centro",head:"Cabeza",neck:"Cuello",shoulder_l:"Hombro izq.",shoulder_r:"Hombro der.",
+  waist:"Cintura",hip:"Cadera",elbow_l:"Codo izq.",elbow_r:"Codo der.",
+  hand_l:"Mano izq.",hand_r:"Mano der.",knee_l:"Rodilla izq.",knee_r:"Rodilla der.",
+  ankle_l:"Tobillo izq.",ankle_r:"Tobillo der.",
+};
+const skeletonLinks:[string,string][] = [
+  ["head","neck"],["neck","shoulder_l"],["neck","shoulder_r"],
+  ["shoulder_l","elbow_l"],["elbow_l","hand_l"],["shoulder_r","elbow_r"],["elbow_r","hand_r"],
+  ["neck","waist"],["waist","hip"],["hip","knee_l"],["knee_l","ankle_l"],
+  ["hip","knee_r"],["knee_r","ankle_r"],
+];
+
+function AnchorStageEditor({imageUrl,anchors,onChange,label}:{imageUrl:string;anchors:AssetConversionMetadata["anchors"];onChange:(value:AssetConversionMetadata["anchors"])=>void;label:string}) {
+  const dragging=useRef<string|null>(null);
+  return <svg className="modular-anchor-stage" viewBox="0 0 512 768" role="group" aria-label={label}
+    onPointerMove={event=>{
+      const name=dragging.current;
+      if(!name)return;
+      const rect=event.currentTarget.getBoundingClientRect();
+      if(!rect.width||!rect.height)return;
+      const x=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
+      const y=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
+      onChange({...anchors,[name]:{x:Number(x.toFixed(4)),y:Number(y.toFixed(4))}});
+    }}
+    onPointerUp={event=>{dragging.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);}}
+    onPointerCancel={()=>{dragging.current=null;}}>
+    <image href={imageUrl} x="0" y="0" width="512" height="768" preserveAspectRatio="none"/>
+    <g className="modular-anchor-bones" pointerEvents="none">
+      {skeletonLinks.filter(([a,b])=>anchors[a]&&anchors[b]).map(([a,b])=><line key={a+"-"+b} x1={anchors[a].x*512} y1={anchors[a].y*768} x2={anchors[b].x*512} y2={anchors[b].y*768}/>)}
+    </g>
+    {Object.entries(anchors).map(([name,point])=><g key={name} className="modular-anchor-point" role="slider" tabIndex={0}
+      aria-label={anchorLabels[name]||name} aria-valuetext={`X ${Math.round(point.x*512)}, Y ${Math.round(point.y*768)}`}
+      transform={`translate(${point.x*512} ${point.y*768})`}
+      onPointerDown={event=>{event.preventDefault();dragging.current=name;event.currentTarget.ownerSVGElement?.setPointerCapture(event.pointerId);}}>
+      <circle r="9"/><circle className="modular-anchor-dot" r="3.2"/>
+      <text x="11" y="-8">{anchorLabels[name]||name}</text>
+    </g>)}
+  </svg>;
+}
+
 function readDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -154,7 +196,7 @@ export function ModularAssetLibrary() {
     setBusy(true);
     try {
       const response=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/validate-anchors",{
-        method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirm:true}),
+        method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirm:true,...(asset.anchor_estimate?{anchors:asset.anchor_estimate}:{})}),
       });
       const result=await response.json();
       if(!response.ok) throw new Error(result.error||"No se pudieron confirmar los anclajes.");
@@ -179,7 +221,7 @@ export function ModularAssetLibrary() {
           dimensions:{width:asset.width,height:asset.height},anchors:asset.anchor_estimate||{},
           transform:{x:0,y:0,scale_x:1,scale_y:1},
           layer_order:asset.layer_order??layerOrder[asset.category]??50,
-          anchors_validated:asset.anchors_validated===true,compatible_with:[],
+          anchors_validated:asset.anchors_validated===true,align_to_body:asset.category!=="body",compatible_with:[],
         };
       });
       const response=await fetch("/api/modular-compose",{
@@ -202,7 +244,7 @@ export function ModularAssetLibrary() {
   return <section className="modular-library" aria-label="Biblioteca modular 2D">
     <div className="modular-library-head">
       <div><small>ASSET FORGE · OFFLINE FIRST</small><h3>Convertidor PNG y biblioteca de piezas</h3>
-        <p>Usa imágenes normales. El convertidor crea una versión con fondo transparente y lienzo común de 512×768, conserva la fuente, propone anclajes y permite componer las piezas verificadas.</p>
+        <p>Importa PNG normales. El convertidor conserva el original, crea una versión 512×768, propone puntos del esqueleto que puedes arrastrar y encaja piezas sobre un cuerpo base confirmado.</p>
       </div><b>{assets.length} RECURSOS</b>
     </div>
 
@@ -237,7 +279,7 @@ export function ModularAssetLibrary() {
       <label className="modular-range"><span>Desplazamiento vertical <b>{offsetY}px</b></span><input aria-label="Desplazamiento vertical" type="range" min="-240" max="240" step="10" value={offsetY} onChange={e=>{setOffsetY(Number(e.target.value));clearConversions();}}/></label>
     </div>
 
-    <p className="modular-converter-note"><b>Regla rápida:</b> un PNG completo con una pose concreta se importa como personaje completo. Para cambiar solo cabello o ropa, selecciona «Pieza separada» y carga ese elemento recortado o transparente. La herramienta quita fondos planos; no inventa partes ocultas ni convierte por sí sola una ilustración plana en capas reales.</p>
+    <p className="modular-converter-note"><b>Regla rápida:</b> una ilustración PNG completa se conserva como personaje entero con esa pose o como referencia frontal/trasera. Para cambiar solo pelo o ropa, importa cada pieza separada, idealmente con transparencia. Se eliminan fondos planos conectados a las esquinas; no se inventan los píxeles ocultos de una ilustración plana.</p>
     <div className="modular-dropzone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();selectFiles(e.dataTransfer.files);}}>
       <strong>Arrastra imágenes aquí</strong><span>PNG, JPEG o WebP · máximo 12 MiB y 20 megapíxeles por archivo</span>
       <button type="button" className="btn muted" onClick={()=>input.current?.click()}>Seleccionar imágenes</button>
@@ -247,7 +289,7 @@ export function ModularAssetLibrary() {
       {previews.map((item,i)=><div key={item.url} className="modular-preview-card">
         <img src={item.url} alt={`Imagen fuente ${item.file.name}`}/>
         <span>{item.file.name}</span><small>Original · {Math.round(item.file.size/1024)} KiB</small>
-        {item.convertedUrl&&<><img className="modular-converted-preview" src={item.convertedUrl} alt={`PNG normalizado de ${item.file.name} 512 por 768`}/><small>Material convertido · 512×768</small></>}
+        {item.convertedUrl&&<>{kind==="modular_piece"&&item.conversion?<div className="modular-converted-preview"><AnchorStageEditor imageUrl={item.convertedUrl} anchors={item.conversion.anchors} label={`Ajustar esqueleto de ${item.file.name}`} onChange={anchors=>setPreviews(current=>current.map((entry,j)=>j===i&&entry.conversion?{...entry,conversion:{...entry.conversion,anchors}}:entry))}/></div>:<img className="modular-converted-preview" src={item.convertedUrl} alt={`PNG normalizado de ${item.file.name} 512 por 768`}/>}<small>{kind==="modular_piece"?"Arrastra los puntos del esqueleto al lugar real de cada articulación; se guardarán con la pieza.":"Material convertido · 512×768"}</small></>}
         <button type="button" onClick={()=>setPreviews(current=>current.filter((_,j)=>j!==i))}>Quitar</button>
       </div>)}
     </div>}
@@ -261,22 +303,22 @@ export function ModularAssetLibrary() {
     <div className="modular-asset-list">
       {assets.map(asset=>{
         const canCompose=isConvertiblePiece(asset);
-        const selectable=canCompose&&(asset.category==="body"||asset.anchors_validated===true);
+        const selectable=canCompose&&asset.anchors_validated===true;
         return <article key={asset.id} data-asset-id={asset.id} data-asset-kind={asset.kind}>
-          <img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={`Material guardado ${asset.label}`}/>
+          {asset.kind==="modular_piece"&&asset.conversion?<div className="modular-saved-preview"><AnchorStageEditor imageUrl={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} anchors={asset.anchor_estimate||asset.conversion.anchors} label={`Ajustar esqueleto de ${asset.label}`} onChange={anchors=>setAssets(current=>current.map(entry=>entry.id===asset.id?{...entry,anchor_estimate:anchors,conversion:entry.conversion?{...entry.conversion,anchors}:entry.conversion}:entry))}/></div>:<img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={`Material guardado ${asset.label}`}/>}
           <b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span>
           <small>{asset.filename} · SHA-256 {asset.sha256.slice(0,16)}… · licencia: {asset.license}</small>
           {asset.conversion&&<small>{asset.conversion.background_removed?"Fondo plano retirado":"Fondo conservado"} · vista {asset.view} · anclajes: {asset.anchor_status==="user_confirmed"?"confirmados":"estimados sin validar"}</small>}
           {canCompose&&<div className="modular-asset-actions">
             <label className="modular-check"><input type="checkbox" aria-label={`Seleccionar pieza ${asset.label}`} checked={selectedAssets.includes(asset.id)} disabled={!selectable||busy} onChange={e=>toggleAsset(asset.id,e.target.checked)}/>{asset.category==="body"?"Base del esqueleto":"Incluir en la composición"}</label>
-            {!asset.anchors_validated&&asset.category!=="body"&&<button type="button" className="btn muted" disabled={busy} onClick={()=>void confirmAnchors(asset)}>Confirmar encaje y anclajes</button>}
-            {!selectable&&asset.category!=="body"&&<small>Primero revisa el PNG en el lienzo y confirma los anclajes aproximados.</small>}
+            {!asset.anchors_validated&&canCompose&&<button type="button" className="btn muted" disabled={busy} onClick={()=>void confirmAnchors(asset)}>Confirmar puntos del esqueleto</button>}
+            {!selectable&&canCompose&&<small>Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático.</small>}
           </div>}
         </article>;
       })}
     </div>
     <div className="modular-composition-panel">
-      <div><b>Compositor de piezas importadas</b><p>Las imágenes comparten el mismo lienzo; el esqueleto usa los anclajes para ordenar y verificar las capas. La primera capa del conjunto debe ser un cuerpo base.</p></div>
+      <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Confirma primero los puntos del cuerpo y de cada pieza; toda composición modular necesita un cuerpo base.</p></div>
       <button className="btn primary" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void composeSelection()}>{busy?"Componiendo…":`Componer selección (${selectedAssets.length})`}</button>
       <span role="status" data-testid="modular-compose-status">{composeStatus}</span>
       {compositionPreview&&<img className="modular-composition-preview" src={compositionPreview} alt="Composición PNG de piezas modulares importadas"/>}

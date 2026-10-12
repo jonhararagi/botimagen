@@ -146,7 +146,11 @@ def list_user_assets(library_root: Path | None = None) -> dict[str, Any]:
     return {"schema_version": 1, "count": len(visible), "assets": visible}
 
 
-def confirm_user_asset_anchors(asset_id: str, library_root: Path | None = None) -> dict[str, Any]:
+def confirm_user_asset_anchors(
+    asset_id: str,
+    library_root: Path | None = None,
+    anchors: Any = None,
+) -> dict[str, Any]:
     """Promote a normalized candidate only after the user checks its stage preview."""
     if not isinstance(asset_id, str) or not re.fullmatch(r"user\.[0-9a-f]{32}", asset_id):
         raise AssetImportError("Identificador de asset inválido.")
@@ -163,10 +167,17 @@ def confirm_user_asset_anchors(asset_id: str, library_root: Path | None = None) 
         raise AssetImportError("Convierte la imagen al lienzo común 512×768 antes de validar sus anclajes.")
     if not isinstance(item.get("anchor_estimate"), dict) or not item["anchor_estimate"]:
         raise AssetImportError("La pieza no contiene estimaciones de anclaje.")
-    _validate_conversion_metadata(item["conversion"], item["width"], item["height"])
+    conversion = dict(item["conversion"])
+    if anchors is not None:
+        conversion["anchors"] = anchors
+    clean_conversion = _validate_conversion_metadata(conversion, item["width"], item["height"])
+    if clean_conversion is None:
+        raise AssetImportError("La pieza no contiene metadatos de conversión válidos.")
+    item["conversion"] = clean_conversion
+    item["anchor_estimate"] = clean_conversion["anchors"]
     item["anchors_validated"] = True
     item["anchor_status"] = "user_confirmed"
-    item["note"] = "El usuario revisó y confirmó los anclajes estimados en la vista previa del lienzo."
+    item["note"] = "El usuario ajustó/revisó los puntos del esqueleto en la vista previa y confirmó el encaje."
     temporary = root / ("catalog.json." + uuid.uuid4().hex + ".tmp")
     try:
         with temporary.open("x", encoding="utf-8") as handle:

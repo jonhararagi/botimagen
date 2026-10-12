@@ -181,6 +181,53 @@ try {
     .waitFor({ state: "visible", timeout: 15000 });
 
 
+  // Full PNG-to-rig flow: edit body joints, persist them, fit a garment, and compose.
+  await page.getByLabel("Tipo de recurso").selectOption("modular_piece");
+  await page.getByLabel("Clasificación de la imagen").selectOption("body");
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-body-anchor.png", mimeType: "image/png", buffer: makeQaPng() });
+  await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
+  const bodyStage = page.locator(".modular-preview-card .modular-anchor-stage").first();
+  await bodyStage.waitFor({ timeout: 10000 });
+  const headPoint = bodyStage.locator('.modular-anchor-point[aria-label="Cabeza"]');
+  const originalHeadTransform = await headPoint.getAttribute("transform");
+  const stageBox = await bodyStage.boundingBox();
+  const headBox = await headPoint.boundingBox();
+  assert.ok(stageBox && headBox, "The normalized PNG should show draggable skeleton landmarks");
+  await page.mouse.move(headBox.x + headBox.width / 2, headBox.y + headBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(stageBox.x + stageBox.width * 0.54, stageBox.y + stageBox.height * 0.12, { steps: 6 });
+  await page.mouse.up();
+  await page.waitForFunction(previous => {
+    const point = document.querySelector('.modular-preview-card .modular-anchor-point[aria-label="Cabeza"]');
+    return point instanceof SVGGElement && point.getAttribute("transform") !== previous;
+  }, originalHeadTransform, { timeout: 5000 });
+  const movedTransform = await bodyStage.locator('.modular-anchor-point[aria-label="Cabeza"]').getAttribute("transform");
+  const movedHead = movedTransform?.match(/translate\(([\d.]+) ([\d.]+)\)/);
+  assert.ok(movedHead, "The edited landmark should keep its normalized stage coordinates");
+  await page.getByRole("button", { name: "Guardar material convertido" }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("material(es) convertido(s)") ?? false, null, { timeout: 15000 });
+  const bodyAsset = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-body-anchor" }).first();
+  await bodyAsset.waitFor({ state: "visible", timeout: 10000 });
+  await bodyAsset.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("Anclajes confirmados") ?? false, null, { timeout: 10000 });
+  const persistedRig = await page.evaluate(async () => { const r = await fetch("/api/modular-assets"); if (!r.ok) throw new Error("Could not read imported rig asset"); const d = await r.json(); return d.assets.find(asset => asset.label === "qa-body-anchor"); });
+  assert.ok(persistedRig?.anchors_validated, "The body landmarks should be confirmed and persisted");
+  assert.ok(Math.abs(persistedRig.anchor_estimate.head.x - Number(movedHead[1]) / 512) < 0.01, "The dragged head landmark should persist in the local asset catalog");
+  await page.getByRole("checkbox", { name: "Seleccionar pieza qa-body-anchor" }).check();
+
+  await page.getByLabel("Clasificación de la imagen").selectOption("clothing_top");
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-top-anchor.png", mimeType: "image/png", buffer: makeQaPng() });
+  await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
+  await page.locator(".modular-preview-card .modular-anchor-stage").last().waitFor({ timeout: 10000 });
+  await page.getByRole("button", { name: "Guardar material convertido" }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("material(es) convertido(s)") ?? false, null, { timeout: 15000 });
+  const topAsset = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-top-anchor" }).first();
+  await topAsset.waitFor({ state: "visible", timeout: 10000 });
+  await topAsset.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("Anclajes confirmados") ?? false, null, { timeout: 10000 });
+  await page.getByRole("checkbox", { name: "Seleccionar pieza qa-top-anchor" }).check();
+  await page.getByRole("button", { name: "Componer selección (2)" }).click();
+  await page.waitForFunction(() => { const image = document.querySelector("img.modular-composition-preview"); return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768; }, null, { timeout: 15000 });
   const assetContracts = await page.evaluate(async () => {
     const response = await fetch("/api/assets/contracts");
     if (!response.ok) throw new Error("The asset contract catalog endpoint is unavailable through the web proxy");

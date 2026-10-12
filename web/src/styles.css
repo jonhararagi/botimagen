@@ -144,3 +144,20 @@
 .modular-composition-preview{grid-column:1/-1;width:100%;max-height:550px;object-fit:contain;border:1px solid #3d4b60;border-radius:10px;background:repeating-conic-gradient(#222a3a 0% 25%,#101725 0% 50%) 50%/20px 20px}
 .modular-composition-panel button:disabled{opacity:.55}
 @media(max-width:650px){.modular-converter-options{grid-template-columns:1fr}.modular-source-url{grid-column:1}.modular-composition-panel{grid-template-columns:1fr}.modular-composition-panel [role=status]{grid-column:1}}
+
+
+/* Editable joint markers on imported normalized PNG layers */
+.modular-converted-preview{display:block;width:100%;max-width:256px;margin:4px auto 0;overflow:hidden;border:1px solid #466274;border-radius:6px;background-color:#101827;background-image:linear-gradient(45deg,#20283a 25%,transparent 25%),linear-gradient(-45deg,#20283a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#20283a 75%),linear-gradient(-45deg,transparent 75%,#20283a 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.modular-anchor-stage{display:block;width:100%;height:auto;touch-action:none;user-select:none;cursor:crosshair}
+.modular-anchor-bones line{stroke:#62f4ec;stroke-width:3;stroke-linecap:round;stroke-dasharray:7 5;opacity:.95}
+.modular-anchor-point{cursor:grab;outline:none}
+.modular-anchor-point:active{cursor:grabbing}
+.modular-anchor-point circle{fill:#ff67c4;stroke:#fff;stroke-width:2.2;vector-effect:non-scaling-stroke}
+.modular-anchor-point .modular-anchor-dot{fill:#fff;stroke:#ff67c4;stroke-width:1.5}
+.modular-anchor-point text{font-size:11px;font-weight:700;fill:#fff;stroke:#0b1221;stroke-width:3px;paint-order:stroke;pointer-events:none}
+.modular-asset-list article .modular-saved-preview{display:block;width:100%;max-width:256px;max-height:none;margin:4px auto;background-color:#101827;background-image:linear-gradient(45deg,#20283a 25%,transparent 25%),linear-gradient(-45deg,#20283a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#20283a 75%),linear-gradient(-45deg,transparent 75%,#20283a 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+
+
+/* Preserve the full normalized canvas while dragging skeleton markers. */
+.modular-preview-card div.modular-converted-preview{height:auto;max-height:none;object-fit:unset;padding:0;overflow:hidden}
+.modular-preview-card div.modular-converted-preview .modular-anchor-stage{display:block;width:100%;height:auto;max-width:100%}

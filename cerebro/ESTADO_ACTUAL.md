@@ -584,3 +584,14 @@ QA Windows: `NOT_RUN`.
 - main comprobada sin cambios (b508cfe7d3216eda801438d46dff8873842cea86). PR #11 permanece abierta/sin fusionar y PR #14 permanece independiente.
 - TIMER para ampliar la siguiente fase artística (mejor segmentación asistida, biblioteca extensa de piezas, mayor riqueza visual y anclajes editables): estimación inicial **8–16 horas activas** según alcance; no es una estimación de finalización de todo BotImagen.
 - Referencias oficiales para el usuario: wallpapers/media https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper ; Art Collection Vol. 2 https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263 ; Art Collection Vol. 1 https://honkaiimpact3.hoyoverse.com/global/en-us/news/106541?cate=516 ; noticias oficiales https://honkaiimpact3.hoyoverse.com/global/en-us/news . No se incorporaron imágenes oficiales al repositorio; importarlas de forma manual y mantener su procedencia/licencia.
+
+
+## BIMG-PNG-TO-RIG-001 · importador PNG con esqueleto ajustable y encaje automático · 2026-10-12
+
+- Se amplía el importador existente de `web/src/visual/ModularAssetLibrary.tsx`; no se creó un segundo flujo paralelo.
+- El usuario puede arrastrar los puntos normalizados del esqueleto directamente sobre la vista previa PNG 512×768 antes de guardar o sobre una pieza ya guardada. Las coordenadas ajustadas se envían a `POST /api/modular-assets/{id}/validate-anchors` y se guardan en `anchor_estimate` y `conversion.anchors`.
+- `modular_character_compositor.py` añade `fit_transform_to_body`: obtiene escala X/Y y traslación a partir de los anclajes compartidos entre cuerpo y pieza. La composición exige confirmar los anclajes del cuerpo base y que cada pieza utilizable tenga sus anclajes confirmados. Se rechaza el encaje si no existen puntos compatibles.
+- El flujo frontal/trasero se mantiene por imagen con su metadata `view`; los PNG de personaje completo siguen guardados como un único sprite/referencia, sin fingir que la segmentación automática separó ropa o pelo oculto.
+- Pruebas nuevas añadidas para anclajes editados y persistidos, cálculo de encaje, y composición PNG alineada. Se amplió el smoke de Chromium para cubrir arrastre de puntos, persistencia de anclajes y encaje cuerpo+prenda.
+- La nueva revisión aún necesita CI y smoke E2E verdes antes de declararse validada. No se ha hecho prueba manual en Windows.
+- TIMER estimado para esta integración del importador/rig: **4–8 horas activas**; tiempo real `NOT_MEASURED`. No es el tiempo restante total de BotImagen.

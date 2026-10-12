@@ -8,8 +8,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from PIL import Image
 
 from modular_character_compositor import (
-    CompositionError, compose_png, make_modular_profile, migrate_profile,
-    validate_piece,
+    CompositionError, compose_png, fit_transform_to_body, make_modular_profile,
+    migrate_profile, validate_piece,
 )
 
 
@@ -92,5 +92,58 @@ class ModularCompositorTests(unittest.TestCase):
             validate_selection([piece("base", "body", "a", 20), piece("base", "body", "b", 20)])
 
 
+    def test_compose_png_aligns_a_piece_to_confirmed_body_landmarks(self):
+        body_png = png((20, 60, 220, 255), size=(16, 16))
+        top_png = png((240, 30, 150, 255), size=(16, 16))
+        body = {
+            "schema_version": 1, "id": "body-main", "category": "body", "resource": "body",
+            "dimensions": {"width": 16, "height": 16},
+            "anchors": {"waist": {"x": 0.75, "y": 0.5}}, "anchors_validated": True,
+        }
+        top = {
+            "schema_version": 1, "id": "top-main", "category": "top", "resource": "top",
+            "dimensions": {"width": 16, "height": 16},
+            "anchors": {"waist": {"x": 0.25, "y": 0.5}},
+            "anchors_validated": True, "align_to_body": True,
+        }
+        result = compose_png([body, top], lambda key: {"body": body_png, "top": top_png}[key], (32, 16))
+        with Image.open(io.BytesIO(result)) as image:
+            self.assertEqual(image.convert("RGBA").getpixel((1, 1)), (20, 60, 220, 255))
+            self.assertEqual(image.convert("RGBA").getpixel((16, 1)), (240, 30, 150, 255))
+            self.assertEqual(image.convert("RGBA").getpixel((31, 1)), (240, 30, 150, 255))
+    def test_anchor_fit_maps_piece_landmarks_to_body(self):
+        body = {"id": "body", "category": "body", "anchors": {
+            "shoulder_l": {"x": 0.25, "y": 0.20},
+            "shoulder_r": {"x": 0.75, "y": 0.20},
+            "waist": {"x": 0.50, "y": 0.50},
+        }}
+        top = {"id": "top", "category": "top", "anchors": {
+            "shoulder_l": {"x": 0.30, "y": 0.20},
+            "shoulder_r": {"x": 0.70, "y": 0.20},
+            "waist": {"x": 0.50, "y": 0.60},
+        }}
+        fitted = fit_transform_to_body(top, body)
+        self.assertAlmostEqual(fitted["scale_x"], 1.25, places=5)
+        self.assertAlmostEqual(fitted["scale_y"], 0.75, places=5)
+        self.assertAlmostEqual(fitted["x"], -0.125, places=5)
+        self.assertAlmostEqual(fitted["y"], 0.05, places=5)
+
+    def test_anchor_fit_rejects_unmatched_landmarks(self):
+        with self.assertRaisesRegex(CompositionError, "no comparte anclajes"):
+            fit_transform_to_body(
+                {"id": "coat", "anchors": {"hand_l": {"x": 0.2, "y": 0.5}}},
+                {"id": "body", "anchors": {"head": {"x": 0.5, "y": 0.1}}},
+            )
+
+    def test_anchor_fit_requires_confirmed_body_anchors(self):
+        with self.assertRaisesRegex(CompositionError, "confirma los anclajes del cuerpo base"):
+            compose_png([
+                {"schema_version": 1, "id": "body", "category": "body", "resource": "body",
+                 "dimensions": {"width": 2, "height": 2}, "anchors": {"waist": {"x": 0.5, "y": 0.5}},
+                 "anchors_validated": False},
+                {"schema_version": 1, "id": "top", "category": "top", "resource": "top",
+                 "dimensions": {"width": 2, "height": 2}, "anchors": {"waist": {"x": 0.5, "y": 0.5}},
+                 "anchors_validated": True, "align_to_body": True},
+            ], lambda _: b"", (2, 2))
 if __name__ == "__main__":
     unittest.main()

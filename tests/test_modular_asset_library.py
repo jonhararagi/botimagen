@@ -121,6 +121,24 @@ class ModularAssetLibraryTests(unittest.TestCase):
             self.assertEqual(confirmed["anchor_status"], "user_confirmed")
             self.assertEqual(list_user_assets(root)["count"], 2)
 
+    def test_user_adjusted_anchor_coordinates_are_persisted_on_confirmation(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = import_user_asset(payload(filename="source.png", label="Source image"), root)
+            conversion = conversion_metadata(source)
+            candidate = import_user_asset(payload(
+                data=PNG_STAGE, filename="body-stage.png", source_filename="source.png",
+                category="body", kind="modular_piece", label="Body stage",
+                source_asset_id=source["id"], conversion=conversion,
+            ), root)
+            adjusted = dict(conversion["anchors"])
+            adjusted["head"] = {"x": 0.54, "y": 0.11}
+            confirmed = confirm_user_asset_anchors(candidate["id"], root, anchors=adjusted)
+            self.assertTrue(confirmed["anchors_validated"])
+            self.assertEqual(confirmed["anchor_estimate"]["head"], {"x": 0.54, "y": 0.11})
+            self.assertEqual(confirmed["conversion"]["anchors"]["head"], {"x": 0.54, "y": 0.11})
+            reloaded = list_user_assets(root)["assets"][1]
+            self.assertEqual(reloaded["anchor_estimate"]["head"], {"x": 0.54, "y": 0.11})
     def test_conversion_rejects_untrusted_anchor_coordinates(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
