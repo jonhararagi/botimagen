@@ -1322,7 +1322,7 @@ try {
   await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-no-hair.png") });
   await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
   await page.getByRole("status").filter({ hasText: "Perfil guardado en el almacenamiento local del motor" }).waitFor({ timeout: 15000 });
-  const profileSelect = cyberstreet.locator("select").filter({ has: page.locator("option", { hasText: "Seleccionar perfil" }) });
+  const profileSelect = cyberstreet.locator("select").first();
   await profileSelect.waitFor({ state: "visible" });
   const savedProfileOption = await profileSelect.locator("option").evaluateAll(options => options.find(option => option.value && option.textContent?.includes("Mi personaje CyberStreet"))?.value || "");
   assert.ok(savedProfileOption, "The modular profile should be persisted through the existing profile API");
