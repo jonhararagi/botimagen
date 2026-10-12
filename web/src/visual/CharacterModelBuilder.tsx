@@ -111,10 +111,11 @@ export function CharacterModelBuilder() {
   };
   useEffect(()=>{
     if(!model||!editingLayerId)return;
-    let cancelled=false;
+    let cancelled=false,sourceLoaded=false,maskLoaded=false;
     setMaskReady(false);
     const source=new Image(),layer=new Image();
-    source.onload=()=>{if(cancelled)return;sourceImageRef.current=source;};
+    const markReady=()=>{if(!cancelled&&sourceLoaded&&maskLoaded){setMaskReady(true);drawMaskPreview();}};
+    source.onload=()=>{if(cancelled)return;sourceImageRef.current=source;sourceLoaded=true;markReady();};
     layer.onload=()=>{
       if(cancelled)return;
       const maskCanvas=maskCanvasRef.current;
@@ -124,9 +125,7 @@ export function CharacterModelBuilder() {
       tempCtx.drawImage(layer,0,0,512,768);
       const rgba=tempCtx.getImageData(0,0,512,768),mask=maskCtx.createImageData(512,768);
       for(let i=0;i<rgba.data.length;i+=4){const value=rgba.data[i+3];mask.data[i]=value;mask.data[i+1]=value;mask.data[i+2]=value;mask.data[i+3]=255;}
-      maskCtx.putImageData(mask,0,0);maskHistoryRef.current=[];setMaskDirty(false);setPolygonPoints([]);setMaskReady(true);
-      if(source.complete&&source.naturalWidth)drawMaskPreview();
-      else source.onload=()=>{if(!cancelled){sourceImageRef.current=source;drawMaskPreview();}};
+      maskCtx.putImageData(mask,0,0);maskHistoryRef.current=[];setMaskDirty(false);setPolygonPoints([]);maskLoaded=true;markReady();
     };
     source.src=imageUrl(model.id,"source.png");
     layer.src=imageUrl(model.id,"layers/"+editingLayerId+".png");
