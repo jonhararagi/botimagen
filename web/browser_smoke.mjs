@@ -666,9 +666,7 @@ try {
     document.head.appendChild(style);
     const svg = document.querySelector(".visual-character-svg");
     if (!svg) throw new Error("Neutral QA fixture could not find the rendered SVG");
-    for (const selector of ['[data-layer-id="ground-shadow"]','[data-layer-id="hair-back"]',".garment-sleeves",'[data-layer-id="base-sleeves"]',".garment-torso-main",".garment-torso-panels",'[data-layer-id="lower-body"]','[data-layer-id="footwear"]','[data-layer-id="outfit"]','[data-layer-id="outer-layer"]','[data-layer-id="surface-details"]','[data-layer-id="chromapatch"]',':scope > path:not([data-layer-id])',':scope > ellipse:not([data-layer-id]):not([fill^="url(#cw-skin-"])']) {
-      for (const el of svg.querySelectorAll(selector)) el.style.setProperty("display","none","important");
-    }
+    // CSS is scoped to this QA fixture; avoid inline DOM mutations that could leak into later smoke checks.
   }, neutralStyleId);
   const neutralBounds = async () => page.locator(".visual-character-svg").evaluate(svg => {
     const box = selector => {
