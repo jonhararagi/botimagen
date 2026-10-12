@@ -417,3 +417,15 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - **CI #399 SUCCESS** para el HEAD de implementación `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`; artefacto: https://github.com/jonhararagi/botimagen/actions/runs/38253325201/artifacts/11748818282.
 - Capturas PNG reales inspeccionadas: dos presets en frontal/trasera, cara/nariz y variaciones de peinado/color/largo. Mejora visible en la longitud del cabello posterior y en el contorno facial; el sombreado frontal sigue siendo moderado. Persisten rigidez de pose/manos pequeñas y familias de peinado compartidas. Por tanto, **PARTIAL**, sin aceptación artística completa.
 - CI #401 SUCCESS para el HEAD de integración `ec48ef00754248d5f45582531fecc1fa87a74bf0`; la validación de esta actualización documental queda asociada al run final registrado en el PR. `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real: `NOT_MEASURED`. Beta global: **63%**.
+
+
+## BIMG-MODULAR-2D-002 · estado de integración (2026-10-12)
+
+- Rama de trabajo: `feature/bimg-engine-001-cyberstreet-visual-renderer`; cambios publicados incrementalmente en GitHub.
+- Añadidos `modular_character_compositor.py`, contrato de piezas v1, compositor Pillow RGBA, API `POST /api/modular-compose`, panel `ModularCharacterComposer` y pruebas unitarias.
+- El perfil modular del panel se guarda/recupera en localStorage del navegador; esto todavía no equivale a persistencia de perfil modular en el backend de perfiles existente.
+- Los anclajes se normalizan 0..1 y requieren calibración explícita. El motor rechaza prendas/cabello/accesorios con `anchors_validated=false`.
+- **No declarar aceptación integral:** no se han ejecutado en esta sesión pruebas, build ni CI después de estos commits; tampoco se han inspeccionado capturas del ensamblador. El test automatizado añadido aún debe ejecutarse en CI.
+- Recursos artísticos: no se afirma que las ilustraciones de referencia sean piezas separadas ni compatibles. La anatomía, los anclajes y el encaje visual requieren recursos PNG segmentados y QA.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; tiempo real medido: `NOT_MEASURED`.
+- Estimación restante revisada: **8–16 horas activas** para corregir integración/CI, completar persistencia de perfiles y exportación robusta, pruebas E2E y revisión visual; la producción/calibración de piezas artísticas se estima aparte según el número y complejidad de piezas.
