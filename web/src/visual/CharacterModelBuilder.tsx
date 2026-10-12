@@ -320,6 +320,20 @@ export function CharacterModelBuilder() {
     finally{setBusy(false);}
   };
 
+  const saveLayerMetadata=async(layer:ModelLayer)=>{
+    if(!model)return;
+    setBusy(true);setError("");setNotice("");
+    try{
+      const response=await fetch("/api/character-models/"+encodeURIComponent(model.id)+"/classify-layer",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({layer_id:layer.id,label:(layerLabels[layer.id]||layer.label).trim(),category:layerCategories[layer.id]||""})});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||"No se pudo guardar el rol.");
+      setModel(data);setLayerLabels(Object.fromEntries(data.layers.map((item:ModelLayer)=>[item.id,item.label])));
+      setLayerCategories(Object.fromEntries(data.layers.filter((item:ModelLayer)=>item.semantic_category).map((item:ModelLayer)=>[item.id,item.semantic_category!])));
+      setNotice("Nombre y rol guardados en el modelo local (revisión "+data.revision+").");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+
   const publishLayer=async(layer:ModelLayer)=>{
     if(!model)return;
     const category=layerCategories[layer.id];
@@ -388,6 +402,7 @@ export function CharacterModelBuilder() {
                 <label>Nombre<input value={layerLabels[layer.id]??layer.label} onChange={event=>setLayerLabels(current=>({...current,[layer.id]:event.target.value}))} /></label>
                 <div className="model-builder-region-meta"><span>{layer.pixel_count.toLocaleString()} px</span>{layer.color_hex&&<i style={{background:layer.color_hex}} title={layer.color_hex}/>}<small>{layer.suggested_zone}</small></div>
                 <label>Rol para importar<select value={layerCategories[layer.id]||""} onChange={event=>setLayerCategories(current=>({...current,[layer.id]:event.target.value}))}><option value="">Solo candidato</option>{roleOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+                <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>saveLayerMetadata(layer)}>Guardar rol y nombre</button>
                 <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>{setEditingLayerId(layer.id);setMaskTool("add");setPolygonPoints([]);setError("");}}>Editar máscara</button>
                 <button type="button" className="model-builder-region-import" disabled={busy||!layerCategories[layer.id]} onClick={()=>publishLayer(layer)}>Importar como pieza</button>
               </div>
