@@ -89,6 +89,8 @@ class Skeleton:
     # keeps the formula `character._arm_line` derives from the hip and the arm's width.
     wrist_y: float | None = None
     wrist_x: float | None = None
+    # Catalog-driven adult face contour; defaults to the historical neutral shape.
+    face_shape: str = "equilibrada"
 
     @property
     def face_build(self) -> float:
