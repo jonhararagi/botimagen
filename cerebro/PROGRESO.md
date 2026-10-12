@@ -127,3 +127,12 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - CI #377 pasó en `fee1524ae241857d8b51bb319f954a21956c8795`: validación Python, catálogo/procedencia, contrato del motor, build React/TypeScript y smoke Chromium E2E. Evidencia: https://github.com/jonhararagi/botimagen/actions/runs/38248187422.
 - Artefacto Chromium del mismo SHA: [botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38248187422/artifacts/11746755371). Contiene capturas del estudio frontal/posterior y presets; no se pudo descargar desde la sesión actual para inspección visual humana, así que la aceptación artística permanece `PARTIAL`.
 - La biblioteca local inicial y el selector de fondos ya están conectados al editor; la biblioteca de referencias indexada, el intake completo y la QA física siguen pendientes. El progreso global permanece en **63%** para no inflarlo por documentación/recursos solamente. `WINDOWS_MANUAL_QA: NOT_RUN`.
+
+
+## BIMG-ART-002-R1 · checkpoint de mejora artística
+
+- Se conectaron controles faciales existentes con el SVG (perfiles de forma, espaciado ocular, desplazamiento de boca y tratamiento de nariz) y se corrigió la longitud de la masa capilar posterior para que siga el largo elegido y los landmarks del cuerpo.
+- Se amplió la cobertura de pruebas del renderer y se añadieron capturas Chromium para ambos presets, vistas posteriores y variantes faciales/capilares.
+- La implementación está en revisión: CI del HEAD final, generación/inspección de PNG y aceptación artística siguen pendientes. No aumentar el progreso ponderado por archivos o pruebas solamente.
+- Estado: **PARTIAL**. Beta global conservada en **63%**. `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real: `NOT_MEASURED`.
+- Informe técnico: [BIMG-ART-002-R1](../docs/engineering/BIMG-ART-002-R1.md).
