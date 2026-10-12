@@ -38,14 +38,15 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIsNotNone(order)
         layers = re.findall(r'"([a-z-]+)"', order.group(1))
         self.assertEqual(len(layers), len(set(layers)))
-        self.assertLess(layers.index("hair-back"), layers.index("neck"))
+        self.assertLess(layers.index("hair-back"), layers.index("body-base"))
+        self.assertLess(layers.index("body-base"), layers.index("neck"))
         self.assertLess(layers.index("arm-skin"), layers.index("hands"))
         self.assertLess(layers.index("base-sleeves"), layers.index("base-torso"))
         self.assertLess(layers.index("base-torso"), layers.index("lower-body"))
         self.assertLess(layers.index("lower-body"), layers.index("footwear"))
         self.assertLess(layers.index("footwear"), layers.index("outfit"))
         self.assertLess(layers.index("outer-layer"), layers.index("chromapatch"))
-        for layer in ("ground-shadow", "hair-back", "neck", "arm-skin", "hands",
+        for layer in ("ground-shadow", "hair-back", "body-base", "neck", "arm-skin", "hands",
                       "base-sleeves", "base-torso", "lower-body", "footwear",
                       "outfit", "outer-layer", "chromapatch"):
             self.assertIn(f'svgLayerIndex("{layer}")', RENDERER)
@@ -77,6 +78,19 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn("bodyLandmarks.handRight.x - 232", RENDERER)
         self.assertIn('data-qa-surface="legs"', RENDERER)
         self.assertIn('data-qa-surface="footwear-base"', RENDERER)
+
+    def test_independent_body_base_is_separate_from_garment_fit_and_public_api(self):
+        body_geometry = LANDMARKS.split("export function getBodyBaseGeometry(view: BodyView)", 1)[1]
+        self.assertIn("export function getBodyBaseGeometry(view: BodyView)", LANDMARKS)
+        self.assertNotIn("torso_length", body_geometry)
+        self.assertNotIn("waist_fit", body_geometry)
+        self.assertIn('import { getBodyBaseGeometry, getBodyLandmarks, svgLayerIndex } from "./bodyLandmarks"', RENDERER)
+        self.assertIn("const bodyLandmarks = getBodyLandmarks(r.view, 343, 34)", RENDERER)
+        self.assertIn('data-body-source="independent-geometry"', RENDERER)
+        for region in ("torso", "pelvis", "legs", "feet"):
+            self.assertIn(f'data-body-region="{region}"', RENDERER)
+        self.assertIn("export function VisualCharacterRenderer({ values, recipe }: RendererProps)", RENDERER)
+        self.assertIn("regionAvailability", SMOKE)
 
     def test_neutral_body_fixture_is_temporary_and_records_front_back_bounds(self):
         self.assertIn('bimg-neutral-body-qa-only', SMOKE)
