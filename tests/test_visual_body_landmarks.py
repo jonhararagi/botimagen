@@ -85,7 +85,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn('neutral-body-manifest.json', SMOKE)
         self.assertIn('data-layer-id="neck"', SMOKE)
         self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
-        self.assertIn('not a production neutral-body asset', SMOKE.lower())
+        self.assertIn('not a production anatomy asset', SMOKE.lower())
 
     def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
         self.assertIn('querySelectorAll("[data-layer-id][data-layer-order]")', SMOKE)
