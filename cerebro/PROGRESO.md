@@ -136,3 +136,10 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - La implementación está en revisión: CI del HEAD final, generación/inspección de PNG y aceptación artística siguen pendientes. No aumentar el progreso ponderado por archivos o pruebas solamente.
 - Estado: **PARTIAL**. Beta global conservada en **63%**. `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real: `NOT_MEASURED`.
 - Informe técnico: [BIMG-ART-002-R1](../docs/engineering/BIMG-ART-002-R1.md).
+
+
+## BIMG-ART-002-R1 · resultado de QA visual
+
+- CI #399 pasó para el código de renderer/pruebas en `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`. Artefacto real inspeccionado: https://github.com/jonhararagi/botimagen/actions/runs/38253325201/artifacts/11748818282.
+- Evidencia visual: la caída posterior del cabello sigue el largo elegido, las formas faciales cambian el contorno real y los paneles de sombra/costuras añaden algo de profundidad a la ropa. La mejora de volumen frontal sigue siendo moderada; pose/manos y reutilización de familias de peinados requieren otra iteración.
+- Estado artístico: **PARTIAL**. No subir la beta global del **63%**. `WINDOWS_MANUAL_QA: NOT_RUN`; tiempo real `NOT_MEASURED`.
