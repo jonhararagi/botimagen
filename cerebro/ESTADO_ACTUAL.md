@@ -349,3 +349,14 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - **Pruebas/CI:** pendiente ejecutar y asociar el resultado al HEAD final. No declarar CI aprobada antes de verificar la ejecución exacta. `WINDOWS_MANUAL_QA: NOT_RUN`.
 - **Tiempo real:** no medido de forma fiable. **TIMER original:** 2–4 horas estimadas; límite de diagnóstico alternativo: 45 minutos.
 - **Siguiente paso:** separar explícitamente la geometría de cuerpo base de la geometría de prendas en una tarea autorizada de arquitectura. Después, generar referencias front/back a partir de esa superficie común. R5 no autoriza cambios anatómicos.
+
+
+## BIMG-ENGINE-009-R1 · separación cuerpo/vestuario · 2026-10-12
+
+- **Veredicto provisional: PARTIAL.** Se añadió `getBodyBaseGeometry(view)` para torso, pelvis, piernas y pies, independiente de la selección de prendas y de los sliders `torso_length` / `waist_fit`. El grupo SVG `body-base` tiene regiones explícitas; el arnés oculta las prendas en lugar de recolorearlas como piel.
+- **Rama:** `feature/bimg-engine-001-cyberstreet-visual-renderer`, PR #11 abierto y sin fusionar. HEAD de implementación antes de documentación: `727dcc94e4c87c254475f9c074ae425119063e06`. La documentación posterior y la CI exacta final deben comprobarse antes del cierre.
+- **Cambios de código:** `web/src/visual/bodyLandmarks.ts`, `web/src/visual/VisualCharacterRenderer.tsx`, `web/browser_smoke.mjs`, `tests/test_visual_body_landmarks.py`. Firma pública del renderer preservada. No se modificaron catálogo, recetas, datos de personajes ni `main`.
+- **Limitaciones:** base geométrica mínima, hombros/tórax no segmentados, cintura independiente no disponible, rodillas/tobillos solo como landmarks. Se necesita inspección humana de capturas front/back y vestuario; no se autoriza calibración de proporciones.
+- **Informe:** [BIMG-ENGINE-009-R1](../docs/engineering/BIMG-ENGINE-009-R1-BODY-GARMENT-SEPARATION.md).
+- **CI R5 previo:** run #337 falló en una aserción del fixture antiguo; no cuenta como PASS. **CI R6 exacta:** pendiente de verificar sobre el HEAD final tras la documentación.
+- `WINDOWS_MANUAL_QA: NOT_RUN`. Tiempo real no medido. TIMER estimado: 4–7 h. Progreso global sin incremento, permanece 63%.
