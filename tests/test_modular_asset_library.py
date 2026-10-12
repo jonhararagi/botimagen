@@ -8,9 +8,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from modular_asset_library import AssetImportError, import_user_asset, list_user_assets
 
-PNG_1X1 = bytes.fromhex(
-    "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489"
-    "0000000b49444154789c636000020000050001a5f645400000000049454e44ae426082"
+import struct
+import zlib
+
+def png_chunk(kind, data):
+    return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+
+PNG_1X1 = (
+    b"\\x89PNG\\r\\n\\x1a\\n"
+    + png_chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0))
+    + png_chunk(b"IDAT", zlib.compress(b"\\x00\\x00\\x00\\x00\\x00"))
+    + png_chunk(b"IEND", b"")
 )
 
 def payload(data=PNG_1X1, **overrides):
