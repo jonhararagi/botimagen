@@ -4,8 +4,8 @@
 **Rama autorizada:** `feature/bimg-engine-001-cyberstreet-visual-renderer`  
 **PR:** https://github.com/jonhararagi/botimagen/pull/11  
 **HEAD inicial comprobado:** `5ef17beb774f17d5ae57ada655c949343cee92aa`  
-**Último commit de código/pruebas:** `475663832c423c947ff179505b1190496be6e014`  
-**CI del SHA final:** PENDING, no declarar aprobado hasta obtener resultado asociado al HEAD exacto.  
+**Último commit de código/pruebas y manifiesto E2E:** `e53235616bf0d58ff623dd4f19e74abdc1a15417`  
+**CI del SHA final:** PENDING, no declarar aprobado hasta obtener resultado asociado al HEAD exacto. El smoke de este commit captura ambas vistas de los dos presets y variantes faciales/capilares.  
 **Tiempo real medido:** NOT_MEASURED  
 **WINDOWS_MANUAL_QA:** NOT_RUN
 
