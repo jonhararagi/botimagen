@@ -1299,6 +1299,47 @@ try {
   assert.equal(await page.locator(".legacy-renderer-fixture").evaluate(el => getComputedStyle(el).opacity), "0", "The legacy React renderer must be visually transparent outside explicit QA capture, not a second visible character");
   assert.equal(await page.locator("img.server-character-art").getAttribute("data-renderer"), "parametric-anime-svg-v1", "The visible product character must come from the local Python renderer");
 
+  // Exercise the packaged CyberStreet SVG layers through the real editor and local API.
+  const cyberstreet = page.locator(".modular-composer");
+  await cyberstreet.scrollIntoViewIfNeeded();
+  await cyberstreet.waitFor({ state: "visible", timeout: 15000 });
+  const cyberstreetPreview = cyberstreet.locator('img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+  await cyberstreetPreview.waitFor({ state: "visible", timeout: 15000 });
+  await page.waitForFunction(() => {
+    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
+  }, null, { timeout: 15000 });
+  await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-full.png") });
+  const hairToggle = cyberstreet.locator(".modular-layer-toggle").filter({ hasText: "Hair Midnight Cyan" }).locator('input[type="checkbox"]');
+  assert.equal(await hairToggle.isChecked(), true, "CyberStreet hair should be enabled initially");
+  const fullLayerImage = await cyberstreetPreview.getAttribute("src");
+  await hairToggle.uncheck();
+  await page.waitForFunction(previous => {
+    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous;
+  }, fullLayerImage, { timeout: 15000 });
+  assert.equal(await hairToggle.isChecked(), false, "Disabling hair must update the real composition");
+  await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-no-hair.png") });
+  await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
+  await page.getByRole("status").filter({ hasText: "Perfil guardado en el almacenamiento local del motor" }).waitFor({ timeout: 15000 });
+  const profileSelect = cyberstreet.locator("select").filter({ has: page.locator("option", { hasText: "Seleccionar perfil" }) });
+  await profileSelect.waitFor({ state: "visible" });
+  const savedProfileOption = await profileSelect.locator("option").evaluateAll(options => options.find(option => option.value && option.textContent?.includes("Mi personaje CyberStreet"))?.value || "");
+  assert.ok(savedProfileOption, "The modular profile should be persisted through the existing profile API");
+  await hairToggle.check();
+  await profileSelect.selectOption(savedProfileOption);
+  await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
+  await page.waitForFunction(() => {
+    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512;
+  }, null, { timeout: 15000 });
+  assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
+  await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
+  await page.waitForFunction(() => {
+    const status = document.querySelector('.modular-composer [role="status"]');
+    return status?.textContent?.includes("PNG exportado con fondo transparente") ?? false;
+  }, null, { timeout: 15000 });
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
