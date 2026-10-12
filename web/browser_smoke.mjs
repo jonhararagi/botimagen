@@ -1130,33 +1130,36 @@ try {
   // Product-facing screenshots use only the Python SVG rendered in the main canvas.
   const productImage = page.locator("img.server-character-art");
   const selectProductView = async (view, label) => {
-    const currentAlt = await productImage.getAttribute("alt") ?? "";
-    if (currentAlt.includes(view)) return;
-    const previous = await productImage.getAttribute("src");
+    if ((await productImage.getAttribute("data-rendered-view")) === view) return;
     await page.getByRole("button", { name: label, exact: true }).click();
-    await page.waitForFunction(({ previousSrc, expectedView }) => {
-      const image = document.querySelector("img.server-character-art");
-      return image instanceof HTMLImageElement && image.src !== previousSrc && image.alt.includes(expectedView);
-    }, { previousSrc: previous, expectedView: view });
+    await page.waitForFunction(expected => document.querySelector("img.server-character-art")?.getAttribute("data-rendered-view") === expected, view);
   };
-  const previousStreetSvg = await productImage.getAttribute("src");
   await page.getByLabel("Preset de personaje").selectOption("street-sentinel");
   await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
-  await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousStreetSvg);
+  await page.waitForFunction(() => {
+    const image = document.querySelector("img.server-character-art");
+    return image?.dataset.renderedHair === "violeta_profundo"
+      && image.dataset.renderedOutfit === "street_bomber"
+      && image.dataset.renderedView === "front";
+  });
   await page.getByLabel("Fondo del estudio").selectOption("cyber-grid");
   await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "cyber-grid");
   const cyberGridBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
-  await selectProductView("frontal", "Frontal");
+  await selectProductView("front", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-front-cyber-grid.png"), fullPage: true });
-  await selectProductView("trasera", "Trasera");
+  await selectProductView("back", "Trasera");
   await page.getByLabel("Fondo del estudio").selectOption("dusk-orbit");
   await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "dusk-orbit");
   const duskOrbitBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-back-dusk-orbit.png"), fullPage: true });
-  const previousPresetSvg = await productImage.getAttribute("src");
   await page.getByLabel("Preset de personaje").selectOption("neon-archivist");
   await page.getByRole("button", { name: "Aplicar preset", exact: true }).click();
-  await page.waitForFunction(previous => document.querySelector("img.server-character-art")?.getAttribute("src") !== previous, previousPresetSvg);
+  await page.waitForFunction(() => {
+    const image = document.querySelector("img.server-character-art");
+    return image?.dataset.renderedHair === "turquesa"
+      && image.dataset.renderedOutfit === "elegant_command"
+      && image.dataset.renderedView === "front";
+  });
   await page.getByLabel("Fondo del estudio").selectOption("aurora-city");
   await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "aurora-city");
   const auroraCityBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);

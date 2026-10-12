@@ -21,6 +21,7 @@ type SavedProfileRecord = { id:string; name:string; saved_at:string; style_id:st
 
 type StudioBackgroundId = "cyber-grid" | "dusk-orbit" | "aurora-city";
 type CharacterPreset = { id:string; name:string; description:string; seed:number; selections:Record<string,string>; visual_recipe:VisualRecipe };
+type RenderedCharacterState = { hair:string; eyes:string; expression:string; outfit:string; view:"front"|"back" };
 const studioBackgrounds: Record<StudioBackgroundId, { label: string; url: string }> = {
  "cyber-grid": { label: "Cyber Grid · laboratorio", url: cyberGridBackground },
  "dusk-orbit": { label: "Dusk Orbit · atardecer", url: duskOrbitBackground },
@@ -123,6 +124,7 @@ export default function App(){
  const [studioBackground,setStudioBackground]=useState<StudioBackgroundId>(()=>{try{const saved=window.localStorage.getItem("botimagen.studioBackground");return saved && saved in studioBackgrounds ? saved as StudioBackgroundId : "cyber-grid"}catch{return "cyber-grid"}});
  const [selectedCharacterPreset,setSelectedCharacterPreset]=useState("street-sentinel");
  const [renderedSvg,setRenderedSvg]=useState<string|null>(null);
+ const [renderedCharacterState,setRenderedCharacterState]=useState<RenderedCharacterState|null>(null);
  const [renderState,setRenderState]=useState("Preparando motor anime local…");
  const [status,setStatus]=useState("Conectando con el motor local de BotImagen…");
  const [showNegative,setShowNegative]=useState(false);
@@ -303,10 +305,11 @@ export default function App(){
     }
     if(disposed)return;
     setRenderedSvg(result.svg);
+    setRenderedCharacterState({hair:values.hair??"",eyes:values.eyes??"",expression:values.expression??"",outfit:values.outfit??"",view:normalizeVisualRecipe(visualRecipe).view});
     setRenderState(result.renderer==="parametric-anime-svg-v1"?"MOTOR ANIME LOCAL":result.renderer);
    }catch(error){
     if(disposed||controller.signal.aborted)return;
-    setRenderedSvg(null);
+    setRenderedSvg(null);setRenderedCharacterState(null);
     setRenderState("VISTA PROVISIONAL · MOTOR NO DISPONIBLE");
    }
   },180);
@@ -338,7 +341,7 @@ export default function App(){
       <div className="studio-background" aria-hidden="true" style={{backgroundImage:`url("${studioBackgrounds[studioBackground].url}")`}}/><div className="grid-bg"/><div className="halo halo-a"/><div className="halo halo-b"/>
       <div className="canvas-labels"><span>BW / DESIGN STUDY</span><span>#{(Number.parseInt(seed,10)||314159).toString().padStart(6,"0").slice(-6)}</span></div><div className="watermark">CHARACTER<br/>PROTOTYPE</div>
       <div className="legacy-renderer-fixture" aria-hidden="true" data-renderer-role="qa-fixture-not-product-preview"><VisualCharacterRenderer values={values} recipe={visualRecipe}/></div>
-      {renderedSvg&&<img className="server-character-art" data-renderer="parametric-anime-svg-v1" alt={`Personaje generado por el motor Python local, vista ${visualRecipe.view === "back" ? "trasera" : "frontal"}`} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderedSvg)}`}/>}
+      {renderedSvg&&<img className="server-character-art" data-renderer="parametric-anime-svg-v1" data-rendered-hair={renderedCharacterState?.hair??""} data-rendered-eyes={renderedCharacterState?.eyes??""} data-rendered-expression={renderedCharacterState?.expression??""} data-rendered-outfit={renderedCharacterState?.outfit??""} data-rendered-view={renderedCharacterState?.view??""} alt={`Personaje generado por el motor Python local, vista ${renderedCharacterState?.view === "back" ? "trasera" : "frontal"}`} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderedSvg)}`}/>}
       <div className="side-mark left"><span>01</span>IDENTITY</div><div className="side-mark right"><span>02</span>SILHOUETTE</div>
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>{renderState}</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
