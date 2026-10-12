@@ -1675,6 +1675,13 @@ try {
   await modelBuilder.screenshot({ path: resolve(visualQaDir, "character-model-builder-grouped-piece.png") });
   console.log("PASS_REAL: UI created a saved character model from local PNGs, emitted independently reviewable masks, extracted a reusable palette, reconstructed all visible pixels, and grouped multiple regions into one modular catalog piece.");
 
+  // Region roles are explicit user decisions and persist in the local model profile.
+  await firstRegion.getByLabel("Rol para importar").selectOption("clothing_top");
+  await firstRegion.getByRole("button", { name: "Guardar rol y nombre" }).click();
+  await modelBuilder.getByRole("status").filter({ hasText: "Nombre y rol guardados" }).waitFor({ state: "visible", timeout: 15000 });
+  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 2/);
+  assert.equal(await firstRegion.getByLabel("Rol para importar").inputValue(), "clothing_top");
+
   // Exercise the mask editor against the source and save/reset through the real Python API.
   await firstRegion.getByRole("button", { name: "Editar máscara" }).click();
   const maskEditor = modelBuilder.getByTestId("mask-editor");
@@ -1685,10 +1692,10 @@ try {
   await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
   await maskEditor.getByRole("button", { name: "Guardar máscara corregida" }).click();
   await modelBuilder.getByRole("status").filter({ hasText: "Máscara guardada" }).waitFor({ state: "visible", timeout: 15000 });
-  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 2/);
+  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 3/);
   await maskEditor.getByRole("button", { name: "Restaurar máscara original" }).click();
   await modelBuilder.getByRole("status").filter({ hasText: "Máscara original restaurada" }).waitFor({ state: "visible", timeout: 15000 });
-  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 3/);
+  assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 4/);
   console.log("PASS_REAL: Chromium imported a multi-file-capable reference through the builder, edited a mask with the canvas brush, persisted the new model revision, and restored the original mask through the API.");
 
   // Smoke the responsive breakpoints used by the local browser UI.
