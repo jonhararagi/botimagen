@@ -591,7 +591,23 @@ QA Windows: `NOT_RUN`.
 - Se amplía el importador existente de `web/src/visual/ModularAssetLibrary.tsx`; no se creó un segundo flujo paralelo.
 - El usuario puede arrastrar los puntos normalizados del esqueleto directamente sobre la vista previa PNG 512×768 antes de guardar o sobre una pieza ya guardada. Las coordenadas ajustadas se envían a `POST /api/modular-assets/{id}/validate-anchors` y se guardan en `anchor_estimate` y `conversion.anchors`.
 - `modular_character_compositor.py` añade `fit_transform_to_body`: obtiene escala X/Y y traslación a partir de los anclajes compartidos entre cuerpo y pieza. La composición exige confirmar los anclajes del cuerpo base y que cada pieza utilizable tenga sus anclajes confirmados. Se rechaza el encaje si no existen puntos compatibles.
-- El flujo frontal/trasero se mantiene por imagen con su metadata `view`; los PNG de personaje completo siguen guardados como un único sprite/referencia, sin fingir que la segmentación automática separó ropa o pelo oculto.
+- El flujo frontal/trasero ahora tiene un selector `Frontal / Trasera` en el compositor. Importa y confirma un cuerpo y sus prendas para cada lado. Los PNG de personaje completo siguen guardados como un único sprite/referencia, sin fingir que la segmentación automática separó ropa o pelo oculto.
 - Pruebas nuevas añadidas para anclajes editados y persistidos, cálculo de encaje, y composición PNG alineada. Se amplió el smoke de Chromium para cubrir arrastre de puntos, persistencia de anclajes y encaje cuerpo+prenda.
-- La nueva revisión aún necesita CI y smoke E2E verdes antes de declararse validada. No se ha hecho prueba manual en Windows.
+- CI y smoke E2E quedaron verdes para el commit de validación `62c0721490b6c476363bc4d4162652959647f2b8`; ver la sección de verificación final abajo. QA manual en Windows sigue sin ejecutarse.
 - TIMER estimado para esta integración del importador/rig: **4–8 horas activas**; tiempo real `NOT_MEASURED`. No es el tiempo restante total de BotImagen.
+
+
+
+### BIMG-PNG-TO-RIG-001 · verificación final · 2026-10-12
+
+- **CI #492 SUCCESS** para HEAD exacto `62c0721490b6c476363bc4d4162652959647f2b8`: https://github.com/jonhararagi/botimagen/actions/runs/38289450841.
+- **Validación de PR #493 SUCCESS** para el mismo HEAD: https://github.com/jonhararagi/botimagen/actions/runs/38289459247.
+- **Artefacto QA generado:** https://github.com/jonhararagi/botimagen/actions/runs/38289450841/artifacts/11763609964.
+- CI comprobó sintaxis Python; biblioteca de assets modular y persistencia de anclajes; cálculo de encaje por landmarks; compositor PNG real; catálogos/manifiestos; suites Python y API preexistentes; `npm ci`; build React/TypeScript; y smoke E2E de Chromium.
+- El smoke E2E ahora ejecuta el flujo de importar un PNG, arrastrar el punto de cabeza, comprobar que el movimiento cambia su coordenada, guardar el material, confirmar y recuperar los anclajes a través de la API. Luego importa cuerpo y prenda, prueba la composición real de 512×768, cambia a vista trasera e importa/compone el cuerpo y prenda posteriores.
+- El smoke mantiene compatibilidad con ambos tipos de preview: imagen PNG para personaje completo y escenario SVG interactivo para una pieza modular. Se aisló el estado entre pruebas para no heredar accidentalmente categoría/pose de un caso anterior.
+- **Resultado aceptado funcionalmente:** el usuario puede importar PNG comunes, normalizar el lienzo, corregir manualmente landmarks, guardar el mapa del esqueleto, cambiar entre frontal/trasera y ajustar una pieza sobre el cuerpo por anclajes compartidos.
+- **Límites intencionales:** no se ejecuta segmentación semántica automática de pelo/ropa. Para capas intercambiables hay que importar piezas ya recortadas o transparentes. Los píxeles ocultos en una ilustración plana no se reconstruyen. La sustracción actual quita fondo plano conectado a esquinas; no sustituye un sistema completo de recorte/máscara.
+- `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- TIMER: esta integración de importador/rig se estima en **4–8 horas activas** de alcance de trabajo; ampliar calidad artística, variedad de piezas y segmentación asistida sigue siendo una fase separada (estimación provisional **8–16 horas activas**). Ninguna cifra es tiempo real medido ni estimación de finalización de todo BotImagen.
+- `main` permanece en `b508cfe7d3216eda801438d46dff8873842cea86`; PR #11 está abierta y sin fusionar; PR #14 sigue abierta e independiente.
