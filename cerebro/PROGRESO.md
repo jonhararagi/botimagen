@@ -143,3 +143,12 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - CI #399 pasó para el código de renderer/pruebas en `32d2b71b0ce9c77b4825bbb566ec53a20a95d6ab`. Artefacto real inspeccionado: https://github.com/jonhararagi/botimagen/actions/runs/38253325201/artifacts/11748818282.
 - Evidencia visual: la caída posterior del cabello sigue el largo elegido, las formas faciales cambian el contorno real y los paneles de sombra/costuras añaden algo de profundidad a la ropa. La mejora de volumen frontal sigue siendo moderada; pose/manos y reutilización de familias de peinados requieren otra iteración.
 - Estado artístico: **PARTIAL**. No subir la beta global del **63%**. `WINDOWS_MANUAL_QA: NOT_RUN`; tiempo real `NOT_MEASURED`.
+
+
+## BIMG-MODULAR-2D-002 · actualización 2026-10-12
+
+- Publicado el contrato modular v1, el compositor determinista PNG y un panel integrado en la aplicación existente.
+- Pruebas añadidas para contrato, anclajes, transparencia/dimensiones, reproducibilidad, recursos ausentes y migración conservadora de recetas v1/v2/v3.
+- **Estado: EN PROGRESO / NO ACEPTADO.** Aún faltan ejecución CI del HEAD actual, E2E real de cambio de cabello/prendas, perfil modular conectado al sistema persistente de perfiles y revisión de capturas.
+- No se incrementa el porcentaje global del producto con esta entrega parcial. `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
+- Estimación restante de ingeniería: **8–16 horas activas**, más producción y calibración de recursos artísticos independientes.
