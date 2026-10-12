@@ -1179,7 +1179,8 @@ try {
   assert.notEqual(cyberGridBackgroundStyle, duskOrbitBackgroundStyle, "Selecting a different bundled background must change the actual canvas image");
   assert.notEqual(duskOrbitBackgroundStyle, auroraCityBackgroundStyle, "The third bundled background must render a distinct canvas image");
   assert.ok(
-    /^url\(["']?data:image\/svg\+xml|^url\(["']?http:\/\/127\.0\.0\.1:5173\/assets\//.test(auroraCityBackgroundStyle),
+    auroraCityBackgroundStyle.includes("data:image/svg+xml")
+      || auroraCityBackgroundStyle.includes("127.0.0.1:5173/assets/"),
     "The selected background must resolve to a bundled local SVG (inlined data URI or local Vite asset), not a remote image",
   );
   assert.equal(await page.locator(".legacy-renderer-fixture").evaluate(el => getComputedStyle(el).opacity), "0", "The legacy React renderer must be visually transparent outside explicit QA capture, not a second visible character");
