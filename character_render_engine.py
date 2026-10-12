@@ -113,49 +113,94 @@ def _frame_multipliers(value: str) -> tuple[float,float,float,float]:
 
 
 def _head_count(values: dict[str,str]) -> float:
+    """Adult-anime head/body ratio, adjusted modestly by stature and silhouette."""
     match = re.search(r"\d{3}", values.get("height_cm","h170"))
     cm = int(match.group()) if match else 170
-    heads = 5.5 + (cm-170)*.015
+    heads = 6.68 + (cm-170)*.012
     stature = values.get("stature","")
-    if stature in {"bajita","muy_bajita","petite"}: heads -= .18
-    if stature in {"alta","muy_alta","alta_imponente"}: heads += .18
+    if stature in {"bajita","muy_bajita","petite"}: heads -= .16
+    if stature in {"alta","muy_alta","alta_imponente"}: heads += .16
     proportions = values.get("body_proportions","")
-    if proportions in {"piernas_largas","extremidades_largas","esbelta_elegante"}: heads += .14
+    if proportions in {"piernas_largas","extremidades_largas","esbelta_elegante"}: heads += .12
     if proportions in {"torso_corto_deportivo","compactas_agiles","potencia_compacta"}: heads -= .12
-    return max(4.75,min(6.0,heads))
+    silhouette = values.get("silhouette","")
+    if silhouette in {"compacta_agil","ligera_compacta","potencia_compacta"}: heads -= .08
+    if silhouette in {"elegante_larga","esbelta_elegante"}: heads += .08
+    return max(6.0,min(7.15,heads))
+
+
+def _face_maturity(values: dict[str,str]) -> float:
+    shape=values.get("face_shape","equilibrada")
+    if shape in {"suave","menton_corto","mandibula_suave"}: return .88
+    if shape in {"afilada","rostro_alargado","menton_fino","diamante","pomulos_definidos"}: return 1.12
+    return 1.0
+
+
+def _resolve_hairstyle(values: dict[str,str]) -> str:
+    """Combine the base cut with selected bangs and texture using available SVG hair designs."""
+    original=values.get("hairstyle","long_flowing")
+    style=HAIRSTYLE_MAP.get(original,"long_traced")
+    bangs=values.get("hair_bangs","recto")
+    texture=values.get("hair_texture","liso_sedoso")
+    sides=values.get("side_hair","mechones_largos")
+    back=values.get("back_hair","recto_liso")
+    short_base=original in {"bob","short_wavy","wolf_cut","curly_lob"}
+    if short_base:
+        if texture in {"ondas_suaves","rizos_sueltos","rizos_definidos","esponjado_suave","puntas_dinamicas"}: style="short_tousled"
+        if bangs in {"abierto_centro","sin_flequillo"}: style="short_crop"
+        elif bangs in {"cubriendo_un_ojo","asimetrico","lateral"}: style="short_tousled"
+    else:
+        if bangs in {"cortina","abierto_centro","sin_flequillo"}: style="long_center_part"
+        elif bangs in {"lateral","cubriendo_un_ojo","asimetrico"}: style="long_parted"
+        elif bangs in {"recto","irregular","mechones_separados","corto"} and original in {"long_flowing","hime_cut","long_straight","medium_layers"}: style="long_fringed"
+        if sides in {"patillas_hime","volumen_lateral"}: style="long_fringed"
+        elif sides in {"mechones_cortos","detras_orejas"} and original in {"long_flowing","long_straight"}: style="short_layered"
+        if back in {"nuca_corta","bob_trasero","nuca_despeinada"}: style="short_tousled" if texture in {"ondas_suaves","rizos_sueltos","rizos_definidos"} else "short_layered"
+        elif back in {"capas_largas","puntas_largas","ondas_traseras","panel_trenzado"} and style.startswith("short"): style="long_traced"
+        if texture in {"rizos_sueltos","rizos_definidos","esponjado_suave"} and style.startswith("long"): style="long_parted"
+    return style
 
 
 def _face_style(values: dict[str,str]) -> FaceStyle:
-    eye_shape = values.get("eye_shape","grande_expresiva")
-    expression = values.get("expression","mirada_enfocada")
-    size,width,corner,openness,tilt = 1.02,1.03,.38,.94,.08
-    if eye_shape in {"grande_expresiva","abiertos","redondos","caidos","suave"}:
-        size,width,corner = 1.12,1.04,.16
-    elif eye_shape in {"afilada","felinos","angulares","asimétricos"}:
-        size,width,corner = .94,1.12,.78
-    elif eye_shape == "entornada":
-        openness = .68
-    if expression in {"sonrisa_abierta","confiada"}: openness,tilt = 1.0,-.04
-    elif expression in {"sonrisa_picara","mirada_desafiante"}: openness,tilt = .84,.2
-    elif expression in {"mirada_enojada","mirada_fria"}: openness,tilt = .68,.28
-    elif expression == "somnolienta": openness,tilt = .52,-.05
-    elif expression == "curiosa": openness,tilt = 1.0,-.14
-    elif expression == "serena": openness,tilt = .88,0.0
-    curve = {
-        "sonrisa_abierta":1.0, "sonrisa_picara":.68, "serena":.22,
-        "mirada_enfocada":.05, "mirada_desafiante":.18, "mirada_enojada":-.32,
-        "mirada_fria":-.12, "somnolienta":.05, "curiosa":.35, "confiada":.6,
-    }.get(expression,.1)
-    accessory = values.get("accessory","").lower()
-    glasses = any(word in accessory for word in ("glasses","gafas","lentes"))
+    eye_shape=values.get("eye_shape","grande_expresiva")
+    expression=values.get("expression","mirada_enfocada")
+    size,width,corner,openness,tilt=.88,1.04,.42,.92,.04
+    if eye_shape in {"grande_expresiva","abiertos","redondos","caidos","suave"}: size,width,corner=.98,1.02,.28
+    elif eye_shape in {"afilada","felinos","angulares","asimétricos"}: size,width,corner=.82,1.15,.74
+    elif eye_shape=="entornada": openness=.68
+    if expression in {"sonrisa_abierta","confiada"}: openness,tilt=1.0,-.04
+    elif expression in {"sonrisa_picara","mirada_desafiante"}: openness,tilt=.84,.20
+    elif expression in {"mirada_enojada","mirada_fria"}: openness,tilt=.68,.30
+    elif expression=="somnolienta": openness,tilt=.52,-.05
+    elif expression=="curiosa": openness,tilt=1.0,-.14
+    elif expression=="serena": openness,tilt=.88,0.0
+    mouth=values.get("mouth_style","sonrisa_pequena")
+    curve={
+        "sonrisa_pequena":.25,"sonrisa_amplia":.82,"puchero":-.48,"sonrisa_ladeada":.58,
+        "colmillo_visible":.64,"boca_neutra":0.0,"labio_inferior_tenso":-.24,
+        "boca_abierta_energia":.50,"mueca_concentrada":-.12,"sonrisa_serena":.35,
+    }.get(mouth,{"sonrisa_abierta":.78,"sonrisa_picara":.58,"serena":.25,"mirada_enfocada":.02,
+       "mirada_desafiante":.05,"mirada_enojada":-.32,"mirada_fria":-.12,"somnolienta":-.02,
+       "curiosa":.24,"confiada":.50}.get(expression,.1))
+    brow=values.get("eyebrow_style","rectas")
+    brow_tilt={"finas_arqueadas":-.12,"rectas":0.0,"gruesas_deportivas":.08,"anguladas":.24,
+       "inclinadas_centro":.28,"elevadas":-.22,"suaves":-.08,"cortas":.02,"largas":.04,
+       "asimetrica":.13}.get(brow,tilt)
+    accessory=values.get("accessory","").lower()
+    facial=values.get("facial_detail","sin_marca")
     return FaceStyle(
-        eye_size=size, eye_width=width, eye_openness=openness, eye_lower_lid=.94,
-        eye_tilt=tilt, eye_corner=corner, iris_size={"corazon":.78,"estrella":.84,"vertical_fina":.64}.get(values.get("pupil_shape",""),.72),
-        iris_aspect=1.18 if values.get("pupil_shape")=="vertical_fina" else 1.0,
-        lash=1.0, brow_tilt=tilt, brow_weight=1.0, mouth_curve=curve, mouth_width=.94,
-        mouth_open=.58 if expression=="sonrisa_abierta" else .08, nose_dot=True,
-        blush=.55 if expression in {"sonrisa_abierta","sonrisa_picara","confiada"} else .15,
-        glasses=glasses,
+        eye_size=size,eye_width=width,eye_openness=openness,eye_lower_lid=.90,
+        eye_tilt=tilt,eye_corner=corner,
+        iris_size={"corazon":.68,"estrella":.72,"vertical_fina":.56,"diamante":.62,"anillo_concentrico":.70}.get(values.get("pupil_shape",""),.64),
+        iris_aspect=1.20 if values.get("pupil_shape")=="vertical_fina" else .98,
+        lash=1.0,brow_tilt=brow_tilt,
+        brow_weight=1.30 if brow=="gruesas_deportivas" else .78 if brow in {"finas_arqueadas","suaves"} else 1.0,
+        brow_length=.78 if brow=="cortas" else 1.12 if brow=="largas" else 1.0,
+        mouth_curve=curve,mouth_width=1.04 if mouth in {"sonrisa_amplia","boca_abierta_energia"} else .88,
+        mouth_open=.58 if mouth=="boca_abierta_energia" else .42 if expression=="sonrisa_abierta" else .06,
+        nose_dot=True,blush=.42 if expression in {"sonrisa_abierta","sonrisa_picara","confiada"} or facial=="rubor_sutil" else .08,
+        glasses=any(word in accessory for word in ("glasses","gafas","lentes","visor")),
+        chin_shadow=facial=="sombra_de_ojera_suave",scar_side=1 if facial=="cicatriz_fina" else 0,
     )
 
 
@@ -197,10 +242,10 @@ def _outfit(values: dict[str,str], recipe: dict[str,Any]) -> Outfit:
         placket_color=accent, chest_pocket_color=panel if style in {"tactical_baseball","support_coat","street_bomber"} else accent,
         strap_color=accent if style in {"techwear_sport","light_armor","armadura_asimetrica"} else None,
         collar_color=panel if style in {"elegant_command","support_coat"} else None,
-        ribbon_color=accent if style=="idol_combat" else None,
+        ribbon_color=accent if style=="idol_combat" or accessory=="hair_ribbon" else None,
         robe_color=robe_color, coat_color=coat_color, coat_sleeves=coat_sleeves, coat_length=coat_length,
         coat_button_color=accent if coat_color else None,
-        hip_pocket_color=accent if style in {"techwear_sport","street_bomber"} else None,
+        hip_pocket_color=accent if style in {"techwear_sport","street_bomber"} or accessory=="utility_pouch" else None,
         boot_shaft=boot_shaft, shoulder_bars_color=shoulder_bars, shoulder_bars=2, goggle_color=goggles,
     )
 
@@ -220,6 +265,29 @@ def _emblem(shape: str, x: float, y: float, size: float, color: str) -> str:
     if shape=="geo":
         return f'<path d="M{x:.1f} {y-size:.1f} L{x+size:.1f} {y:.1f} L{x:.1f} {y+size:.1f} L{x-size:.1f} {y:.1f} Z" fill="{color}"/>'
     return f'<g fill="{color}"><ellipse cx="{x-size*.42:.1f}" cy="{y-size*.55:.1f}" rx="{size*.22:.1f}" ry="{size*.48:.1f}"/><ellipse cx="{x+size*.42:.1f}" cy="{y-size*.55:.1f}" rx="{size*.22:.1f}" ry="{size*.48:.1f}"/><circle cx="{x:.1f}" cy="{y+size*.15:.1f}" r="{size*.58:.1f}"/></g>'
+
+
+def _underlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, sk: Any) -> str:
+    """Paint tails behind body and garments, not on top of them."""
+    cx,cy,r=sk.head_cx,sk.head_cy,sk.head_r
+    parts=[]
+    tail=values.get("tail_style","sin_cola")
+    if tail not in {"sin_cola","none","auto",""}:
+        color=recipe["garment_accent_color"] if any(t in tail for t in ("dracon","mecan","energ")) else p.skin_tone if "conejo" in tail or "pluma" in tail else p.hair_color
+        sx,sy=cx+sk.hip_half_w*.74,sk.hip_y+r*.08
+        sway=r*(.32 if "corta" in tail else .62)
+        endy=sy+r*(.82 if "corta" in tail else 1.05)
+        d=f"M{sx:.1f} {sy:.1f} C{sx+sway:.1f} {sy+r*.32:.1f} {sx+sway*1.1:.1f} {endy-r*.2:.1f} {sx+sway*.65:.1f} {endy:.1f}"
+        parts.append(f'<path class="extra-tail" d="{d}" fill="none" stroke="#0d0d0d" stroke-width="{r*.20:.1f}" stroke-linecap="round"/><path d="{d}" fill="none" stroke="{color}" stroke-width="{r*.145:.1f}" stroke-linecap="round"/>')
+    if values.get("hair_arrangement")=="coletas_gemelas":
+        for side in (-1,1):
+            sx=cx+side*r*.58
+            sy=cy-r*.35
+            ex=cx+side*r*1.02
+            ey=cy+r*1.78
+            d=f"M{sx:.1f} {sy:.1f} C{sx+side*r*.40:.1f} {sy+r*.55:.1f} {ex+side*r*.22:.1f} {ey-r*.35:.1f} {ex:.1f} {ey:.1f}"
+            parts.append(f'<path class="hair-twin-tail" d="{d}" fill="none" stroke="#0d0d0d" stroke-width="{r*.22:.1f}" stroke-linecap="round"/><path d="{d}" fill="none" stroke="{p.hair_color}" stroke-width="{r*.17:.1f}" stroke-linecap="round"/>')
+    return '<g class="botimagen-engine-underlays">'+"".join(parts)+"</g>" if parts else ""
 
 
 def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, sk: Any) -> str:
@@ -245,25 +313,30 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
     else:
         pattern=recipe["fabric_pattern"]
         if pattern in {"circuit","geometric","gradient"}:
-            top=sk.shoulder_y+r*.18
-            bottom=min(sk.waist_y+r*.18,sk.hip_y)
+            # The luminous design is kept in a compact chest region instead of a grid over the whole coat.
+            top=sk.shoulder_y+r*.28
+            bottom=min(sk.shoulder_y+(sk.waist_y-sk.shoulder_y)*.58,sk.waist_y+r*.12)
             clip="bw-cyber-torso-pattern"
-            torso=f"M{cx-sk.shoulder_half_w*.58:.1f} {top:.1f} Q{cx:.1f} {top-r*.16:.1f} {cx+sk.shoulder_half_w*.58:.1f} {top:.1f} L{cx+sk.waist_half_w*.92:.1f} {bottom:.1f} L{cx-sk.waist_half_w*.92:.1f} {bottom:.1f} Z"
+            width_top=sk.shoulder_half_w*.29
+            width_bottom=sk.waist_half_w*.40
+            torso=f"M{cx-width_top:.1f} {top:.1f} Q{cx:.1f} {top-r*.10:.1f} {cx+width_top:.1f} {top:.1f} L{cx+width_bottom:.1f} {bottom:.1f} L{cx-width_bottom:.1f} {bottom:.1f} Z"
             parts.append(f'<defs><clipPath id="{clip}"><path d="{torso}"/></clipPath></defs>')
-            strokes=1 if detail<24 else 3 if detail<70 else 5
+            strokes=1 if detail<62 else 2
             lines=[]
             for i in range(strokes):
                 y=top+(bottom-top)*(i+1)/(strokes+1)
                 direction=-1 if i%2 else 1
-                x0=cx-sk.waist_half_w*.8; x1=cx+sk.waist_half_w*.8
-                bend=cx+direction*sk.waist_half_w*.22
-                lines.append(f'<path d="M{x0:.1f} {y:.1f} L{bend:.1f} {y:.1f} L{bend+direction*r*.12:.1f} {y+r*.10:.1f} L{x1:.1f} {y+r*.10:.1f}" fill="none" stroke="{accent}" stroke-width="{max(1.1,r*.022):.1f}" opacity=".72"/>')
+                x0=cx-width_bottom*.72
+                x1=cx+width_bottom*.72
+                bend=cx+direction*width_bottom*.22
+                lines.append(f'<path d="M{x0:.1f} {y:.1f} L{bend:.1f} {y:.1f} L{bend+direction*r*.07:.1f} {y+r*.06:.1f} L{x1:.1f} {y+r*.06:.1f}" fill="none" stroke="{accent}" stroke-width="{max(.8,r*.012):.1f}" opacity=".34"/>')
             if pattern=="geometric":
                 for side in (-1,1):
-                    x=cx+side*sk.waist_half_w*.52; y=top+(bottom-top)*.52
-                    lines.append(f'<path d="M{x:.1f} {y-r*.13:.1f} l{r*.10:.1f} {r*.13:.1f} l{-r*.10:.1f} {r*.13:.1f} l{-r*.10:.1f} {-r*.13:.1f} Z" fill="none" stroke="{accent}" stroke-width="{max(1,r*.018):.1f}"/>')
+                    x=cx+side*width_bottom*.52
+                    y=top+(bottom-top)*.54
+                    lines.append(f'<path d="M{x:.1f} {y-r*.08:.1f} l{r*.07:.1f} {r*.08:.1f} l{-r*.07:.1f} {r*.08:.1f} l{-r*.07:.1f} {-r*.08:.1f} Z" fill="none" stroke="{accent}" stroke-width="{max(.8,r*.012):.1f}" opacity=".42"/>')
             if pattern=="gradient":
-                lines.append(f'<path d="M{cx-sk.waist_half_w*.38:.1f} {top+r*.08:.1f} L{cx+sk.waist_half_w*.38:.1f} {bottom-r*.08:.1f}" stroke="{panel}" stroke-width="{max(2,r*.05):.1f}" opacity=".78"/>')
+                lines.append(f'<path d="M{cx-width_bottom*.28:.1f} {top+r*.06:.1f} L{cx+width_bottom*.28:.1f} {bottom-r*.06:.1f}" stroke="{panel}" stroke-width="{max(1.4,r*.03):.1f}" opacity=".48"/>')
             parts.append(f'<g class="cyberpunk-fabric-details" clip-path="url(#{clip})">{"".join(lines)}</g>')
         if detail>=18 and recipe["nanowear_state"]!="everyday":
             y=sk.shoulder_y+r*.12
@@ -283,6 +356,24 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
         crown=ACCENT_COLORS.get(values.get("hair_crown_color","matching_base"))
         if crown and crown!=hair:
             parts.append(f'<path class="hair-crown-accent" d="M{cx-r*.32:.1f} {cy-r*.82:.1f} Q{cx:.1f} {cy-r*1.12:.1f} {cx+r*.34:.1f} {cy-r*.80:.1f} L{cx+r*.20:.1f} {cy-r*.60:.1f} L{cx-r*.20:.1f} {cy-r*.60:.1f} Z" fill="{crown}"/>')
+        texture=values.get("hair_texture","liso_sedoso")
+        if texture in {"ondas_suaves","rizos_sueltos","rizos_definidos","esponjado_suave","hebras_finas","capas_texturizadas","puntas_dinamicas","textura_mixta"}:
+            count=2 if texture in {"ondas_suaves","hebras_finas"} else 4
+            hair_length=HAIR_LENGTHS.get(values.get("hair_length","largo"),.78)
+            for side in (-1,1):
+                for i in range(count):
+                    x=cx+side*r*(.72+i*.045)
+                    start=cy+r*(.12+i*.07)
+                    end=min(sk.hip_y-r*.20,cy+r*(1.1+hair_length*2.2))
+                    sway=side*r*(.05 if i%2 else -.035)
+                    parts.append(f'<path class="hair-texture-strand" d="M{x:.1f} {start:.1f} Q{x+sway:.1f} {(start+end)/2:.1f} {x+sway*.4:.1f} {end:.1f}" fill="none" stroke="{_shade(hair,.72)}" stroke-width="{max(.75,r*.012):.1f}" opacity=".70" stroke-linecap="round"/>')
+        inner=ACCENT_COLORS.get(values.get("hair_inner_color","matching_base"))
+        if inner and inner!=hair:
+            for side in (-1,1):
+                x=cx+side*r*.79
+                start=cy+r*.70
+                end=min(sk.hip_y-r*.12,cy+r*(1.4+HAIR_LENGTHS.get(values.get("hair_length","largo"),.78)*2))
+                parts.append(f'<path class="hair-inner-streak" d="M{x:.1f} {start:.1f} Q{x+side*r*.10:.1f} {(start+end)/2:.1f} {x-side*r*.02:.1f} {end:.1f}" fill="none" stroke="{inner}" stroke-width="{max(1.2,r*.065):.1f}" opacity=".85" stroke-linecap="round"/>')
     ear=values.get("ear_style","orejas_humanas")
     if ear not in {"orejas_humanas","none","auto",""}:
         ear_color=accent if "luminosas" in ear or "sensor" in ear else hair
@@ -303,13 +394,6 @@ def _overlays(values: dict[str,str], recipe: dict[str,Any], p: CharacterParams, 
         for side in (-1,1):
             x=cx+side*r*.37
             parts.append(f'<path class="extra-horn" d="M{x-r*.08:.1f} {cy-r*.68:.1f} Q{x+side*r*.06:.1f} {cy-r*1.12:.1f} {x+side*r*.22:.1f} {cy-r*1.18:.1f} Q{x+side*r*.16:.1f} {cy-r*.80:.1f} {x+r*.04:.1f} {cy-r*.66:.1f} Z" fill="{color}" stroke="#0d0d0d" stroke-width="{max(1.0,r*.03):.1f}"/>')
-    tail=values.get("tail_style","sin_cola")
-    if tail not in {"sin_cola","none","auto",""}:
-        color=accent if any(t in tail for t in ("dracon","mecan","energ")) else p.skin_tone if "conejo" in tail or "pluma" in tail else hair
-        sx,sy=cx+sk.hip_half_w*.74,sk.hip_y+r*.08
-        sway=r*(.35 if "corta" in tail else .72); endy=sy+r*(.85 if "corta" in tail else 1.1)
-        d=f"M{sx:.1f} {sy:.1f} C{sx+sway:.1f} {sy+r*.35:.1f} {sx+sway*1.1:.1f} {endy-r*.2:.1f} {sx+sway*.65:.1f} {endy:.1f}"
-        parts.append(f'<path class="extra-tail" d="{d}" fill="none" stroke="#0d0d0d" stroke-width="{r*.21:.1f}" stroke-linecap="round"/><path d="{d}" fill="none" stroke="{color}" stroke-width="{r*.15:.1f}" stroke-linecap="round"/>')
     if values.get("scale_pattern","no_visible_scales") not in {"no_visible_scales","none","auto",""}:
         color=ACCENT_COLORS.get(values.get("scale_color",""),recipe["emblem_color"])
         for side in (-1,1):
@@ -329,7 +413,7 @@ def render_profile_svg(selections: Any, visual_recipe: Any = None) -> str:
     hair=HAIR_COLORS.get(values.get("hair",""),"#e3b448")
     eye=EYE_COLORS.get(values.get("eyes",""),"#4a9c6d")
     skin=SKIN_COLORS.get(values.get("skin_tone",""),"#f2d8cc")
-    hairstyle=HAIRSTYLE_MAP.get(values.get("hairstyle",""),"long_traced")
+    hairstyle=_resolve_hairstyle(values)
     hair_length=HAIR_LENGTHS.get(values.get("hair_length",""),.46)
     tip_id=values.get("hair_tip_color","matching_base")
     if tip_id=="matching_base":
@@ -343,17 +427,19 @@ def render_profile_svg(selections: Any, visual_recipe: Any = None) -> str:
     pose=values.get("pose","")
     arm_out=13.0 if any(word in pose for word in ("defiant","dynamic","ready","desafiante")) else 0.0
     hair_arrangement=values.get("hair_arrangement","suelto")
+    heads=_head_count(values)
+    maturity=_face_maturity(values)
     params=CharacterParams(
         skin_tone=skin,hair_color=hair,hair_tip_color=tip,hair_length=hair_length,
         hairstyle=hairstyle,eye_color=eye,
         hair_tail=.62 if any(word in hair_arrangement for word in ("coleta","ponytail","recogido")) else 0.0,
         hair_knot=any(word in hair_arrangement for word in ("moño","bun")),
         outfit=coat,face=_face_style(values),body="tall_chibi_long_torso",height=1.0,
-        hand_style="traced",grip_style="mitten",face_age=.3,frame=frame,bust=bust,
+        hand_style="traced",grip_style="mitten",face_age=maturity,frame=frame,bust=bust,
         right_arm_out=arm_out,left_arm_out=arm_out*.45,
         shaded=recipe["toon_influence"]<78,
     )
-    skeleton=build_skeleton(canvas_w=400,canvas_h=640,heads=_head_count(values),frame=frame,bust=bust)
+    skeleton=build_skeleton(canvas_w=400,canvas_h=640,heads=heads,frame=frame,bust=bust)
     proportions=values.get("body_proportions","")
     waist_delta=(50-recipe["torso_length"])*skeleton.head_r*.003
     if proportions in {"piernas_largas","extremidades_largas"}: waist_delta-=skeleton.head_r*.13
@@ -366,15 +452,17 @@ def render_profile_svg(selections: Any, visual_recipe: Any = None) -> str:
         hip_half_w=skeleton.hip_half_w*hips,arm_half_w=skeleton.arm_half_w*limbs,
         leg_half_w=skeleton.leg_half_w*limbs,arm_x=skeleton.arm_x*shoulder,
         waist_y=skeleton.waist_y+waist_delta,hip_y=skeleton.hip_y+waist_delta*.65,
-        face_maturity=.3,limb_taper=.55,
+        face_maturity=maturity,limb_taper=.62,
     )
     svg=render_character(params,skeleton)
+    underlays=_underlays(values,recipe,params,skeleton)
     svg=svg.replace("</svg>",_overlays(values,recipe,params,skeleton)+"</svg>")
-    attrs=(f'class="parametric-anime-svg" data-renderer="{RENDERER_ID}" data-view="{recipe["view"]}" '
+    attrs=(f'class="parametric-anime-svg" data-renderer="{RENDERER_ID}" data-view="{recipe["view"]}" data-head-count="{heads:.2f}" data-face-maturity="{maturity:.2f}" '
            f'data-hair-color="{hair}" data-skin-color="{skin}" data-eye-color="{eye}" '
            f'data-fabric-base="{recipe["garment_base_color"]}" data-fabric-panel="{recipe["garment_panel_color"]}" '
            f'data-fabric-accent="{recipe["garment_accent_color"]}"')
     svg=svg.replace('<svg xmlns="http://www.w3.org/2000/svg"',f'<svg {attrs} xmlns="http://www.w3.org/2000/svg"',1)
+    svg=re.sub(r"(<svg\b[^>]*>)",lambda match: match.group(1)+underlays,svg,count=1)
     if len(svg.encode("utf-8"))>SVG_MAX_BYTES:
         raise ValueError("El SVG generado supera el límite de salida permitido.")
     return svg

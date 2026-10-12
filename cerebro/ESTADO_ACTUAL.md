@@ -372,3 +372,11 @@ Descargué y revisé una matriz de contacto con seis capturas front/back a fit 5
 - **QA Windows / Chrome / Edge:** \`NOT_RUN\` hasta validación física.
 - **Progreso global:** permanece en 63% hasta reevaluar con evidencias y pesos reales, sin puntos artificiales por documentación.
 
+
+
+## BIMG-ENGINE-010-R1 · ajuste tras revisión de captura · 2026-10-12
+
+- CI del commit de integración c908775039417adaa55f10019afaa05678eefb58: SUCCESS; se inspeccionó el artefacto Chromium.
+- Defectos confirmados: proporción chibi, ojos/rostro demasiado infantiles, cola superpuesta sobre el vestuario y patrón brillante como cuadrícula encima del abrigo.
+- Corrección publicada en la rama visual: proporciones adultas, madurez facial 1,0, mapeo visual de flequillo/textura/boca/cejas, colas en capa posterior y patrón más pequeño/tenue.
+- El criterio artístico sigue PARTIAL hasta revisar nuevas capturas. QA Windows/Chrome/Edge sigue NOT_RUN.

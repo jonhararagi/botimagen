@@ -14,21 +14,24 @@ from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_p
 GENERATOR = CharacterGenerator(ROOT / "character_rules.json")
 
 
-def test_engine_renders_full_transparent_svg_with_layered_anime_geometry():
+def test_engine_renders_adult_proportioned_anime_svg_with_layered_geometry():
     svg = render_profile_svg({
         "species": "draconica", "height_cm": "h170", "body_build": "fuerte_guardiana",
-        "body_proportions": "piernas_largas", "skin_tone": "porcelana_neutra",
+        "body_proportions": "piernas_largas", "silhouette": "elegante_larga", "skin_tone": "porcelana_neutra",
         "hair": "rojo_coral", "hair_tip_color": "metallic_gold", "hairstyle": "long_flowing",
-        "hair_length": "largo", "eyes": "ambar", "eye_shape": "grande_expresiva",
-        "expression": "sonrisa_abierta", "outfit": "street_bomber", "outer_layer": "long_coat",
+        "hair_length": "largo", "hair_bangs": "cortina", "hair_texture": "ondas_suaves", "eyes": "ambar", "eye_shape": "grande_expresiva",
+        "expression": "sonrisa_abierta", "mouth_style": "sonrisa_amplia", "outfit": "street_bomber", "outer_layer": "long_coat",
         "ear_style": "orejas_gato", "tail_style": "cola_draconica", "horn_style": "cuernos_curvos",
     }, DEFAULT_RENDER_RECIPE)
     assert svg.startswith('<svg class="parametric-anime-svg"')
     assert 'viewBox="0 0 400 640"' in svg
     assert f'data-renderer="{RENDERER_ID}"' in svg
+    assert 'data-head-count="6.' in svg
+    assert 'data-face-maturity="1.' in svg
     assert 'class="extra-ear"' in svg
     assert 'class="extra-tail"' in svg
     assert 'class="extra-horn"' in svg
+    assert 'class="hair-texture-strand"' in svg
     assert len(svg) > 12000
     assert svg.count("<path") > 30
     assert "</svg>" in svg
@@ -82,3 +85,19 @@ def test_render_endpoint_uses_canonical_catalogue_validation():
         assert "Opción no disponible" in str(error)
     else:
         raise AssertionError("Unknown catalogue values must not be rendered")
+
+
+
+def test_hair_bangs_texture_mouth_and_brows_change_the_rendered_svg():
+    common = {
+        "skin_tone": "marfil_calido", "hair_length": "largo",
+        "hairstyle": "long_flowing", "eyes": "azul_hielo", "outfit": "idol_combat",
+        "hair": "rojo_coral", "hair_bangs": "recto", "hair_texture": "liso_sedoso",
+    }
+    straight = render_profile_svg(common, DEFAULT_RENDER_RECIPE)
+    curtain = render_profile_svg({**common, "hair_bangs": "cortina"}, DEFAULT_RENDER_RECIPE)
+    wavy = render_profile_svg({**common, "hair_texture": "ondas_suaves"}, DEFAULT_RENDER_RECIPE)
+    mouth = render_profile_svg({**common, "mouth_style": "puchero"}, DEFAULT_RENDER_RECIPE)
+    brow = render_profile_svg({**common, "eyebrow_style": "anguladas"}, DEFAULT_RENDER_RECIPE)
+    assert len({straight,curtain,wavy,mouth,brow}) == 5
+    assert 'class="hair-texture-strand"' in wavy

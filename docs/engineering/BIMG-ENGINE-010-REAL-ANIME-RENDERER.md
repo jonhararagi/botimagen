@@ -28,3 +28,10 @@ La CI debe demostrar que el servidor emite SVG, que los cambios de opciones alte
 La geometría adicional de orejas, cuernos, colas, marcas y detalles CyberStreet se compone en capas SVG. No todas las 47 categorías tienen aún una geometría individual especializada. La vista posterior es una composición de presentación sobre el mismo esqueleto, no un segundo rig anatómico completo. Esos límites no deben describirse como funciones terminadas.
 
 **Pendiente:** CI del SHA final, inspección de la salida visual en artefactos y QA manual en Windows/Chrome/Edge (\`NOT_RUN\` hasta ejecutarse físicamente). El progreso global no sube hasta revisar evidencias y volver a calcular la beta con su ponderación real.
+
+
+## BIMG-ENGINE-010-R1 · corrección guiada por la captura real
+
+La primera captura real de Chromium reveló que la integración seguía demasiado chibi. Esta corrección aborda defectos observados, no solo la compilación: sube la proporción corporal objetivo a 6,0–7,15 cabezas, eleva la madurez facial de base a 1,0, reduce ojos/iris, conecta flequillo/textura/boca/cejas a las opciones seleccionadas, coloca colas/coletas en el fondo de SVG y limita el patrón CyberStreet a un panel central tenue.
+
+La aceptación artística continúa en PARTIAL hasta inspeccionar las nuevas capturas. CI verde no significa diseño aprobado.
