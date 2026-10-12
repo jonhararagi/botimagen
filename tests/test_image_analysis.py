@@ -108,7 +108,7 @@ class ImageAnalysisTests(unittest.TestCase):
             self.assertEqual(status, 403); self.assertEqual(error["error"]["code"], "ORIGIN_NOT_ALLOWED")
             status, error = request("POST", b"not image")
             self.assertEqual(status, 422); self.assertEqual(error["error"]["code"], "INVALID_IMAGE")
-            status, error = request("PUT", raw)
+            status, error = request("PUT", b"")
             self.assertEqual(status, 405); self.assertEqual(error["error"]["code"], "METHOD_NOT_ALLOWED")
         finally:
             server.shutdown(); server.server_close(); thread.join(timeout=2)
