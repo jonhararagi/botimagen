@@ -84,6 +84,6 @@ export function ModularAssetLibrary() {
     </div>
     {previews.length>0 && <div className="modular-preview-grid">{previews.map((item,i)=><div key={item.url}><img src={item.url} alt={item.file.name}/><span>{item.file.name}</span><button type="button" onClick={()=>setPreviews(current=>current.filter((_,j)=>i!==j))}>Quitar</button></div>)}</div>}
     <div className="modular-library-actions"><button className="btn primary" type="button" disabled={!previews.length||busy} onClick={()=>void importFiles()}>{busy?"Importando…":`Importar ${previews.length} archivo(s)`}</button><button className="btn muted" type="button" disabled={busy} onClick={()=>void refresh()}>Actualizar biblioteca</button><span role="status">{status}</span></div>
-    <div className="modular-asset-list">{assets.map(asset=><article key={asset.id}><b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span><small>{asset.filename} · SHA-256 {asset.sha256.slice(0,16)}… · licencia: {asset.license}</small></article>)}</div>
+    <div className="modular-asset-list">{assets.map(asset=><article key={asset.id}><img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={asset.label}/><b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span><small>{asset.filename} · SHA-256 {asset.sha256.slice(0,16)}… · licencia: {asset.license}</small></article>)}</div>
   </section>;
 }
