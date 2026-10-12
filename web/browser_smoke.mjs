@@ -105,7 +105,7 @@ try {
     const src = await page.locator("img.server-character-art").getAttribute("src");
     assert.ok(src?.startsWith("data:image/svg+xml;charset=utf-8,"), "The product preview must remain a local engine SVG");
     const svg = decodeURIComponent(src.slice(src.indexOf(",") + 1));
-    return svg.match(/\\bdata-view="(front|back)"/)?.[1] ?? null;
+    return svg.match(/\bdata-view="(front|back)"/)?.[1] ?? null;
   };
   assert.equal(await page.locator("img.server-character-art").getAttribute("data-rendered-view"), "front",
     "The product preview metadata must identify the actual initial front view");
