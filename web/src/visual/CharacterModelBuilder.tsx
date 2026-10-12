@@ -353,6 +353,7 @@ export function CharacterModelBuilder() {
           <label>Máximo de capas candidatas<select value={maxRegions} onChange={event=>setMaxRegions(event.target.value)}><option value="24">24 capas</option><option value="48">48 capas</option><option value="64">64 capas</option></select></label>
           <label>Imagen que se va a separar<select value={baseAssetId} onChange={event=>setBaseAssetId(event.target.value)}><option value="">Elegir imagen base</option>{selectedAssets.map(asset=><option key={asset.id} value={asset.id}>{asset.label}</option>)}</select></label>
         </div>
+        <label className="model-builder-upload">Importar varias imágenes directamente<input aria-label="Importar varias imágenes directamente" type="file" accept="image/png,image/jpeg,image/webp" multiple disabled={busy} onChange={event=>{void importReferenceFiles(event.currentTarget.files);event.currentTarget.value="";}}/><small>PNG, JPEG o WebP. Las imágenes se guardan como referencias con SHA-256, procedencia y vista sin clasificar automáticamente como prendas.</small></label>
         <label className="model-builder-search">Filtrar recursos<input value={filter} onChange={event=>setFilter(event.target.value)} placeholder="Nombre, archivo o categoría…" /></label>
         <button type="button" className="model-builder-secondary" disabled={busy} onClick={refreshLibrary}>Actualizar biblioteca local</button>
         <div className="model-builder-asset-list">
@@ -385,10 +386,31 @@ export function CharacterModelBuilder() {
                 <label>Nombre<input value={layerLabels[layer.id]??layer.label} onChange={event=>setLayerLabels(current=>({...current,[layer.id]:event.target.value}))} /></label>
                 <div className="model-builder-region-meta"><span>{layer.pixel_count.toLocaleString()} px</span>{layer.color_hex&&<i style={{background:layer.color_hex}} title={layer.color_hex}/>}<small>{layer.suggested_zone}</small></div>
                 <label>Rol para importar<select value={layerCategories[layer.id]||""} onChange={event=>setLayerCategories(current=>({...current,[layer.id]:event.target.value}))}><option value="">Solo candidato</option>{roleOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+                <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>{setEditingLayerId(layer.id);setMaskTool("add");setPolygonPoints([]);setError("");}}>Editar máscara</button>
                 <button type="button" className="model-builder-region-import" disabled={busy||!layerCategories[layer.id]} onClick={()=>publishLayer(layer)}>Importar como pieza</button>
               </div>
             </article>)}
           </div>
+          {editingLayerId&&model.layers.some(layer=>layer.id===editingLayerId)&&<div className="model-builder-group-panel" data-testid="mask-editor">
+            <div className="model-builder-group-heading"><b>Corregir máscara · {model.layers.find(layer=>layer.id===editingLayerId)?.label}</b><span>Rojo = píxeles seleccionados. Pincel y polígono solo seleccionan píxeles que ya existen en la fuente; no inventan zonas ocultas.</span></div>
+            <div className="model-builder-form-row"><label>Herramienta<select value={maskTool} onChange={event=>setMaskTool(event.target.value as typeof maskTool)}><option value="add">Pincel: sumar</option><option value="erase">Pincel: borrar</option><option value="polygon-add">Polígono: sumar</option><option value="polygon-erase">Polígono: borrar</option></select></label>
+              <label>Tamaño del pincel<input type="range" min="2" max="72" value={brushSize} onChange={event=>setBrushSize(Number(event.target.value))}/></label></div>
+            <div style={{position:"relative",width:"min(100%, 320px)",margin:"0 auto",background:"#151522",borderRadius:"8px",overflow:"hidden"}}>
+              <canvas ref={previewCanvasRef} width={512} height={768} aria-label="Fuente con superposición de máscara editable" data-testid="mask-preview" style={{display:"block",width:"100%",height:"auto",touchAction:"none",cursor:maskTool.startsWith("polygon")?"crosshair":"cell"}} onPointerDown={event=>{const point=canvasPoint(event);if(maskTool.startsWith("polygon")){setPolygonPoints(current=>[...current,point]);}else{event.currentTarget.setPointerCapture(event.pointerId);paintAt(point,true);}}} onPointerMove={event=>{if(paintingRef.current&&!maskTool.startsWith("polygon"))paintAt(canvasPoint(event),false);}} onPointerUp={finishPaint} onPointerCancel={finishPaint} />
+              <canvas ref={maskCanvasRef} width={512} height={768} aria-hidden="true" style={{position:"absolute",left:"-10000px",top:0,pointerEvents:"none"}} />
+            </div>
+            {maskTool.startsWith("polygon")&&<p>{polygonPoints.length} puntos marcados. Haz clic en la imagen para añadir vértices.</p>}
+            <div className="model-builder-action-row">
+              <button type="button" className="model-builder-secondary" disabled={busy||!maskHistoryRef.current.length} onClick={undoMask}>Deshacer última edición</button>
+              <button type="button" className="model-builder-secondary" disabled={busy||polygonPoints.length<3} onClick={applyPolygon}>Aplicar polígono</button>
+              <button type="button" className="model-builder-secondary" disabled={busy||!polygonPoints.length} onClick={()=>setPolygonPoints([])}>Cancelar polígono</button>
+            </div>
+            <div className="model-builder-action-row">
+              <button type="button" className="model-builder-primary" disabled={busy||!maskDirty} onClick={saveMask}>Guardar máscara corregida</button>
+              <button type="button" className="model-builder-secondary" disabled={busy} onClick={resetMask}>Restaurar máscara original</button>
+              <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>setEditingLayerId("")}>Cerrar editor</button>
+            </div>
+          </div>}
           {selectedRegionIds.length>0&&<div className="model-builder-group-panel">
             <div className="model-builder-group-heading"><b>Agrupar regiones seleccionadas</b><span>{selectedRegionIds.length} regiones se convertirán en una sola máscara PNG transparente.</span></div>
             <div className="model-builder-group-fields">
