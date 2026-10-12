@@ -31,7 +31,7 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn("getBodyLandmarks(r.view, hemY, waistHalf)", RENDERER)
         self.assertIn("landmarks.torsoShoulderLeft.x", RENDERER)
         self.assertIn("landmarks.hemRight.y", RENDERER)
-        self.assertIn("landmarks.neckLeft.x", RENDERER)
+        self.assertIn("bodyLandmarks.neckLeft.x", RENDERER)
 
     def test_layer_contract_is_consumed_by_rendered_svg_elements(self):
         order = re.search(r"const SVG_LAYER_ORDER = \[(.*?)\] as const", LANDMARKS, re.S)
