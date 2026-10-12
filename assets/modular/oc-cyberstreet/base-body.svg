@@ -11,5 +11,5 @@
 <path fill="#f2c6b5" d="M217 120 Q215 92 250 89 Q290 88 294 120 L288 179 Q267 202 244 180Z"/>
 </g>
 <g fill="#d78e88" opacity=".28"><path d="M215 198 Q201 218 194 258 L176 300 Q181 311 188 300 L211 251Z"/><path d="M297 198 Q311 218 318 258 L336 300 Q331 311 324 300 L301 251Z"/><path d="M203 484 L192 658 Q193 672 202 673 L214 493Z"/><path d="M309 484 L320 658 Q319 672 310 673 L298 493Z"/></g>
-<g fill="none" stroke-linecap="round"><path d="M219 203 Q212 215 207 236 M293 203 Q300 215 305 236" stroke="#ffddd1" stroke-width="4" opacity=".9"/><path d="M188 301 l-5 11 M324 301 l5 11" stroke="#a9636d" stroke-width="2.5" opacity=".6"/><path d="M232 555 L226 644 M300 555 L306 644" stroke="#ffddd1" stroke-width="3.2" opacity=".75"/></g>
+<g fill="none" stroke-linecap="round"><path d="M219 203 Q212 215 207 236 M293 203 Q300 215 305 236" stroke="#ffddd1" stroke-width="4" opacity=".9"/><path d="M188 301 l-5 11 M324 301 l5 11" stroke="#a9636d" stroke-width="2.5" opacity=".6"/><path d="M203 555 L199 644 M300 555 L306 644" stroke="#ffddd1" stroke-width="3.2" opacity=".75"/></g>
 </svg>
