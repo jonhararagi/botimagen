@@ -147,7 +147,7 @@ def list_user_assets(library_root: Path | None = None) -> dict[str, Any]:
 
 
 def read_user_asset(asset_id: str, library_root: Path | None = None) -> tuple[bytes, str]:
-    if not isinstance(asset_id, str) or not re.fullmatch(r"user\\.[0-9a-f]{32}", asset_id):
+    if not isinstance(asset_id, str) or not re.fullmatch(r"user\.[0-9a-f]{32}", asset_id):
         raise AssetImportError("Identificador de asset inválido.")
     root = Path(library_root) if library_root else DEFAULT_LIBRARY_ROOT
     catalog = _read_catalog(root)
