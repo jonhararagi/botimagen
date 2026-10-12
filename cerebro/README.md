@@ -9,17 +9,26 @@ Este directorio es la memoria operativa y la fuente de dirección técnica de la
 - **PLAN_MAESTRO.md**: fases, tareas, dependencias y TIMER estimado de cada trabajo.
 - **ESTADO_ACTUAL.md**: punto de partida verificado y funciones que todavía no deben darse por terminadas.
 - **PROGRESO.md**: porcentaje global ponderado hacia la beta local, reglas de cálculo y contribuciones de cada fase.
+- **VISION_CREADOR_PERSONAJES.md**: visión de largo plazo para BotImagen Character Studio, con personalización modular inspirada en creadores como Koikatsu y tres direcciones artísticas: sci-fi anime inspirado en NIKKE, pixel art y Toon Style.
 
-## Misión
+## Misión de la beta actual
 
-Convertir BotImagen en un editor modular de personajes con una interfaz web interactiva que funcione localmente en Windows, reutilizando lo que ya sirve del motor Python. Debe permitir combinaciones visuales muy amplias, gestionar referencias e imágenes y mantener abierta una ruta futura hacia una aplicación de escritorio y, por separado, una experiencia web remota.
+Estabilizar un editor modular de personajes con una interfaz web interactiva que funcione localmente en Windows y reutilice el motor Python existente. La beta se centra en perfiles, opciones de catálogo, generación de prompts, guardado y las demás capacidades enumeradas en el plan maestro y estado verificado.
+
+## Visión del producto a largo plazo
+
+La dirección creativa futura está documentada en [VISION_CREADOR_PERSONAJES.md](VISION_CREADOR_PERSONAJES.md). Es una meta para explorar por etapas, no una declaración de que ya exista un creador 3D, un renderizador completo o un catálogo casi infinito.
+
+La herramienta debe servir para diseñar personajes destinados a distintos videojuegos, historias, novelas, cómics y proyectos personales. BaseWarriors: Meta-Strike es uno de los proyectos que podrá beneficiarse de BotImagen, no su único destino.
+
+Los tres estilos deseados son paquetes diferenciados. No se deben mezclar automáticamente, y cada uno puede necesitar recursos o un flujo técnico distinto.
 
 ## Estado actual
 
-La auditoría BIMG-002 está cerrada. La UI React/TypeScript/Vite consume el catálogo y `CharacterGenerator` mediante el servicio local `botimagen_server.py`; la API valida las opciones, genera prompts y permite guardar, listar y leer perfiles locales. CI #60 pasó, incluyendo UI de perfiles: https://github.com/jonhararagi/botimagen/actions/runs/37887835609.
+Consultar [ESTADO_ACTUAL.md](ESTADO_ACTUAL.md) y [PROGRESO.md](PROGRESO.md) antes de declarar una tarea completa. El porcentaje de progreso mide exclusivamente la beta local definida en el plan, no toda la visión futura del producto.
 
-**No declarar la beta completa:** faltan `package-lock.json`, la biblioteca visual, el intake web y el smoke test en navegador/Windows, que sigue NOT_RUN. El progreso ponderado hacia la beta local figura en [PROGRESO.md](PROGRESO.md).
+No afirmar que una función está implementada solo porque figure en la visión. Verificar código y pruebas, y distinguir CI automatizada de QA física en Windows.
 
 ## Regla de continuidad
 
-Antes de trabajar, verificar el HEAD real de main y leer INSTRUCCIONES.md, ARQUITECTURA.md, PLAN_MAESTRO.md y ESTADO_ACTUAL.md. Después de trabajar, actualizar la documentación de estado con hechos, pruebas y enlaces verificables.
+Antes de trabajar, verificar el HEAD real de main y leer INSTRUCCIONES.md, ARQUITECTURA.md, PLAN_MAESTRO.md, ESTADO_ACTUAL.md y esta visión cuando la tarea afecte el alcance creativo. Después de trabajar, actualizar la documentación de estado con hechos, pruebas y enlaces verificables.
