@@ -648,8 +648,10 @@ QA Windows: `NOT_RUN`.
 - Diagnóstico y corrección: el primer test generó erróneamente una franja `248×50` porque los últimos cuatro clics del test quedaban fuera del viewport. El test ahora centra el lienzo completo con `scrollIntoViewIfNeeded`; el informe final registra los 8 puntos del contorno. No fue un fallo del material ni una conversión semántica automática.
 - `web/src/visual/ModularAssetLibrary.tsx` transforma ahora coordenadas de clic mediante `getScreenCTM().inverse()` y conserva la proporción del `viewBox` (`width`/`height` explícitos).
 - **UI limpia:** se retiró el panel de enlaces externos a páginas de juegos. El material se valida cargando directamente el PNG real; se añadió una aserción en el smoke para impedir que vuelva el panel de links.
-- **CI pública del código/lasso:** CI #504 y PR CI #505 SUCCESS en commit `770ead684c6ca27c1f10a7771ccae861579ec0ca`; el build, el smoke Chromium y la composición de piezas pasan. El cambio de retirada de enlaces y la aserción anti-links documentados aquí quedan pendientes de la siguiente CI.
+- **CI pública del cambio final:** push CI #507 y PR CI #506 SUCCESS en commit `26df8cf69971d749ae829ff8699a29dc928093f3`. Pasan build web, suites Python/API y Chromium smoke, incluida la aserción de que no se muestran enlaces externos en el importador.
 - **Límite honesto:** Firefly es un recorte vertical con torso, no un rig de cuerpo completo. El `clothing_top` es un candidato extraído con polígono manual de píxeles visibles; no se afirma que el programa detecte o separe automáticamente todo el atuendo, que reconstruya la parte posterior ni los píxeles ocultos.
 - `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - Timer estimado para la siguiente fase de segmentación más automática, ajuste de capas/anclajes y más variantes de prendas: **8–16 horas activas**, no es tiempo medido ni tiempo restante total del proyecto.
 - `main` sigue intacta (`b508cfe7d3216eda801438d46dff8873842cea86`); PR #11 sigue abierta/sin fusionar y PR #14 sigue independiente.
+
+- Head público verificado tras la retirada de enlaces: `26df8cf69971d749ae829ff8699a29dc928093f3`. `main` sin cambios y las PR #11/#14 conservan su estado abierto e independiente.
