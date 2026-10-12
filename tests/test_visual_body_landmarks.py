@@ -73,8 +73,8 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn("d={lowerBodyPath}", RENDERER)
         self.assertIn("d={legSilhouettePath}", RENDERER)
         self.assertIn("d={baseFootwearPath}", RENDERER)
-        self.assertIn("landmarks.handLeft.x - 108", RENDERER)
-        self.assertIn("landmarks.handRight.x - 232", RENDERER)
+        self.assertIn("bodyLandmarks.handLeft.x - 108", RENDERER)
+        self.assertIn("bodyLandmarks.handRight.x - 232", RENDERER)
         self.assertIn('data-qa-surface="legs"', RENDERER)
         self.assertIn('data-qa-surface="footwear-base"', RENDERER)
 
@@ -84,9 +84,9 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn('neutral-body-manifest.json', SMOKE)
         self.assertIn("box('[data-layer-id=\"neck\"]')", SMOKE)
         self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
-        self.assertIn('PARTIAL_NOT_A_NEUTRAL_ANATOMY_REFERENCE', SMOKE)
+        self.assertIn('BODY_BASE_GEOMETRY_PRESENT_ART_REVIEW_REQUIRED', SMOKE)
         self.assertIn('normalizedPathBounds', SMOKE)
-        self.assertIn('garment_path_proxy_not_anatomy', SMOKE)
+        self.assertIn('independent_body_base_path_bbox', SMOKE)
         self.assertIn('Cosmetic SVG layers must be explicitly hidden', SMOKE)
 
     def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
