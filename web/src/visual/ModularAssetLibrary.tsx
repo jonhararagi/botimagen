@@ -9,7 +9,8 @@ type UserAsset = {
   layer_order?: number | null; anchor_estimate?: Record<string, {x:number;y:number}>;
   anchors_validated?: boolean; anchor_status?: string; conversion?: AssetConversionMetadata | null; note?: string;
 };
-type PreviewItem = { file:File; url:string; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
+type CutoutPoint = { x:number; y:number };
+type PreviewItem = { file:File; url:string; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
 const categories = [
   ["reference", "Referencia / clasificar después"], ["body", "Cuerpo base"], ["head", "Cabeza"],
   ["face", "Rostro"], ["hair_back", "Cabello posterior"], ["hair_front", "Cabello frontal"],
@@ -79,6 +80,63 @@ function AnchorStageEditor({imageUrl,anchors,onChange,label}:{imageUrl:string;an
   </svg>;
 }
 
+function PolygonCutoutEditor({
+  imageUrl, points, onChange, label, disabled,
+}: {
+  imageUrl:string;
+  points:CutoutPoint[];
+  onChange:(value:CutoutPoint[])=>void;
+  label:string;
+  disabled:boolean;
+}) {
+  const [open,setOpen]=useState(false);
+  const [size,setSize]=useState({width:0,height:0});
+  useEffect(()=>{
+    let active=true;
+    const image=new Image();
+    image.onload=()=>{if(active)setSize({width:image.naturalWidth,height:image.naturalHeight});};
+    image.src=imageUrl;
+    return ()=>{active=false;image.onload=null;};
+  },[imageUrl]);
+
+  const pointString=points.map(point=>`${point.x*size.width},${point.y*size.height}`).join(" ");
+  const addPoint=(event:MouseEvent<SVGSVGElement>)=>{
+    const rect=event.currentTarget.getBoundingClientRect();
+    if(!rect.width||!rect.height||!size.width||!size.height||points.length>=256)return;
+    const next:CutoutPoint={
+      x:Number(Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width)).toFixed(5)),
+      y:Number(Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height)).toFixed(5)),
+    };
+    onChange([...points,next]);
+  };
+  return <div className="modular-cutout-editor">
+    <button type="button" className="btn muted" disabled={disabled} aria-expanded={open} onClick={()=>setOpen(value=>!value)}>
+      {open?"Cerrar contorno":"Dibujar contorno de pieza"}
+    </button>
+    {open&&<>
+      <p>Haz clic alrededor del cabello, rostro, ropa o accesorio que quieras extraer. Cada clic añade un punto. El exterior quedará transparente al preparar el PNG. Las partes ocultas detrás de otra prenda no existen en la imagen original.</p>
+      {size.width>0&&size.height>0&&<svg
+        className="modular-cutout-stage"
+        viewBox={`0 0 ${size.width} ${size.height}`}
+        role="application"
+        aria-label={label}
+        onClick={addPoint}
+      >
+        <image href={imageUrl} x="0" y="0" width={size.width} height={size.height} preserveAspectRatio="none" pointerEvents="none"/>
+        {points.length>=3&&<polygon points={pointString} className="modular-cutout-fill"/>}
+        {points.length>=2&&<polyline points={pointString} className="modular-cutout-line"/>}
+        {points.map((point,index)=><circle key={index} cx={point.x*size.width} cy={point.y*size.height} r={Math.max(4,Math.min(12,size.width*0.018))} className="modular-cutout-point"/>)}
+      </svg>}
+      <div className="modular-cutout-actions">
+        <span>{points.length} punto(s) · {points.length>=3?"contorno listo":"se necesitan al menos 3"}</span>
+        <button type="button" className="btn muted" disabled={disabled||points.length===0} onClick={()=>onChange(points.slice(0,-1))}>Deshacer punto</button>
+        <button type="button" className="btn muted" disabled={disabled||points.length===0} onClick={()=>onChange([])}>Borrar contorno</button>
+      </div>
+    </>}
+    {points.length>=3&&<small className="modular-cutout-ready">Recorte manual activo. Pulsa «Preparar PNG 512 × 768» para crear una pieza transparente.</small>}
+  </div>;
+}
+
 function readDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -136,7 +194,7 @@ export function ModularAssetLibrary() {
   };
   useEffect(() => { void refresh().catch(e => setStatus(e instanceof Error ? e.message : "API local no disponible")); }, []);
 
-  const clearConversions = () => setPreviews(current => current.map(item => ({file:item.file,url:item.url})));
+  const clearConversions = () => setPreviews(current => current.map(item => ({...item,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined})));
   const selectFiles = (files: FileList | null) => {
     if (!files) return;
     const accepted = Array.from(files);
@@ -148,6 +206,10 @@ export function ModularAssetLibrary() {
 
   const prepareMaterial = async () => {
     if (!previews.length || busy) return;
+    if (previews.some(item => (item.cutoutPoints?.length||0)>0 && (item.cutoutPoints?.length||0)<3)) {
+      setStatus("Completa el contorno con al menos 3 puntos o bórralo antes de preparar el material.");
+      return;
+    }
     setBusy(true);
     try {
       const prepared:PreviewItem[]=[];
@@ -155,11 +217,12 @@ export function ModularAssetLibrary() {
         const converted=await convertToModularStage(item.file,{
           category,kind,view,removeFlatBackground:removeBackground,backgroundTolerance:tolerance,
           scalePercent,offsetX,offsetY,
+          ...(item.cutoutPoints && item.cutoutPoints.length>=3 ? {cutoutPolygon:item.cutoutPoints} : {}),
         });
         prepared.push({...item,convertedBlob:converted.blob,convertedUrl:makeUrl(converted.blob),conversion:converted.metadata});
       }
       setPreviews(prepared);
-      setStatus(`Conversión lista: ${prepared.length} PNG de 512×768. Revisa el resultado antes de guardar.`);
+      setStatus(`Conversión lista: ${prepared.length} PNG de 512×768. ${prepared.filter(item=>item.conversion?.cutout_applied).length} con recorte manual. Revisa el resultado antes de guardar.`);
     } catch(error) {
       setStatus(error instanceof Error ? error.message : "No se pudo convertir la imagen.");
     } finally { setBusy(false); }
@@ -183,7 +246,8 @@ export function ModularAssetLibrary() {
             category:"reference",kind:"reference",label:`Fuente original · ${stem}`,view,license,source_url:sourceUrl,
           });
         }
-        const convertedFile=new File([item.convertedBlob!],`${stem}-botimagen-512x768.png`,{type:"image/png"});
+        const suffix=item.conversion?.cutout_applied?"-pieza-recortada":"";
+        const convertedFile=new File([item.convertedBlob!],`${stem}${suffix}-botimagen-512x768.png`,{type:"image/png"});
         const convertedBase64=await readDataUrl(convertedFile);
         await postAsset({
           filename:convertedFile.name,source_filename:item.file.name,mime_type:"image/png",data_base64:convertedBase64,
@@ -316,7 +380,7 @@ export function ModularAssetLibrary() {
       <span>Úsalas como guía de silueta, materiales y detalles. Descarga e importa las imágenes que quieras probar y anota su procedencia.</span>
       <a href="https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper" target="_blank" rel="noopener noreferrer">Abrir wallpapers oficiales ↗</a>
       <a href="https://honkaiimpact3.hoyoverse.com/global/en-us/news/106540" target="_blank" rel="noopener noreferrer">Art Collection Vol. I · noticia oficial ↗</a>
-      <a href="https://honkaiimpact3.hoyoverse.com/m/global/en-us/news/112263" target="_blank" rel="noopener noreferrer">Art Collection Vol. II · página oficial ↗</a>
+      <a href="https://honkaiimpact3.hoyoverse.com/global/en-us/news/112510" target="_blank" rel="noopener noreferrer">Art Collection Vol. II · página oficial ↗</a>
     </div>
     <div className="modular-dropzone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();selectFiles(e.dataTransfer.files);}}>
       <strong>Arrastra imágenes aquí</strong><span>PNG, JPEG o WebP · máximo 12 MiB y 20 megapíxeles por archivo</span>
@@ -326,6 +390,8 @@ export function ModularAssetLibrary() {
     {previews.length>0&&<div className="modular-preview-grid">
       {previews.map((item,i)=><div key={item.url} className="modular-preview-card">
         <img src={item.url} alt={`Imagen fuente ${item.file.name}`}/>
+        <PolygonCutoutEditor imageUrl={item.url} points={item.cutoutPoints||[]} label={`Dibujar contorno en ${item.file.name}`} disabled={busy}
+          onChange={points=>setPreviews(current=>current.map((entry,j)=>j===i?{...entry,cutoutPoints:points,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined}:entry))}/>
         <span>{item.file.name}</span><small>Original · {Math.round(item.file.size/1024)} KiB</small>
         {item.convertedUrl&&<>{kind==="modular_piece"&&item.conversion?<div className="modular-converted-preview"><AnchorStageEditor imageUrl={item.convertedUrl} anchors={item.conversion.anchors} label={`Ajustar esqueleto de ${item.file.name}`} onChange={anchors=>setPreviews(current=>current.map((entry,j)=>j===i&&entry.conversion?{...entry,conversion:{...entry.conversion,anchors}}:entry))}/></div>:<img className="modular-converted-preview" src={item.convertedUrl} alt={`PNG normalizado de ${item.file.name} 512 por 768`}/>}<small>{kind==="modular_piece"?"Arrastra los puntos del esqueleto al lugar real de cada articulación; se guardarán con la pieza.":"Material convertido · 512×768"}</small></>}
         <button type="button" onClick={()=>setPreviews(current=>current.filter((_,j)=>j!==i))}>Quitar</button>
@@ -346,7 +412,7 @@ export function ModularAssetLibrary() {
           {asset.kind==="modular_piece"&&asset.conversion?<div className="modular-saved-preview"><AnchorStageEditor imageUrl={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} anchors={asset.anchor_estimate||asset.conversion.anchors} label={`Ajustar esqueleto de ${asset.label}`} onChange={anchors=>setAssets(current=>current.map(entry=>entry.id===asset.id?{...entry,anchor_estimate:anchors,conversion:entry.conversion?{...entry.conversion,anchors}:entry.conversion}:entry))}/></div>:<img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={`Material guardado ${asset.label}`}/>}
           <b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span>
           <small>{asset.filename} · SHA-256 {asset.sha256.slice(0,16)}… · licencia: {asset.license}</small>
-          {asset.conversion&&<small>{asset.conversion.background_removed?"Fondo plano retirado":"Fondo conservado"} · vista {asset.view} · anclajes: {asset.anchor_status==="user_confirmed"?"confirmados":"estimados sin validar"}</small>}
+          {asset.conversion&&<small>{asset.conversion.cutout_applied?"Recorte manual":"Imagen completa"} · {asset.conversion.background_removed?"fondo plano retirado":"fondo conservado"} · vista {asset.view} · anclajes: {asset.anchor_status==="user_confirmed"?"confirmados":"estimados sin validar"}</small>}
           {canCompose&&<div className="modular-asset-actions">
             <label className="modular-check"><input type="checkbox" aria-label={`Seleccionar pieza ${asset.label}`} checked={selectedAssets.includes(asset.id)} disabled={!selectable||busy} onChange={e=>toggleAsset(asset.id,e.target.checked)}/>{asset.category==="body"?"Base del esqueleto":"Incluir en la composición"}</label>
             {!asset.anchors_validated&&canCompose&&<button type="button" className="btn muted" disabled={busy} onClick={()=>void confirmAnchors(asset)}>Confirmar puntos del esqueleto</button>}
