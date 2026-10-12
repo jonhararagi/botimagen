@@ -176,7 +176,9 @@ try {
   const persistedAssetId = await savedAsset.getAttribute("data-asset-id");
   assert.ok(persistedAssetId, "The library item should expose a stable persisted ID");
   await page.reload({ waitUntil: "domcontentloaded" });
-  await page.locator(".modular-asset-list article").filter({ hasText: "qa-reference" }).waitFor({ state: "visible", timeout: 15000 });
+  await page.locator('.modular-asset-list article[data-asset-kind="reference"]')
+    .filter({ hasText: "Fuente original · qa-reference" }).first()
+    .waitFor({ state: "visible", timeout: 15000 });
 
 
   const assetContracts = await page.evaluate(async () => {
