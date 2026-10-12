@@ -1163,7 +1163,7 @@ try {
   await page.getByLabel("Fondo del estudio").selectOption("aurora-city");
   await page.waitForFunction(() => document.querySelector(".canvas")?.getAttribute("data-studio-background") === "aurora-city");
   const auroraCityBackgroundStyle = await page.locator(".studio-background").evaluate(el => getComputedStyle(el).backgroundImage);
-  await selectProductView("frontal", "Frontal");
+  await selectProductView("front", "Frontal");
   await page.screenshot({ path: resolve(visualQaDir, "product-studio-neon-archivist-front.png"), fullPage: true });
   const productStudioManifest = {
     source: "Live BotImagen React app with POST /api/render/character SVG as the only visible character renderer",
