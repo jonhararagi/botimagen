@@ -161,3 +161,7 @@
 /* Preserve the full normalized canvas while dragging skeleton markers. */
 .modular-preview-card div.modular-converted-preview{height:auto;max-height:none;object-fit:unset;padding:0;overflow:hidden}
 .modular-preview-card div.modular-converted-preview .modular-anchor-stage{display:block;width:100%;height:auto;max-width:100%}
+
+
+.modular-composition-view{display:grid;gap:6px;margin-top:12px;max-width:240px;color:#b8c7db;font-size:11px}
+.modular-composition-view select{width:100%;padding:9px 10px;border:1px solid #34435a;border-radius:8px;background:#101a2c;color:#f3f7ff}

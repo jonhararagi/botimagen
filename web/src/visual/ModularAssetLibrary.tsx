@@ -43,16 +43,15 @@ const skeletonLinks:[string,string][] = [
 
 function AnchorStageEditor({imageUrl,anchors,onChange,label}:{imageUrl:string;anchors:AssetConversionMetadata["anchors"];onChange:(value:AssetConversionMetadata["anchors"])=>void;label:string}) {
   const dragging=useRef<string|null>(null);
+  const placePoint=(svg:SVGSVGElement,name:string,clientX:number,clientY:number)=>{
+    const rect=svg.getBoundingClientRect();
+    if(!rect.width||!rect.height)return;
+    const x=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+    const y=Math.max(0,Math.min(1,(clientY-rect.top)/rect.height));
+    onChange({...anchors,[name]:{x:Number(x.toFixed(4)),y:Number(y.toFixed(4))}});
+  };
   return <svg className="modular-anchor-stage" viewBox="0 0 512 768" role="group" aria-label={label}
-    onPointerMove={event=>{
-      const name=dragging.current;
-      if(!name)return;
-      const rect=event.currentTarget.getBoundingClientRect();
-      if(!rect.width||!rect.height)return;
-      const x=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
-      const y=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
-      onChange({...anchors,[name]:{x:Number(x.toFixed(4)),y:Number(y.toFixed(4))}});
-    }}
+    onPointerMove={event=>{const name=dragging.current;if(name)placePoint(event.currentTarget,name,event.clientX,event.clientY);}}
     onPointerUp={event=>{dragging.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);}}
     onPointerCancel={()=>{dragging.current=null;}}>
     <image href={imageUrl} x="0" y="0" width="512" height="768" preserveAspectRatio="none"/>
@@ -62,7 +61,18 @@ function AnchorStageEditor({imageUrl,anchors,onChange,label}:{imageUrl:string;an
     {Object.entries(anchors).map(([name,point])=><g key={name} className="modular-anchor-point" role="slider" tabIndex={0}
       aria-label={anchorLabels[name]||name} aria-valuetext={`X ${Math.round(point.x*512)}, Y ${Math.round(point.y*768)}`}
       transform={`translate(${point.x*512} ${point.y*768})`}
-      onPointerDown={event=>{event.preventDefault();dragging.current=name;event.currentTarget.ownerSVGElement?.setPointerCapture(event.pointerId);}}>
+      onPointerDown={event=>{
+        event.preventDefault();
+        dragging.current=name;
+        const svg=event.currentTarget.ownerSVGElement;
+        if(svg){svg.setPointerCapture(event.pointerId);placePoint(svg,name,event.clientX,event.clientY);}
+      }}
+      onKeyDown={event=>{
+        const step=event.shiftKey?0.02:0.005;
+        const changes:Record<string,{x:number;y:number}>={ArrowLeft:{x:-step,y:0},ArrowRight:{x:step,y:0},ArrowUp:{x:0,y:-step},ArrowDown:{x:0,y:step}};
+        const delta=changes[event.key];
+        if(delta){event.preventDefault();onChange({...anchors,[name]:{x:Number(Math.max(0,Math.min(1,point.x+delta.x)).toFixed(4)),y:Number(Math.max(0,Math.min(1,point.y+delta.y)).toFixed(4))}});}
+      }}>
       <circle r="9"/><circle className="modular-anchor-dot" r="3.2"/>
       <text x="11" y="-8">{anchorLabels[name]||name}</text>
     </g>)}
@@ -102,6 +112,7 @@ export function ModularAssetLibrary() {
   const [offsetY, setOffsetY] = useState(0);
   const [keepOriginal, setKeepOriginal] = useState(true);
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
+  const [compositionView, setCompositionView] = useState<"front"|"back">("front");
   const [compositionPreview, setCompositionPreview] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Biblioteca local persistente · listo para convertir imágenes");
@@ -212,7 +223,7 @@ export function ModularAssetLibrary() {
     setBusy(true);
     setComposeStatus("");
     try {
-      const selected=assets.filter(asset=>selectedAssets.includes(asset.id));
+      const selected=assets.filter(asset=>selectedAssets.includes(asset.id)&&(asset.view==="unknown"||asset.view===compositionView));
       const pieces=selected.map(asset=>{
         const compositorCategory=rigCategories[asset.category];
         if(!compositorCategory) throw new Error(`«${asset.label}» no es una pieza modular del esqueleto.`);
@@ -238,7 +249,27 @@ export function ModularAssetLibrary() {
     } finally { setBusy(false); }
   };
 
-  const toggleAsset = (id:string, checked:boolean) => setSelectedAssets(current=>checked?[...new Set([...current,id])]:current.filter(value=>value!==id));
+  const supportsCompositionView=(asset:UserAsset,view=compositionView)=>asset.view==="unknown"||asset.view===view;
+  const changeCompositionView=(view:"front"|"back")=>{
+    setCompositionView(view);
+    setSelectedAssets(current=>current.filter(id=>{const asset=assets.find(item=>item.id===id);return Boolean(asset&&supportsCompositionView(asset,view));}));
+    setCompositionPreview("");
+    setComposeStatus(view==="front"?"Vista frontal seleccionada.":"Vista trasera seleccionada.");
+  };
+  const toggleAsset=(id:string,checked:boolean)=>{
+    if(!checked){setSelectedAssets(current=>current.filter(value=>value!==id));return;}
+    const chosen=assets.find(asset=>asset.id===id);
+    if(!chosen||!supportsCompositionView(chosen))return;
+    const multi=["accessory_back","accessory_front","footwear"];
+    setSelectedAssets(current=>{
+      const compatible=current.filter(existingId=>{
+        const existing=assets.find(asset=>asset.id===existingId);
+        if(!existing||!supportsCompositionView(existing))return false;
+        return multi.includes(chosen.category)||existing.category!==chosen.category;
+      });
+      return [...new Set([...compatible,id])];
+    });
+  };
   const isConvertiblePiece = (asset:UserAsset) => asset.kind==="modular_piece" && Boolean(asset.conversion) && Boolean(rigCategories[asset.category]);
 
   return <section className="modular-library" aria-label="Biblioteca modular 2D">
@@ -303,7 +334,7 @@ export function ModularAssetLibrary() {
     <div className="modular-asset-list">
       {assets.map(asset=>{
         const canCompose=isConvertiblePiece(asset);
-        const selectable=canCompose&&asset.anchors_validated===true;
+        const selectable=canCompose&&asset.anchors_validated===true&&supportsCompositionView(asset);
         return <article key={asset.id} data-asset-id={asset.id} data-asset-kind={asset.kind}>
           {asset.kind==="modular_piece"&&asset.conversion?<div className="modular-saved-preview"><AnchorStageEditor imageUrl={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} anchors={asset.anchor_estimate||asset.conversion.anchors} label={`Ajustar esqueleto de ${asset.label}`} onChange={anchors=>setAssets(current=>current.map(entry=>entry.id===asset.id?{...entry,anchor_estimate:anchors,conversion:entry.conversion?{...entry.conversion,anchors}:entry.conversion}:entry))}/></div>:<img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={`Material guardado ${asset.label}`}/>}
           <b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span>
@@ -312,13 +343,13 @@ export function ModularAssetLibrary() {
           {canCompose&&<div className="modular-asset-actions">
             <label className="modular-check"><input type="checkbox" aria-label={`Seleccionar pieza ${asset.label}`} checked={selectedAssets.includes(asset.id)} disabled={!selectable||busy} onChange={e=>toggleAsset(asset.id,e.target.checked)}/>{asset.category==="body"?"Base del esqueleto":"Incluir en la composición"}</label>
             {!asset.anchors_validated&&canCompose&&<button type="button" className="btn muted" disabled={busy} onClick={()=>void confirmAnchors(asset)}>Confirmar puntos del esqueleto</button>}
-            {!selectable&&canCompose&&<small>Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático.</small>}
+            {!selectable&&canCompose&&<small>{!supportsCompositionView(asset)?`Esta pieza es de vista ${asset.view==="back"?"trasera":"frontal"}. Cambia la vista de composición para usarla.`:"Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático."}</small>}
           </div>}
         </article>;
       })}
     </div>
     <div className="modular-composition-panel">
-      <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Confirma primero los puntos del cuerpo y de cada pieza; toda composición modular necesita un cuerpo base.</p></div>
+      <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Importa y confirma un juego frontal y otro trasero, y cambia la vista aquí para alternarlos.</p><label className="modular-composition-view">Vista de composición<select aria-label="Vista para componer" value={compositionView} onChange={e=>changeCompositionView(e.target.value as "front"|"back")}><option value="front">Frontal</option><option value="back">Trasera</option></select></label></div>
       <button className="btn primary" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void composeSelection()}>{busy?"Componiendo…":`Componer selección (${selectedAssets.length})`}</button>
       <span role="status" data-testid="modular-compose-status">{composeStatus}</span>
       {compositionPreview&&<img className="modular-composition-preview" src={compositionPreview} alt="Composición PNG de piezas modulares importadas"/>}
