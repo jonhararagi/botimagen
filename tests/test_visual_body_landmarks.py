@@ -78,6 +78,15 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertIn('data-qa-surface="legs"', RENDERER)
         self.assertIn('data-qa-surface="footwear-base"', RENDERER)
 
+    def test_neutral_body_fixture_is_temporary_and_records_front_back_bounds(self):
+        self.assertIn('bimg-neutral-body-qa-only', SMOKE)
+        self.assertIn('neutral-body-front', SMOKE)
+        self.assertIn('neutral-body-back', SMOKE)
+        self.assertIn('neutral-body-manifest.json', SMOKE)
+        self.assertIn('data-layer-id="neck"', SMOKE)
+        self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
+        self.assertIn('not a production neutral-body asset', SMOKE.lower())
+
     def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
         self.assertIn('querySelectorAll("[data-layer-id][data-layer-order]")', SMOKE)
         self.assertIn("domLayers.every((entry, index) => index === 0 || entry.order >= domLayers[index - 1].order)", SMOKE)
