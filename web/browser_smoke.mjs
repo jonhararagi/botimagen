@@ -1528,6 +1528,7 @@ try {
   await cutoutCard.getByRole("button", { name: "Dibujar contorno de pieza" }).click();
   const lassoStage = cutoutCard.locator(".modular-cutout-stage");
   await lassoStage.waitFor({ state: "visible", timeout: 10000 });
+  await lassoStage.scrollIntoViewIfNeeded();
   const lassoBounds = await lassoStage.boundingBox();
   assert.ok(lassoBounds && lassoBounds.width > 40 && lassoBounds.height > 60, "The interactive polygon cutter should display the source image at a usable size");
   for (const [x, y] of [[106 / 320, 156 / 480], [214 / 320, 156 / 480], [214 / 320, 314 / 480], [106 / 320, 314 / 480]]) {
