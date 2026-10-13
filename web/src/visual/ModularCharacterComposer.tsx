@@ -41,6 +41,25 @@ export function ModularCharacterComposer() {
   catch(e){setMessage(e instanceof Error?e.message:"Error guardando perfil.");}
   finally{setBusy(false);}
  }
+ async function duplicateVariant() {
+  if (!manifest) { setMessage("El paquete modular aún no está disponible."); return; }
+  setBusy(true);
+  try {
+   const baseName=profileName.trim()||"Mi personaje CyberStreet";
+   const variantName=(baseName+" (variante)").slice(0,80);
+   const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+    name:variantName,
+    profile:{modular_composition:{schema_version:1,pack_id:manifest.pack_id,enabled:{...enabled}}}
+   })});
+   const d=await r.json();
+   if(!r.ok)throw new Error(d.error||"No se pudo duplicar la variante.");
+   setProfileName(variantName);
+   setProfileId(d.id||"");
+   await refreshProfiles();
+   setMessage("Variante duplicada como perfil independiente; puedes seguir editándola sin alterar el original.");
+  } catch(e) { setMessage(e instanceof Error?e.message:"Error duplicando la variante."); }
+  finally { setBusy(false); }
+ }
  async function loadProfile() {
   if(!profileId){setMessage("Selecciona un perfil guardado.");return;}
   setBusy(true);
@@ -70,7 +89,7 @@ export function ModularCharacterComposer() {
     {manifest?.layers.map(layer=><label key={layer.id} className="modular-layer-toggle"><input type="checkbox" checked={enabled[layer.id]!==false} disabled={!layer.editable||layer.id==="base-body"||busy} onChange={e=>toggle(layer.id,e.target.checked)}/><span>{layer.label}</span><small>{layer.role}</small></label>)}
     <label>Nombre del perfil<input value={profileName} maxLength={80} onChange={e=>setProfileName(e.target.value)}/></label>
     <label>Perfiles guardados<select value={profileId} onChange={e=>setProfileId(e.target.value)}><option value="">Seleccionar perfil</option>{profiles.map(p=><option key={p.id} value={p.id}>{p.name} · {new Date(p.saved_at).toLocaleString()}</option>)}</select></label>
-    <div className="prompt-actions"><button className="btn primary" disabled={busy||!manifest} onClick={()=>void render()}>{busy?"Renderizando…":"Actualizar composición"}</button><button className="btn muted" disabled={busy} onClick={()=>void saveProfile()}>Guardar perfil</button><button className="btn muted" disabled={busy||!profileId} onClick={()=>void loadProfile()}>Restaurar perfil</button><button className="btn muted" disabled={busy||!svg} onClick={()=>void exportPng()}>Exportar PNG</button><button className="btn muted" onClick={()=>void refreshProfiles()}>Actualizar perfiles</button></div>
+    <div className="prompt-actions"><button className="btn primary" disabled={busy||!manifest} onClick={()=>void render()}>{busy?"Renderizando…":"Actualizar composición"}</button><button className="btn muted" disabled={busy} onClick={()=>void saveProfile()}>Guardar perfil</button><button className="btn muted" disabled={busy||!manifest} onClick={()=>void duplicateVariant()}>Duplicar variante</button><button className="btn muted" disabled={busy||!profileId} onClick={()=>void loadProfile()}>Restaurar perfil</button><button className="btn muted" disabled={busy||!svg} onClick={()=>void exportPng()}>Exportar PNG</button><button className="btn muted" onClick={()=>void refreshProfiles()}>Actualizar perfiles</button></div>
    </div>
    <div className="modular-composer-preview">{svgUrl?<img src={svgUrl} alt="Personaje CyberStreet compuesto con capas SVG reales" style={{width:"100%",maxHeight:"640px",objectFit:"contain"}}/>:<div>El personaje aparecerá cuando el paquete SVG esté disponible.</div>}</div>
   </div><p role="status" aria-live="polite">{message}</p>
