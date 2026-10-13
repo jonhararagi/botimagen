@@ -248,6 +248,22 @@ try {
     await page.locator(".modular-asset-list article").filter({ hasText: label }).first().waitFor({ state: "visible", timeout: 10000 });
   }
 
+  const splitBody = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-alpha-sheet-pieza-01" }).first();
+  const splitTop = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-alpha-sheet-pieza-02" }).first();
+  await splitBody.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
+  await page.getByText("Anclajes confirmados", { exact: false }).waitFor({ timeout: 10000 });
+  await splitTop.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
+  await page.getByText("Anclajes confirmados", { exact: false }).waitFor({ timeout: 10000 });
+  await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).check();
+  await splitTop.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-02" }).check();
+  await page.getByRole("button", { name: "Componer selección (2)" }).click();
+  await page.waitForFunction(() => {
+    const image = document.querySelector("img.modular-composition-preview");
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
+  }, null, { timeout: 15000 });
+  await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).uncheck();
+  await splitTop.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-02" }).uncheck();
+
   await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-diagonal.png", mimeType: "image/png", buffer: makeAlphaQaPng("diagonal") });
   await page.getByRole("button", { name: "Separar piezas por transparencia" }).last().click();
   await page.getByText("Separación terminada: 2 piezas transparentes.", { exact: false }).waitFor({ timeout: 10000 });
