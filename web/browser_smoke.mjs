@@ -1821,13 +1821,14 @@ try {
   await modularBody.waitFor({ state: "visible", timeout: 15000 });
   assert.ok(await modularTop.locator('input[type="checkbox"]').count(), "Saved imported clothing must remain available after a full browser reload");
   assert.ok(await modularBody.locator('input[type="checkbox"]').count(), "Saved imported body material must remain available after a full browser reload");
+  await page.waitForFunction(()=>[...document.querySelectorAll(".modular-library select[aria-label=\"Perfil de piezas guardado\"] option")].some(option=>option.value&&option.textContent?.includes("QA Imported Waifu Profile")),null,{timeout:15000});
   const persistedImportedProfileOption=await assetLibrary.getByLabel("Perfil de piezas guardado").locator("option").evaluateAll(options=>options.find(option=>option.value&&option.textContent?.includes("QA Imported Waifu Profile"))?.value||"");
   assert.equal(persistedImportedProfileOption,importedProfileId,"The imported character profile must persist after a full browser reload");
   await assetLibrary.getByLabel("Perfil de piezas guardado").selectOption(importedProfileId);
   await assetLibrary.getByRole("button",{name:"Cargar personaje importado"}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Selecciones y referencias de piezas recuperadas")??false,null,{timeout:15000});
   assert.deepEqual([await modularBody.locator('input[type="checkbox"]').isChecked(),await modularTop.locator('input[type="checkbox"]').isChecked()],[true,true],"Imported profile references must restore the selected pieces after reload");
-  await assetLibrary.getByRole("button",{name:/Componer selección \\(2\\)/}).click();
+  await assetLibrary.getByRole("button",{name:/Componer selección \(2\)/}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Composición real lista")??false,null,{timeout:15000});
   assert.deepEqual(modularConsoleErrors, [], "Modular character flow must not emit browser console errors");
   assert.deepEqual(modularPageErrors, [], "Modular character flow must not emit uncaught page errors");
