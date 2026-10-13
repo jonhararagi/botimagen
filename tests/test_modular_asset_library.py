@@ -152,6 +152,26 @@ class ModularAssetLibraryTests(unittest.TestCase):
                 )
             self.assertEqual(list_user_assets(root)["count"], 1)
 
+    def test_derived_piece_can_link_to_source_sheet_with_its_own_dimensions_and_hash(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = import_user_asset(payload(filename="sprite-sheet.png"), root)
+            conversion = conversion_metadata(source)
+            conversion["source_width"] = 36
+            conversion["source_height"] = 42
+            conversion["source_sha256"] = "a" * 64
+            derived = import_user_asset(
+                payload(
+                    data=PNG_STAGE, filename="sprite-piece.png", source_filename="sprite-sheet.png",
+                    kind="modular_piece", category="clothing_top", conversion=conversion,
+                    source_asset_id=source["id"],
+                ), root,
+            )
+            self.assertEqual(derived["source_asset_id"], source["id"])
+            self.assertEqual(derived["conversion"]["source_width"], 36)
+            self.assertEqual(derived["conversion"]["source_height"], 42)
+            self.assertEqual(list_user_assets(root)["count"], 2)
+
     def test_manual_cutout_metadata_is_preserved_and_validated(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
