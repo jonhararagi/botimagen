@@ -155,3 +155,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 
 - **BIMG-WAIFU-FACTORY-002 (2026-10-13):** se amplió el smoke E2E para validar el PNG descargado (dimensiones/RGBA/alfa/contenido), la independencia persistente de la variante y la persistencia de piezas importadas después de recargar la app. Código de prueba: `47b35e0d991f4b2c1f9bfdd1d0cf3fd8949b17b3`. Ejecución local y CI exacta aún sin evidencia verificable; estado PARTIAL, sin subir el progreso ponderado global (**63%**, último checkpoint registrado). TIMER estimado 8–16 h; tiempo real `NOT_MEASURED`.
+
+
+- **BIMG-WAIFU-FACTORY-002 · cierre técnico del recorrido (2026-10-13):** CI #629 PASS_REAL en el SHA de código 0b85ddd5c98eb5c0e81d459b99f00fa67ec7c599: [run y pasos](https://github.com/jonhararagi/botimagen/actions/runs/38413181653), [artefacto visual QA](https://github.com/jonhararagi/botimagen/actions/runs/38413181653/artifacts/11821424551). Build TS/Vite, suites Python/API y Chromium pasaron; se verificó el archivo PNG descargado con alfa y contenido, perfiles independientes, guardado/carga de referencias de piezas importadas tras recarga y composición real. El porcentaje ponderado permanece **63%** porque no se ha declarado cerrada la beta completa. QA física Windows y segmentación semántica de imágenes opacas continúan pendientes.
