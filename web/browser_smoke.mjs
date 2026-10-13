@@ -260,6 +260,7 @@ try {
     await page.locator(".modular-asset-list article").filter({ hasText: label }).first().waitFor({ state: "visible", timeout: 10000 });
   }
 
+  await page.getByLabel("Tipo de recurso").selectOption("modular_piece");
   await page.locator('.modular-dropzone input[type="file"]').setInputFiles([
     { name: "batch-alpha.png", mimeType: "image/png", buffer: makeAlphaQaPng() },
     { name: "batch-opaque.png", mimeType: "image/png", buffer: makeAlphaQaPng("opaque") },
