@@ -212,6 +212,28 @@ export function ModularAssetLibrary() {
     if (next.length) setStatus(`${next.length} imagen(es) lista(s). Ajusta las opciones y prepara el PNG normalizado.`);
   };
 
+  const splitPreviewIntoPieces = async (item:PreviewItem) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const pieces=await splitTransparentPng(item.file);
+      const replacements:PreviewItem[]=pieces.map(piece=>({
+        file:piece.file,
+        url:makeUrl(piece.file),
+        category:item.category||category,
+        sourceFile:item.sourceFile||item.file,
+      }));
+      setPreviews(current=>{
+        const index=current.findIndex(entry=>entry.url===item.url);
+        if(index<0)return current;
+        return [...current.slice(0,index),...replacements,...current.slice(index+1)];
+      });
+      setStatus(`Separación terminada: ${pieces.length} piezas transparentes. Clasifica cada una y prepara los PNG para la biblioteca.`);
+    } catch(error) {
+      setStatus(error instanceof Error?error.message:"No se pudieron separar las piezas del PNG.");
+    } finally { setBusy(false); }
+  };
+
   const prepareMaterial = async () => {
     if (!previews.length || busy) return;
     if (previews.some(item => (item.cutoutPoints?.length||0)>0 && (item.cutoutPoints?.length||0)<3)) {
