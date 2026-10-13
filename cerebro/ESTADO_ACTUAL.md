@@ -780,3 +780,12 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - Estimación restante para cerrar y validar esta etapa: 2–4 horas activas.
 - Tiempo real medido: NOT_MEASURED.
 - No presentar esta estimación como el tiempo total para terminar BotImagen.
+
+## BIMG-PNG-ALPHA-SPLITTER-001-R2 · cierre E2E de anclajes · 2026-10-13
+
+- **Estado al inicio:** el HEAD `03a056f8c99e06e2966aebf3c53038747ec431ad` pasó CI #599, pero la aserción exacta de coordenadas arrastradas había sido sustituida por una comprobación de rango y consistencia. Eso no demostraba que el gesto del usuario se guardara correctamente.
+- **Causa identificada en código:** `AnchorStageEditor` actualizaba el punto durante `pointermove`, pero `pointerup` solo terminaba el arrastre. Si el último movimiento/coordenada final no había sido procesado antes de soltar, el último valor persistido podía quedarse atrás. La prueba ahora conserva la aserción funcional: tras arrastrar la cabeza al 54% del ancho y 12% del alto, exige coordenadas normalizadas dentro de una tolerancia de 0.015 y comprueba igualdad con los metadatos de conversión.
+- **Corrección aplicada en rama:** el manejador `pointerup` escribe una última coordenada usando la posición real del puntero antes de limpiar el estado de arrastre y liberar pointer capture.
+- **Evidencia previa al cambio:** CI #599 SUCCESS en SHA `03a056f8c99e06e2966aebf3c53038747ec431ad`, https://github.com/jonhararagi/botimagen/actions/runs/38330185335. Incluyó build web, validaciones Python/API y smoke Chromium. El E2E verificó división de 3 islas alfa, categorías independientes, una sola fuente original, persistencia/reapertura, confirmación de anclajes y composición 512×768. Artefacto de QA visual asociado a esa ejecución: https://github.com/jonhararagi/botimagen/actions/runs/38330185335/artifacts/11782960274. Ese artefacto corresponde al HEAD anterior a esta corrección y no se presenta como captura del nuevo código.
+- **Resultado de esta revisión:** la corrección del anclaje y la aserción estricta se enviaron juntas a la rama autorizada; el estado final de cierre depende de la CI de ese nuevo HEAD. No se marca DONE hasta verificar esa ejecución.
+- **Limitaciones honestas:** la división automática detecta componentes conectados por alfa, no prendas semánticas. PNG opaco o ilustraciones con cabello/ropa unidos requieren recorte manual o preparación de máscara. QA físico de Windows no ejecutado; tiempo real de trabajo no medido.
