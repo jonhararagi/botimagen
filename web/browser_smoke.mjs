@@ -1840,6 +1840,7 @@ try {
   await importedProfileSelect.selectOption(importedProfileId);
   await assetLibrary.getByRole("button",{name:"Cargar personaje importado"}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Selecciones y referencias de piezas recuperadas")??false,null,{timeout:15000});
+  await page.waitForFunction(()=>[...document.querySelectorAll('.modular-asset-list article[data-asset-kind="modular_piece"] input[type="checkbox"]')].filter(input=>input.checked).length===2,null,{timeout:5000});
   assert.deepEqual([await modularBody.locator('input[type="checkbox"]').isChecked(),await modularTop.locator('input[type="checkbox"]').isChecked()],[true,true],"Loading the imported profile must restore both saved piece references");
   await assetLibrary.getByRole("button",{name:/Componer selección \(2\)/}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Composición real lista")??false,null,{timeout:15000});

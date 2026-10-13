@@ -470,6 +470,7 @@ export function ModularAssetLibrary() {
   const loadCompositionProfile = async () => {
     if(busy||!profileId){setComposeStatus("Selecciona un perfil de piezas guardado.");return;}
     setBusy(true);
+    setComposeStatus("Cargando perfil de piezas…");
     try {
       const response=await fetch("/api/profiles/"+encodeURIComponent(profileId));
       const data=await response.json();
