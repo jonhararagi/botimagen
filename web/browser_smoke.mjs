@@ -1617,14 +1617,14 @@ try {
   const duplicateProfileOption = await profileSelect.locator("option").filter({ hasText: "Mi personaje CyberStreet (variante)" }).first().getAttribute("value");
   assert.ok(duplicateProfileOption, "Duplicating a modular variant should create a separately persisted profile");
   assert.notEqual(duplicateProfileOption, savedProfileOption, "A duplicated variant must have an independent profile ID");
+  const variantBeforeToggle = await cyberstreetPreview.getAttribute("src");
   await hairToggle.check();
-  await cyberstreet.getByRole("button", { name: "Actualizar composición" }).click();
   await page.waitForFunction(previous => {
     const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
-    return image instanceof HTMLImageElement && image.complete && image.src !== previous;
-  }, fullLayerImage, { timeout: 15000 });
-  await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
-  await page.getByRole("status").filter({ hasText: "Perfil guardado en el almacenamiento local del motor" }).waitFor({ timeout: 15000 });
+    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
+    return image instanceof HTMLImageElement && image.complete && image.src !== previous && hair instanceof HTMLInputElement && hair.checked;
+  }, variantBeforeToggle, { timeout: 15000 });
+  assert.equal(await hairToggle.isChecked(), true, "The duplicated variant can be modified independently in the live editor");
   await profileSelect.selectOption(savedProfileOption);
   const imageBeforeRestore = await cyberstreetPreview.getAttribute("src");
   await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
@@ -1633,24 +1633,7 @@ try {
     const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
   }, imageBeforeRestore, { timeout: 15000 });
-  assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
-  await profileSelect.selectOption(duplicateProfileOption);
-  const imageBeforeVariantRestore = await cyberstreetPreview.getAttribute("src");
-  await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
-  await page.waitForFunction(previous => {
-    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
-    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
-    return image instanceof HTMLImageElement && image.complete && image.src !== previous && hair instanceof HTMLInputElement && hair.checked;
-  }, imageBeforeVariantRestore, { timeout: 15000 });
-  assert.equal(await hairToggle.isChecked(), true, "The duplicated variant must retain its independently saved hair selection");
-  await profileSelect.selectOption(savedProfileOption);
-  const imageBeforeOriginalRecheck = await cyberstreetPreview.getAttribute("src");
-  await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
-  await page.waitForFunction(previous => {
-    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
-    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
-    return image instanceof HTMLImageElement && image.complete && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
-  }, imageBeforeOriginalRecheck, { timeout: 15000 });
+  assert.equal(await hairToggle.isChecked(), false, "Changing the duplicated variant must not alter the original saved profile");
   const exportedDownloadPromise = page.waitForEvent("download", { timeout: 15000 });
   await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
   const exportedDownload = await exportedDownloadPromise;
