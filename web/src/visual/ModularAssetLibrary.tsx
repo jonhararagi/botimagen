@@ -13,6 +13,7 @@ type UserAsset = {
 type CutoutPoint = { x:number; y:number };
 type PreviewItem = { file:File; url:string; category?:string; sourceFile?:File; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
 type SavedProfile = { id:string; name:string; saved_at:string };
+type PieceTransform = { x:number; y:number; scale:number; rotation:number; layer_order:number; visible:boolean };
 const categories = [
   ["reference", "Referencia / clasificar después"], ["body", "Cuerpo base"], ["head", "Cabeza"],
   ["face", "Rostro"], ["hair_back", "Cabello posterior"], ["hair_front", "Cabello frontal"],
@@ -222,6 +223,8 @@ export function ModularAssetLibrary() {
   const [offsetY, setOffsetY] = useState(0);
   const [keepOriginal, setKeepOriginal] = useState(true);
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
+  const [selectedPieceId, setSelectedPieceId] = useState("");
+  const [pieceTransforms, setPieceTransforms] = useState<Record<string,PieceTransform>>({});
   const [compositionView, setCompositionView] = useState<"front"|"back">("front");
   const [compositionPreview, setCompositionPreview] = useState("");
   const [busy, setBusy] = useState(false);
@@ -407,23 +410,29 @@ export function ModularAssetLibrary() {
     } finally { setBusy(false); }
   };
 
-  const composeSelection = async () => {
+  const getPieceTransform = (asset:UserAsset, source=pieceTransforms):PieceTransform => source[asset.id] || ({
+    x:0,y:0,scale:100,rotation:0,layer_order:asset.layer_order??layerOrder[asset.category]??50,visible:true,
+  });
+  const composeSelection = async (transformSource=pieceTransforms) => {
     if (busy || !selectedAssets.length) return;
     setBusy(true);
     setComposeStatus("");
     try {
       const selected=assets.filter(asset=>selectedAssets.includes(asset.id)&&(asset.view==="unknown"||asset.view===compositionView));
-      const pieces=selected.map(asset=>{
+      const visible=selected.filter(asset=>asset.category==="body"||getPieceTransform(asset,transformSource).visible);
+      const pieces=visible.map(asset=>{
         const compositorCategory=rigCategories[asset.category];
         if(!compositorCategory) throw new Error(`«${asset.label}» no es una pieza modular del esqueleto.`);
+        const transform=getPieceTransform(asset,transformSource);
         return {
           schema_version:1,id:asset.id,category:compositorCategory,resource:asset.id,
           dimensions:{width:asset.width,height:asset.height},anchors:asset.anchor_estimate||{},
-          transform:{x:0,y:0,scale_x:1,scale_y:1},
-          layer_order:asset.layer_order??layerOrder[asset.category]??50,
+          transform:{x:transform.x/512,y:transform.y/768,scale_x:transform.scale/100,scale_y:transform.scale/100,rotation:transform.rotation},
+          layer_order:transform.layer_order,
           anchors_validated:asset.anchors_validated===true,align_to_body:asset.category!=="body",compatible_with:[],
         };
       });
+      if(!pieces.some(piece=>piece.category==="body")) throw new Error("La composición necesita una pieza de cuerpo base visible.");
       const response=await fetch("/api/modular-compose",{
         method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({pieces,canvas_size:[512,768]}),
@@ -444,7 +453,10 @@ export function ModularAssetLibrary() {
     try {
       const response=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
         name:profileName.trim()||"Mi personaje importado",
-        profile:{modular_composition:{schema_version:1,source:"imported-assets",pieces:[...selectedAssets],view:compositionView}},
+        profile:{modular_composition:{
+          schema_version:1,source:"imported-assets",pieces:[...selectedAssets],view:compositionView,
+          transforms:Object.fromEntries(selectedAssets.map(id=>{const asset=assets.find(item=>item.id===id);return [id,asset?getPieceTransform(asset):undefined];}).filter((entry):entry is [string,PieceTransform]=>Boolean(entry[1]))),
+        }},
       })});
       const data=await response.json();
       if(!response.ok)throw new Error(data.error||"No se pudo guardar el personaje importado.");
@@ -467,9 +479,21 @@ export function ModularAssetLibrary() {
       const available=new Set(assets.map(asset=>asset.id));
       const restored=composition.pieces.filter((id:string)=>available.has(id));
       if(restored.length!==composition.pieces.length)throw new Error("Faltan piezas referenciadas en la biblioteca; no se restauró una composición incompleta.");
+      const restoredTransforms:Record<string,PieceTransform>={};
+      if(composition.transforms!==undefined){
+        if(!composition.transforms||typeof composition.transforms!=="object"||Array.isArray(composition.transforms))throw new Error("El perfil contiene transformaciones inválidas; no se modificó la composición actual.");
+        for(const [id,value] of Object.entries(composition.transforms as Record<string,unknown>)){
+          if(!restored.includes(id)||!value||typeof value!=="object")throw new Error("El perfil contiene una transformación sin referencia válida; no se modificó la composición actual.");
+          const item=value as Partial<PieceTransform>;
+          if(![item.x,item.y,item.scale,item.rotation,item.layer_order].every(Number.isFinite)||typeof item.visible!=="boolean"||item.scale! < 50||item.scale! > 150||item.x! < -512||item.x! > 512||item.y! < -768||item.y! > 768||item.rotation! < -180||item.rotation! > 180||!Number.isInteger(item.layer_order)||item.layer_order! < 0||item.layer_order! > 100)throw new Error("El perfil contiene valores de transformación fuera de rango; no se modificó la composición actual.");
+          restoredTransforms[id]={x:item.x!,y:item.y!,scale:item.scale!,rotation:item.rotation!,layer_order:item.layer_order!,visible:item.visible};
+        }
+      }
       setProfileName(data.name||"Mi personaje importado");
       setCompositionView(composition.view==="back"?"back":"front");
       setSelectedAssets(restored);
+      setSelectedPieceId(restored[0]||"");
+      setPieceTransforms(restoredTransforms);
       setCompositionPreview("");
       setComposeStatus("Selecciones y referencias de piezas recuperadas del perfil local.");
     } catch(error) { setComposeStatus(error instanceof Error?error.message:"Falló la carga del personaje importado."); }
@@ -483,10 +507,22 @@ export function ModularAssetLibrary() {
     setCompositionPreview("");
     setComposeStatus(view==="front"?"Vista frontal seleccionada.":"Vista trasera seleccionada.");
   };
+  const updatePieceTransform=(assetId:string,patch:Partial<PieceTransform>)=>{
+    const asset=assets.find(item=>item.id===assetId);
+    if(!asset||asset.category==="body")return;
+    setPieceTransforms(current=>({...current,[assetId]:{...getPieceTransform(asset,current),...patch}}));
+    setCompositionPreview("");
+  };
+  useEffect(()=>{
+    if(!selectedAssets.length)return;
+    const timer=window.setTimeout(()=>void composeSelection(),180);
+    return ()=>window.clearTimeout(timer);
+  },[pieceTransforms,selectedAssets,compositionView,assets]);
   const toggleAsset=(id:string,checked:boolean)=>{
     if(!checked){setSelectedAssets(current=>current.filter(value=>value!==id));return;}
     const chosen=assets.find(asset=>asset.id===id);
     if(!chosen||!supportsCompositionView(chosen))return;
+    setSelectedPieceId(chosen.id);
     const multi=["accessory_back","accessory_front","footwear"];
     setSelectedAssets(current=>{
       const compatible=current.filter(existingId=>{
@@ -498,6 +534,8 @@ export function ModularAssetLibrary() {
     });
   };
   const isConvertiblePiece = (asset:UserAsset) => asset.kind==="modular_piece" && Boolean(asset.conversion) && Boolean(rigCategories[asset.category]);
+  const selectedPiece=assets.find(asset=>asset.id===selectedPieceId&&selectedAssets.includes(asset.id));
+  const selectedPieceTransform=selectedPiece?getPieceTransform(selectedPiece):null;
 
   return <section className="modular-library" aria-label="Biblioteca modular 2D">
     <div className="modular-library-head">
@@ -593,6 +631,24 @@ export function ModularAssetLibrary() {
       <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Importa y confirma un juego frontal y otro trasero, y cambia la vista aquí para alternarlos.</p><label className="modular-composition-view">Vista de composición<select aria-label="Vista para componer" value={compositionView} onChange={e=>changeCompositionView(e.target.value as "front"|"back")}><option value="front">Frontal</option><option value="back">Trasera</option></select></label></div>
       <label>Nombre del personaje importado<input aria-label="Nombre del personaje importado" maxLength={80} value={profileName} onChange={event=>setProfileName(event.target.value)}/></label>
       <label>Perfil de piezas guardado<select aria-label="Perfil de piezas guardado" value={profileId} onChange={event=>setProfileId(event.target.value)}><option value="">Seleccionar perfil</option>{profiles.map(profile=><option key={profile.id} value={profile.id}>{profile.name} · {new Date(profile.saved_at).toLocaleString()}</option>)}</select></label>
+      {selectedAssets.length>0&&<div className="modular-piece-editor" aria-label="Ajustes de la pieza seleccionada">
+        <label>🧩 Pieza a editar
+          <select aria-label="Pieza a editar" value={selectedPiece?.id||""} onChange={event=>setSelectedPieceId(event.target.value)}>
+            {assets.filter(asset=>selectedAssets.includes(asset.id)).map(asset=><option key={asset.id} value={asset.id}>{asset.label} · {asset.category==="body"?"Cuerpo base":asset.category}</option>)}
+          </select>
+        </label>
+        {selectedPiece&&selectedPieceTransform&&<div className="modular-piece-transform-grid">
+          <div className="modular-piece-identity"><b>{selectedPiece.category==="body"?"🧍 Cuerpo base":"🎨 "+selectedPiece.label}</b><small>{selectedPiece.id} · {selectedPiece.category} · alfa original conservado</small></div>
+          <label><span>↔ Posición X <b>{selectedPieceTransform.x}px</b></span><input aria-label="Desplazamiento horizontal de pieza" type="range" min="-256" max="256" step="4" value={selectedPieceTransform.x} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{x:Number(event.target.value)})}/></label>
+          <label><span>↕ Posición Y <b>{selectedPieceTransform.y}px</b></span><input aria-label="Desplazamiento vertical de pieza" type="range" min="-384" max="384" step="4" value={selectedPieceTransform.y} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{y:Number(event.target.value)})}/></label>
+          <label><span>⤢ Escala <b>{selectedPieceTransform.scale}%</b></span><input aria-label="Escala de pieza" type="range" min="50" max="150" step="5" value={selectedPieceTransform.scale} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{scale:Number(event.target.value)})}/></label>
+          <label><span>⟳ Rotación <b>{selectedPieceTransform.rotation}°</b></span><input aria-label="Rotación de pieza" type="range" min="-180" max="180" step="5" value={selectedPieceTransform.rotation} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{rotation:Number(event.target.value)})}/></label>
+          <label><span>▤ Orden de capa <b>{selectedPieceTransform.layer_order}</b></span><input aria-label="Orden de capa de pieza" type="range" min="0" max="100" step="1" value={selectedPieceTransform.layer_order} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{layer_order:Number(event.target.value)})}/></label>
+          <label className="modular-check"><input aria-label="Pieza visible" type="checkbox" checked={selectedPiece.category==="body"||selectedPieceTransform.visible} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{visible:event.target.checked})}/> 👁 Mostrar pieza sin eliminarla de la selección</label>
+          <button type="button" className="btn muted" disabled={busy||selectedPiece.category==="body"} onClick={()=>updatePieceTransform(selectedPiece.id,{x:0,y:0,scale:100,rotation:0,layer_order:selectedPiece.layer_order??layerOrder[selectedPiece.category]??50,visible:true})}>Restaurar ajustes guardados por defecto</button>
+        </div>}
+        <small role="status">Los cambios se aplican al PNG real automáticamente. El cuerpo base se mantiene visible como referencia.</small>
+      </div>}
       <div className="modular-library-actions">
         <button className="btn muted" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void saveCompositionProfile()}>Guardar personaje importado</button>
         <button className="btn muted" type="button" disabled={!profileId||busy} onClick={()=>void loadCompositionProfile()}>Cargar personaje importado</button>

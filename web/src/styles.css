@@ -139,12 +139,23 @@
 .modular-asset-actions .modular-check{padding:5px 0}
 .modular-composition-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:18px;padding:14px;border:1px solid rgba(116,225,231,.24);border-radius:12px;background:rgba(21,31,49,.7)}
 .modular-composition-panel>div>b{font-size:13px;color:#d5e7f5}
+.modular-piece-editor{grid-column:1/-1;display:grid;gap:12px;padding:12px;border:1px solid rgba(92,228,220,.28);border-radius:10px;background:rgba(7,15,28,.5);min-width:0}
+.modular-piece-editor>label{display:grid;gap:6px;min-width:0;font-size:11px;color:#b6c5d9}
+.modular-piece-editor select,.modular-piece-editor input{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+.modular-piece-transform-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
+.modular-piece-transform-grid>label{display:grid;gap:6px;min-width:0;font-size:11px;color:#b6c5d9}
+.modular-piece-transform-grid>label span{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.modular-piece-transform-grid b{color:#5ce4dc}
+.modular-piece-identity{grid-column:1/-1;display:grid;gap:4px;overflow-wrap:anywhere}
+.modular-piece-identity small,.modular-piece-editor>small{font-size:10px;color:#a8b7cd;overflow-wrap:anywhere}
+.modular-piece-editor .modular-check{display:flex;align-items:center;gap:8px}
+.modular-piece-editor .modular-check input{width:auto;min-width:auto}
 .modular-composition-panel p{margin:5px 0 0;color:#a8b7cd;font-size:11px;line-height:1.5}
 .modular-composition-panel [role=status]{grid-column:1/-1;color:#aebbd0;font-size:11px}
 .modular-composition-preview{grid-column:1/-1;width:100%;max-height:550px;object-fit:contain;border:1px solid #3d4b60;border-radius:10px;background:repeating-conic-gradient(#222a3a 0% 25%,#101725 0% 50%) 50%/20px 20px}
 .modular-composition-panel button:disabled{opacity:.55}
 .modular-composition-panel>label{display:grid;min-width:0;gap:6px;overflow-wrap:anywhere;font-size:11px;color:#b6c5d9}.modular-composition-panel input,.modular-composition-panel select{width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:650px){.modular-converter-options{grid-template-columns:1fr}.modular-source-url{grid-column:1}.modular-composition-panel{grid-template-columns:1fr}.modular-composition-panel [role=status]{grid-column:1}}
+@media(max-width:650px){.modular-converter-options{grid-template-columns:1fr}.modular-source-url{grid-column:1}.modular-composition-panel{grid-template-columns:1fr}.modular-composition-panel [role=status]{grid-column:1}.modular-piece-transform-grid{grid-template-columns:1fr}.modular-piece-identity{grid-column:1}}
 
 
 /* Editable joint markers on imported normalized PNG layers */

@@ -50,6 +50,27 @@ class ModularCompositorTests(unittest.TestCase):
         self.assertEqual(result.getpixel((0, 0))[3], 0)
         self.assertGreater(result.getpixel((20, 20))[3], 0)
 
+    def test_piece_transform_changes_real_rendered_pixels(self):
+        body = piece("base", "body", "base", 20)
+        assets = {"base": png((255, 0, 0, 255), (8, 8))}
+        baseline = Image.open(io.BytesIO(compose_png([body], assets.__getitem__, (64, 64)))).convert("RGBA")
+        moved = {**body, "transform": {"x": 0.75, "y": 0.25, "scale_x": 1.5, "scale_y": 1.5, "rotation": 0}}
+        adjusted = Image.open(io.BytesIO(compose_png([moved], assets.__getitem__, (64, 64)))).convert("RGBA")
+        self.assertNotEqual(list(baseline.getdata()), list(adjusted.getdata()))
+        self.assertEqual(baseline.getpixel((16, 16)), (255, 0, 0, 255))
+        self.assertEqual(adjusted.getpixel((48, 16)), (255, 0, 0, 255))
+
+    def test_layer_order_changes_the_topmost_rendered_pixels(self):
+        body = {**piece("base", "body", "base", 20), "transform": {"x": 0.25, "y": 0.25}}
+        top = {**piece("shirt", "top", "shirt", 40), "transform": {"x": 0.25, "y": 0.25}}
+        assets = {"base": png((255, 0, 0, 255), (8, 8)), "shirt": png((0, 255, 0, 255), (8, 8))}
+        front = Image.open(io.BytesIO(compose_png([body, top], assets.__getitem__, (64, 64)))).convert("RGBA")
+        reordered = [{**body, "layer_order": 60}, {**top, "layer_order": 10}]
+        back = Image.open(io.BytesIO(compose_png(reordered, assets.__getitem__, (64, 64)))).convert("RGBA")
+        self.assertNotEqual(front.getpixel((20, 20)), back.getpixel((20, 20)))
+        self.assertEqual(front.getpixel((20, 20)), (0, 255, 0, 255))
+        self.assertEqual(back.getpixel((20, 20)), (255, 0, 0, 255))
+
     def test_unvalidated_non_body_anchor_is_rejected(self):
         body = piece("base", "body", "base", 20)
         top = piece("shirt", "top", "shirt", 40, validated=False)
