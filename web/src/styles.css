@@ -146,7 +146,9 @@
 .modular-piece-transform-grid>label{display:grid;gap:6px;min-width:0;font-size:11px;color:#b6c5d9}
 .modular-piece-transform-grid>label span{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .modular-piece-transform-grid b{color:#5ce4dc}
-.modular-piece-identity{grid-column:1/-1;display:grid;gap:4px;overflow-wrap:anywhere}
+.modular-piece-identity{grid-column:1/-1;display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:12px;overflow-wrap:anywhere}
+.modular-piece-identity>img{width:70px;height:105px;object-fit:contain;border:1px solid rgba(116,225,231,.22);border-radius:8px;background:repeating-conic-gradient(#19263a 0% 25%,#0e1727 0% 50%) 50%/12px 12px}
+.modular-piece-identity>div{display:grid;gap:4px;min-width:0}
 .modular-piece-identity small,.modular-piece-editor>small{font-size:10px;color:#a8b7cd;overflow-wrap:anywhere}
 .modular-piece-editor .modular-check{display:flex;align-items:center;gap:8px}
 .modular-piece-editor .modular-check input{width:auto;min-width:auto}

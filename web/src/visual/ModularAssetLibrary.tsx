@@ -492,7 +492,7 @@ export function ModularAssetLibrary() {
       setProfileName(data.name||"Mi personaje importado");
       setCompositionView(composition.view==="back"?"back":"front");
       setSelectedAssets(restored);
-      setSelectedPieceId(restored[0]||"");
+      setSelectedPieceId(restored.includes(selectedPieceId)?selectedPieceId:(restored[0]||""));
       setPieceTransforms(restoredTransforms);
       setCompositionPreview("");
       setComposeStatus("Selecciones y referencias de piezas recuperadas del perfil local.");
@@ -638,14 +638,14 @@ export function ModularAssetLibrary() {
           </select>
         </label>
         {selectedPiece&&selectedPieceTransform&&<div className="modular-piece-transform-grid">
-          <div className="modular-piece-identity"><b>{selectedPiece.category==="body"?"🧍 Cuerpo base":"🎨 "+selectedPiece.label}</b><small>{selectedPiece.id} · {selectedPiece.category} · alfa original conservado</small></div>
+          <div className="modular-piece-identity"><img src={"/api/modular-assets/"+encodeURIComponent(selectedPiece.id)+"/image"} alt={"Vista de la pieza seleccionada "+selectedPiece.label}/><div><b>{selectedPiece.category==="body"?"🧍 Cuerpo base":"🎨 "+selectedPiece.label}</b><small>{selectedPiece.id} · {selectedPiece.category} · alfa original conservado</small></div></div>
           <label><span>↔ Posición X <b>{selectedPieceTransform.x}px</b></span><input aria-label="Desplazamiento horizontal de pieza" type="range" min="-256" max="256" step="4" value={selectedPieceTransform.x} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{x:Number(event.target.value)})}/></label>
           <label><span>↕ Posición Y <b>{selectedPieceTransform.y}px</b></span><input aria-label="Desplazamiento vertical de pieza" type="range" min="-384" max="384" step="4" value={selectedPieceTransform.y} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{y:Number(event.target.value)})}/></label>
           <label><span>⤢ Escala <b>{selectedPieceTransform.scale}%</b></span><input aria-label="Escala de pieza" type="range" min="50" max="150" step="5" value={selectedPieceTransform.scale} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{scale:Number(event.target.value)})}/></label>
           <label><span>⟳ Rotación <b>{selectedPieceTransform.rotation}°</b></span><input aria-label="Rotación de pieza" type="range" min="-180" max="180" step="5" value={selectedPieceTransform.rotation} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{rotation:Number(event.target.value)})}/></label>
           <label><span>▤ Orden de capa <b>{selectedPieceTransform.layer_order}</b></span><input aria-label="Orden de capa de pieza" type="range" min="0" max="100" step="1" value={selectedPieceTransform.layer_order} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{layer_order:Number(event.target.value)})}/></label>
           <label className="modular-check"><input aria-label="Pieza visible" type="checkbox" checked={selectedPiece.category==="body"||selectedPieceTransform.visible} disabled={busy||selectedPiece.category==="body"} onChange={event=>updatePieceTransform(selectedPiece.id,{visible:event.target.checked})}/> 👁 Mostrar pieza sin eliminarla de la selección</label>
-          <button type="button" className="btn muted" disabled={busy||selectedPiece.category==="body"} onClick={()=>updatePieceTransform(selectedPiece.id,{x:0,y:0,scale:100,rotation:0,layer_order:selectedPiece.layer_order??layerOrder[selectedPiece.category]??50,visible:true})}>Restaurar ajustes guardados por defecto</button>
+          <button type="button" className="btn muted" disabled={busy||selectedPiece.category==="body"} onClick={()=>updatePieceTransform(selectedPiece.id,{x:0,y:0,scale:100,rotation:0,layer_order:selectedPiece.layer_order??layerOrder[selectedPiece.category]??50,visible:true})}>Restaurar valores iniciales de esta pieza</button>
         </div>}
         <small role="status">Los cambios se aplican al PNG real automáticamente. El cuerpo base se mantiene visible como referencia.</small>
       </div>}

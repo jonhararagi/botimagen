@@ -1814,7 +1814,7 @@ try {
   const transformedPreviewData = await importedComposition.getAttribute("src");
   assert.notEqual(transformedPreviewData,initialPreviewData,"Changing the scale control must rerender the actual PNG pixels");
   await page.evaluate(async()=>{const panel=document.querySelector('.modular-piece-editor');if(panel)panel.scrollIntoView({block:'center'});});
-  await assetLibrary.locator(".modular-composition-panel").screenshot({path:resolve(root,"artifacts/visual-qa/imported-piece-transform-editor.png")});
+  await assetLibrary.locator(".modular-composition-panel").screenshot({path:resolve(visualQaDir,"imported-piece-transform-editor.png")});
   await assetLibrary.getByLabel("Nombre del personaje importado").fill("QA Imported Waifu Profile");
   await assetLibrary.getByRole("button",{name:"Guardar personaje importado"}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Personaje importado guardado con referencias persistentes")??false,null,{timeout:15000});
