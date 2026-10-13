@@ -265,22 +265,25 @@ export function ModularAssetLibrary() {
     }
     setBusy(true);
     let finished=0;
+    const savedSources=new WeakMap<File,UserAsset>();
     try {
       for (const item of previews) {
         const stem=item.file.name.replace(/\.[^.]+$/,"").slice(0,90) || "personaje";
-        let sourceRecord:UserAsset|undefined;
-        if (keepOriginal) {
-          const originalBase64=await readDataUrl(item.file);
+        const sourceFile=item.sourceFile||item.file;
+        let sourceRecord:UserAsset|undefined=savedSources.get(sourceFile);
+        if (keepOriginal && !sourceRecord) {
+          const originalBase64=await readDataUrl(sourceFile);
           sourceRecord=await postAsset({
-            filename:item.file.name,source_filename:item.file.name,mime_type:item.file.type,data_base64:originalBase64,
-            category:"reference",kind:"reference",label:`Fuente original · ${stem}`,view,license,source_url:sourceUrl,
+            filename:sourceFile.name,source_filename:sourceFile.name,mime_type:sourceFile.type,data_base64:originalBase64,
+            category:"reference",kind:"reference",label:`Fuente original · ${sourceFile.name.replace(/\.[^.]+$/,"").slice(0,90)}`,view,license,source_url:sourceUrl,
           });
+          savedSources.set(sourceFile,sourceRecord);
         }
         const suffix=item.conversion?.cutout_applied?"-pieza-recortada":"";
         const convertedFile=new File([item.convertedBlob!],`${stem}${suffix}-botimagen-512x768.png`,{type:"image/png"});
         const convertedBase64=await readDataUrl(convertedFile);
         await postAsset({
-          filename:convertedFile.name,source_filename:item.file.name,mime_type:"image/png",data_base64:convertedBase64,
+          filename:convertedFile.name,source_filename:sourceFile.name,mime_type:"image/png",data_base64:convertedBase64,
           category:item.category||category,kind,label:stem,view,license,source_url:sourceUrl,
           ...(sourceRecord?.id?{source_asset_id:sourceRecord.id}:{}),
           conversion:item.conversion,
