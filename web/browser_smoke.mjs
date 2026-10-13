@@ -318,6 +318,7 @@ try {
   const movedTransform = await bodyStage.locator('.modular-anchor-point[aria-label="Cabeza"]').getAttribute("transform");
   const movedHead = movedTransform?.match(/translate\(([\d.]+) ([\d.]+)\)/);
   assert.ok(movedHead, "The edited landmark should keep its normalized stage coordinates");
+  await page.waitForTimeout(150);
   await page.getByRole("button", { name: "Guardar material convertido" }).click();
   await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("material(es) convertido(s)") ?? false, null, { timeout: 15000 });
   const bodyAsset = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-body-anchor" }).first();
