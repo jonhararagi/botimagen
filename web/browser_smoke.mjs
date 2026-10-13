@@ -260,6 +260,15 @@ try {
     await page.locator(".modular-asset-list article").filter({ hasText: label }).first().waitFor({ state: "visible", timeout: 10000 });
   }
 
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles([
+    { name: "batch-alpha.png", mimeType: "image/png", buffer: makeAlphaQaPng() },
+    { name: "batch-opaque.png", mimeType: "image/png", buffer: makeAlphaQaPng("opaque") },
+  ]);
+  await page.getByRole("button", { name: "Separar todas las PNG transparentes" }).click();
+  await page.getByText("Lote terminado:", { exact: false }).waitFor({ timeout: 10000 });
+  assert.equal(await page.locator(".modular-preview-card").filter({ hasText: "batch-alpha-pieza-" }).count(), 3);
+  assert.equal(await page.locator(".modular-preview-card").filter({ hasText: "batch-opaque.png" }).count(), 1);
+
   const splitBody = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-alpha-sheet-pieza-01" }).first();
   const splitTop = page.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({ hasText: "qa-alpha-sheet-pieza-02" }).first();
   await splitBody.getByRole("button", { name: "Confirmar puntos del esqueleto" }).click();
