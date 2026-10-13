@@ -398,11 +398,10 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
             raise AssetImportError("No se encuentra el PNG original vinculado; impórtalo primero.")
         if source_record.get("kind") not in {"reference", "full_character", "portrait"}:
             raise AssetImportError("El recurso de origen vinculado no es una fuente de imagen.")
-        if conversion is not None:
-            if conversion.get("source_sha256") and conversion["source_sha256"] != source_record.get("sha256"):
-                raise AssetImportError("El SHA-256 del PNG convertido no coincide con su fuente vinculada.")
-            if (conversion["source_width"], conversion["source_height"]) != (source_record.get("width"), source_record.get("height")):
-                raise AssetImportError("Las dimensiones guardadas no coinciden con el PNG original vinculado.")
+        # A linked source is provenance, not necessarily the exact raster normalized into this
+        # asset: alpha-split pieces have their own dimensions and SHA-256 while pointing back
+        # to the single original sprite sheet. The relationship is validated above by ID/kind.
+        # Conversion metadata remains the checksum and dimensions of the actual piece input.
     digest = hashlib.sha256(data).hexdigest()
     for existing in catalog["assets"]:
         if (
