@@ -1729,7 +1729,7 @@ try {
   await lassoStage.scrollIntoViewIfNeeded();
   const lassoBounds = await lassoStage.boundingBox();
   assert.ok(lassoBounds && lassoBounds.width > 40 && lassoBounds.height > 60, "The interactive polygon cutter should display the source image at a usable size");
-  await cutoutCard.getByLabel("Herramienta de recorte de Dibujar contorno de pieza").selectOption("lasso");
+  await cutoutCard.getByLabel("Herramienta de recorte de Dibujar contorno en qa-synthetic-character.png").selectOption("lasso");
   const lassoPoints = [[106 / 320, 156 / 480], [214 / 320, 156 / 480], [214 / 320, 314 / 480], [106 / 320, 314 / 480], [106 / 320, 156 / 480]];
   await page.mouse.move(lassoBounds.x + lassoBounds.width * lassoPoints[0][0], lassoBounds.y + lassoBounds.height * lassoPoints[0][1]);
   await page.mouse.down();
