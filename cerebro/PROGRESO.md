@@ -152,3 +152,6 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - **Estado: EN PROGRESO / NO ACEPTADO.** Aún faltan ejecución CI del HEAD actual, E2E real de cambio de cabello/prendas, perfil modular conectado al sistema persistente de perfiles y revisión de capturas.
 - No se incrementa el porcentaje global del producto con esta entrega parcial. `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - Estimación restante de ingeniería: **8–16 horas activas**, más producción y calibración de recursos artísticos independientes.
+
+
+- **BIMG-WAIFU-FACTORY-002 (2026-10-13):** se amplió el smoke E2E para validar el PNG descargado (dimensiones/RGBA/alfa/contenido), la independencia persistente de la variante y la persistencia de piezas importadas después de recargar la app. Código de prueba: `47b35e0d991f4b2c1f9bfdd1d0cf3fd8949b17b3`. Ejecución local y CI exacta aún sin evidencia verificable; estado PARTIAL, sin subir el progreso ponderado global (**63%**, último checkpoint registrado). TIMER estimado 8–16 h; tiempo real `NOT_MEASURED`.
