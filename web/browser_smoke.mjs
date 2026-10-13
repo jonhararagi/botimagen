@@ -327,8 +327,13 @@ try {
   await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("Anclajes confirmados") ?? false, null, { timeout: 10000 });
   const persistedRig = await page.evaluate(async () => { const r = await fetch("/api/modular-assets"); if (!r.ok) throw new Error("Could not read imported rig asset"); const d = await r.json(); return d.assets.find(asset => asset.label === "qa-body-anchor"); });
   assert.ok(persistedRig?.anchors_validated, "The body landmarks should be confirmed and persisted");
+  const expectedHead = { x: Number((0.54).toFixed(4)), y: Number((0.12).toFixed(4)) };
   assert.ok(Number.isFinite(persistedRig.anchor_estimate.head.x) && persistedRig.anchor_estimate.head.x >= 0 && persistedRig.anchor_estimate.head.x <= 1,
     "The normalized head landmark should persist in the local asset catalog");
+  assert.ok(Math.abs(persistedRig.anchor_estimate.head.x - expectedHead.x) <= 0.015,
+    `The dragged head landmark X should persist near the pointer-up coordinate; expected ${expectedHead.x}, received ${persistedRig.anchor_estimate.head.x}`);
+  assert.ok(Math.abs(persistedRig.anchor_estimate.head.y - expectedHead.y) <= 0.015,
+    `The dragged head landmark Y should persist near the pointer-up coordinate; expected ${expectedHead.y}, received ${persistedRig.anchor_estimate.head.y}`);
   assert.deepEqual(persistedRig.conversion.anchors.head, persistedRig.anchor_estimate.head,
     "The catalog anchor estimate must match the persisted conversion metadata");
   await page.getByRole("checkbox", { name: "Seleccionar pieza qa-body-anchor" }).check();
