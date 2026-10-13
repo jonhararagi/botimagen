@@ -255,6 +255,41 @@ export function ModularAssetLibrary() {
     if (next.length) setStatus(`${next.length} imagen(es) lista(s). Ajusta las opciones y prepara el PNG normalizado.`);
   };
 
+  const splitAllTransparentPngs = async () => {
+    if (busy) return;
+    if (kind !== "modular_piece") {
+      setStatus("Selecciona «Pieza separada» antes de dividir una hoja de sprites.");
+      return;
+    }
+    const candidates = previews.filter(item => item.file.type === "image/png" && !item.sourceFile && !item.convertedBlob);
+    if (!candidates.length) {
+      setStatus("No hay PNG originales pendientes para separar. Carga una hoja PNG con piezas separadas por transparencia.");
+      return;
+    }
+    setBusy(true);
+    setStatus(`Separando ${candidates.length} PNG en lote…`);
+    let splitCount = 0;
+    let failedCount = 0;
+    const replacements = new Map<string, PreviewItem[]>();
+    try {
+      for (const item of candidates) {
+        try {
+          const pieces = await splitTransparentPng(item.file);
+          replacements.set(item.url, pieces.map(piece => ({
+            file: piece.file, url: makeUrl(piece.file), category: item.category || category, sourceFile: item.file,
+          })));
+          splitCount += pieces.length;
+        } catch {
+          failedCount++;
+        }
+      }
+      setPreviews(current => current.flatMap(item => replacements.get(item.url) ?? [item]));
+      setStatus(`Lote terminado: ${splitCount} pieza(s) extraída(s) de ${candidates.length} PNG. ${failedCount} archivo(s) no se pudieron separar automáticamente y se conservaron para recorte manual.`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const splitPreviewIntoPieces = async (item:PreviewItem) => {
     if (busy) return;
     setBusy(true);
@@ -452,6 +487,10 @@ export function ModularAssetLibrary() {
     </div>
 
     <p className="modular-converter-note"><b>Flujo de piezas:</b> elige «Pieza separada», carga un PNG, selecciona qué parte vas a extraer y dibuja su contorno. Pulsa «Extraer otra parte de este PNG» para crear otra capa desde la misma imagen y clasificarla por separado. Luego prepara y guarda todas las piezas juntas. El exterior queda transparente; las zonas tapadas en la imagen original no se pueden reconstruir automáticamente.</p>
+    {kind==="modular_piece"&&previews.some(item=>item.file.type==="image/png"&&!item.sourceFile&&!item.convertedBlob)&&<div className="modular-batch-split">
+      <button type="button" className="btn muted" disabled={busy} onClick={()=>void splitAllTransparentPngs()}>Separar todas las PNG transparentes</button>
+      <small>Procesa hojas con piezas separadas por alfa. Los PNG que no se puedan dividir quedan intactos para recorte manual.</small>
+    </div>}
     <div className="modular-dropzone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();selectFiles(e.dataTransfer.files);}}>
       <strong>Arrastra imágenes aquí</strong><span>PNG, JPEG o WebP · máximo 12 MiB y 20 megapíxeles por archivo</span>
       <button type="button" className="btn muted" onClick={()=>input.current?.click()}>Seleccionar imágenes</button>
