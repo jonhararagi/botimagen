@@ -12,6 +12,7 @@ type UserAsset = {
 };
 type CutoutPoint = { x:number; y:number };
 type PreviewItem = { file:File; url:string; category?:string; sourceFile?:File; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
+type SavedProfile = { id:string; name:string; saved_at:string };
 const categories = [
   ["reference", "Referencia / clasificar después"], ["body", "Cuerpo base"], ["head", "Cabeza"],
   ["face", "Rostro"], ["hair_back", "Cabello posterior"], ["hair_front", "Cabello frontal"],
@@ -226,6 +227,9 @@ export function ModularAssetLibrary() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Biblioteca local persistente · listo para convertir imágenes");
   const [composeStatus, setComposeStatus] = useState("");
+  const [profileName, setProfileName] = useState("Mi personaje importado");
+  const [profiles, setProfiles] = useState<SavedProfile[]>([]);
+  const [profileId, setProfileId] = useState("");
 
   const makeUrl = (blob:Blob) => {
     const url=URL.createObjectURL(blob);
@@ -243,7 +247,16 @@ export function ModularAssetLibrary() {
     const data = await response.json();
     setAssets(Array.isArray(data.assets) ? data.assets : []);
   };
-  useEffect(() => { void refresh().catch(e => setStatus(e instanceof Error ? e.message : "API local no disponible")); }, []);
+  const refreshProfiles = async () => {
+    const response=await fetch("/api/profiles");
+    if(!response.ok)throw new Error("No se pudieron cargar los perfiles guardados.");
+    const data=await response.json();
+    setProfiles(Array.isArray(data.profiles)?data.profiles:[]);
+  };
+  useEffect(() => {
+    void refresh().catch(e => setStatus(e instanceof Error ? e.message : "API local no disponible"));
+    void refreshProfiles().catch(e => setStatus(e instanceof Error ? e.message : "No se pudieron cargar los perfiles."));
+  }, []);
 
   const clearConversions = () => setPreviews(current => current.map(item => ({...item,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined})));
   const selectFiles = (files: FileList | null) => {
@@ -425,6 +438,44 @@ export function ModularAssetLibrary() {
     } finally { setBusy(false); }
   };
 
+  const saveCompositionProfile = async () => {
+    if(busy||!selectedAssets.length){setComposeStatus("Selecciona piezas antes de guardar el personaje.");return;}
+    setBusy(true);
+    try {
+      const response=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+        name:profileName.trim()||"Mi personaje importado",
+        profile:{modular_composition:{schema_version:1,source:"imported-assets",pieces:[...selectedAssets],view:compositionView}},
+      })});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"No se pudo guardar el personaje importado.");
+      setProfileId(data.id||"");
+      await refreshProfiles();
+      setComposeStatus("Personaje importado guardado con referencias persistentes a sus piezas.");
+    } catch(error) { setComposeStatus(error instanceof Error?error.message:"Falló el guardado del personaje importado."); }
+    finally { setBusy(false); }
+  };
+
+  const loadCompositionProfile = async () => {
+    if(busy||!profileId){setComposeStatus("Selecciona un perfil de piezas guardado.");return;}
+    setBusy(true);
+    try {
+      const response=await fetch("/api/profiles/"+encodeURIComponent(profileId));
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"No se pudo recuperar el personaje importado.");
+      const composition=data.profile?.modular_composition;
+      if(composition?.source!=="imported-assets"||!Array.isArray(composition.pieces)||!composition.pieces.every((id:unknown)=>typeof id==="string"))throw new Error("El perfil no contiene referencias de piezas importadas compatibles.");
+      const available=new Set(assets.map(asset=>asset.id));
+      const restored=composition.pieces.filter((id:string)=>available.has(id));
+      if(restored.length!==composition.pieces.length)throw new Error("Faltan piezas referenciadas en la biblioteca; no se restauró una composición incompleta.");
+      setProfileName(data.name||"Mi personaje importado");
+      setCompositionView(composition.view==="back"?"back":"front");
+      setSelectedAssets(restored);
+      setCompositionPreview("");
+      setComposeStatus("Selecciones y referencias de piezas recuperadas del perfil local.");
+    } catch(error) { setComposeStatus(error instanceof Error?error.message:"Falló la carga del personaje importado."); }
+    finally { setBusy(false); }
+  };
+
   const supportsCompositionView=(asset:UserAsset,view=compositionView)=>asset.view==="unknown"||asset.view===view;
   const changeCompositionView=(view:"front"|"back")=>{
     setCompositionView(view);
@@ -540,7 +591,13 @@ export function ModularAssetLibrary() {
     </div>
     <div className="modular-composition-panel">
       <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Importa y confirma un juego frontal y otro trasero, y cambia la vista aquí para alternarlos.</p><label className="modular-composition-view">Vista de composición<select aria-label="Vista para componer" value={compositionView} onChange={e=>changeCompositionView(e.target.value as "front"|"back")}><option value="front">Frontal</option><option value="back">Trasera</option></select></label></div>
-      <button className="btn primary" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void composeSelection()}>{busy?"Componiendo…":`Componer selección (${selectedAssets.length})`}</button>
+      <label>Nombre del personaje importado<input aria-label="Nombre del personaje importado" maxLength={80} value={profileName} onChange={event=>setProfileName(event.target.value)}/></label>
+      <label>Perfil de piezas guardado<select aria-label="Perfil de piezas guardado" value={profileId} onChange={event=>setProfileId(event.target.value)}><option value="">Seleccionar perfil</option>{profiles.map(profile=><option key={profile.id} value={profile.id}>{profile.name} · {new Date(profile.saved_at).toLocaleString()}</option>)}</select></label>
+      <div className="modular-library-actions">
+        <button className="btn muted" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void saveCompositionProfile()}>Guardar personaje importado</button>
+        <button className="btn muted" type="button" disabled={!profileId||busy} onClick={()=>void loadCompositionProfile()}>Cargar personaje importado</button>
+        <button className="btn primary" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void composeSelection()}>{busy?"Componiendo…":`Componer selección (${selectedAssets.length})`}</button>
+      </div>
       <span role="status" data-testid="modular-compose-status">{composeStatus}</span>
       {compositionPreview&&<img className="modular-composition-preview" src={compositionPreview} alt="Composición PNG de piezas modulares importadas"/>}
     </div>
