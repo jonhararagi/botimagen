@@ -56,24 +56,27 @@ function makeQaPng(variant = 0) {
 }
 
 
-function makeAlphaQaPng(single = false, opaque = false) {
+function makeAlphaQaPng(mode = "three") {
   const width = 180, height = 120, rowBytes = width * 4;
   const raw = Buffer.alloc((rowBytes + 1) * height);
   for (let y = 0; y < height; y++) {
     const row = y * (rowBytes + 1);
     raw[row] = 0;
     for (let x = 0; x < width; x++) {
-      const shapes = [
-        x >= 12 && x < 48 && y >= 12 && y < 54,
-        x >= 70 && x < 112 && y >= 18 && y < 72,
-        x >= 128 && x < 166 && y >= 60 && y < 105,
-      ];
-      const visible = single ? shapes[0] : shapes.some(Boolean);
+      const shapes = mode === "diagonal"
+        ? [x >= 12 && x < 32 && y >= 12 && y < 32,
+           x >= 31 && x < 52 && y >= 31 && y < 52,
+           x >= 128 && x < 166 && y >= 60 && y < 105]
+        : [x >= 12 && x < 48 && y >= 12 && y < 54,
+           x >= 70 && x < 112 && y >= 18 && y < 72,
+           x >= 128 && x < 166 && y >= 60 && y < 105];
+      const mote = (x === 3 && y === 3) || (x === 176 && y === 4) || (x === 90 && y === 110);
+      const visible = mode === "single" ? shapes[0] : shapes.some(Boolean) || mote;
       const p = row + 1 + x * 4;
       raw[p] = shapes[0] ? 230 : shapes[1] ? 40 : 30;
       raw[p + 1] = shapes[1] ? 160 : shapes[2] ? 190 : 80;
       raw[p + 2] = shapes[2] ? 230 : 150;
-      raw[p + 3] = visible || opaque ? 255 : 0;
+      raw[p + 3] = mode === "opaque" || visible ? 255 : 0;
     }
   }
   const signature = Buffer.from([137,80,78,71,13,10,26,10]);
@@ -241,10 +244,21 @@ try {
     await page.locator(".modular-asset-list article").filter({ hasText: label }).first().waitFor({ state: "visible", timeout: 10000 });
   }
 
-  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-single.png", mimeType: "image/png", buffer: makeAlphaQaPng(true) });
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-diagonal.png", mimeType: "image/png", buffer: makeAlphaQaPng("diagonal") });
+  await page.getByRole("button", { name: "Separar piezas por transparencia" }).last().click();
+  await page.getByText("Separación terminada: 2 piezas transparentes.", { exact: false }).waitFor({ timeout: 10000 });
+  assert.equal(await page.locator(".modular-preview-card").filter({ hasText: "qa-alpha-diagonal-pieza-" }).count(), 2,
+    "Eight-connected diagonal pixels are one component; the separate island remains the second component");
+
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-single.png", mimeType: "image/png", buffer: makeAlphaQaPng("single") });
   await page.getByRole("button", { name: "Separar piezas por transparencia" }).last().click();
   await page.getByText("No se detectaron dos o más piezas separadas por transparencia.", { exact: false }).waitFor({ timeout: 10000 });
   await page.getByText("qa-alpha-single.png", { exact: false }).waitFor({ state: "visible" });
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-opaque.png", mimeType: "image/png", buffer: makeAlphaQaPng("opaque") });
+  await page.getByRole("button", { name: "Separar piezas por transparencia" }).last().click();
+  await page.getByText("No se detectaron dos o más piezas separadas por transparencia.", { exact: false }).waitFor({ timeout: 10000 });
+  await page.getByText("qa-alpha-opaque.png", { exact: false }).waitFor({ state: "visible" });
+
 
   // Full PNG-to-rig flow: edit body joints, persist them, fit a garment, and compose.
   await page.getByLabel("Tipo de recurso").selectOption("modular_piece");
