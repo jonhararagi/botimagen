@@ -878,3 +878,12 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - **Límite de alcance:** este incremento no demuestra por sí solo el cierre de BIMG-WAIFU-FACTORY-001. El compositor, importador, biblioteca persistente y constructor de modelos existentes se conservan y requieren validación E2E integrada en el HEAD actual.
 - **TIMER del encargo global:** 16–32 horas activas estimadas por el usuario; tiempo real medido: `NOT_MEASURED`. Este pequeño incremento no equivale a completar el encargo.
 - **Progreso ponderado beta:** sin recalcular; este cambio aislado no justifica alterar los pesos ni los porcentajes globales de `cerebro/PROGRESO.md`.
+
+
+### Seguimiento de BIMG-WAIFU-FACTORY-001 · cobertura de variante independiente
+
+- **HEAD de código actual verificado:** `abf4a98bb2ec0a48ff1a1163f396e4e800c8322e` · [test: cover independent modular variant duplication](https://github.com/jonhararagi/botimagen/commit/abf4a98bb2ec0a48ff1a1163f396e4e800c8322e).
+- **Archivo adicional modificado:** `web/browser_smoke.mjs`.
+- **Cobertura añadida:** el smoke Chromium busca el botón «Duplicar variante», espera el mensaje de confirmación, comprueba que el perfil duplicado aparece en el selector y que su ID difiere del perfil original.
+- **Verificación remota posterior:** lectura de GitHub confirmó que el componente contiene el control y que el smoke contiene las nuevas aserciones (`PASS_STATIC`). No se pudo ejecutar Chromium desde esta sesión; prueba E2E real: `NOT_RUN`. La consulta de workflow runs asociada al SHA no devolvió ejecuciones, así que CI permanece `UNKNOWN/NOT_RUN`.
+- **No se ha modificado `main`, no se ha fusionado ni cerrado ningún PR.** El encargo completo sigue `PARTIAL`; este incremento no prueba por sí solo el criterio DONE.
