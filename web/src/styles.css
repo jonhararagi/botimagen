@@ -137,7 +137,7 @@
 .modular-preview-card small{color:#8da3bc;font-size:10px;line-height:1.45}
 .modular-asset-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
 .modular-asset-actions .modular-check{padding:5px 0}
-.modular-composition-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:18px;padding:14px;border:1px solid rgba(116,225,231,.24);border-radius:12px;background:rgba(21,31,49,.7)}
+.modular-composition-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:18px;padding:14px;border:1px solid rgba(116,225,231,.24);border-radius:12px;background:rgba(21,31,49,.7);min-width:0;max-width:100%;box-sizing:border-box}
 .modular-composition-panel>div>b{font-size:13px;color:#d5e7f5}
 .modular-piece-editor{grid-column:1/-1;display:grid;gap:12px;padding:12px;border:1px solid rgba(92,228,220,.28);border-radius:10px;background:rgba(7,15,28,.5);min-width:0}
 .modular-piece-editor>label{display:grid;gap:6px;min-width:0;font-size:11px;color:#b6c5d9}
@@ -157,7 +157,7 @@
 .modular-composition-preview{grid-column:1/-1;width:100%;max-height:550px;object-fit:contain;border:1px solid #3d4b60;border-radius:10px;background:repeating-conic-gradient(#222a3a 0% 25%,#101725 0% 50%) 50%/20px 20px}
 .modular-composition-panel button:disabled{opacity:.55}
 .modular-composition-panel>label{display:grid;min-width:0;gap:6px;overflow-wrap:anywhere;font-size:11px;color:#b6c5d9}.modular-composition-panel input,.modular-composition-panel select{width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:650px){.modular-converter-options{grid-template-columns:1fr}.modular-source-url{grid-column:1}.modular-composition-panel{grid-template-columns:1fr}.modular-composition-panel [role=status]{grid-column:1}.modular-piece-transform-grid{grid-template-columns:1fr}.modular-piece-identity{grid-column:1}}
+@media(max-width:650px){.modular-library{min-width:0;max-width:100%;box-sizing:border-box}.modular-converter-options{grid-template-columns:1fr}.modular-source-url{grid-column:1}.modular-composition-panel{grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}.modular-piece-editor{width:100%;min-width:0;max-width:100%;box-sizing:border-box}.modular-composition-panel [role=status]{grid-column:1}.modular-piece-transform-grid{grid-template-columns:minmax(0,1fr)}.modular-piece-identity{grid-column:1}}
 
 
 /* Editable joint markers on imported normalized PNG layers */

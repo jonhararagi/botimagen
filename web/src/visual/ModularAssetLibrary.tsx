@@ -513,6 +513,7 @@ export function ModularAssetLibrary() {
     if(!asset||asset.category==="body")return;
     setPieceTransforms(current=>({...current,[assetId]:{...getPieceTransform(asset,current),...patch}}));
     setCompositionPreview("");
+    setComposeStatus("Actualizando composición…");
   };
   useEffect(()=>{
     if(!selectedAssets.length)return;
