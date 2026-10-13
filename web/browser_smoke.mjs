@@ -276,6 +276,7 @@ try {
   await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).uncheck();
   await splitTop.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-02" }).uncheck();
 
+  await page.getByLabel("Tipo de recurso").selectOption("modular_piece");
   await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-diagonal.png", mimeType: "image/png", buffer: makeAlphaQaPng("diagonal") });
   await page.getByRole("button", { name: "Separar piezas por transparencia" }).last().click();
   await page.getByText("Separación terminada: 2 piezas transparentes.", { exact: false }).waitFor({ timeout: 10000 });
