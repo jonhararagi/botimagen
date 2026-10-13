@@ -1663,10 +1663,15 @@ try {
   await lassoStage.scrollIntoViewIfNeeded();
   const lassoBounds = await lassoStage.boundingBox();
   assert.ok(lassoBounds && lassoBounds.width > 40 && lassoBounds.height > 60, "The interactive polygon cutter should display the source image at a usable size");
-  for (const [x, y] of [[106 / 320, 156 / 480], [214 / 320, 156 / 480], [214 / 320, 314 / 480], [106 / 320, 314 / 480]]) {
-    await page.mouse.click(lassoBounds.x + lassoBounds.width * x, lassoBounds.y + lassoBounds.height * y);
+  await cutoutCard.getByLabel("Herramienta de recorte de Dibujar contorno de pieza").selectOption("lasso");
+  const lassoPoints = [[106 / 320, 156 / 480], [214 / 320, 156 / 480], [214 / 320, 314 / 480], [106 / 320, 314 / 480], [106 / 320, 156 / 480]];
+  await page.mouse.move(lassoBounds.x + lassoBounds.width * lassoPoints[0][0], lassoBounds.y + lassoBounds.height * lassoPoints[0][1]);
+  await page.mouse.down();
+  for (const [x, y] of lassoPoints.slice(1)) {
+    await page.mouse.move(lassoBounds.x + lassoBounds.width * x, lassoBounds.y + lassoBounds.height * y, { steps: 5 });
   }
-  assert.equal(await lassoStage.locator("polygon").count(), 1, "The drawn lasso should render a closed cutout preview");
+  await page.mouse.up();
+  assert.equal(await lassoStage.locator("polygon").count(), 1, "The freehand lasso should render a closed cutout preview");
   await assetLibrary.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
   await cutoutCard.locator(".modular-anchor-stage image").waitFor({ state: "attached", timeout: 15000 });
   const cutoutAlpha = await cutoutCard.evaluate(async card => {
