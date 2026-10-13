@@ -55,6 +55,33 @@ function makeQaPng(variant = 0) {
   ]);
 }
 
+
+function makeAlphaQaPng(single = false, opaque = false) {
+  const width = 180, height = 120, rowBytes = width * 4;
+  const raw = Buffer.alloc((rowBytes + 1) * height);
+  for (let y = 0; y < height; y++) {
+    const row = y * (rowBytes + 1);
+    raw[row] = 0;
+    for (let x = 0; x < width; x++) {
+      const shapes = [
+        x >= 12 && x < 48 && y >= 12 && y < 54,
+        x >= 70 && x < 112 && y >= 18 && y < 72,
+        x >= 128 && x < 166 && y >= 60 && y < 105,
+      ];
+      const visible = single ? shapes[0] : shapes.some(Boolean);
+      const p = row + 1 + x * 4;
+      raw[p] = shapes[0] ? 230 : shapes[1] ? 40 : 30;
+      raw[p + 1] = shapes[1] ? 160 : shapes[2] ? 190 : 80;
+      raw[p + 2] = shapes[2] ? 230 : 150;
+      raw[p + 3] = visible || opaque ? 255 : 0;
+    }
+  }
+  const signature = Buffer.from([137,80,78,71,13,10,26,10]);
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0); ihdr.writeUInt32BE(height, 4); ihdr[8] = 8; ihdr[9] = 6;
+  return Buffer.concat([signature, pngChunk("IHDR", ihdr), pngChunk("IDAT", deflateSync(raw)), pngChunk("IEND", Buffer.alloc(0))]);
+}
+
 const children = [];
 const logs = { api: "", vite: "" };
 let browser;
@@ -180,6 +207,44 @@ try {
     .filter({ hasText: "Fuente original · qa-reference" }).first()
     .waitFor({ state: "visible", timeout: 15000 });
 
+
+
+  // Split three disconnected alpha islands, classify them independently, persist the shared source once,
+  // reload the library, then exercise the explicit failure path without dropping the failed source.
+  await page.getByLabel("Tipo de recurso").selectOption("modular_piece");
+  await page.getByLabel("Clasificación de la imagen").selectOption("body");
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-sheet.png", mimeType: "image/png", buffer: makeAlphaQaPng() });
+  await page.getByRole("button", { name: "Separar piezas por transparencia" }).click();
+  await page.getByText("Separación terminada: 3 piezas transparentes.", { exact: false }).waitFor({ timeout: 10000 });
+  const alphaCards = page.locator(".modular-preview-card").filter({ hasText: "qa-alpha-sheet-pieza-" });
+  await assert.equal(await alphaCards.count(), 3, "A transparent sprite sheet must split into three independently editable pieces");
+  await page.getByLabel("Parte que extraer de qa-alpha-sheet-pieza-02.png").selectOption("clothing_top");
+  await page.getByLabel("Parte que extraer de qa-alpha-sheet-pieza-03.png").selectOption("footwear");
+  await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
+  await page.getByRole("img", { name: "PNG normalizado de qa-alpha-sheet-pieza-01.png 512 por 768" }).waitFor({ timeout: 10000 });
+  await page.getByRole("button", { name: "Guardar material convertido" }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("3 material(es) convertido(s)") ?? false, null, { timeout: 15000 });
+  const alphaPersisted = await page.evaluate(async () => {
+    const response = await fetch("/api/modular-assets");
+    if (!response.ok) throw new Error("Could not reload modular asset library after alpha split");
+    const data = await response.json();
+    return data.assets.filter(asset => ["qa-alpha-sheet-pieza-01", "qa-alpha-sheet-pieza-02", "qa-alpha-sheet-pieza-03"].some(name => asset.label.includes(name)));
+  });
+  assert.equal(alphaPersisted.length, 3, "All three normalized pieces should persist in the existing library");
+  assert.deepEqual(alphaPersisted.map(asset => asset.category).sort(), ["body", "clothing_top", "footwear"].sort(),
+    "Each extracted component must retain its individually selected category");
+  assert.equal(alphaPersisted.filter(asset => asset.label.includes("Fuente original · qa-alpha-sheet")).length, 0,
+    "The source reference is saved with the source filename, not duplicated as a derived piece");
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.locator('.modular-asset-list article[data-asset-kind="reference"]').filter({ hasText: "Fuente original · qa-alpha-sheet" }).waitFor({ state: "visible", timeout: 15000 });
+  for (const label of ["qa-alpha-sheet-pieza-01", "qa-alpha-sheet-pieza-02", "qa-alpha-sheet-pieza-03"]) {
+    await page.locator(".modular-asset-list article").filter({ hasText: label }).first().waitFor({ state: "visible", timeout: 10000 });
+  }
+
+  await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-alpha-single.png", mimeType: "image/png", buffer: makeAlphaQaPng(true) });
+  await page.getByRole("button", { name: "Separar piezas por transparencia" }).last().click();
+  await page.getByText("No se detectaron dos o más piezas separadas por transparencia.", { exact: false }).waitFor({ timeout: 10000 });
+  await page.getByText("qa-alpha-single.png", { exact: false }).waitFor({ state: "visible" });
 
   // Full PNG-to-rig flow: edit body joints, persist them, fit a garment, and compose.
   await page.getByLabel("Tipo de recurso").selectOption("modular_piece");
