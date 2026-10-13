@@ -826,3 +826,26 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - **Referencias privadas:** se verificó el listado de `referencias/16.png`–`referencias/29.png` (14 PNG; permanecen solo en el repositorio privado). La continuidad de la prueba privada anterior registra procesamiento 14/14 y un artefacto QA privado: [run #38321848683](https://github.com/jonhararagi/botimagen-referencias-privadas/actions/runs/38321848683), [artefacto de QA](https://github.com/jonhararagi/botimagen-referencias-privadas/actions/runs/38321848683/artifacts/11778719782). Esta evidencia es de la ejecución privada anterior, no de este nuevo commit público.
 - **Estado funcional honesto:** el importador, eliminación de fondo plano conectado a las esquinas, lazo/polígono, normalización, categorías, anclajes, API de biblioteca y compositor son parte de la arquitectura actual. El lazo nuevo aún requiere validación E2E específica. El control de pincel aditivo/sustractivo, zoom de edición, informe generado en la misma ejecución para los 14 archivos y una composición visual final con esos materiales reales no quedan demostrados por el cambio actual. La segmentación alfa no reconoce semánticamente cabello/ropa. QA manual en Windows no ejecutado.
 - **Cierre:** PARTIAL hasta completar E2E/QA visual de este cambio y evidenciar los criterios restantes. No afirmar DONE por una compilación verde. TIMER solicitado para esta fase: 8–16 horas activas estimadas; tiempo real medido: `NOT_MEASURED`.
+
+
+---
+
+## BIMG-PNG-PIPELINE-CIERRE-003 · lote de PNG transparentes · 2026-10-13
+
+**Estado de esta entrega:** implementación publicada; CI del HEAD de código pendiente de finalizar en el momento de esta anotación. No marcar la función como validada hasta revisar la ejecución correspondiente.
+
+- Rama: `feature/bimg-engine-001-cyberstreet-visual-renderer`.
+- HEAD de código con la nueva función: `a83285a257df5d7acdf973aa2858e27c0eca4906`.
+- Prueba E2E actualizada después: `02b6d1cc3f88ed8a1efe52ec5341450e368a4e75`.
+- Cambio de UI: `web/src/visual/ModularAssetLibrary.tsx`. Añadido «Separar todas las PNG transparentes». Procesa PNG originales pendientes en lote, convierte cada isla alfa en una pieza, y conserva los archivos que no se pueden separar para el recorte manual.
+- Smoke E2E: `web/browser_smoke.mjs`. Añadido un caso con una hoja PNG transparente y otra opaca; comprueba que se crean tres piezas de la primera y se conserva la segunda. Confirmar el resultado real en CI #613 antes de dar PASS.
+- Prompt de trabajo de una sola ejecución: `cerebro/PROMPT_OBRERO_CIERRE_IMPORTADOR_PNG_003.md`.
+- CI asociado al test actualizado: https://github.com/jonhararagi/botimagen/actions/runs/38392335240
+- CI anterior a la nueva prueba: https://github.com/jonhararagi/botimagen/actions/runs/38392268304
+- No se modificó `main`; no se fusionó ni cerró ningún PR.
+
+**Límites que siguen vigentes:** la separación por alfa solo divide componentes que ya están separados por transparencia. No puede deducir pelo/ropa/piel de una ilustración opaca. Para ello se necesita recorte manual con máscara o integrar un segmentador real. No afirmar que las prendas están listas para el compositor solo porque el PNG se normalizó; hay que comprobar la máscara, escala, anclajes y composición.
+
+**Timer estimado para completar y validar el flujo de importación completo:** 8–16 horas activas. Tiempo medido: `NOT_MEASURED`. La cifra es una estimación del tramo, no una promesa de que todo BotImagen estará terminado en ese tiempo.
+
+**Siguiente acción única:** revisar CI #613; corregir cualquier fallo real en la misma rama; seguir con el prompt de cierre sin sustituir implementación por nuevos informes. Después revisar el flujo completo de máscara, persistencia, anclajes y composición con captura real.
