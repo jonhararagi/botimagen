@@ -849,3 +849,16 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 **Timer estimado para completar y validar el flujo de importación completo:** 8–16 horas activas. Tiempo medido: `NOT_MEASURED`. La cifra es una estimación del tramo, no una promesa de que todo BotImagen estará terminado en ese tiempo.
 
 **Siguiente acción única:** revisar CI #613; corregir cualquier fallo real en la misma rama; seguir con el prompt de cierre sin sustituir implementación por nuevos informes. Después revisar el flujo completo de máscara, persistencia, anclajes y composición con captura real.
+
+
+---
+
+## BIMG-PNG-PIPELINE-CIERRE-003 · corrección E2E del lote y prueba de lazo · 2026-10-13
+
+- **Rama autorizada:** `feature/bimg-engine-001-cyberstreet-visual-renderer`. No se modificó `main` ni se fusionó/cerró PR.
+- **Causa real de CI #613/#614:** el smoke E2E subía dos PNG de lote mientras el selector global «Tipo de recurso» estaba en `full_character`. En ese estado, la UI oculta correctamente el botón de separar lote, por lo que el test esperaba un control que no debía aparecer. No era un fallo del separador: faltaba preparar el estado de UI en la prueba.
+- **Corrección de prueba:** `web/browser_smoke.mjs` selecciona `modular_piece` antes de subir `batch-alpha.png` y `batch-opaque.png`. Se amplió también el escenario de recorte manual para seleccionar «Lazo libre (arrastrar)» y realizar un gesto real de puntero, manteniendo las aserciones de alfa, categoría, persistencia, anclajes y composición.
+- **Commits de corrección:** `d261200e718d69ea51c21b12d4fe73ed3e5a55c3` (estado de UI de lote) y `9141bc7791c96c8523d3ec75eceb3136c1f24af8` (E2E de lazo libre). La ejecución #615 aún estaba en curso al consultar; la ejecución #616 se había encolado para el segundo cambio. No declarar PASS hasta revisar la ejecución del HEAD que contenga ambos cambios.
+- **Cobertura E2E que se intenta validar:** tres islas alfa → tres piezas clasificables; PNG opaco permanece en la lista para recorte manual; una sola fuente original vinculada a las piezas; persistencia tras recargar; confirmación de anclajes y composición PNG 512×768; recorte manual por gesto de lazo con esquinas transparentes fuera de la selección.
+- **Limitaciones reales:** el separador alfa no clasifica semánticamente cabello, ropa ni piel. La herramienta actual ofrece polígono y lazo libre, no un pincel de máscara aditivo/sustractivo. QA físico en Windows no ejecutado. No presentar las fixtures sintéticas del smoke como referencias reales del juego.
+- **TIMER:** 8–16 horas activas estimadas para este tramo; tiempo real medido: `NOT_MEASURED`. Estado de cierre: **PARTIAL hasta que CI #616 o la ejecución posterior finalice en SUCCESS y se inspeccione su artefacto visual**.
