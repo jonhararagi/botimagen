@@ -862,3 +862,19 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - **Cobertura E2E que se intenta validar:** tres islas alfa → tres piezas clasificables; PNG opaco permanece en la lista para recorte manual; una sola fuente original vinculada a las piezas; persistencia tras recargar; confirmación de anclajes y composición PNG 512×768; recorte manual por gesto de lazo con esquinas transparentes fuera de la selección.
 - **Limitaciones reales:** el separador alfa no clasifica semánticamente cabello, ropa ni piel. La herramienta actual ofrece polígono y lazo libre, no un pincel de máscara aditivo/sustractivo. QA físico en Windows no ejecutado. No presentar las fixtures sintéticas del smoke como referencias reales del juego.
 - **TIMER:** 8–16 horas activas estimadas para este tramo; tiempo real medido: `NOT_MEASURED`. Estado de cierre: **PARTIAL hasta que CI #616 o la ejecución posterior finalice en SUCCESS y se inspeccione su artefacto visual**.
+
+
+---
+
+## BIMG-WAIFU-FACTORY-001 · incremento de variantes del compositor · 2026-10-13
+
+- **Rama autorizada:** `feature/bimg-engine-001-cyberstreet-visual-renderer`.
+- **HEAD verificado antes del incremento:** `f86f9345943389dd4ef42d91bc0ec23b38b371d5`.
+- **Commit del incremento:** `ab51eced1d82b164cadadd216a893e4cd31e1496` · [feat: duplicate modular character variants](https://github.com/jonhararagi/botimagen/commit/ab51eced1d82b164cadadd216a893e4cd31e1496).
+- **Archivo modificado:** `web/src/visual/ModularCharacterComposer.tsx`.
+- **Implementado:** nueva acción «Duplicar variante» en el compositor modular CyberStreet. Crea un perfil local independiente mediante `POST /api/profiles`, copiando las selecciones actuales de capas y el identificador del paquete, asigna un nombre de variante y selecciona el nuevo perfil creado. El original no se actualiza ni sobrescribe.
+- **Prueba estática posterior al commit:** se volvió a leer el archivo desde la rama y se confirmó la presencia de la función `duplicateVariant` y del control «Duplicar variante». Estado: `PASS_STATIC`.
+- **Pruebas de navegador, TypeScript/build y regresión:** `NOT_RUN` en esta sesión. La consulta de workflow runs por este SHA no devolvió ejecuciones; no se declara CI verde.
+- **Límite de alcance:** este incremento no demuestra por sí solo el cierre de BIMG-WAIFU-FACTORY-001. El compositor, importador, biblioteca persistente y constructor de modelos existentes se conservan y requieren validación E2E integrada en el HEAD actual.
+- **TIMER del encargo global:** 16–32 horas activas estimadas por el usuario; tiempo real medido: `NOT_MEASURED`. Este pequeño incremento no equivale a completar el encargo.
+- **Progreso ponderado beta:** sin recalcular; este cambio aislado no justifica alterar los pesos ni los porcentajes globales de `cerebro/PROGRESO.md`.
