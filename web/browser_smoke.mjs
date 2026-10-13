@@ -1813,6 +1813,30 @@ try {
   }, initialPreviewData, {timeout:15000});
   const transformedPreviewData = await importedComposition.getAttribute("src");
   assert.notEqual(transformedPreviewData,initialPreviewData,"Changing the scale control must rerender the actual PNG pixels");
+  const layerOrderControl=assetLibrary.getByLabel("Orden de capa de pieza");
+  await layerOrderControl.focus();
+  for(let step=0;step<30;step++) await layerOrderControl.press("ArrowLeft");
+  await page.waitForFunction(previous=>{
+    const image=document.querySelector('.modular-composition-preview');
+    return image?.getAttribute('src')!==previous&&document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes('Composición real lista');
+  },transformedPreviewData,{timeout:15000});
+  const reorderedPreviewData=await importedComposition.getAttribute("src");
+  assert.notEqual(reorderedPreviewData,transformedPreviewData,"Changing the layer order must change the real composed PNG");
+  const visibilityControl=assetLibrary.getByLabel("Pieza visible");
+  await visibilityControl.uncheck();
+  await page.waitForFunction(previous=>{
+    const image=document.querySelector('.modular-composition-preview');
+    return image?.getAttribute('src')!==previous&&document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes('Composición real lista');
+  },reorderedPreviewData,{timeout:15000});
+  const hiddenPreviewData=await importedComposition.getAttribute("src");
+  assert.notEqual(hiddenPreviewData,reorderedPreviewData,"Hiding a selected piece must remove its pixels without deleting its asset reference");
+  await visibilityControl.check();
+  await page.waitForFunction(previous=>{
+    const image=document.querySelector('.modular-composition-preview');
+    return image?.getAttribute('src')!==previous&&document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes('Composición real lista');
+  },hiddenPreviewData,{timeout:15000});
+  const visiblePreviewData=await importedComposition.getAttribute("src");
+  assert.notEqual(visiblePreviewData,hiddenPreviewData,"Restoring piece visibility must recompose the piece");
   await page.evaluate(async()=>{const panel=document.querySelector('.modular-piece-editor');if(panel)panel.scrollIntoView({block:'center'});});
   await assetLibrary.locator(".modular-composition-panel").screenshot({path:resolve(visualQaDir,"imported-piece-transform-editor.png")});
   await assetLibrary.getByLabel("Nombre del personaje importado").fill("QA Imported Waifu Profile");
@@ -1822,6 +1846,8 @@ try {
   const importedProfileId=await importedProfileSelect.locator("option").evaluateAll(options=>options.find(option=>option.value&&option.textContent?.includes("QA Imported Waifu Profile"))?.value||"");
   assert.ok(importedProfileId,"Saving an imported character must create a retrievable profile");
   assert.equal(await scaleControl.inputValue(),"120","The saved imported profile must retain the adjusted piece scale");
+  assert.equal(await layerOrderControl.inputValue(),"10","The saved imported profile must retain the adjusted layer order");
+  assert.equal(await visibilityControl.isChecked(),true,"The saved imported profile must retain piece visibility");
   await scaleControl.focus();
   for(let step=0;step<6;step++) await scaleControl.press("ArrowLeft");
   await page.waitForFunction(previous => {
@@ -1835,6 +1861,8 @@ try {
   await assetLibrary.getByRole("button",{name:"Cargar personaje importado"}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Selecciones y referencias de piezas recuperadas")??false,null,{timeout:15000});
   assert.equal(await scaleControl.inputValue(),"120","Editing and saving a second variant must not mutate the original profile");
+  assert.equal(await layerOrderControl.inputValue(),"10","The original profile's layer order must remain independent from the variant");
+  assert.equal(await visibilityControl.isChecked(),true,"The original profile's visibility must remain independent from the variant");
   await modularBody.locator('input[type="checkbox"]').uncheck();
   await modularTop.locator('input[type="checkbox"]').uncheck();
   await importedProfileSelect.selectOption(importedProfileId);
