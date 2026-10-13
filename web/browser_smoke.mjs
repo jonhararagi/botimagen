@@ -65,7 +65,7 @@ function makeAlphaQaPng(mode = "three") {
     for (let x = 0; x < width; x++) {
       const shapes = mode === "diagonal"
         ? [x >= 12 && x < 32 && y >= 12 && y < 32,
-           x >= 31 && x < 52 && y >= 31 && y < 52,
+           x >= 32 && x < 52 && y >= 32 && y < 52,
            x >= 128 && x < 166 && y >= 60 && y < 105]
         : [x >= 12 && x < 48 && y >= 12 && y < 54,
            x >= 70 && x < 112 && y >= 18 && y < 72,
@@ -231,13 +231,17 @@ try {
     const response = await fetch("/api/modular-assets");
     if (!response.ok) throw new Error("Could not reload modular asset library after alpha split");
     const data = await response.json();
-    return data.assets.filter(asset => ["qa-alpha-sheet-pieza-01", "qa-alpha-sheet-pieza-02", "qa-alpha-sheet-pieza-03"].some(name => asset.label.includes(name)));
+    return data.assets.filter(asset => asset.label.includes("qa-alpha-sheet"));
   });
-  assert.equal(alphaPersisted.length, 3, "All three normalized pieces should persist in the existing library");
-  assert.deepEqual(alphaPersisted.map(asset => asset.category).sort(), ["body", "clothing_top", "footwear"].sort(),
+  assert.equal(alphaPersisted.length, 4, "Three pieces and exactly one source record should persist in the existing library");
+  const alphaPieces = alphaPersisted.filter(asset => asset.kind === "modular_piece");
+  const alphaSources = alphaPersisted.filter(asset => asset.kind === "reference" && asset.label === "Fuente original · qa-alpha-sheet");
+  assert.equal(alphaPieces.length, 3, "All three normalized pieces should persist in the existing library");
+  assert.equal(alphaSources.length, 1, "The original image must be stored exactly once for all derived pieces");
+  assert.ok(alphaPieces.every(asset => asset.source_asset_id === alphaSources[0].id), "Each derived piece must point to the single stored source asset");
+  assert.deepEqual(alphaPieces.map(asset => asset.category).sort(), ["body", "clothing_top", "footwear"].sort(),
     "Each extracted component must retain its individually selected category");
-  assert.equal(alphaPersisted.filter(asset => asset.label.includes("Fuente original · qa-alpha-sheet")).length, 0,
-    "The source reference is saved with the source filename, not duplicated as a derived piece");
+  
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.locator('.modular-asset-list article[data-asset-kind="reference"]').filter({ hasText: "Fuente original · qa-alpha-sheet" }).waitFor({ state: "visible", timeout: 15000 });
   for (const label of ["qa-alpha-sheet-pieza-01", "qa-alpha-sheet-pieza-02", "qa-alpha-sheet-pieza-03"]) {
