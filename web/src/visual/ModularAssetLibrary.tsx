@@ -95,6 +95,10 @@ function PolygonCutoutEditor({
 }) {
   const [open,setOpen]=useState(false);
   const [size,setSize]=useState({width:0,height:0});
+  const [mode,setMode]=useState<"polygon"|"lasso">("polygon");
+  const [drawing,setDrawing]=useState(false);
+  const [redoStack,setRedoStack]=useState<CutoutPoint[][]>([]);
+  const beforeEdit=useRef<CutoutPoint[]>(points);
   useEffect(()=>{
     let active=true;
     const image=new Image();
@@ -104,18 +108,40 @@ function PolygonCutoutEditor({
   },[imageUrl]);
 
   const pointString=points.map(point=>`${point.x*size.width},${point.y*size.height}`).join(" ");
-  const addPoint=(event:MouseEvent<SVGSVGElement>)=>{
-    if(!size.width||!size.height||points.length>=256)return;
+  const pointAt=(event:{currentTarget:SVGSVGElement;clientX:number;clientY:number})=>{
+    if(!size.width||!size.height)return null;
     const inverse=event.currentTarget.getScreenCTM()?.inverse();
-    if(!inverse)return;
-    // Convert viewport clicks to SVG viewBox coordinates. getBoundingClientRect()
-    // alone is wrong if the browser letterboxes an SVG with a mismatched aspect ratio.
+    if(!inverse)return null;
     const local=new DOMPoint(event.clientX,event.clientY).matrixTransform(inverse);
-    const next:CutoutPoint={
-      x:Number(Math.max(0,Math.min(1,local.x/size.width)).toFixed(5)),
-      y:Number(Math.max(0,Math.min(1,local.y/size.height)).toFixed(5)),
-    };
+    return {x:Number(Math.max(0,Math.min(1,local.x/size.width)).toFixed(5)),y:Number(Math.max(0,Math.min(1,local.y/size.height)).toFixed(5))};
+  };
+  const addPoint=(event:MouseEvent<SVGSVGElement>)=>{
+    if(mode!=="polygon"||points.length>=256)return;
+    const next=pointAt(event);if(!next)return;
+    beforeEdit.current=points;setRedoStack([]);onChange([...points,next]);
+  };
+  const startLasso=(event:React.PointerEvent<SVGSVGElement>)=>{
+    if(mode!=="lasso"||disabled)return;
+    const next=pointAt(event);if(!next)return;
+    event.preventDefault();beforeEdit.current=points;setRedoStack([]);setDrawing(true);
+    event.currentTarget.setPointerCapture(event.pointerId);onChange([next]);
+  };
+  const continueLasso=(event:React.PointerEvent<SVGSVGElement>)=>{
+    if(!drawing||mode!=="lasso"||points.length>=256)return;
+    const next=pointAt(event);if(!next)return;
+    const last=points[points.length-1];
+    if(last&&Math.hypot(next.x-last.x,next.y-last.y)<0.003)return;
     onChange([...points,next]);
+  };
+  const finishLasso=()=>setDrawing(false);
+  const undoEdit=()=>{
+    if(!points.length)return;
+    setRedoStack(stack=>[points,...stack].slice(0,20));
+    onChange(mode==="polygon"?points.slice(0,-1):beforeEdit.current);
+  };
+  const redoEdit=()=>{
+    const next=redoStack[0];if(!next)return;
+    setRedoStack(stack=>stack.slice(1));onChange(next);
   };
   return <div className="modular-cutout-editor">
     <button type="button" className="btn muted" disabled={disabled} aria-expanded={open} onClick={()=>setOpen(value=>!value)}>
@@ -123,6 +149,14 @@ function PolygonCutoutEditor({
     </button>
     {open&&<>
       <p>Haz clic alrededor del cabello, rostro, ropa o accesorio que quieras extraer. Cada clic añade un punto. El exterior quedará transparente al preparar el PNG. Las partes ocultas detrás de otra prenda no existen en la imagen original.</p>
+      <div className="modular-cutout-actions">
+        <label>Herramienta de recorte
+          <select aria-label={`Herramienta de recorte de ${label}`} value={mode} disabled={disabled||drawing} onChange={event=>setMode(event.target.value as "polygon"|"lasso")}>
+            <option value="polygon">Polígono por puntos</option><option value="lasso">Lazo libre (arrastrar)</option>
+          </select>
+        </label>
+        <span>{mode==="lasso"?"Arrastra alrededor de la pieza y suelta para cerrar el lazo.":"Haz clic para añadir vértices al contorno."}</span>
+      </div>
       {size.width>0&&size.height>0&&<svg
         className="modular-cutout-stage"
         width={size.width}
@@ -131,7 +165,12 @@ function PolygonCutoutEditor({
         preserveAspectRatio="none"
         role="application"
         aria-label={label}
+        style={{touchAction:"none",cursor:mode==="lasso"?"crosshair":"default"}}
         onClick={addPoint}
+        onPointerDown={startLasso}
+        onPointerMove={continueLasso}
+        onPointerUp={finishLasso}
+        onPointerCancel={finishLasso}
       >
         <image href={imageUrl} x="0" y="0" width={size.width} height={size.height} preserveAspectRatio="none" pointerEvents="none"/>
         {points.length>=3&&<polygon points={pointString} className="modular-cutout-fill"/>}
@@ -140,8 +179,9 @@ function PolygonCutoutEditor({
       </svg>}
       <div className="modular-cutout-actions">
         <span>{points.length} punto(s) · {points.length>=3?"contorno listo":"se necesitan al menos 3"}</span>
-        <button type="button" className="btn muted" disabled={disabled||points.length===0} onClick={()=>onChange(points.slice(0,-1))}>Deshacer punto</button>
-        <button type="button" className="btn muted" disabled={disabled||points.length===0} onClick={()=>onChange([])}>Borrar contorno</button>
+        <button type="button" className="btn muted" disabled={disabled||points.length===0} onClick={undoEdit}>{mode==="lasso"?"Deshacer lazo":"Deshacer punto"}</button>
+        <button type="button" className="btn muted" disabled={disabled||redoStack.length===0} onClick={redoEdit}>Rehacer</button>
+        <button type="button" className="btn muted" disabled={disabled||points.length===0} onClick={()=>{beforeEdit.current=points;setRedoStack([]);onChange([]);}}>Borrar contorno</button>
       </div>
     </>}
     {points.length>=3&&<small className="modular-cutout-ready">Recorte manual activo. Pulsa «Preparar PNG 512 × 768» para crear una pieza transparente.</small>}
