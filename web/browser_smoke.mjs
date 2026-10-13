@@ -1800,12 +1800,20 @@ try {
   const composedDimensions = await importedComposition.evaluate(async image => { await image.decode(); return [image.naturalWidth, image.naturalHeight]; });
   assert.deepEqual(composedDimensions, [512, 768], "The imported modular pieces must compose through the existing Python engine");
   assert.deepEqual([await modularBody.locator('input[type="checkbox"]').isChecked(),await modularTop.locator('input[type="checkbox"]').isChecked()],[true,true],"Saved imported pieces must remain selectable in the live composition library");
-  assert.deepEqual(modularConsoleErrors, [], "Modular character flow must not emit browser console errors");
-  assert.deepEqual(modularPageErrors, [], "Modular character flow must not emit uncaught page errors");
-  assert.deepEqual(modularApiErrors, [], "Modular character flow must not produce failing profile/import/composition API responses");
-  page.off("console",captureModularConsole);
-  page.off("pageerror",captureModularPageError);
-  page.off("response",captureModularResponse);
+  await assetLibrary.getByLabel("Nombre del personaje importado").fill("QA Imported Waifu Profile");
+  await assetLibrary.getByRole("button",{name:"Guardar personaje importado"}).click();
+  await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Personaje importado guardado con referencias persistentes")??false,null,{timeout:15000});
+  const importedProfileSelect=assetLibrary.getByLabel("Perfil de piezas guardado");
+  const importedProfileId=await importedProfileSelect.locator("option").evaluateAll(options=>options.find(option=>option.value&&option.textContent?.includes("QA Imported Waifu Profile"))?.value||"");
+  assert.ok(importedProfileId,"Saving an imported character must create a retrievable profile");
+  await modularBody.locator('input[type="checkbox"]').uncheck();
+  await modularTop.locator('input[type="checkbox"]').uncheck();
+  await importedProfileSelect.selectOption(importedProfileId);
+  await assetLibrary.getByRole("button",{name:"Cargar personaje importado"}).click();
+  await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Selecciones y referencias de piezas recuperadas")??false,null,{timeout:15000});
+  assert.deepEqual([await modularBody.locator('input[type="checkbox"]').isChecked(),await modularTop.locator('input[type="checkbox"]').isChecked()],[true,true],"Loading the imported profile must restore both saved piece references");
+  await assetLibrary.getByRole("button",{name:/Componer selección \(2\)/}).click();
+  await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Composición real lista")??false,null,{timeout:15000});
   await page.reload();
   await cyberstreetPreview.waitFor({ state: "visible", timeout: 15000 });
   await assetLibrary.scrollIntoViewIfNeeded();
@@ -1813,7 +1821,21 @@ try {
   await modularBody.waitFor({ state: "visible", timeout: 15000 });
   assert.ok(await modularTop.locator('input[type="checkbox"]').count(), "Saved imported clothing must remain available after a full browser reload");
   assert.ok(await modularBody.locator('input[type="checkbox"]').count(), "Saved imported body material must remain available after a full browser reload");
-  console.log("PASS_REAL: modular profile save/restore/independent variant, downloaded PNG RGBA dimensions/transparency/content, imported PNG persistence after reload, manual lasso alpha, confirmed anchors, and real Python composition verified.");
+  const persistedImportedProfileOption=await assetLibrary.getByLabel("Perfil de piezas guardado").locator("option").evaluateAll(options=>options.find(option=>option.value&&option.textContent?.includes("QA Imported Waifu Profile"))?.value||"");
+  assert.equal(persistedImportedProfileOption,importedProfileId,"The imported character profile must persist after a full browser reload");
+  await assetLibrary.getByLabel("Perfil de piezas guardado").selectOption(importedProfileId);
+  await assetLibrary.getByRole("button",{name:"Cargar personaje importado"}).click();
+  await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Selecciones y referencias de piezas recuperadas")??false,null,{timeout:15000});
+  assert.deepEqual([await modularBody.locator('input[type="checkbox"]').isChecked(),await modularTop.locator('input[type="checkbox"]').isChecked()],[true,true],"Imported profile references must restore the selected pieces after reload");
+  await assetLibrary.getByRole("button",{name:/Componer selección \\(2\\)/}).click();
+  await page.waitForFunction(()=>document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes("Composición real lista")??false,null,{timeout:15000});
+  assert.deepEqual(modularConsoleErrors, [], "Modular character flow must not emit browser console errors");
+  assert.deepEqual(modularPageErrors, [], "Modular character flow must not emit uncaught page errors");
+  assert.deepEqual(modularApiErrors, [], "Modular character flow must not produce failing profile/import/composition API responses");
+  page.off("console",captureModularConsole);
+  page.off("pageerror",captureModularPageError);
+  page.off("response",captureModularResponse);
+  console.log("PASS_REAL: modular profile save/restore/independent variant, downloaded PNG RGBA dimensions/transparency/content, imported asset/profile persistence after reload, manual lasso alpha, confirmed anchors, and real Python composition verified.");
 
   // Exercise the real batch character-model builder against the saved PNGs above.
   // This proves model creation, palette extraction, region masks, and exact pixel reconstruction.
