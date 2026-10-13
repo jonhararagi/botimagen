@@ -3,7 +3,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve } from "node:path";
-import { deflateSync } from "node:zlib";
+import { deflateSync, inflateSync } from "node:zlib";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
@@ -22,6 +22,38 @@ function crc32(buffer) {
     for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
   }
   return (crc ^ 0xffffffff) >>> 0;
+}
+
+function inspectRgbaPng(buffer) {
+  const signature = Buffer.from([137,80,78,71,13,10,26,10]);
+  assert.ok(buffer.subarray(0,8).equals(signature), "Export must be a real PNG file");
+  let offset=8, width=0, height=0, bitDepth=0, colorType=0;
+  const imageData=[];
+  while(offset+12<=buffer.length){
+    const length=buffer.readUInt32BE(offset); const type=buffer.toString("ascii",offset+4,offset+8);
+    const data=buffer.subarray(offset+8,offset+8+length); offset+=length+12;
+    if(type==="IHDR"){width=data.readUInt32BE(0);height=data.readUInt32BE(4);bitDepth=data[8];colorType=data[9];}
+    if(type==="IDAT") imageData.push(data);
+    if(type==="IEND") break;
+  }
+  assert.equal(bitDepth,8,"Exported PNG must use 8-bit channels");
+  assert.equal(colorType,6,"Exported PNG must preserve RGBA alpha");
+  const bpp=4, stride=width*bpp, raw=inflateSync(Buffer.concat(imageData));
+  assert.equal(raw.length,(stride+1)*height,"PNG scanline payload must match its dimensions");
+  const pixels=Buffer.alloc(stride*height);
+  const paeth=(a,b,c)=>{const p=a+b-c, da=Math.abs(p-a), db=Math.abs(p-b), dc=Math.abs(p-c);return da<=db&&da<=dc?a:db<=dc?b:c;};
+  for(let y=0;y<height;y++){
+    const filter=raw[y*(stride+1)], src=y*(stride+1)+1, dst=y*stride;
+    for(let x=0;x<stride;x++){
+      const value=raw[src+x], left=x>=bpp?pixels[dst+x-bpp]:0, up=y?pixels[dst-stride+x]:0, upperLeft=y&&x>=bpp?pixels[dst-stride+x-bpp]:0;
+      let predictor=0;
+      if(filter===1)predictor=left;else if(filter===2)predictor=up;else if(filter===3)predictor=Math.floor((left+up)/2);else if(filter===4)predictor=paeth(left,up,upperLeft);else assert.equal(filter,0,"PNG scanline filter must be supported");
+      pixels[dst+x]=(value+predictor)&255;
+    }
+  }
+  let opaque=0, transparent=0;
+  for(let i=3;i<pixels.length;i+=4){if(pixels[i]===0)transparent++;if(pixels[i]>0)opaque++;}
+  return {width,height,opaque,transparent,cornerAlpha:pixels[3],pixels};
 }
 function pngChunk(type, data) {
   const name = Buffer.from(type, "ascii");
@@ -1540,6 +1572,17 @@ try {
   assert.equal(await page.locator("img.server-character-art").getAttribute("data-renderer"), "parametric-anime-svg-v1", "The visible product character must come from the local Python renderer");
 
   // Exercise the packaged CyberStreet SVG layers through the real editor and local API.
+  const modularConsoleErrors = [];
+  const modularPageErrors = [];
+  const modularApiErrors = [];
+  const captureModularConsole = message => { if(message.type()==="error") modularConsoleErrors.push(message.text()); };
+  const captureModularPageError = error => modularPageErrors.push(error.message);
+  const captureModularResponse = response => {
+    if(response.url().includes("/api/") && /\/api\/(modular-|profiles)/.test(response.url()) && response.status()>=400) modularApiErrors.push(response.status()+" "+response.url());
+  };
+  page.on("console",captureModularConsole);
+  page.on("pageerror",captureModularPageError);
+  page.on("response",captureModularResponse);
   const cyberstreet = page.locator(".modular-composer");
   await cyberstreet.scrollIntoViewIfNeeded();
   await cyberstreet.waitFor({ state: "visible", timeout: 15000 });
@@ -1575,6 +1618,13 @@ try {
   assert.ok(duplicateProfileOption, "Duplicating a modular variant should create a separately persisted profile");
   assert.notEqual(duplicateProfileOption, savedProfileOption, "A duplicated variant must have an independent profile ID");
   await hairToggle.check();
+  await cyberstreet.getByRole("button", { name: "Actualizar composición" }).click();
+  await page.waitForFunction(previous => {
+    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    return image instanceof HTMLImageElement && image.complete && image.src !== previous;
+  }, fullLayerImage, { timeout: 15000 });
+  await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
+  await page.getByRole("status").filter({ hasText: "Perfil guardado en el almacenamiento local del motor" }).waitFor({ timeout: 15000 });
   await profileSelect.selectOption(savedProfileOption);
   const imageBeforeRestore = await cyberstreetPreview.getAttribute("src");
   await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
@@ -1584,7 +1634,15 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
   }, imageBeforeRestore, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
+  const exportedDownloadPromise = page.waitForEvent("download", { timeout: 15000 });
   await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
+  const exportedDownload = await exportedDownloadPromise;
+  const exportedPath = resolve(visualQaDir, "cyberstreet-export-verified.png");
+  await exportedDownload.saveAs(exportedPath);
+  const exportedPng = inspectRgbaPng(await readFile(exportedPath));
+  assert.deepEqual([exportedPng.width, exportedPng.height], [512,768], "The downloaded PNG must have the expected 512×768 dimensions");
+  assert.ok(exportedPng.transparent > 0, "The downloaded PNG must contain genuinely transparent pixels");
+  assert.ok(exportedPng.opaque > 0, "The downloaded PNG must contain non-empty character pixels");
   await page.waitForFunction(() => {
     const status = document.querySelector('.modular-composer [role="status"]');
     return status?.textContent?.includes("PNG exportado con fondo transparente") ?? false;
@@ -1741,7 +1799,14 @@ try {
   await importedComposition.waitFor({ timeout: 15000 });
   const composedDimensions = await importedComposition.evaluate(async image => { await image.decode(); return [image.naturalWidth, image.naturalHeight]; });
   assert.deepEqual(composedDimensions, [512, 768], "The imported modular pieces must compose through the existing Python engine");
-  console.log("PASS_REAL: PNG converter normalized source art to 512×768, removed the connected flat background, preserved the original source, registered estimated rig anchors, and composed a body piece through the real local API.");
+  assert.deepEqual([await modularBody.locator('input[type="checkbox"]').isChecked(),await modularTop.locator('input[type="checkbox"]').isChecked()],[true,true],"Saved imported pieces must remain selectable in the live composition library");
+  assert.deepEqual(modularConsoleErrors, [], "Modular character flow must not emit browser console errors");
+  assert.deepEqual(modularPageErrors, [], "Modular character flow must not emit uncaught page errors");
+  assert.deepEqual(modularApiErrors, [], "Modular character flow must not produce failing profile/import/composition API responses");
+  page.off("console",captureModularConsole);
+  page.off("pageerror",captureModularPageError);
+  page.off("response",captureModularResponse);
+  console.log("PASS_REAL: modular profile save/restore/independent variant, downloaded PNG RGBA dimensions/transparency/content, imported PNG persistence, manual lasso alpha, confirmed anchors, and real Python composition verified.");
 
   // Exercise the real batch character-model builder against the saved PNGs above.
   // This proves model creation, palette extraction, region masks, and exact pixel reconstruction.
