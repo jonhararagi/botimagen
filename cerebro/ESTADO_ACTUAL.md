@@ -748,3 +748,35 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - **Timer:** estimación de esta fase 8–16 horas activas, según la orden. Tiempo real medido: `NOT_MEASURED`. No es una estimación garantizada de finalización de todo BotImagen.
 - **Estado de repositorio al comprobar:** esta tarea solo escribió en la rama de trabajo y en la rama privada de prueba; no ejecutó commits en `main`, merges ni cierres de PR. Al consultar GitHub, `main` apuntaba a `f86f9345943389dd4ef42d91bc0ec23b38b371d5`; PR #11 figuraba cerrado/merged y PR #14 cerrado/no merged. Estos son estados observados, no acciones realizadas por esta tarea.
 - **Siguiente acción concreta:** calibrar máscaras/candidatos sobre más fixtures reales, añadir controles explícitos para categoría y vista de cada lote y revisar visualmente piezas publicadas antes de marcarlas como `component_validated`.
+
+
+---
+
+## BIMG-PNG-ALPHA-SPLITTER-001 · IMPLEMENTACIÓN INICIAL EN CURSO · 2026-10-12
+
+### Objetivo práctico
+Permitir importar un PNG normal con varias piezas separadas por transparencia, dividir los componentes visibles en PNG individuales, asignar manualmente a cada uno su categoría (cuerpo, cabeza, cabello, ropa, calzado o accesorio), normalizarlos y guardarlos en la biblioteca modular existente. No depender de prompts ni exigir que el usuario recorte cada archivo antes de importarlo.
+
+### Código publicado en la rama de trabajo
+- Nuevo `web/src/visual/pngAlphaSplitter.ts`: segmentación por componentes conectados del canal alfa, límites de tamaño, recortes PNG transparentes y metadatos de caja delimitadora.
+- `web/src/visual/ModularAssetLibrary.tsx`: botón «Separar piezas por transparencia» dentro del flujo de importación de `modular_piece`; reemplaza la imagen de origen por piezas separadas, permite clasificar cada pieza y conserva una sola copia del PNG fuente al guardar las piezas extraídas.
+- No usa un modelo de IA ni pretende reconocer semánticamente cabello/ropa. Solo divide islas de píxeles conectados por transparencia; una imagen con fondo opaco o una figura conectada debe pasar por el recorte manual o la retirada de fondo existente.
+- La salida sigue pasando por `convertToModularStage` y por la API de biblioteca ya existente. No crea un segundo catálogo ni otro compositor.
+
+### HEAD de referencia
+- Rama: `feature/bimg-engine-001-cyberstreet-visual-renderer`
+- Último commit registrado al escribir esta nota: `ec46ce6ce42820e80bf8070486813e257e6341e1`
+- Main no se modificó; no se fusionó ni cerró ningún PR.
+- GitHub Actions se lanzó para los commits de esta integración, pero el resultado final del HEAD más reciente debe volver a consultarse antes de declarar PASS.
+- QA visual manual, prueba en Windows y verificación real con un PNG de sprites separados: PENDIENTES.
+
+### Instrucción operativa para el siguiente Bot Obrero
+No repetir auditorías ni elaborar otro plan. Leer esta sección y el prompt `cerebro/PROMPT_OBRERO_PNG_ALPHA_SPLITTER_001.md`, inspeccionar el HEAD real, completar las pruebas automatizadas y el smoke test de navegador, corregir cualquier fallo y dejar la función usable. Probar al menos: (1) PNG con 2+ componentes transparentes, (2) PNG con una sola figura, (3) fondo opaco, (4) ruido/píxeles pequeños, (5) múltiples piezas clasificadas de forma distinta, (6) guardar y volver a cargar la biblioteca, (7) conservar el original una sola vez, (8) composición después de confirmar anclajes, (9) perfiles existentes y flujos antiguos sin regresión.
+
+### Criterio de cierre
+DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados por transparencia, ejecutar la separación, asignar categoría individual a cada salida, previsualizar y normalizar cada pieza, guardar el original una sola vez, confirmar anclajes y componer las piezas guardadas. Para arte con fondo opaco, indicar claramente que el recorte manual/limpieza de fondo es el flujo requerido; no prometer segmentación semántica automática.
+
+### TIMER
+- Estimación restante para cerrar y validar esta etapa: 2–4 horas activas.
+- Tiempo real medido: NOT_MEASURED.
+- No presentar esta estimación como el tiempo total para terminar BotImagen.
