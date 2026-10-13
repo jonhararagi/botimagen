@@ -54,7 +54,7 @@ function AnchorStageEditor({imageUrl,anchors,onChange,label}:{imageUrl:string;an
   };
   return <svg className="modular-anchor-stage" viewBox="0 0 512 768" role="group" aria-label={label}
     onPointerMove={event=>{const name=dragging.current;if(name)placePoint(event.currentTarget,name,event.clientX,event.clientY);}}
-    onPointerUp={event=>{dragging.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);}}
+    onPointerUp={event=>{const name=dragging.current;if(name)placePoint(event.currentTarget,name,event.clientX,event.clientY);dragging.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);}}
     onPointerCancel={()=>{dragging.current=null;}}>
     <image href={imageUrl} x="0" y="0" width="512" height="768" preserveAspectRatio="none"/>
     <g className="modular-anchor-bones" pointerEvents="none">
