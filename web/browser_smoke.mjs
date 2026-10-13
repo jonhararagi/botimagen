@@ -1566,6 +1566,14 @@ try {
   await profileSelect.waitFor({ state: "visible" });
   const savedProfileOption = await profileSelect.locator("option").evaluateAll(options => options.find(option => option.value && option.textContent?.includes("Mi personaje CyberStreet"))?.value || "");
   assert.ok(savedProfileOption, "The modular profile should be persisted through the existing profile API");
+  await cyberstreet.getByRole("button", { name: "Duplicar variante" }).click();
+  await page.waitForFunction(() => {
+    const status = document.querySelector('.modular-composer [role="status"]');
+    return status?.textContent?.includes("Variante duplicada como perfil independiente") ?? false;
+  }, null, { timeout: 15000 });
+  const duplicateProfileOption = await profileSelect.locator("option").filter({ hasText: "Mi personaje CyberStreet (variante)" }).first().getAttribute("value");
+  assert.ok(duplicateProfileOption, "Duplicating a modular variant should create a separately persisted profile");
+  assert.notEqual(duplicateProfileOption, savedProfileOption, "A duplicated variant must have an independent profile ID");
   await hairToggle.check();
   await profileSelect.selectOption(savedProfileOption);
   const imageBeforeRestore = await cyberstreetPreview.getAttribute("src");
