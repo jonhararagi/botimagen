@@ -241,6 +241,7 @@ export function ModularAssetLibrary() {
       return;
     }
     setBusy(true);
+    setStatus("Preparando las piezas normalizadas 512×768…");
     try {
       const prepared:PreviewItem[]=[];
       for (const item of previews) {

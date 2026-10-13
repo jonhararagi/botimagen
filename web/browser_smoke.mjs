@@ -223,11 +223,15 @@ try {
   await assert.equal(await alphaCards.count(), 3, "A transparent sprite sheet must split into three independently editable pieces");
   await page.getByLabel("Parte que extraer de qa-alpha-sheet-pieza-02.png").selectOption("clothing_top");
   await page.getByLabel("Parte que extraer de qa-alpha-sheet-pieza-03.png").selectOption("footwear");
-  await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
+  const prepareAlphaButton = page.getByRole("button", { name: "Preparar PNG 512 × 768" });
+  assert.equal(await prepareAlphaButton.isEnabled(), true, "The splitter should leave the normalizer action enabled");
+  await prepareAlphaButton.click();
   await page.waitForFunction(() => {
     const status = document.querySelector('[data-testid="modular-library-status"]')?.textContent || "";
     return status.includes("Conversión lista") || status.includes("No se pudo") || status.includes("Falló") || status.includes("Error");
-  }, null, { timeout: 15000 });
+  }, null, { timeout: 15000 }).catch(async error => {
+    throw new Error(`Split-piece normalization did not finish. Status: ${await page.locator('[data-testid="modular-library-status"]').innerText()}; button enabled: ${await prepareAlphaButton.isEnabled()}; ${error}`);
+  });
   const alphaPrepareStatus = await page.locator('[data-testid="modular-library-status"]').innerText();
   assert.ok(alphaPrepareStatus.includes("Conversión lista"), `Split-piece normalization should succeed; received: ${alphaPrepareStatus}`);
   await page.locator(".modular-preview-card .modular-anchor-stage").first().waitFor({ timeout: 10000 });
