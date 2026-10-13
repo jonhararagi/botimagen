@@ -46,10 +46,13 @@ const skeletonLinks:[string,string][] = [
 function AnchorStageEditor({imageUrl,anchors,onChange,label}:{imageUrl:string;anchors:AssetConversionMetadata["anchors"];onChange:(value:AssetConversionMetadata["anchors"])=>void;label:string}) {
   const dragging=useRef<string|null>(null);
   const placePoint=(svg:SVGSVGElement,name:string,clientX:number,clientY:number)=>{
-    const rect=svg.getBoundingClientRect();
-    if(!rect.width||!rect.height)return;
-    const x=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
-    const y=Math.max(0,Math.min(1,(clientY-rect.top)/rect.height));
+    // Map screen coordinates through the actual SVG transform into its 512x768 viewBox.
+    // Bounding-client-rect normalization drifts when CSS scales or letterboxes the SVG.
+    const inverse=svg.getScreenCTM()?.inverse();
+    if(!inverse)return;
+    const local=new DOMPoint(clientX,clientY).matrixTransform(inverse);
+    const x=Math.max(0,Math.min(1,local.x/512));
+    const y=Math.max(0,Math.min(1,local.y/768));
     onChange({...anchors,[name]:{x:Number(x.toFixed(4)),y:Number(y.toFixed(4))}});
   };
   return <svg className="modular-anchor-stage" viewBox="0 0 512 768" role="group" aria-label={label}
