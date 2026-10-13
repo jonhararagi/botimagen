@@ -236,7 +236,9 @@ try {
   assert.ok(alphaPrepareStatus.includes("Conversión lista"), `Split-piece normalization should succeed; received: ${alphaPrepareStatus}`);
   await page.locator(".modular-preview-card .modular-anchor-stage").first().waitFor({ timeout: 10000 });
   await page.getByRole("button", { name: "Guardar material convertido" }).click();
-  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("3 material(es) convertido(s)") ?? false, null, { timeout: 15000 });
+  await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("3 material(es) convertido(s)") ?? false, null, { timeout: 15000 }).catch(async error => {
+    throw new Error(`Split pieces failed to persist. Status: ${await page.locator('[data-testid="modular-library-status"]').innerText()}; ${error}`);
+  });
   const alphaPersisted = await page.evaluate(async () => {
     const response = await fetch("/api/modular-assets");
     if (!response.ok) throw new Error("Could not reload modular asset library after alpha split");
