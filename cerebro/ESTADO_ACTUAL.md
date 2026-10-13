@@ -803,3 +803,16 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - **Reglas:** no tocar `main`, no fusionar/cerrar PRs, no crear otro compositor/catálogo, no relajar pruebas ni declarar DONE con CI fallida.
 - **Prompt operativo canónico:** `cerebro/PROMPT_OBRERO_PNG_ALPHA_SPLITTER_001.md` (orden de cierre consolidada en ese mismo archivo).
 - **TIMER:** 3–6 horas activas estimadas para cerrar esta integración; tiempo real no medido.
+
+
+## BIMG-PNG-ALPHA-SPLITTER-001-R3 · resultado CI tras corrección E2E · 2026-10-13
+
+- **Estado comprobado:** CI **SUCCESS** en el HEAD final de código de esta corrección: `dddde2c871f60ec5bf408b413e5362ffcf1fc069`.
+- **Ejecución:** [GitHub Actions #606 · SUCCESS](https://github.com/jonhararagi/botimagen/actions/runs/38384108945). Rama `feature/bimg-engine-001-cyberstreet-visual-renderer`; ejecución completada el 2026-10-13.
+- **Causa corregida en el E2E:** el smoke podía seleccionar el primer escenario de anclaje de la lista en vez de la tarjeta asociada al archivo recién importado. Ahora el gesto y las aserciones se limitan a la tarjeta que contiene `qa-body-anchor.png`. La aserción de coordenadas finales normalizadas se mantiene estricta (X≈0.54, Y≈0.12 dentro de tolerancia 0.015), incluyendo la comprobación de consistencia de metadatos.
+- **Cambios previos que forman parte del HEAD validado:** el `pointerup` aplica la última coordenada del puntero antes de cerrar el arrastre; el E2E vuelve a verificar coordenadas concretas en lugar de un simple rango.
+- **Pasos de CI comprobados como SUCCESS:** validaciones Python y contratos de biblioteca/compositor/catálogo, API local, constructor de modelos, instalación de dependencias, build web TypeScript/React, smoke test Chromium y paso de subida de capturas QA visual.
+- **Flujo comprobado por el smoke de esta ejecución:** el escenario automatizado de importación de piezas PNG con transparencia, clasificación por pieza, fuente única, reapertura/persistencia, confirmación de anclajes y composición; revisar el detalle del smoke y los artefactos de la ejecución para su evidencia visual concreta.
+- **Alcance de la declaración:** esta CI valida la integración automatizada en navegador y las suites incluidas en el workflow; no equivale a QA manual físico en Windows ni certifica calidad artística profesional.
+- **Limitación funcional verificada:** la separación automática detecta islas conectadas por alfa, no interpreta semánticamente prendas. Una silueta conectada o fondo opaco requiere el recorte/limpieza manual existente. No se modifica `main`, no se fusiona ni se cierra ningún PR.
+- **Timer:** 3–6 horas activas fue una estimación de la orden. Tiempo real medido: `NOT_MEASURED`.
