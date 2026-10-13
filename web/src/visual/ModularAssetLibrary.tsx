@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { convertToModularStage } from "./pngToModularAsset";
 import type { AssetConversionMetadata } from "./pngToModularAsset";
+import { splitTransparentPng } from "./pngAlphaSplitter";
 
 type UserAsset = {
   id: string; label: string; category: string; kind: string; filename: string; source_filename?: string;
@@ -10,7 +11,7 @@ type UserAsset = {
   anchors_validated?: boolean; anchor_status?: string; conversion?: AssetConversionMetadata | null; note?: string;
 };
 type CutoutPoint = { x:number; y:number };
-type PreviewItem = { file:File; url:string; category?:string; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
+type PreviewItem = { file:File; url:string; category?:string; sourceFile?:File; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
 const categories = [
   ["reference", "Referencia / clasificar después"], ["body", "Cuerpo base"], ["head", "Cabeza"],
   ["face", "Rostro"], ["hair_back", "Cabello posterior"], ["hair_front", "Cabello frontal"],
