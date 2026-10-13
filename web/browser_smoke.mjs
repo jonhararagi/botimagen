@@ -1634,6 +1634,23 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
   }, imageBeforeRestore, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
+  await profileSelect.selectOption(duplicateProfileOption);
+  const imageBeforeVariantRestore = await cyberstreetPreview.getAttribute("src");
+  await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
+  await page.waitForFunction(previous => {
+    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
+    return image instanceof HTMLImageElement && image.complete && image.src !== previous && hair instanceof HTMLInputElement && hair.checked;
+  }, imageBeforeVariantRestore, { timeout: 15000 });
+  assert.equal(await hairToggle.isChecked(), true, "The duplicated variant must retain its independently saved hair selection");
+  await profileSelect.selectOption(savedProfileOption);
+  const imageBeforeOriginalRecheck = await cyberstreetPreview.getAttribute("src");
+  await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
+  await page.waitForFunction(previous => {
+    const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
+    return image instanceof HTMLImageElement && image.complete && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
+  }, imageBeforeOriginalRecheck, { timeout: 15000 });
   const exportedDownloadPromise = page.waitForEvent("download", { timeout: 15000 });
   await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
   const exportedDownload = await exportedDownloadPromise;
@@ -1806,7 +1823,14 @@ try {
   page.off("console",captureModularConsole);
   page.off("pageerror",captureModularPageError);
   page.off("response",captureModularResponse);
-  console.log("PASS_REAL: modular profile save/restore/independent variant, downloaded PNG RGBA dimensions/transparency/content, imported PNG persistence, manual lasso alpha, confirmed anchors, and real Python composition verified.");
+  await page.reload();
+  await cyberstreetPreview.waitFor({ state: "visible", timeout: 15000 });
+  await assetLibrary.scrollIntoViewIfNeeded();
+  await modularTop.waitFor({ state: "visible", timeout: 15000 });
+  await modularBody.waitFor({ state: "visible", timeout: 15000 });
+  assert.ok(await modularTop.locator('input[type="checkbox"]').count(), "Saved imported clothing must remain available after a full browser reload");
+  assert.ok(await modularBody.locator('input[type="checkbox"]').count(), "Saved imported body material must remain available after a full browser reload");
+  console.log("PASS_REAL: modular profile save/restore/independent variant, downloaded PNG RGBA dimensions/transparency/content, imported PNG persistence after reload, manual lasso alpha, confirmed anchors, and real Python composition verified.");
 
   // Exercise the real batch character-model builder against the saved PNGs above.
   // This proves model creation, palette extraction, region masks, and exact pixel reconstruction.
