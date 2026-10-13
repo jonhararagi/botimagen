@@ -224,7 +224,7 @@ try {
   await page.getByLabel("Parte que extraer de qa-alpha-sheet-pieza-02.png").selectOption("clothing_top");
   await page.getByLabel("Parte que extraer de qa-alpha-sheet-pieza-03.png").selectOption("footwear");
   await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
-  await page.getByRole("img", { name: "PNG normalizado de qa-alpha-sheet-pieza-01.png 512 por 768" }).waitFor({ timeout: 10000 });
+  await page.locator(".modular-preview-card .modular-anchor-stage").first().waitFor({ timeout: 10000 });
   await page.getByRole("button", { name: "Guardar material convertido" }).click();
   await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("3 material(es) convertido(s)") ?? false, null, { timeout: 15000 });
   const alphaPersisted = await page.evaluate(async () => {
