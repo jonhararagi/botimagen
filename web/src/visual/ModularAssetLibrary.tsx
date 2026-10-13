@@ -246,7 +246,7 @@ export function ModularAssetLibrary() {
       const prepared:PreviewItem[]=[];
       for (const item of previews) {
         const converted=await convertToModularStage(item.file,{
-          category:item.category||category,kind,view,removeFlatBackground:removeBackground,backgroundTolerance:tolerance,
+          category:item.category||category,kind,view,removeFlatBackground:removeBackground&&!item.sourceFile,backgroundTolerance:tolerance,
           scalePercent,offsetX,offsetY,
           ...(item.cutoutPoints && item.cutoutPoints.length>=3 ? {cutoutPolygon:item.cutoutPoints} : {}),
         });
