@@ -300,6 +300,7 @@ try {
   await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
   const bodyStage = page.locator(".modular-preview-card .modular-anchor-stage").first();
   await bodyStage.waitFor({ timeout: 10000 });
+  await bodyStage.scrollIntoViewIfNeeded();
   const headPoint = bodyStage.locator('.modular-anchor-point[aria-label="Cabeza"]');
   const originalHeadTransform = await headPoint.getAttribute("transform");
   const stageBox = await bodyStage.boundingBox();
