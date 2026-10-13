@@ -1805,7 +1805,8 @@ try {
   await assetLibrary.getByLabel("Pieza a editar").selectOption(topAssetId);
   const scaleControl = assetLibrary.getByLabel("Escala de pieza");
   const initialPreviewData = await importedComposition.getAttribute("src");
-  await scaleControl.fill("120");
+  await scaleControl.focus();
+  for(let step=0;step<4;step++) await scaleControl.press("ArrowRight");
   await page.waitForFunction(previous => {
     const image=document.querySelector('.modular-composition-preview');
     return image?.getAttribute('src')!==previous && document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes('Composición real lista');
@@ -1821,7 +1822,8 @@ try {
   const importedProfileId=await importedProfileSelect.locator("option").evaluateAll(options=>options.find(option=>option.value&&option.textContent?.includes("QA Imported Waifu Profile"))?.value||"");
   assert.ok(importedProfileId,"Saving an imported character must create a retrievable profile");
   assert.equal(await scaleControl.inputValue(),"120","The saved imported profile must retain the adjusted piece scale");
-  await scaleControl.fill("90");
+  await scaleControl.focus();
+  for(let step=0;step<6;step++) await scaleControl.press("ArrowLeft");
   await page.waitForFunction(previous => {
     const image=document.querySelector('.modular-composition-preview');
     return image?.getAttribute('src')!==previous && document.querySelector('[data-testid="modular-compose-status"]')?.textContent?.includes('Composición real lista');

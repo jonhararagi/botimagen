@@ -52,7 +52,7 @@ class ModularCompositorTests(unittest.TestCase):
 
     def test_piece_transform_changes_real_rendered_pixels(self):
         body = piece("base", "body", "base", 20)
-        assets = {"base": png((255, 0, 0, 255), (8, 8))}
+        assets = {"base": png((255, 0, 0, 255))}
         baseline = Image.open(io.BytesIO(compose_png([body], assets.__getitem__, (64, 64)))).convert("RGBA")
         moved = {**body, "transform": {"x": 0.75, "y": 0.25, "scale_x": 1.5, "scale_y": 1.5, "rotation": 0}}
         adjusted = Image.open(io.BytesIO(compose_png([moved], assets.__getitem__, (64, 64)))).convert("RGBA")
@@ -63,7 +63,7 @@ class ModularCompositorTests(unittest.TestCase):
     def test_layer_order_changes_the_topmost_rendered_pixels(self):
         body = {**piece("base", "body", "base", 20), "transform": {"x": 0.25, "y": 0.25}}
         top = {**piece("shirt", "top", "shirt", 40), "transform": {"x": 0.25, "y": 0.25}}
-        assets = {"base": png((255, 0, 0, 255), (8, 8)), "shirt": png((0, 255, 0, 255), (8, 8))}
+        assets = {"base": png((255, 0, 0, 255)), "shirt": png((0, 255, 0, 255))}
         front = Image.open(io.BytesIO(compose_png([body, top], assets.__getitem__, (64, 64)))).convert("RGBA")
         reordered = [{**body, "layer_order": 60}, {**top, "layer_order": 10}]
         back = Image.open(io.BytesIO(compose_png(reordered, assets.__getitem__, (64, 64)))).convert("RGBA")

@@ -517,7 +517,7 @@ export function ModularAssetLibrary() {
     if(!selectedAssets.length)return;
     const timer=window.setTimeout(()=>void composeSelection(),180);
     return ()=>window.clearTimeout(timer);
-  },[pieceTransforms,selectedAssets,compositionView,assets]);
+  },[pieceTransforms]);
   const toggleAsset=(id:string,checked:boolean)=>{
     if(!checked){setSelectedAssets(current=>current.filter(value=>value!==id));return;}
     const chosen=assets.find(asset=>asset.id===id);
