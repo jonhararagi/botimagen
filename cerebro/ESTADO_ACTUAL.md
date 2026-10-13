@@ -789,3 +789,17 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - **Evidencia previa al cambio:** CI #599 SUCCESS en SHA `03a056f8c99e06e2966aebf3c53038747ec431ad`, https://github.com/jonhararagi/botimagen/actions/runs/38330185335. Incluyó build web, validaciones Python/API y smoke Chromium. El E2E verificó división de 3 islas alfa, categorías independientes, una sola fuente original, persistencia/reapertura, confirmación de anclajes y composición 512×768. Artefacto de QA visual asociado a esa ejecución: https://github.com/jonhararagi/botimagen/actions/runs/38330185335/artifacts/11782960274. Ese artefacto corresponde al HEAD anterior a esta corrección y no se presenta como captura del nuevo código.
 - **Resultado de esta revisión:** la corrección del anclaje y la aserción estricta se enviaron juntas a la rama autorizada; el estado final de cierre depende de la CI de ese nuevo HEAD. No se marca DONE hasta verificar esa ejecución.
 - **Limitaciones honestas:** la división automática detecta componentes conectados por alfa, no prendas semánticas. PNG opaco o ilustraciones con cabello/ropa unidos requieren recorte manual o preparación de máscara. QA físico de Windows no ejecutado; tiempo real de trabajo no medido.
+
+
+---
+
+## BIMG-PNG-CHARACTER-PIPELINE-CLOSURE-001 · ORDEN ACTUALIZADA · 2026-10-13
+
+- **Objetivo:** cerrar en la rama de trabajo el flujo real de importar PNG, dividir componentes alfa, clasificar piezas, normalizar, editar anclajes, persistir en la biblioteca y componerlas en el compositor existente.
+- **HEAD observado al crear la orden:** `43d3be41adf2cbe5e6b3dffdd2ef86799b8f784a`.
+- **CI #603:** FAIL. Ejecución https://github.com/jonhararagi/botimagen/actions/runs/38381770670. El smoke de Chromium falla en `web/browser_smoke.mjs:333`: esperaba X=0.54 para el anclaje de cabeza tras pointer-up y recibió 0.5. El log indica que no se encontraron archivos en `artifacts/visual-qa/`; no afirmar que esta ejecución dejó capturas.
+- **Acción inmediata:** corregir la causa real del fallo de pointer-up conservando la aserción estricta; después volver a ejecutar build web, suites Python/API y smoke Chromium hasta validar el SHA final.
+- **Límites funcionales:** la división automática reconoce componentes conectados por alfa. No separa semánticamente ropa/cabello de una ilustración opaca conectada. Para esos casos se debe usar el recorte manual existente y conservar el archivo original.
+- **Reglas:** no tocar `main`, no fusionar/cerrar PRs, no crear otro compositor/catálogo, no relajar pruebas ni declarar DONE con CI fallida.
+- **Prompt operativo canónico:** `cerebro/PROMPT_OBRERO_PNG_ALPHA_SPLITTER_001.md` (orden de cierre consolidada en ese mismo archivo).
+- **TIMER:** 3–6 horas activas estimadas para cerrar esta integración; tiempo real no medido.
