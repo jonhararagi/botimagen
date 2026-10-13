@@ -228,7 +228,7 @@ try {
   await prepareAlphaButton.click();
   await page.waitForFunction(() => {
     const status = document.querySelector('[data-testid="modular-library-status"]')?.textContent || "";
-    return status.includes("Conversión lista") || status.includes("No se pudo") || status.includes("Falló") || status.includes("Error");
+    return !status.includes("Preparando las piezas normalizadas") && !status.includes("Separación terminada:");
   }, null, { timeout: 15000 }).catch(async error => {
     throw new Error(`Split-piece normalization did not finish. Status: ${await page.locator('[data-testid="modular-library-status"]').innerText()}; button enabled: ${await prepareAlphaButton.isEnabled()}; ${error}`);
   });
