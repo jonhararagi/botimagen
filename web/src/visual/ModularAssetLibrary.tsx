@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { convertToModularStage } from "./pngToModularAsset";
 import type { AssetConversionMetadata } from "./pngToModularAsset";
 import { splitTransparentPng } from "./pngAlphaSplitter";
@@ -120,7 +120,7 @@ function PolygonCutoutEditor({
     const next=pointAt(event);if(!next)return;
     beforeEdit.current=points;setRedoStack([]);onChange([...points,next]);
   };
-  const startLasso=(event:React.PointerEvent<SVGSVGElement>)=>{
+  const startLasso=(event:ReactPointerEvent<SVGSVGElement>)=>{
     if(mode!=="lasso"||disabled)return;
     const next=pointAt(event);if(!next)return;
     event.preventDefault();beforeEdit.current=points;setRedoStack([]);setDrawing(true);
