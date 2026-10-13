@@ -10,7 +10,7 @@ type UserAsset = {
   anchors_validated?: boolean; anchor_status?: string; conversion?: AssetConversionMetadata | null; note?: string;
 };
 type CutoutPoint = { x:number; y:number };
-type PreviewItem = { file:File; url:string; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
+type PreviewItem = { file:File; url:string; category?:string; cutoutPoints?:CutoutPoint[]; convertedUrl?:string; convertedBlob?:Blob; conversion?:AssetConversionMetadata };
 const categories = [
   ["reference", "Referencia / clasificar después"], ["body", "Cuerpo base"], ["head", "Cabeza"],
   ["face", "Rostro"], ["hair_back", "Cabello posterior"], ["hair_front", "Cabello frontal"],
@@ -207,7 +207,7 @@ export function ModularAssetLibrary() {
     const accepted = Array.from(files);
     const next = accepted.filter(file => ["image/png","image/jpeg","image/webp"].includes(file.type) && file.size > 0 && file.size <= 12 * 1024 * 1024);
     if (next.length !== accepted.length) setStatus("Se omitieron archivos vacíos, mayores de 12 MiB o con formato no admitido.");
-    setPreviews(current => [...current, ...next.map(file => ({file, url:makeUrl(file)}))]);
+    setPreviews(current => [...current, ...next.map(file => ({file, url:makeUrl(file), category}))]);
     if (next.length) setStatus(`${next.length} imagen(es) lista(s). Ajusta las opciones y prepara el PNG normalizado.`);
   };
 
@@ -222,7 +222,7 @@ export function ModularAssetLibrary() {
       const prepared:PreviewItem[]=[];
       for (const item of previews) {
         const converted=await convertToModularStage(item.file,{
-          category,kind,view,removeFlatBackground:removeBackground,backgroundTolerance:tolerance,
+          category:item.category||category,kind,view,removeFlatBackground:removeBackground,backgroundTolerance:tolerance,
           scalePercent,offsetX,offsetY,
           ...(item.cutoutPoints && item.cutoutPoints.length>=3 ? {cutoutPolygon:item.cutoutPoints} : {}),
         });
@@ -258,7 +258,7 @@ export function ModularAssetLibrary() {
         const convertedBase64=await readDataUrl(convertedFile);
         await postAsset({
           filename:convertedFile.name,source_filename:item.file.name,mime_type:"image/png",data_base64:convertedBase64,
-          category,kind,label:stem,view,license,source_url:sourceUrl,
+          category:item.category||category,kind,label:stem,view,license,source_url:sourceUrl,
           ...(sourceRecord?.id?{source_asset_id:sourceRecord.id}:{}),
           conversion:item.conversion,
         });
@@ -381,7 +381,7 @@ export function ModularAssetLibrary() {
       <label className="modular-range"><span>Desplazamiento vertical <b>{offsetY}px</b></span><input aria-label="Desplazamiento vertical" type="range" min="-240" max="240" step="10" value={offsetY} onChange={e=>{setOffsetY(Number(e.target.value));clearConversions();}}/></label>
     </div>
 
-    <p className="modular-converter-note"><b>Regla rápida:</b> importa un PNG entero para conservarlo como personaje o referencia, o elige «Pieza separada» y dibuja el contorno de una zona visible para obtener una capa con transparencia. El programa no recupera zonas que otra prenda tapa.</p>
+    <p className="modular-converter-note"><b>Flujo de piezas:</b> elige «Pieza separada», carga un PNG, selecciona qué parte vas a extraer y dibuja su contorno. Pulsa «Extraer otra parte de este PNG» para crear otra capa desde la misma imagen y clasificarla por separado. Luego prepara y guarda todas las piezas juntas. El exterior queda transparente; las zonas tapadas en la imagen original no se pueden reconstruir automáticamente.</p>
     <div className="modular-dropzone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();selectFiles(e.dataTransfer.files);}}>
       <strong>Arrastra imágenes aquí</strong><span>PNG, JPEG o WebP · máximo 12 MiB y 20 megapíxeles por archivo</span>
       <button type="button" className="btn muted" onClick={()=>input.current?.click()}>Seleccionar imágenes</button>
@@ -390,11 +390,17 @@ export function ModularAssetLibrary() {
     {previews.length>0&&<div className="modular-preview-grid">
       {previews.map((item,i)=><div key={item.url} className="modular-preview-card">
         <img src={item.url} alt={`Imagen fuente ${item.file.name}`}/>
+        {kind==="modular_piece"&&<label>Parte que extraer
+          <select aria-label={`Parte que extraer de ${item.file.name}`} value={item.category||category} disabled={busy} onChange={e=>setPreviews(current=>current.map((entry,j)=>j===i?{...entry,category:e.target.value,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined}:entry))}>
+            {categories.filter(([id])=>id!=="portrait"&&id!=="reference").map(([id,label])=><option key={id} value={id}>{label}</option>)}
+          </select>
+        </label>}
         <PolygonCutoutEditor imageUrl={item.url} points={item.cutoutPoints||[]} label={`Dibujar contorno en ${item.file.name}`} disabled={busy}
           onChange={points=>setPreviews(current=>current.map((entry,j)=>j===i?{...entry,cutoutPoints:points,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined}:entry))}/>
         <span>{item.file.name}</span><small>Original · {Math.round(item.file.size/1024)} KiB</small>
         {item.convertedUrl&&<>{kind==="modular_piece"&&item.conversion?<div className="modular-converted-preview"><AnchorStageEditor imageUrl={item.convertedUrl} anchors={item.conversion.anchors} label={`Ajustar esqueleto de ${item.file.name}`} onChange={anchors=>setPreviews(current=>current.map((entry,j)=>j===i&&entry.conversion?{...entry,conversion:{...entry.conversion,anchors}}:entry))}/></div>:<img className="modular-converted-preview" src={item.convertedUrl} alt={`PNG normalizado de ${item.file.name} 512 por 768`}/>}<small>{kind==="modular_piece"?"Arrastra los puntos del esqueleto al lugar real de cada articulación; se guardarán con la pieza.":"Material convertido · 512×768"}</small></>}
-        <button type="button" onClick={()=>setPreviews(current=>current.filter((_,j)=>j!==i))}>Quitar</button>
+        {kind==="modular_piece"&&<button type="button" className="btn muted" disabled={busy} onClick={()=>setPreviews(current=>{const source=current[i];if(!source)return current;return [...current.slice(0,i+1),{file:source.file,url:makeUrl(source.file),category:"hair_front"},...current.slice(i+1)];})}>Extraer otra parte de este PNG</button>}
+        <button type="button" disabled={busy} onClick={()=>setPreviews(current=>current.filter((_,j)=>j!==i))}>Quitar</button>
       </div>)}
     </div>}
     <div className="modular-library-actions">
