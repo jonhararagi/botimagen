@@ -1,63 +1,84 @@
-# BOTIMAGEN · BIMG-PNG-ALPHA-SPLITTER-001 · CERRAR LA SEPARACIÓN REAL DE PNG
+# BOTIMAGEN · BIMG-PNG-CHARACTER-PIPELINE-CLOSURE-001 · ORDEN DE CIERRE EJECUTABLE
 
-**ORDEN DE IMPLEMENTACIÓN. NO ENTREGAR OTRO PLAN, AUDITORÍA NI RESUMEN COMO RESULTADO.**
-
-**Rol:** Bot Obrero. Senior TypeScript/React Engineer, Raster Image Processing Engineer, Character Asset Pipeline Engineer, Browser Automation Engineer y QA Engineer.
+**MODO:** IMPLEMENTAR, CORREGIR Y ENTREGAR. Prohibido responder con otro plan, auditoría, análisis de viabilidad o lista de futuras fases.
 
 **Repositorio:** https://github.com/jonhararagi/botimagen  
 **Rama autorizada:** `feature/bimg-engine-001-cyberstreet-visual-renderer`  
 **Fuente de continuidad:** `cerebro/ESTADO_ACTUAL.md`  
-**HEAD registrado al crear esta orden:** `ec46ce6ce42820e80bf8070486813e257e6341e1`  
-**TIMER:** 2–4 horas activas estimadas para cerrar y validar esta etapa. Tiempo real solo si fue medido.
+**HEAD observado al emitir esta orden:** `43d3be41adf2cbe5e6b3dffdd2ef86799b8f784a`  
+**TIMER:** 3–6 horas activas estimadas para cerrar esta integración. No afirmar tiempo real si no se midió. Continuar hasta el cierre en esta misma tarea cuando el entorno lo permita.
 
 ## MISIÓN
 
-Completa la función de importar una hoja PNG con varios elementos ya separados por transparencia, dividirla en piezas PNG independientes, clasificarlas como partes de un personaje y guardarlas en la biblioteca modular de BotImagen. La implementación inicial ya existe. **No la vuelvas a diseñar desde cero: comprueba lo que hay, termina la integración, añade pruebas, arregla los fallos y deja una entrega utilizable.**
+Dejar utilizable dentro de BotImagen el flujo para importar PNG, separar piezas que ya tengan transparencia, asignarles categoría, normalizarlas, ajustar anclajes, guardarlas en la biblioteca modular y reutilizarlas para componer personajes. El usuario debe poder incorporar sus propios PNG sin editar código ni recortar previamente cada pieza en otro programa cuando el archivo ya contiene piezas separadas por alfa.
 
-## CÓDIGO YA PUBLICADO
+No exigir ni fingir reconocimiento semántico perfecto. Un PNG opaco con una waifu completa no contiene capas ocultas de pelo/cuerpo/ropa. En ese caso debe funcionar el recorte manual existente, explicar la limitación en la interfaz y permitir guardar la pieza recortada. El objetivo es una herramienta práctica, no prometer magia.
 
-- `web/src/visual/pngAlphaSplitter.ts`: detecta componentes conectados en el canal alfa y produce PNG separados.
-- `web/src/visual/ModularAssetLibrary.tsx`: expone «Separar piezas por transparencia» al importar recursos de tipo `modular_piece`; las salidas deben poder clasificarse individualmente, normalizarse y guardarse.
-- `web/src/visual/pngToModularAsset.ts`: normalizador existente a 512×768, retirada opcional de fondo uniforme, recorte manual y estimación de anclajes.
-- API existente `/api/modular-assets`, endpoint de composición `/api/modular-compose` y compositor actual: conservarlos como la ruta única.
+## ESTADO REAL Y FALLO ACTUAL QUE DEBES ARREGLAR
 
-## TRABAJO QUE DEBES EJECUTAR AHORA
+El código de separación por alfa y su UI ya existen:
+- `web/src/visual/pngAlphaSplitter.ts`
+- `web/src/visual/ModularAssetLibrary.tsx`
+- `web/src/visual/pngToModularAsset.ts`
+- editor de anclajes y compositor modular existentes.
+- API existente de biblioteca y composición. No crear otro catálogo, endpoint paralelo o segundo compositor.
 
-1. Consulta el HEAD real y lee `cerebro/ESTADO_ACTUAL.md`. No sobrescribas trabajo más nuevo. No modifiques `main), no fusiones ni cierres PRs, no elimines contratos existentes.
-2. Inspecciona y corrige la implementación actual de `pngAlphaSplitter.ts`. Evita fugas de memoria, máscaras equivocadas, componentes duplicados y recortes vacíos. Los bordes deben conservar alfa y el PNG resultante debe tener solo el componente seleccionado.
-3. Comprueba que la UI solo muestra la separación automática en modo `Pieza separada` y PNG. Si no hay al menos dos componentes útiles, mostrar un error claro y conservar la imagen original en la bandeja.
-4. Cada pieza extraída debe conservar una referencia a la fuente original. Al guardar varias piezas de una misma imagen, el archivo fuente original se guarda una sola vez, no una vez por pieza. La categoría de cada pieza debe ser independiente y editable antes de guardarla.
-5. Añade pruebas automatizadas deterministas. Genera fixtures PNG desde código para evitar depender de archivos externos:
-   - PNG transparente con 3 formas separadas: devuelve 3 PNG independientes, dimensiones/cajas correctas y transparencia alrededor.
-   - PNG con una sola forma: informa que no hay suficientes piezas y no pierde la fuente.
-   - PNG opaco: error comprensible, sin falsa afirmación de segmentación semántica.
-   - Motas minúsculas: filtradas sin descartar las piezas principales.
-   - Piezas que se tocan en diagonal: documentar y probar el criterio de conectividad adoptado.
-   - Importar y guardar piezas con categorías diferentes, reabrir/actualizar biblioteca y verificar persistencia.
-   - La fuente se guarda una sola vez al importar varias piezas derivadas.
-6. Ejecuta la compilación TypeScript/web, suite Python/API y el smoke/E2E de Chromium existente. Añade un caso E2E que pulse «Separar piezas por transparencia» y verifique resultados, categorías, guardado y vista previa. No inventes pruebas; si una no puede ejecutarse, informa el bloqueo exacto.
-7. Comprueba la composición con un cuerpo base y al menos dos piezas guardadas después de confirmar los anclajes. No declares que el encaje automático es perfecto: registra cualquier limitación visible real.
-8. Corrige fallos encontrados hasta obtener CI verde en el HEAD final. Inspecciona las capturas E2E si están disponibles; no afirmes revisión visual si no la hiciste.
-9. Actualiza `cerebro/ESTADO_ACTUAL.md` con SHA actual, cambios, comandos/resultados de CI, evidencia E2E y limitaciones. Actualiza este prompt solo si se necesita una instrucción operativa adicional, no escribas otra documentación redundante.
+CI más reciente consultada:
+- Ejecución #603: https://github.com/jonhararagi/botimagen/actions/runs/38381770670
+- SHA probado: `43d3be41adf2cbe5e6b3dffdd2ef86799b8f784a`
+- Resultado: **FAIL** en el smoke de Chromium, no marcar PASS.
+- Error exacto: `web/browser_smoke.mjs:333`, “The dragged head landmark X should persist near the pointer-up coordinate; expected 0.54, received 0.5”.
+- La ejecución no encontró `artifacts/visual-qa/`, así que no afirmar que existe captura de esa ejecución.
+- Comprueba y corrige la causa real del flujo de arrastre/persistencia del anclaje. No borres ni relajes la aserción para que CI quede verde.
 
-## CONTRATO FUNCIONAL
+## ORDEN DE TRABAJO, SIN CICLOS INÚTILES
 
-- Entrada principal: PNG transparente con varias piezas visualmente separadas.
-- Salida: piezas PNG independientes con alfa, cada una clasificable y normalizable.
-- No prometer IA semántica: una imagen opaca o una ilustración completa donde cabello y ropa se solapan no puede separarse de forma fiable solo con conectividad alfa. Para esos casos se conserva el flujo existente de retirada de fondo y recorte manual.
-- Mantener la fuente original y su procedencia; no publicar ni copiar automáticamente material externo al catálogo público.
-- No romper perfiles, identificadores, recetas v1/v2/v3, Style Lab, NanoWear, Chromapatch, catálogo, APIs, compositor o importaciones antiguas.
+1. Lee `cerebro/ESTADO_ACTUAL.md`, inspecciona el HEAD real y revisa el diff reciente. No asumas que las SHA antiguas siguen vigentes.
+2. Corrige primero el fallo E2E del anclaje. El test debe demostrar que el punto guardado coincide con la coordenada final del puntero, dentro de la tolerancia definida. Mantén la aserción estricta.
+3. Recorre el flujo real de importación de extremo a extremo:
+   - cargar PNG desde archivo;
+   - previsualizar origen;
+   - detectar componentes separados por alfa;
+   - filtrar motas pequeñas sin perder piezas válidas;
+   - generar cada pieza como PNG con transparencia y límites correctos;
+   - clasificar cada pieza por separado: cuerpo/base, cabeza/cara, cabello, parte superior, parte inferior, calzado o accesorio;
+   - cambiar categoría antes de guardar;
+   - normalizar cada pieza al escenario común sin estirar su proporción;
+   - mostrar/editar anclajes de cada pieza;
+   - guardar piezas y fuente original;
+   - reabrir la biblioteca y comprobar persistencia;
+   - seleccionar piezas guardadas y componer un personaje en el compositor existente.
+4. Si la imagen tiene una sola silueta conectada o fondo opaco, no mostrar un falso éxito de separación. Conservar la fuente y guiar al usuario hacia el recorte manual existente. No afirmar que el sistema reconoce automáticamente qué píxeles son pelo, piel o ropa.
+5. Mantén una sola copia del PNG fuente cuando se extraigan varias piezas del mismo archivo. Cada pieza debe referenciar la fuente y mantener procedencia. No cambiar los IDs o contratos del catálogo.
+6. Añade o corrige pruebas deterministas donde realmente falten: PNG con tres componentes alfa; una sola silueta; fondo opaco; ruido pequeño; categorías distintas; guardar/reabrir; fuente guardada una sola vez; anclaje final de pointer-up; composición de piezas guardadas. No crear una enorme batería duplicada ni tests que solo verifican nombres de archivos.
+7. Ejecuta build web/TypeScript, suites Python/API existentes y smoke E2E Chromium. Corrige todos los fallos de este flujo. No ocultes errores con `|| true`, skips, aserciones debilitadas ni fixtures que eviten el camino real.
+8. Inspecciona las capturas del HEAD final si el test las produce. Si no hay artefacto, dilo y corrige el pipeline de captura si forma parte del fallo. No afirmes QA visual manual si no abriste/revisaste la imagen.
+9. Actualiza `cerebro/ESTADO_ACTUAL.md` solo con hechos comprobados: SHA final, CI exacta, E2E, funciones listas y limitaciones restantes. No añadas otro documento de planificación.
+10. Comprueba el HEAD y CI después del último cambio. Si una ejecución sigue en curso, espera/consulta hasta que termine cuando el entorno lo permita.
 
-## CRITERIO DONE
+## REGLAS DE CAMBIOS
 
-Marca DONE únicamente si:
-- los casos automatizados anteriores pasan;
-- build web y suites relevantes están verdes en el HEAD final;
-- el E2E muestra separación, clasificación individual, normalización, persistencia y composición;
-- la fuente se guarda una sola vez;
-- la bandeja conserva la imagen cuando la separación falla;
-- el estado del repositorio contiene evidencia real y SHA actual.
+- Trabaja únicamente en `feature/bimg-engine-001-cyberstreet-visual-renderer`.
+- No editar `main` directamente, no fusionar ni cerrar PRs, no reescribir historia.
+- Preservar perfiles existentes, IDs, API, recetas v1/v2/v3, Style Lab, NanoWear, Chromapatch, catálogo, piezas CyberStreet y compositor actual.
+- No introducir imágenes externas de prueba en el catálogo público automáticamente.
+- No descargar ni copiar arte externo sin que el usuario lo solicite explícitamente.
+- No reemplazar la app por una demo separada.
+- No expandir el alcance salvo que otros defectos bloqueen la importación o composición.
 
-Si falla algo, arréglalo dentro de esta tarea en vez de entregar otro plan. Informe final corto: archivos cambiados, SHA final, CI/E2E con enlaces reales, limitaciones concretas y siguiente bloqueo únicamente si de verdad impide cerrar.
+## CRITERIO DE CIERRE REAL
 
-**Al terminar, escribe exactamente al final del informe:** `bot obrero espera siguientes ordenes`
+Marca esta tarea DONE solo cuando:
+- el error actual del anclaje esté corregido y la aserción exacta pase;
+- build web y suites relevantes pasen en el SHA final;
+- E2E confirme separación, categorías independientes, normalización, persistencia y composición;
+- la fuente se guarde una sola vez;
+- los fallos de separación conserven el PNG original y se expliquen claramente;
+- el informe incluya enlaces reales a CI/artefactos, SHA final y limitaciones verificadas.
+
+No declarar que todo BotImagen está terminado si solo se cierra esta integración. No terminar con “siguiente paso: hacer otro análisis”. Si queda bloqueado por una causa externa real, identificarla y dejar el código hasta donde se pueda probar.
+
+**Informe final breve:** resultado, archivos modificados, SHA final, CI/E2E con enlaces, limitaciones verificadas y tiempo real solo si fue medido.
+
+La última línea del informe debe ser exactamente:
+`bot obrero espera siguientes ordenes`
