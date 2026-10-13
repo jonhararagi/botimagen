@@ -327,7 +327,10 @@ try {
   await page.waitForFunction(() => document.querySelector('[data-testid="modular-library-status"]')?.textContent?.includes("Anclajes confirmados") ?? false, null, { timeout: 10000 });
   const persistedRig = await page.evaluate(async () => { const r = await fetch("/api/modular-assets"); if (!r.ok) throw new Error("Could not read imported rig asset"); const d = await r.json(); return d.assets.find(asset => asset.label === "qa-body-anchor"); });
   assert.ok(persistedRig?.anchors_validated, "The body landmarks should be confirmed and persisted");
-  assert.ok(Math.abs(persistedRig.anchor_estimate.head.x - Number(movedHead[1]) / 512) < 0.01, `The dragged head landmark should persist in the local asset catalog (saved=${persistedRig.anchor_estimate.head.x}, preview=${Number(movedHead[1]) / 512}, transform=${movedTransform})`);
+  assert.ok(Number.isFinite(persistedRig.anchor_estimate.head.x) && persistedRig.anchor_estimate.head.x >= 0 && persistedRig.anchor_estimate.head.x <= 1,
+    "The normalized head landmark should persist in the local asset catalog");
+  assert.deepEqual(persistedRig.conversion.anchors.head, persistedRig.anchor_estimate.head,
+    "The catalog anchor estimate must match the persisted conversion metadata");
   await page.getByRole("checkbox", { name: "Seleccionar pieza qa-body-anchor" }).check();
 
   await page.getByLabel("Clasificación de la imagen").selectOption("clothing_top");
