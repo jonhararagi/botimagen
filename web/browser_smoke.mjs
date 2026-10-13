@@ -298,7 +298,7 @@ try {
   await page.getByLabel("Clasificación de la imagen").selectOption("body");
   await page.locator('.modular-dropzone input[type="file"]').setInputFiles({ name: "qa-body-anchor.png", mimeType: "image/png", buffer: makeQaPng() });
   await page.getByRole("button", { name: "Preparar PNG 512 × 768" }).click();
-  const bodyStage = page.locator(".modular-preview-card .modular-anchor-stage").first();
+  const bodyStage = page.locator(".modular-preview-card").filter({ hasText: "qa-body-anchor.png" }).locator(".modular-anchor-stage");
   await bodyStage.waitFor({ timeout: 10000 });
   await bodyStage.scrollIntoViewIfNeeded();
   const headPoint = bodyStage.locator('.modular-anchor-point[aria-label="Cabeza"]');
@@ -312,7 +312,8 @@ try {
   await page.mouse.move(stageBox.x + stageBox.width * 0.54, stageBox.y + stageBox.height * 0.12, { steps: 6 });
   await page.mouse.up();
   await page.waitForFunction(previous => {
-    const point = document.querySelector('.modular-preview-card .modular-anchor-point[aria-label="Cabeza"]');
+    const card = [...document.querySelectorAll(".modular-preview-card")].find(node => node.textContent?.includes("qa-body-anchor.png"));
+    const point = card?.querySelector('.modular-anchor-point[aria-label="Cabeza"]');
     return point instanceof SVGGElement && point.getAttribute("transform") !== previous;
   }, transformAfterPress ?? originalHeadTransform, { timeout: 5000 });
   const movedTransform = await bodyStage.locator('.modular-anchor-point[aria-label="Cabeza"]').getAttribute("transform");
