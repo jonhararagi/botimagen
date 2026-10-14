@@ -1685,7 +1685,7 @@ try {
   await page.waitForFunction(async()=>{const i=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');if(!(i instanceof HTMLImageElement)||!i.complete)return false;const d=new DOMParser().parseFromString(await(await fetch(i.src)).text(),"image/svg+xml");return !d.querySelector('g[data-layer-id="hair-midnight-cyan"]');},null,{timeout:15000});
   await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
   await page.getByRole("status").filter({ hasText: "Perfil guardado en el almacenamiento local del motor" }).waitFor({ timeout: 15000 });
-  const profileSelect = cyberstreet.locator("select").first();
+  const profileSelect = cyberstreet.getByLabel("Perfiles CyberStreet guardados");
   await profileSelect.waitFor({ state: "visible" });
   const savedProfileOption = await profileSelect.locator("option").evaluateAll(options => options.find(option => option.value && option.textContent?.includes("Mi personaje CyberStreet"))?.value || "");
   assert.ok(savedProfileOption, "The modular profile should be persisted through the existing profile API");
