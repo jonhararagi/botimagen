@@ -20,6 +20,7 @@ from modular_character_compositor import CompositionError, compose_png, validate
 from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
 from modular_asset_library import read_user_asset
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
+from mini_ai_generator import MiniAIError, generate_mini_ai, mini_ai_status
 from modular_asset_library import (
     AssetImportError, confirm_user_asset_anchors, import_user_asset, list_user_assets, read_user_asset,
 )
@@ -353,6 +354,8 @@ def make_handler(
             path = urlsplit(self.path).path
             allowed_by_path = {
                 "/api/health": ("GET",),
+                "/api/mini-ai/status": ("GET",),
+                "/api/mini-ai/generate": ("POST",),
                 "/api/catalog": ("GET",),
                 "/api/assets/contracts": ("GET",),
                 "/api/modular-assets": ("GET", "POST"),
@@ -392,6 +395,9 @@ def make_handler(
             path = urlsplit(self.path).path
             if path == "/api/health":
                 self._send_json(HTTPStatus.OK, {"status": "ok", "service": "botimagen-local", "schema_version": 1})
+                return
+            if path == "/api/mini-ai/status":
+                self._send_json(HTTPStatus.OK, mini_ai_status())
                 return
             if path == "/api/catalog":
                 self._send_json(HTTPStatus.OK, catalog)
@@ -516,7 +522,7 @@ def make_handler(
             model_publish_route = path.startswith("/api/character-models/") and path.endswith("/publish-layer")
             model_edit_route = path.startswith("/api/character-models/") and path.endswith("/edit-layer")
             model_reset_route = path.startswith("/api/character-models/") and path.endswith("/reset-layer")
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render"} and not validate_anchor_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route:
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render", "/api/mini-ai/generate"} and not validate_anchor_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
@@ -535,6 +541,13 @@ def make_handler(
                         self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
                         return
                     except AssetImportError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
+                    return
+                if path == "/api/mini-ai/generate":
+                    try:
+                        result = generate_mini_ai(payload)
+                    except MiniAIError as exc:
                         raise ApiInputError(str(exc)) from exc
                     self._send_json(HTTPStatus.OK, result)
                     return
