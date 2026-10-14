@@ -177,3 +177,83 @@ Investigar lo suficiente para reducir un riesgo concreto, no para aplazar la ent
 - **Límites:** issues externos leídos como reportes, no reproducidos. No se importó código ni assets de esas referencias; no se ha realizado auditoría de licencias de sus recursos.
 - **Estado final:** INVESTIGACIÓN INICIAL COMPLETADA; implementar y probar queda pendiente de BIMG-008.
 - **Impacto en progreso:** ninguno. La investigación reduce incertidumbre, pero no cierra criterios de la beta ni aumenta el porcentaje.
+
+
+---
+
+## BIMG-RESEARCH-003 · ampliar la biblioteca visual a partir de CyberStreet
+
+- **Fecha de consulta:** 2026-10-14.
+- **TIMER:** 2–4 horas estimadas para convertir esta investigación en un primer pack utilizable, sujeto a la prueba de importación/alineación. Tiempo real: `NOT_MEASURED`.
+- **Pregunta:** ¿Qué recursos y métodos pueden ampliar cabello, ropa, calzado y accesorios sin abandonar el estilo de la ilustración existente ni exigir un servicio de IA de pago?
+
+### 1. Inspección del paquete real del repositorio
+
+- **Fuente:** [directorio `assets/modular/oc-cyberstreet`](https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet) y [manifiesto](https://github.com/jonhararagi/botimagen/blob/feature/bimg-engine-001-cyberstreet-visual-renderer/assets/modular/oc-cyberstreet/manifest.json).
+- **HECHO OBSERVADO:** el paquete tiene seis piezas SVG originales, todas en lienzo transparente de 512×768: cuerpo base, rostro anime, cabello combinado frontal/posterior, falda tecnológica, zapatillas y chaqueta. La estética se define por azul marino, cyan/turquesa luminoso, acentos magenta y prendas techwear.
+- **HECHO OBSERVADO:** el manifiesto declara que las piezas son un starter pack estilizado y no una ilustración de producción. No contiene PNG/JPG ni una biblioteca de prendas intercambiables.
+- **LECTURA DE LA BRECHA:** faltan variantes independientes de cabello frontal/posterior, ojos/cejas/boca, tops y capas exteriores, pantalones/shorts, mangas, guantes, medias, zapatos alternativos, cinturones, bolsos, auriculares, gafas, clips, collares, pendientes y otros accesorios. La carencia principal es volumen y variedad de arte, no otro panel de controles.
+- **Palabras clave derivadas de la referencia:** anime cyberpunk techwear; cropped technical jacket; cyan neon piping; navy pleated skirt; high-top sneakers; twin tails / side locks; magenta hair clip; visor / headphones; utility belt; choker; gloves; leg straps; stockings.
+
+### 2. Fuentes visuales y de tecnología evaluadas
+
+#### A. See-through · descomposición semántica de una ilustración
+
+- **Fuente:** [GitHub: shitagaki-lab/see-through](https://github.com/shitagaki-lab/see-through), [licencia Apache 2.0](https://github.com/shitagaki-lab/see-through/blob/main/LICENSE).
+- **HECHO OBSERVADO:** el proyecto de investigación transforma una ilustración anime en hasta 23 capas semánticas, con cabello, rostro, ojos, ropa y accesorios, además de reconstrucción de zonas ocultas y orden de profundidad.
+- **Valor:** es el método más cercano a reutilizar una ilustración propia como fuente de piezas, en lugar de dibujar cada pieza desde cero.
+- **Límite:** requiere modelos de IA y recursos de cómputo; no asumir que la inferencia completa será práctica en el Ryzen 5 5600G con iGPU y 16 GB de RAM. La licencia del código no concede derechos sobre cualquier ilustración que se procese.
+- **Complemento:** [ComfyUI-See-through](https://github.com/jtydhr88/ComfyUI-See-through) integra el flujo y exporta PSD con capas. Tratarlo como vía experimental opcional, no como dependencia obligatoria de la beta local.
+
+#### B. OpenGameArt · Dress-Up Illustration Set — Lin Tongze
+
+- **Fuente:** [página del recurso y descarga PSD/ZIP](https://opengameart.org/content/dress-up-illustration-set-lin-tongze).
+- **HECHO OBSERVADO:** el PSD enumera cabello negro/blanco con mechones delanteros, laterales y posteriores, trenzas, coletas y moños; orejas/colas de gato y conejo; gafas; ojos, cejas y bocas; abrigos, suéteres, camisas, vestidos, shorts, varios zapatos, medias, relojes, pulseras, chokers y otros accesorios.
+- **Licencia declarada:** CC BY-SA 4.0; atribución a THE13RUIN y cumplimiento de compartir igual para material adaptado cuando aplique.
+- **Valor:** candidato muy completo para validar un flujo de piezas y la arquitectura de biblioteca. El estilo anime es más suave/tradicional que el techwear neon de CyberStreet.
+- **Decisión:** no mezclar directamente sus piezas con el cuerpo CyberStreet sin retargeting/alineación y revisión visual. Puede funcionar como segundo pack o referencia para diseñar piezas originales. Registrar la licencia y atribución si se incorpora.
+
+#### C. OpenGameArt · Kuudere Visual Novel Sprite
+
+- **Fuente:** [página del recurso](https://opengameart.org/content/kuudere-visual-novel-sprite).
+- **HECHO OBSERVADO:** 98 PNG de un personaje, cuatro conjuntos de ropa con variaciones de chaqueta y siete expresiones/posiciones de cabeza; el autor incluye PSD para recolorear cabello, piel y ropa y mezclar accesorios.
+- **Licencia declarada:** CC BY 4.0, con atribución a LisadiKaprio.
+- **Valor:** candidato secundario para estudiar estructura de capas, expresiones y cambios de outfit.
+- **Límite:** el personaje es una composición completa y el estilo/proporciones no coinciden exactamente con CyberStreet. No tratar sus PNG como piezas plug-and-play del mismo esqueleto.
+
+#### D. OpenGameArt · Modular Character Pack de Kenney
+
+- **Fuente:** [página del pack](https://opengameart.org/content/modular-character-pack).
+- **HECHO OBSERVADO:** incluye sprites PNG separados, spritesheets y vectores; la licencia declarada es CC0.
+- **Valor:** buen material de prueba para importación, catálogo, transparencia, anclajes y combinaciones sin añadir obligaciones de atribución.
+- **Límite:** estilo flat/genérico, no anime gacha. Útil para QA/estructura, no como sustituto del arte final de CyberStreet.
+
+#### E. Itch.io · Cyberpunk Character Pack de OcO
+
+- **Fuente:** [página del pack](https://oco.itch.io/cyberpunk-character-pack).
+- **HECHO OBSERVADO:** arte de personajes cyberpunk en pixel art; la página ofrece el personaje Striker gratis y otros archivos en niveles de pago.
+- **Valor:** referencia visual temática cyberpunk y posible fuente de inspiración para siluetas/props.
+- **Límite:** el pixel art no coincide con el SVG anime vectorial de CyberStreet y el pack presenta personajes completos, no un guardarropa modular confirmado. No importar piezas como si fueran compatibles ni asumir licencia/redistribución sin revisar las condiciones del archivo descargado.
+
+#### F. ImageToLayers · alternativa web de descomposición
+
+- **Fuente:** [Anime Character PSD Generator](https://www.imagetolayers.com/character-to-layers/anime-character-psd-generator).
+- **HECHO OBSERVADO:** anuncia exportación de capas PNG/PSD para cabello, cara, ojos, ropa y accesorios; el servicio indica uso de créditos.
+- **Valor:** posible comparación puntual de calidad, no dependencia de producto.
+- **Límite/decisión:** servicio remoto con créditos, por lo que no encaja como ruta obligatoria offline-first ni se usará para procesar arte sin derechos de uso.
+
+### 3. Decisión accionable
+
+1. **Mantener intacto** el pack original CyberStreet y usarlo como referencia de estilo y lienzo.
+2. **Construir variedad real en dos carriles:** (a) piezas originales alineadas a 512×768, con paleta navy/cyan/magenta; (b) packs externos independientes con autor, licencia, fuente, SHA-256, dimensiones y categoría documentados.
+3. **Prioridad de producción:** 6–10 peinados (frente y atrás por separado); 8–12 tops/capas; 6–10 prendas inferiores; 6–8 zapatos; 12–20 accesorios pequeños. Cantidades son objetivo inicial, no assets ya existentes.
+4. **No exigir IA pesada para importar:** permitir cargar PNG transparente o preparar manualmente una pieza en Krita/GIMP, elegir categoría, previsualizar sobre el cuerpo, ajustar anclajes y guardar. La descomposición automática será una herramienta opcional, con fallback manual.
+5. **No deformar recursos incompatibles para aparentar integración:** si un pack usa otras proporciones, mantenerlo como pack/cuerpo independiente o crear un proceso explícito de retargeting y validar la silueta antes de publicarlo.
+6. **Criterio mínimo de aceptación del primer pack externo:** al menos cabello, top, prenda inferior, calzado y accesorio visibles como opciones reales; combinación en el mismo personaje; preview antes/después; export PNG transparente; guardar/recargar perfil; procedencia/licencia visible en biblioteca.
+
+### 4. Qué se comprobó y qué no
+
+- **Comprobado por inspección del repositorio:** manifiesto de seis SVG originales y sus roles; el paquete actual es un starter pack pequeño.
+- **Comprobado en páginas públicas:** descripciones, recursos listados y licencias declaradas de los proyectos citados.
+- **NOT_RUN:** descarga/importación de estos packs a BotImagen, retargeting, revisión de calidad de archivos descargados, prueba física en Windows, inferencia de See-through en el equipo del usuario y verificación legal individual de cada archivo redistribuido.
+- **Impacto en el progreso global:** ninguno. La investigación no equivale a integrar ni probar assets; no aumentar el 63% hasta que el primer pack ampliado funcione en la aplicación.
