@@ -217,6 +217,15 @@ export function AnimePngLibrary() {
         <input className="anime-png-search" aria-label="Buscar PNG de personajes" placeholder="Buscar por nombre de archivo…" value={query} onChange={event => setQuery(event.target.value)} />
         <span className="anime-png-count">{filtered.length.toLocaleString()} / {items.length.toLocaleString()} personajes</span>
       </div>
+      <div className="anime-png-sources">
+        <strong>Encontrar arte anime real</strong>
+        <p>Explorá catálogos externos con miles de sprites e ilustraciones. Descargá los PNG que te gusten y después importalos aquí. No todos los resultados son anime ni todos permiten uso comercial: revisá la licencia de cada creador.</p>
+        <div className="anime-png-source-links">
+          <a href="https://itch.io/game-assets/genre-visual-novel/tag-sprites" target="_blank" rel="noreferrer">Sprites de novelas visuales · miles de resultados ↗</a>
+          <a href="https://itch.io/game-assets/free/tag-manga/tag-sprites" target="_blank" rel="noreferrer">Sprites manga gratuitos ↗</a>
+          <a href="https://itch.io/game-assets/tag-characters/tag-manga" target="_blank" rel="noreferrer">Personajes manga dibujados a mano ↗</a>
+        </div>
+      </div>
       <p role="status" aria-live="polite" className="anime-png-note">{message}</p>
       {filtered.length ? <div className="anime-png-grid" style={{ marginTop: 14 }}>
         {filtered.map(item => {
