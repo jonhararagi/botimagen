@@ -90,6 +90,8 @@ export function AnimePngLibrary() {
   const [message, setMessage] = useState("Importá PNG de personajes anime de cuerpo completo o sprites con fondo transparente.");
   const [selected, setSelected] = useState<CharacterPng | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const folderInput = useRef<HTMLInputElement>(null);
+  useEffect(() => { folderInput.current?.setAttribute("webkitdirectory", ""); }, []);
 
   const refresh = async () => {
     try {
@@ -104,7 +106,7 @@ export function AnimePngLibrary() {
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase();
     if (!normalized) return items;
-    return items.filter(item => item.name.toLocaleLowerCase().includes(normalized) || "anime personaje universal cuerpo completo sprite png".includes(normalized));
+    return items.filter(item => item.name.toLocaleLowerCase().includes(normalized));
   }, [items, query]);
 
   const importFiles = async (fileList: FileList | null) => {
@@ -117,6 +119,12 @@ export function AnimePngLibrary() {
       for (const file of Array.from(fileList)) {
         if (file.type !== "image/png" && !file.name.toLowerCase().endsWith(".png")) {
           skipped++;
+          continue;
+        }
+        const signature = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+        if (signature.length !== 8 || signature.some((value, index) => value !== [137, 80, 78, 71, 13, 10, 26, 10][index])) {
+          skipped++;
+          problems.push(`${file.name}: el contenido no es un PNG válido`);
           continue;
         }
         if (file.size > MAX_FILE_BYTES || file.size === 0) {
@@ -195,12 +203,14 @@ export function AnimePngLibrary() {
       <div className="anime-png-head">
         <div>
           <h2 id="anime-png-library-title">Biblioteca universal de personajes anime PNG</h2>
-          <p>Galería de personajes completos, sprites y referencias de arte real. Importá colecciones grandes, buscá por nombre y revisá cada PNG sobre fondo de transparencia.</p>
+          <p>Galería universal para personajes completos, sprites y referencias de arte real. Importá una carpeta con cientos o miles de PNG, buscá por nombre y revisá cada imagen sobre fondo de transparencia.</p>
           <p className="anime-png-note">Los archivos quedan en este navegador, no se suben a GitHub ni a ningún servidor. Importá solo arte propio o con permiso/licencia de uso.</p>
         </div>
         <div className="anime-png-actions">
           <input ref={fileInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
+          <input ref={folderInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
           <button className="anime-png-primary" type="button" disabled={busy} onClick={() => fileInput.current?.click()}>{busy ? "Importando…" : "＋ Importar PNG"}</button>
+          <button type="button" disabled={busy} onClick={() => folderInput.current?.click()}>Importar carpeta completa</button>
         </div>
       </div>
       <div className="anime-png-toolbar">
