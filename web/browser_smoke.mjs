@@ -1593,7 +1593,7 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
   }, null, { timeout: 15000 });
   await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-full.png") });
-  const hairToggle = cyberstreet.locator(".modular-layer-toggle").filter({ hasText: "Cabello cyan" }).locator('input[type="checkbox"]');
+  const hairToggle = cyberstreet.locator(".modular-layer-row").filter({ hasText: "Cabello cyan" }).locator('input[type="checkbox"]');
   assert.equal(await hairToggle.isChecked(), true, "CyberStreet hair should be enabled initially");
   const fullLayerImage = await cyberstreetPreview.getAttribute("src");
   await hairToggle.uncheck();
@@ -1638,7 +1638,7 @@ try {
   await hairToggle.check();
   await page.waitForFunction(previous => {
     const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
-    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
+    const hair = [...document.querySelectorAll(".modular-layer-row")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
     return image instanceof HTMLImageElement && image.complete && image.src !== previous && hair instanceof HTMLInputElement && hair.checked;
   }, variantBeforeToggle, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), true, "The duplicated variant can be modified independently in the live editor");
@@ -1647,7 +1647,7 @@ try {
   await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
   await page.waitForFunction(previous => {
     const image = document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
-    const hair = [...document.querySelectorAll(".modular-layer-toggle")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
+    const hair = [...document.querySelectorAll(".modular-layer-row")].find(el => el.textContent?.includes("Cabello cyan"))?.querySelector('input[type="checkbox"]');
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
   }, imageBeforeRestore, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Changing the duplicated variant must not alter the original saved profile");
