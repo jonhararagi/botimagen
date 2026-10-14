@@ -12,6 +12,7 @@ Añadir una clase de asset universal para ilustraciones de personajes completos 
 - Galería con miniaturas sobre patrón de transparencia, nombre, dimensiones, tamaño, búsqueda, vista ampliada y descarga del original.
 - Almacenamiento local en IndexedDB del navegador. Los archivos no se envían al servidor ni se añaden automáticamente al repositorio.
 - Clase inicial fija: `universal-character`, destinada a personajes completos y sprites. No fuerza una anatomía ni un esquema de capas.
+- Accesos directos a catálogos externos de sprites/arte manga para explorar miles de resultados, descargar los recursos deseados e importarlos luego. Cada ficha externa debe revisarse individualmente por formato, calidad y licencia.
 
 ## Límites importantes
 
