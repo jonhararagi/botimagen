@@ -169,3 +169,11 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Implementados y probados en Chromium los controles del compositor CyberStreet para visibilidad, movimiento, escala, rotación y orden; guardado/duplicación/restauración de perfil; PNG RGBA transparente 512×768.
 - Artefacto visual real: [botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38512999758/artifacts/11871071978).
 - BIMG-WAIFU-FACTORY-004-R2 sigue **PARTIAL**: pendiente cambiar una pieza por una alternativa PNG de la biblioteca importada y validar ese roundtrip. QA física Windows **NOT_RUN**.
+
+## BIMG-WAIFU-FACTORY-004-R4 · evidencia de integración PNG · 2026-10-14
+
+- Alcance específico **PASS_REAL** en SHA probado `7de4e7305bd0463c37429a5b2d39a41b85c55244`; [CI #652](https://github.com/jonhararagi/botimagen/actions/runs/38564001716) pasó suites Python/API, `npm ci`, build y Chromium E2E.
+- El smoke E2E importa una pieza PNG de la biblioteca, la asigna a la capa real de chaqueta CyberStreet, verifica que el SVG contiene el ID del PNG, exporta antes/después y confirma que cambian los bytes del PNG RGBA 512×768. Después recarga la app y restaura el mismo ID de pieza desde el perfil persistido. [Artefacto QA](https://github.com/jonhararagi/botimagen/actions/runs/38564001716/artifacts/11893795035).
+- Esto cierra el hueco concreto de conexión biblioteca PNG → compositor CyberStreet → exportación → perfil. No cierra por sí solo todas las tareas BIMG-007/008/009/010 ni la beta completa; por ello el porcentaje ponderado global queda en **63%**, sin recalcular fases ajenas a este alcance.
+- QA física en Windows: `NOT_RUN`. El fixture es sintético; la evaluación de assets artísticos reales sigue siendo independiente.
+- TIMER estimado original: 4–8 horas activas; tiempo real medido: `NOT_MEASURED`.
