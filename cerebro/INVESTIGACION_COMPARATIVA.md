@@ -257,3 +257,13 @@ Investigar lo suficiente para reducir un riesgo concreto, no para aplazar la ent
 - **Comprobado en páginas públicas:** descripciones, recursos listados y licencias declaradas de los proyectos citados.
 - **NOT_RUN:** descarga/importación de estos packs a BotImagen, retargeting, revisión de calidad de archivos descargados, prueba física en Windows, inferencia de See-through en el equipo del usuario y verificación legal individual de cada archivo redistribuido.
 - **Impacto en el progreso global:** ninguno. La investigación no equivale a integrar ni probar assets; no aumentar el 63% hasta que el primer pack ampliado funcione en la aplicación.
+
+
+### 5. Hallazgo adicional: dataset interno de cuerpos como referencia de estilo
+
+- **Directorio inspeccionado:** [`references/dataset-cuerpos/`](https://github.com/jonhararagi/botimagen/tree/feature/bimg-engine-001-cyberstreet-visual-renderer/references/dataset-cuerpos).
+- **HECHO OBSERVADO:** existen 16 imágenes PNG (`0.png` a `15.png`), todas de 768×1280 y RGBA. No existe un único archivo identificado explícitamente como ilustración principal. Los presets `street-sentinel.json` y `neon-archivist.json` son datos editables de personaje, no imágenes.
+- **Muestra directa:** [cuerpo de referencia 0](https://raw.githubusercontent.com/jonhararagi/botimagen/feature/bimg-engine-001-cyberstreet-visual-renderer/references/dataset-cuerpos/0.png), [cuerpo de referencia 1](https://raw.githubusercontent.com/jonhararagi/botimagen/feature/bimg-engine-001-cyberstreet-visual-renderer/references/dataset-cuerpos/1.png), [cuerpo de referencia 2](https://raw.githubusercontent.com/jonhararagi/botimagen/feature/bimg-engine-001-cyberstreet-visual-renderer/references/dataset-cuerpos/2.png).
+- **Lectura de arquitectura:** antes de adaptar arte externo al SVG de 512×768, el próximo trabajo debe comparar visualmente los 16 cuerpos y determinar si alguno ya representa mejor las proporciones/cuerpo base deseados. Si los cuerpos pertenecen a estilos o proporciones distintas, no forzarlos a compartir el mismo esqueleto. Seleccionar un cuerpo canónico y asignar a cada pack su propia referencia corporal y lienzo cuando corresponda.
+- **Decisión prioritaria actualizada:** usar los 16 PNG internos como primer conjunto de referencias para fijar proporciones, silueta, pose y estilo; después buscar/crear piezas de cabello, ropa y accesorios que encajen con el cuerpo canónico elegido. El pack Dress-Up de OpenGameArt sigue siendo una referencia de variedad, no una integración confirmada.
+- **NOT_RUN:** inspección visual lado a lado de los 16 archivos; no afirmar que son compatibles entre sí ni que incluyen capas de ropa separadas. El listado del repositorio solo confirma dimensiones y formato.
