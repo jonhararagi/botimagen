@@ -1,97 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
-
-type Layer = { id:string; label:string; role:string; z:number; editable:boolean; enabled_by_default:boolean };
-type Manifest = { schema_version:number; pack_id:string; title:string; width:number; height:number; layers:Layer[] };
-type Saved = { id:string; name:string; saved_at:string; style_id:string; seed:number|null };
-const defaultEnabled:Record<string,boolean> = {
- "base-body":true,"skirt-tech-pleated":true,"top-neon-jacket":true,"hair-midnight-cyan":true
-};
-
-export function ModularCharacterComposer() {
- const [manifest,setManifest]=useState<Manifest|null>(null);
- const [enabled,setEnabled]=useState<Record<string,boolean>>(defaultEnabled);
- const [svg,setSvg]=useState("");
- const [message,setMessage]=useState("Cargando el paquete CyberStreet local…");
- const [busy,setBusy]=useState(false);
- const [profileName,setProfileName]=useState("Mi personaje CyberStreet");
- const [profiles,setProfiles]=useState<Saved[]>([]);
- const [profileId,setProfileId]=useState("");
-
- const svgUrl=useMemo(()=>svg?URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"})):"",[svg]);
- useEffect(()=>()=>{if(svgUrl)URL.revokeObjectURL(svgUrl)},[svgUrl]);
-
- async function refreshProfiles() {
-  try { const r=await fetch("/api/profiles"); if(!r.ok) throw new Error(); const d=await r.json(); setProfiles(Array.isArray(d.profiles)?d.profiles:[]); }
-  catch { setMessage("No se pudieron cargar los perfiles guardados en el motor local."); }
- }
- useEffect(()=>{void (async()=>{try{const r=await fetch("/api/modular-cyberstreet");const d=await r.json();if(!r.ok)throw new Error(d.error||"Paquete no disponible.");setManifest(d);setEnabled(Object.fromEntries(d.layers.map((l:Layer)=>[l.id,true])));setMessage("Paquete SVG real cargado. Activa o desactiva las capas para modificar la composición.");await render(Object.fromEntries(d.layers.map((l:Layer)=>[l.id,true])));}catch(e){setMessage(e instanceof Error?e.message:"No se pudo cargar CyberStreet.");}})();void refreshProfiles();},[]);
-
- async function render(selection=enabled) {
-  setBusy(true);
-  try { const r=await fetch("/api/modular-cyberstreet/render",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled:selection})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Falló el render SVG.");setSvg(d.svg);setMessage("Composición actualizada desde los SVG originales del paquete."); }
-  catch(e){setMessage(e instanceof Error?e.message:"Error de render desconocido.");}
-  finally{setBusy(false);}
- }
- function toggle(id:string,value:boolean) {
-  const next={...enabled,[id]:value};setEnabled(next);void render(next);
- }
- async function saveProfile() {
-  setBusy(true);
-  try {const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:profileName,profile:{modular_composition:{schema_version:1,pack_id:manifest?.pack_id,enabled}}})});const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo guardar el perfil.");setProfileId(d.id||"");await refreshProfiles();setMessage("Perfil guardado en el almacenamiento local del motor.");}
-  catch(e){setMessage(e instanceof Error?e.message:"Error guardando perfil.");}
-  finally{setBusy(false);}
- }
- async function duplicateVariant() {
-  if (!manifest) { setMessage("El paquete modular aún no está disponible."); return; }
-  setBusy(true);
-  try {
-   const baseName=profileName.trim()||"Mi personaje CyberStreet";
-   const variantName=(baseName+" (variante)").slice(0,80);
-   const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-    name:variantName,
-    profile:{modular_composition:{schema_version:1,pack_id:manifest.pack_id,enabled:{...enabled}}}
-   })});
-   const d=await r.json();
-   if(!r.ok)throw new Error(d.error||"No se pudo duplicar la variante.");
-   setProfileName(variantName);
-   setProfileId(d.id||"");
-   await refreshProfiles();
-   setMessage("Variante duplicada como perfil independiente; puedes seguir editándola sin alterar el original.");
-  } catch(e) { setMessage(e instanceof Error?e.message:"Error duplicando la variante."); }
-  finally { setBusy(false); }
- }
- async function loadProfile() {
-  if(!profileId){setMessage("Selecciona un perfil guardado.");return;}
-  setBusy(true);
-  try {const r=await fetch("/api/profiles/"+encodeURIComponent(profileId));const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo recuperar el perfil.");const comp=d.profile?.modular_composition;const next=comp?.enabled;if(!next||typeof next!=="object")throw new Error("El perfil no contiene selecciones CyberStreet.");setProfileName(d.name||"Mi personaje CyberStreet");setEnabled(next);await render(next);setMessage("Selecciones recuperadas del perfil local.");}
-  catch(e){setMessage(e instanceof Error?e.message:"Error cargando perfil.");}
-  finally{setBusy(false);}
- }
- async function exportPng() {
-  if(!svg){setMessage("Primero renderiza una composición.");return;}
-  setBusy(true);
-  try {
-   const image=new Image();const url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));
-   await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(new Error("El navegador no pudo rasterizar el SVG."));image.src=url;});
-   const canvas=document.createElement("canvas");canvas.width=manifest?.width||512;canvas.height=manifest?.height||768;
-   const context=canvas.getContext("2d");if(!context)throw new Error("Canvas 2D no disponible.");
-   context.clearRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);
-   const blob=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("No se pudo crear el PNG.")),"image/png"));
-   const downloadUrl=URL.createObjectURL(blob);const a=document.createElement("a");a.href=downloadUrl;a.download="botimagen-cyberstreet.png";a.click();URL.revokeObjectURL(downloadUrl);setMessage("PNG exportado con fondo transparente y lienzo 512×768.");
-  } catch(e){setMessage(e instanceof Error?e.message:"Falló la exportación PNG.");}
-  finally{setBusy(false);}
- }
- return <section className="modular-composer" aria-label="Ensamblador CyberStreet por capas">
-  <div className="kicker"><span><i>04</i> PERSONAJE MODULAR</span><small>CYBERSTREET SVG</small></div>
-  <p>Composición real del paquete local 512×768. El cuerpo base es obligatorio; las otras capas se pueden alternar.</p>
-  <div className="modular-composer-grid">
-   <div className="modular-composer-controls">
-    {manifest?.layers.map(layer=><label key={layer.id} className="modular-layer-toggle"><input type="checkbox" checked={enabled[layer.id]!==false} disabled={!layer.editable||layer.id==="base-body"||busy} onChange={e=>toggle(layer.id,e.target.checked)}/><span>{layer.label}</span><small>{layer.role}</small></label>)}
-    <label>Nombre del perfil<input value={profileName} maxLength={80} onChange={e=>setProfileName(e.target.value)}/></label>
-    <label>Perfiles guardados<select value={profileId} onChange={e=>setProfileId(e.target.value)}><option value="">Seleccionar perfil</option>{profiles.map(p=><option key={p.id} value={p.id}>{p.name} · {new Date(p.saved_at).toLocaleString()}</option>)}</select></label>
-    <div className="prompt-actions"><button className="btn primary" disabled={busy||!manifest} onClick={()=>void render()}>{busy?"Renderizando…":"Actualizar composición"}</button><button className="btn muted" disabled={busy} onClick={()=>void saveProfile()}>Guardar perfil</button><button className="btn muted" disabled={busy||!manifest} onClick={()=>void duplicateVariant()}>Duplicar variante</button><button className="btn muted" disabled={busy||!profileId} onClick={()=>void loadProfile()}>Restaurar perfil</button><button className="btn muted" disabled={busy||!svg} onClick={()=>void exportPng()}>Exportar PNG</button><button className="btn muted" onClick={()=>void refreshProfiles()}>Actualizar perfiles</button></div>
-   </div>
-   <div className="modular-composer-preview">{svgUrl?<img src={svgUrl} alt="Personaje CyberStreet compuesto con capas SVG reales" style={{width:"100%",maxHeight:"640px",objectFit:"contain"}}/>:<div>El personaje aparecerá cuando el paquete SVG esté disponible.</div>}</div>
-  </div><p role="status" aria-live="polite">{message}</p>
- </section>;
+type Layer={id:string;label:string;role:string;z:number;editable:boolean;enabled_by_default:boolean};
+type Manifest={schema_version:number;pack_id:string;title:string;width:number;height:number;layers:Layer[]};
+type Saved={id:string;name:string;saved_at:string;style_id:string;seed:number|null};
+type Transform={x:number;y:number;scale:number;rotation:number};
+type Composition={enabled:Record<string,boolean>;transforms:Record<string,Transform>;order:string[]};
+const identity:Transform={x:0,y:0,scale:1,rotation:0};
+function applyComposition(source:string,c:Composition):string{const d=new DOMParser().parseFromString(source,"image/svg+xml");if(d.querySelector("parsererror"))throw new Error("El compositor devolvió un SVG inválido.");const root=d.documentElement,groups=[...root.querySelectorAll(":scope > g[data-layer-id]")],map=new Map(groups.map(g=>[g.getAttribute("data-layer-id")||"",g]));for(const [id,g] of map){const t={...identity,...c.transforms[id]};g.setAttribute("transform",`translate(${t.x} ${t.y}) translate(256 384) rotate(${t.rotation}) scale(${t.scale}) translate(-256 -384)`);}const order=c.order.length?c.order:groups.map(g=>g.getAttribute("data-layer-id")||"");for(const id of order){const g=map.get(id);if(g)root.appendChild(g);}for(const g of groups){const id=g.getAttribute("data-layer-id")||"";if(!order.includes(id))root.appendChild(g);}return new XMLSerializer().serializeToString(d);}
+export function ModularCharacterComposer(){
+ const [manifest,setManifest]=useState<Manifest|null>(null),[enabled,setEnabled]=useState<Record<string,boolean>>({}),[transforms,setTransforms]=useState<Record<string,Transform>>({}),[order,setOrder]=useState<string[]>([]),[svg,setSvg]=useState(""),[message,setMessage]=useState("Cargando el paquete CyberStreet local…"),[busy,setBusy]=useState(false),[profileName,setProfileName]=useState("Mi personaje CyberStreet"),[profiles,setProfiles]=useState<Saved[]>([]),[profileId,setProfileId]=useState(""),[selectedLayer,setSelectedLayer]=useState("");
+ const svgUrl=useMemo(()=>svg?URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"})):"",[svg]);useEffect(()=>()=>{if(svgUrl)URL.revokeObjectURL(svgUrl)},[svgUrl]);
+ async function refreshProfiles(){try{const r=await fetch("/api/profiles");if(!r.ok)throw new Error();const d=await r.json();setProfiles(Array.isArray(d.profiles)?d.profiles:[]);}catch{setMessage("No se pudieron cargar los perfiles guardados en el motor local.");}}
+ useEffect(()=>{void(async()=>{try{const r=await fetch("/api/modular-cyberstreet"),d=await r.json();if(!r.ok)throw new Error(d.error||"Paquete no disponible.");const e=Object.fromEntries(d.layers.map((l:Layer)=>[l.id,true])),o=d.layers.map((l:Layer)=>l.id);setManifest(d);setEnabled(e);setOrder(o);setSelectedLayer(d.layers.find((l:Layer)=>l.editable)?.id??d.layers[0]?.id??"");setMessage("Personaje CyberStreet cargado desde el manifiesto original.");await render(e,{},o);}catch(e){setMessage(e instanceof Error?e.message:"No se pudo cargar CyberStreet.");}})();void refreshProfiles();},[]);
+ async function render(e=enabled,t=transforms,o=order){setBusy(true);try{const r=await fetch("/api/modular-cyberstreet/render",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled:e})}),d=await r.json();if(!r.ok)throw new Error(d.error||"Falló el render SVG.");setSvg(applyComposition(d.svg,{enabled:e,transforms:t,order:o}));setMessage("Personaje actualizado con las piezas SVG originales.");}catch(e){setMessage(e instanceof Error?e.message:"Error de render desconocido.");}finally{setBusy(false);}}
+ function toggle(id:string,v:boolean){const n={...enabled,[id]:v};setEnabled(n);void render(n);}
+ function changeTransform(id:string,p:Partial<Transform>){const n={...transforms,[id]:{...identity,...transforms[id],...p}};setTransforms(n);void render(enabled,n,order);}
+ function moveLayer(id:string,d:-1|1){const n=[...order],i=n.indexOf(id),j=i+d;if(i<0||j<0||j>=n.length)return;[n[i],n[j]]=[n[j],n[i]];setOrder(n);void render(enabled,transforms,n);}
+ async function saveProfile(){setBusy(true);try{const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:profileName,profile:{modular_composition:{schema_version:2,pack_id:manifest?.pack_id,enabled,transforms,order}}})}),d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo guardar el perfil.");setProfileId(d.id||"");await refreshProfiles();setMessage("Perfil guardado en el almacenamiento local del motor.");}catch(e){setMessage(e instanceof Error?e.message:"Error guardando perfil.");}finally{setBusy(false);}}
+ async function duplicateVariant(){if(!manifest)return;setBusy(true);try{const name=((profileName.trim()||"Mi personaje CyberStreet")+" (variante)").slice(0,80),r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,profile:{modular_composition:{schema_version:2,pack_id:manifest.pack_id,enabled:{...enabled},transforms:{...transforms},order:[...order]}}})}),d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo duplicar la variante.");setProfileName(name);setProfileId(d.id||"");await refreshProfiles();setMessage("Variante duplicada como perfil independiente; puedes seguir editándola sin alterar el original.");}catch(e){setMessage(e instanceof Error?e.message:"Error duplicando la variante.");}finally{setBusy(false);}}
+ async function loadProfile(){if(!profileId){setMessage("Selecciona un perfil guardado.");return;}setBusy(true);try{const r=await fetch("/api/profiles/"+encodeURIComponent(profileId)),d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo recuperar el perfil.");const c=d.profile?.modular_composition,n=c?.enabled;if(!n||typeof n!=="object")throw new Error("El perfil no contiene selecciones CyberStreet.");const t=c.transforms&&typeof c.transforms==="object"?c.transforms:{},o=Array.isArray(c.order)?c.order:manifest?.layers.map(l=>l.id)??[];setProfileName(d.name||"Mi personaje CyberStreet");setEnabled(n);setTransforms(t);setOrder(o);await render(n,t,o);setMessage("Piezas, transformaciones y orden recuperados del perfil local.");}catch(e){setMessage(e instanceof Error?e.message:"Error cargando perfil.");}finally{setBusy(false);}}
+ async function exportPng(){if(!svg)return;setBusy(true);try{const image=new Image(),url=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(new Error("El navegador no pudo rasterizar el SVG."));image.src=url;});const canvas=document.createElement("canvas");canvas.width=manifest?.width||512;canvas.height=manifest?.height||768;const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Canvas 2D no disponible.");ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);const blob=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("No se pudo crear el PNG.")),"image/png")),u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download="botimagen-cyberstreet.png";a.click();URL.revokeObjectURL(u);setMessage("PNG exportado con fondo transparente y lienzo 512×768.");}catch(e){setMessage(e instanceof Error?e.message:"Falló la exportación PNG.");}finally{setBusy(false);}}
+ const active={...identity,...transforms[selectedLayer]},layer=manifest?.layers.find(l=>l.id===selectedLayer);
+ return <section className="modular-composer" aria-label="Ensamblador CyberStreet por capas"><div className="kicker"><span><i>04</i> PERSONAJE MODULAR</span><small>CYBERSTREET SVG · 512×768</small></div><p>Personaje inicial ensamblado desde el manifiesto original. Selecciona una pieza para moverla, escalarla, girarla, reordenarla u ocultarla.</p><div className="modular-composer-grid"><div className="modular-composer-controls">
+ <div className="modular-layer-list">{manifest?.layers.map(l=><div key={l.id} className={"modular-layer-row"+(selectedLayer===l.id?" selected":"")} data-layer-id={l.id}><button type="button" className="modular-layer-select" aria-pressed={selectedLayer===l.id} onClick={()=>setSelectedLayer(l.id)}>{l.label}<small>{l.role} · capa {order.indexOf(l.id)+1}</small></button><label className="modular-layer-visibility"><input aria-label={"Mostrar "+l.label} type="checkbox" checked={enabled[l.id]!==false} disabled={l.id==="base-body"||busy} onChange={e=>toggle(l.id,e.target.checked)}/><span>Visible</span></label><div className="modular-layer-order"><button type="button" aria-label={"Subir "+l.label} disabled={busy||order.indexOf(l.id)<=0} onClick={()=>moveLayer(l.id,-1)}>↑</button><button type="button" aria-label={"Bajar "+l.label} disabled={busy||order.indexOf(l.id)>=order.length-1} onClick={()=>moveLayer(l.id,1)}>↓</button></div></div>)}</div>
+ {layer&&<div className="modular-transform-editor" aria-label={"Transformar "+layer.label}><b>Transformar: {layer.label}</b>{(["x","y","scale","rotation"] as const).map(k=><label className="modular-transform-range" key={k}><span>{{x:"Mover horizontal",y:"Mover vertical",scale:"Escala",rotation:"Rotación"}[k]} <strong>{k==="scale"?active[k].toFixed(2)+"×":active[k]+(k==="rotation"?"°":" px")}</strong></span><input type="range" aria-label={{x:"Mover horizontal",y:"Mover vertical",scale:"Escala",rotation:"Rotación"}[k]} min={k==="scale"?.4:k==="rotation"?-180:-160} max={k==="scale"?1.8:k==="rotation"?180:160} step={k==="scale"?.05:1} value={active[k]} disabled={busy} onChange={e=>changeTransform(selectedLayer,{[k]:Number(e.target.value)})}/></label>)}<button type="button" className="btn muted" disabled={busy} onClick={()=>changeTransform(selectedLayer,identity)}>Restablecer transformación</button></div>}
+ <label>Nombre del perfil<input aria-label="Nombre del perfil CyberStreet" value={profileName} maxLength={80} onChange={e=>setProfileName(e.target.value)}/></label><label>Perfiles guardados<select aria-label="Perfiles CyberStreet guardados" value={profileId} onChange={e=>setProfileId(e.target.value)}><option value="">Seleccionar perfil</option>{profiles.map(p=><option key={p.id} value={p.id}>{p.name} · {new Date(p.saved_at).toLocaleString()}</option>)}</select></label>
+ <div className="prompt-actions"><button className="btn primary" disabled={busy||!manifest} onClick={()=>void render()}>{busy?"Renderizando…":"Actualizar composición"}</button><button className="btn muted" disabled={busy} onClick={()=>void saveProfile()}>Guardar perfil</button><button className="btn muted" disabled={busy||!manifest} onClick={()=>void duplicateVariant()}>Duplicar variante</button><button className="btn muted" disabled={busy||!profileId} onClick={()=>void loadProfile()}>Restaurar perfil</button><button className="btn muted" disabled={busy||!svg} onClick={()=>void exportPng()}>Exportar PNG</button><button className="btn muted" onClick={()=>void refreshProfiles()}>Actualizar perfiles</button></div></div><div className="modular-composer-preview">{svgUrl?<img src={svgUrl} alt="Personaje CyberStreet compuesto con capas SVG reales" data-testid="cyberstreet-preview" style={{width:"100%",maxHeight:"640px",objectFit:"contain"}}/>:<div>El personaje aparecerá cuando el paquete SVG esté disponible.</div>}</div></div><p role="status" aria-live="polite">{message}</p></section>;
 }

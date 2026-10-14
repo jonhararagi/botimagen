@@ -1603,6 +1603,19 @@ try {
   }, fullLayerImage, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Disabling hair must update the real composition");
   await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-no-hair.png") });
+  // Real transform/reorder controls must alter the rendered SVG.
+  await cyberstreet.locator('.modular-layer-row[data-layer-id="hair-midnight-cyan"] .modular-layer-select').click();
+  const beforeMove = await cyberstreetPreview.getAttribute("src");
+  await cyberstreet.getByRole("slider", {name:"Mover horizontal"}).evaluate(el=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set.call(el,"24");el.dispatchEvent(new Event("input",{bubbles:true}));});
+  await page.waitForFunction(previous=>{const i=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');return i instanceof HTMLImageElement&&i.complete&&i.src!==previous&&decodeURIComponent(i.src).includes("translate(24 0)");},beforeMove,{timeout:15000});
+  const beforeScale = await cyberstreetPreview.getAttribute("src");
+  await cyberstreet.getByRole("slider",{name:"Escala"}).evaluate(el=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set.call(el,"1.25");el.dispatchEvent(new Event("input",{bubbles:true}));});
+  await page.waitForFunction(previous=>{const i=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');return i instanceof HTMLImageElement&&i.complete&&i.src!==previous&&decodeURIComponent(i.src).includes("scale(1.25)");},beforeScale,{timeout:15000});
+  const beforeRotate = await cyberstreetPreview.getAttribute("src");
+  await cyberstreet.getByRole("slider",{name:"Rotación"}).evaluate(el=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set.call(el,"15");el.dispatchEvent(new Event("input",{bubbles:true}));});
+  await page.waitForFunction(previous=>{const i=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');return i instanceof HTMLImageElement&&i.complete&&i.src!==previous&&decodeURIComponent(i.src).includes("rotate(15)");},beforeRotate,{timeout:15000});
+  await cyberstreet.getByRole("button",{name:"Subir Cabello cyan"}).click();
+  await page.waitForFunction(()=>{const i=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');if(!(i instanceof HTMLImageElement)||!i.complete)return false;const s=decodeURIComponent(i.src);return s.indexOf('data-layer-id="hair-midnight-cyan"')<s.indexOf('data-layer-id="top-neon-jacket"');},null,{timeout:15000});
   await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
   await page.getByRole("status").filter({ hasText: "Perfil guardado en el almacenamiento local del motor" }).waitFor({ timeout: 15000 });
   const profileSelect = cyberstreet.locator("select").first();
