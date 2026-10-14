@@ -313,10 +313,10 @@ try {
   const pngSwapComposer = page.locator(".modular-composer");
   await pngSwapComposer.scrollIntoViewIfNeeded();
   await pngSwapComposer.getByRole("button", { name: "Actualizar biblioteca/perfiles" }).click();
-  const topAssetId = await splitTop.getAttribute("data-asset-id");
-  assert.ok(topAssetId, "The imported clothing-top piece must expose a stable asset ID");
+  const pngSwapAssetId = await splitTop.getAttribute("data-asset-id");
+  assert.ok(pngSwapAssetId, "The imported clothing-top piece must expose a stable asset ID");
   const topPngSelect = pngSwapComposer.getByLabel("PNG para Chaqueta neón");
-  await topPngSelect.locator(`option[value="${topAssetId}"]`).waitFor({ state: "attached", timeout: 10000 });
+  await topPngSelect.locator(`option[value="${pngSwapAssetId}"]`).waitFor({ state: "attached", timeout: 10000 });
   const beforeDownloadPromise = page.waitForEvent("download");
   await pngSwapComposer.getByRole("button", { name: "Exportar PNG" }).click();
   const beforeDownload = await beforeDownloadPromise;
@@ -328,15 +328,15 @@ try {
   assert.equal(beforeInfo.width, 512);
   assert.equal(beforeInfo.height, 768);
 
-  await topPngSelect.selectOption(topAssetId);
+  await topPngSelect.selectOption(pngSwapAssetId);
   await page.waitForFunction(async assetId => {
     const image = document.querySelector('img[data-testid="pngSwapComposer-preview"]');
     if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
     const svg = await (await fetch(image.src)).text();
     return svg.includes(`data-user-asset-id="${assetId}"`) && svg.includes(`data-replaced-by-png="${assetId}"`);
-  }, topAssetId, { timeout: 10000 });
+  }, pngSwapAssetId, { timeout: 10000 });
   const replacedSvg = await pngSwapComposer.locator('img[data-testid="pngSwapComposer-preview"]').evaluate(async image => await (await fetch(image.src)).text());
-  assert.ok(replacedSvg.includes(`data-user-asset-id="${topAssetId}"`), "The selected PNG must be embedded in the actual CyberStreet render");
+  assert.ok(replacedSvg.includes(`data-user-asset-id="${pngSwapAssetId}"`), "The selected PNG must be embedded in the actual CyberStreet render");
 
   await pngSwapComposer.getByLabel("Nombre del perfil CyberStreet").fill("QA PNG swap persistence");
   await pngSwapComposer.getByRole("button", { name: "Guardar perfil" }).click();
@@ -360,7 +360,7 @@ try {
   assert.ok(afterInfo.opaque > 0 && afterInfo.transparent > 0, "The replaced character PNG must retain visible and transparent pixels");
 
   await page.reload({ waitUntil: "domcontentloaded" });
-  await pngSwapComposer.getByLabel("PNG para Chaqueta neón").locator(`option[value="${topAssetId}"]`).waitFor({ state: "attached", timeout: 10000 });
+  await pngSwapComposer.getByLabel("PNG para Chaqueta neón").locator(`option[value="${pngSwapAssetId}"]`).waitFor({ state: "attached", timeout: 10000 });
   await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").locator(`option[value="${savedCyberstreetProfileId}"]`).waitFor({ state: "attached", timeout: 10000 });
   await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").selectOption(savedCyberstreetProfileId);
   await pngSwapComposer.getByRole("button", { name: "Restaurar perfil" }).click();
@@ -369,9 +369,9 @@ try {
     if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
     const svg = await (await fetch(image.src)).text();
     return svg.includes(`data-user-asset-id="${assetId}"`);
-  }, topAssetId, { timeout: 10000 });
+  }, pngSwapAssetId, { timeout: 10000 });
   const restoredSvg = await pngSwapComposer.locator('img[data-testid="pngSwapComposer-preview"]').evaluate(async image => await (await fetch(image.src)).text());
-  assert.ok(restoredSvg.includes(`data-user-asset-id="${topAssetId}"`), "Reloading the saved profile must restore the same PNG asset ID");
+  assert.ok(restoredSvg.includes(`data-user-asset-id="${pngSwapAssetId}"`), "Reloading the saved profile must restore the same PNG asset ID");
 
   await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).check();
   await splitTop.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-02" }).check();
