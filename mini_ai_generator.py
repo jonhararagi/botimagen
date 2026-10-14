@@ -156,6 +156,13 @@ def _build_prompts(payload: dict[str, Any]) -> tuple[str, str]:
     return prompt, negative
 
 
+def _interrupt_engine(base: str) -> None:
+    try:
+        _request_json(base + "/sdapi/v1/interrupt", {}, timeout=2)
+    except Exception:
+        pass
+
+
 def generate_mini_ai(payload: Any) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise MiniAIError("El cuerpo debe ser un objeto JSON.")
@@ -171,7 +178,7 @@ def generate_mini_ai(payload: Any) -> dict[str, Any]:
         raise MiniAIError("Los límites de generación deben ser valores numéricos válidos.") from exc
     if not 4 <= steps <= _MAX_STEPS:
         raise MiniAIError(f"Los pasos deben estar entre 4 y {_MAX_STEPS}.")
-    if width not in {512, 640} or height not in {512, 640, 768} or width > _MAX_SIDE or height > _MAX_SIDE:
+    if (width, height) not in {(512, 512), (512, 640), (512, 768), (640, 640)} or width > _MAX_SIDE or height > _MAX_SIDE:
         raise MiniAIError("Resolución permitida: 512×512, 512×640, 512×768 o 640×640.")
     if not 30 <= timeout_seconds <= _MAX_SECONDS:
         raise MiniAIError(f"El límite de tiempo debe estar entre 30 y {_MAX_SECONDS} segundos.")
@@ -195,11 +202,13 @@ def generate_mini_ai(payload: Any) -> dict[str, Any]:
         }
         try:
             result = _request_json(base + "/sdapi/v1/txt2img", body, timeout=timeout_seconds)
-        except (TimeoutError, socket.timeout, urllib.error.URLError) as exc:
-            try:
-                _request_json(base + "/sdapi/v1/interrupt", {}, timeout=2)
-            except Exception:
-                pass
+        except urllib.error.URLError as exc:
+            if not isinstance(getattr(exc, "reason", None), (TimeoutError, socket.timeout)):
+                raise MiniAIError(f"No se pudo completar la solicitud al motor local: {getattr(exc, 'reason', exc)}") from exc
+            _interrupt_engine(base)
+            raise MiniAIError(f"Se agotó el tiempo de generación ({timeout_seconds} s). Se envió una orden de interrupción al motor local. Revisá su consola por si necesita detenerse manualmente.") from exc
+        except (TimeoutError, socket.timeout) as exc:
+            _interrupt_engine(base)
             raise MiniAIError(f"Se agotó el tiempo de generación ({timeout_seconds} s). Se envió una orden de interrupción al motor local. Revisá su consola por si necesita detenerse manualmente.") from exc
         images = result.get("images")
         if not isinstance(images, list) or not images or not isinstance(images[0], str):
