@@ -930,3 +930,14 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - **Limitaciones explícitas:** QA manual física en Windows `NOT_RUN`. No existe segmentación semántica automática validada para separar pelo, piel y ropa de PNG opacos; el recorte manual no reconstruye píxeles ocultos. La calidad visual de recursos artísticos reales requiere revisión separada.
 - **Estado BIMG-WAIFU-FACTORY-003: PASS_REAL** para los controles integrados, transformaciones que afectan píxeles, persistencia de perfiles/variantes y regresiones automatizadas del SHA indicado. No significa que el arte sintético de QA sea profesional ni que toda la beta esté cerrada.
 - **TIMER:** 12–24 horas activas estimadas por el encargo. Tiempo real medido: `NOT_MEASURED`. El progreso global ponderado permanece en **63%**, último checkpoint documentado, porque esta entrega no cierra por sí sola la beta local completa.
+
+
+## BIMG-WAIFU-FACTORY-004-R2 · checkpoint de implementación · 2026-10-14
+
+- Rama autorizada: `feature/bimg-engine-001-cyberstreet-visual-renderer`.
+- Implementación de compositor interactivo: [`3e8469682af7ecd2372461fac54273a387c16ec3`](https://github.com/jonhararagi/botimagen/commit/3e8469682af7ecd2372461fac54273a387c16ec3). QA Chromium y selectores del arnés corregidos en [`ca3b518cc7aece9c7ace1ee03f71e509b42a9a51`](https://github.com/jonhararagi/botimagen/commit/ca3b518cc7aece9c7ace1ee03f71e509b42a9a51).
+- CI `PASS` para el SHA exacto `ca3b518cc7aece9c7ace1ee03f71e509b42a9a51`: [run 643](https://github.com/jonhararagi/botimagen/actions/runs/38512999758). Pasaron las suites Python/API, `npm ci --no-audit --no-fund`, build React/TypeScript y smoke E2E Chromium.
+- La vista CyberStreet inicial usa las seis capas SVG del manifiesto y el lienzo 512×768. Controles funcionales de visibilidad, movimiento X/Y, escala, rotación y orden de capas. El perfil persiste capas, transformaciones y orden; duplicación mantiene ID independiente. Exportación PNG comprobada por el smoke test con dimensiones 512×768, RGBA, píxeles visibles y píxeles transparentes.
+- Capturas de QA generadas por la ejecución: [artefacto botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38512999758/artifacts/11871071978), incluye `cyberstreet-modular-full.png` y `cyberstreet-export-verified.png`.
+- Estado global de esta tarea: **PARTIAL**, no PASS_REAL. El paquete de inicio solo contiene una variante SVG por cada rol; el compositor todavía no permite reemplazar cabello/rostro/chaqueta/falda/calzado seleccionando piezas PNG de la biblioteca modular importada. Este criterio requiere integración explícita de `GET /api/modular-assets` y `/api/modular-assets/{id}/image`.
+- QA física en Windows: **NOT_RUN**. No se ha afirmado validación de navegador físico ni en el PC del usuario.

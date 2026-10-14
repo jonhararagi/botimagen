@@ -161,3 +161,11 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 
 
 - **BIMG-WAIFU-FACTORY-003 · personalización artística de piezas (2026-10-13):** estado `PASS_REAL` para el código probado `405a1283d3402f2b78f25bb9206c864ec8065298`; [CI #639](https://github.com/jonhararagi/botimagen/actions/runs/38451083604) completó las suites Python/API, build TypeScript/Vite y Chromium E2E. Se añadieron controles reales de posición X/Y, escala, rotación, orden de capa y visibilidad, con persistencia por perfil. Las pruebas verifican cambios de píxeles, orden y visibilidad, restauración e independencia de variantes, PNG RGBA 512×768 con alfa y ausencia de overflow/API/console errors. [Artefacto QA visual](https://github.com/jonhararagi/botimagen/actions/runs/38451083604/artifacts/11840835816). La captura usa fixtures sintéticos y no representa una aceptación de arte profesional. QA física Windows: `NOT_RUN`; segmentación semántica de PNG opacos sigue sin estar implementada/validada. TIMER estimado 12–24 h; tiempo real `NOT_MEASURED`. El porcentaje global no cambia: **63%**.
+
+
+## BIMG-WAIFU-FACTORY-004-R2 · evidencia incremental · 2026-10-14
+
+- CI PASS para el SHA probado `ca3b518cc7aece9c7ace1ee03f71e509b42a9a51`: [Actions run 643](https://github.com/jonhararagi/botimagen/actions/runs/38512999758).
+- Implementados y probados en Chromium los controles del compositor CyberStreet para visibilidad, movimiento, escala, rotación y orden; guardado/duplicación/restauración de perfil; PNG RGBA transparente 512×768.
+- Artefacto visual real: [botimagen-visual-garment-qa](https://github.com/jonhararagi/botimagen/actions/runs/38512999758/artifacts/11871071978).
+- BIMG-WAIFU-FACTORY-004-R2 sigue **PARTIAL**: pendiente cambiar una pieza por una alternativa PNG de la biblioteca importada y validar ese roundtrip. QA física Windows **NOT_RUN**.
