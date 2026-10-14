@@ -728,3 +728,14 @@ El usuario pidió cerrar el ciclo de documentación y hacer el programa de verda
 ### Siguiente objetivo no negociable
 
 Ejecutar una sola orden de trabajo para completar la edición de máscaras y el flujo de modelo multi-PNG, ampliar/validar el modelo con varias referencias privadas y producir capturas privadas que **visualmente contengan el fixture Firefly** dentro del programa. Timer estimado: **8–16 horas activas** para esta fase, no medido y no equivalente a terminar todo BotImagen.
+
+
+## BIMG-ANIME-PNG-UNIVERSAL-LIBRARY · 2026-10-14
+
+- Rama de trabajo: `feature/bimg-anime-png-universal-library`.
+- Añadido `web/src/visual/AnimePngLibrary.tsx`: biblioteca local universal para personajes completos/sprites PNG, importación múltiple y por carpeta, validación de firma PNG, miniaturas, búsqueda, vista ampliada, descarga y eliminación.
+- Conectada en `web/src/App.tsx`; el acceso lateral «Biblioteca de PNG» desplaza hasta la galería.
+- Los archivos se guardan en IndexedDB del navegador y no se suben al backend.
+- Documentación: `docs/BIMG-ANIME-PNG-LIBRARY.md`.
+- **Límite explícito:** no se empaquetaron miles de ilustraciones. Antes de redistribuir arte de terceros hay que verificar licencia, atribución y permisos. La nueva biblioteca puede cargar colecciones grandes autorizadas desde el PC, pero no genera ni descarga ilustraciones de internet.
+- CI/build, pruebas funcionales y QA en Windows: pendientes de ejecución para esta rama. No declarar PASS hasta comprobar resultados reales.
