@@ -60,7 +60,7 @@ export function MiniAnimeAI() {
     link.click();
   };
 
-  return <section className="mini-anime-ai" aria-labelledby="mini-anime-ai-title">
+  return <section id="mini-anime-ai" className="mini-anime-ai" aria-labelledby="mini-anime-ai-title">
     <style>{`
       .mini-anime-ai{margin:24px 0;padding:22px;border:1px solid #38344f;border-radius:18px;background:linear-gradient(145deg,#191624,#101018);color:#f7f4ff}
       .mini-anime-ai *{box-sizing:border-box}.mini-ai-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
