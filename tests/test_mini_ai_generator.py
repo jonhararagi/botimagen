@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import os
+import sys
 import unittest
+from pathlib import Path
 from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mini_ai_generator import MiniAIError, _build_prompts, _engine_url
 
