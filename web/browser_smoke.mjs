@@ -360,6 +360,8 @@ try {
   assert.ok(afterInfo.opaque > 0 && afterInfo.transparent > 0, "The replaced character PNG must retain visible and transparent pixels");
 
   await page.reload({ waitUntil: "domcontentloaded" });
+  await pngSwapComposer.getByLabel("PNG para Chaqueta neón").locator(`option[value="${topAssetId}"]`).waitFor({ state: "attached", timeout: 10000 });
+  await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").locator(`option[value="${savedCyberstreetProfileId}"]`).waitFor({ state: "attached", timeout: 10000 });
   await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").selectOption(savedCyberstreetProfileId);
   await pngSwapComposer.getByRole("button", { name: "Restaurar perfil" }).click();
   await page.waitForFunction(async assetId => {
