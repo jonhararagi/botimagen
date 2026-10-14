@@ -739,3 +739,14 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - Documentación: `docs/BIMG-ANIME-PNG-LIBRARY.md`.
 - **Límite explícito:** no se empaquetaron miles de ilustraciones. Antes de redistribuir arte de terceros hay que verificar licencia, atribución y permisos. La nueva biblioteca puede cargar colecciones grandes autorizadas desde el PC, pero no genera ni descarga ilustraciones de internet.
 - CI/build, pruebas funcionales y QA en Windows: pendientes de ejecución para esta rama. No declarar PASS hasta comprobar resultados reales.
+
+
+## BIMG-MINI-AI-LOCAL · 2026-10-14
+
+- Mismo branch y misma PR #15: `feature/bimg-anime-png-universal-library`. No se abrió una segunda rama.
+- Integrado `mini_ai_generator.py`: puente opcional a AUTOMATIC1111/Forge local, acceso restringido a loopback, plantilla de prompt anime, prompt negativo, semilla fija, una imagen por solicitud, 512×768, 4–16 pasos, presupuesto preventivo de RAM y timeout de hasta 300 segundos con intento de interrupción.
+- Integrado `web/src/visual/MiniAnimeAI.tsx` en el estudio y acceso lateral «Mini IA anime». El PNG generado se descarga y puede importarse a la biblioteca universal.
+- Rutas locales: `GET /api/mini-ai/status` y `POST /api/mini-ai/generate`. No se empaqueta un modelo, no hay API paga y no se envía la solicitud a la nube. Para generar de verdad, el usuario debe instalar un checkpoint anime y ejecutar AUTOMATIC1111/Forge con `--api`.
+- Restricción importante: el presupuesto RAM actual solo comprueba memoria libre antes de iniciar, no impone un límite duro al proceso externo; el timeout intenta enviar `/sdapi/v1/interrupt`, pero la detención efectiva depende del motor. No afirmar control duro de RAM/CPU ni consistencia perfecta de personaje.
+- Pruebas añadidas: `tests/test_mini_ai_generator.py`, incluidas en el workflow de validación. Build, smoke test y conexión real con motor local todavía deben confirmarse en CI/Windows.
+- La CI anterior de la rama (run #658, SHA `56eddfae6015096811c1d5602496fa6e9f1e38ad`) falló en el smoke test preexistente de máscaras: Playwright no pudo pulsar «Guardar máscara corregida» porque el botón seguía deshabilitado. No atribuir ese fallo a la mini IA sin evidencia ni declarar la rama verde hasta una nueva ejecución.
