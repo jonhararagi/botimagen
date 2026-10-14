@@ -85,9 +85,6 @@ def mini_ai_status() -> dict[str, Any]:
     available_ram = _available_ram_gb()
     try:
         base = _engine_url()
-        models = _request_json(base + "/sdapi/v1/sd-models", timeout=2)
-        # AUTOMATIC1111 returns a list, so use the endpoint's JSON directly below instead.
-        del models
         request = urllib.request.Request(base + "/sdapi/v1/sd-models")
         with urllib.request.urlopen(request, timeout=2) as response:
             model_list = json.loads(response.read(2 * 1024 * 1024).decode("utf-8"))
