@@ -310,18 +310,18 @@ try {
   await page.getByText("Anclajes confirmados", { exact: false }).waitFor({ timeout: 10000 });
 
   // Replace a real CyberStreet SVG layer with the imported PNG, export it, then verify profile round-trip.
-  const cyberstreet = page.locator(".modular-composer");
-  await cyberstreet.scrollIntoViewIfNeeded();
-  await cyberstreet.getByRole("button", { name: "Actualizar biblioteca/perfiles" }).click();
+  const pngSwapComposer = page.locator(".modular-composer");
+  await pngSwapComposer.scrollIntoViewIfNeeded();
+  await pngSwapComposer.getByRole("button", { name: "Actualizar biblioteca/perfiles" }).click();
   const topAssetId = await splitTop.getAttribute("data-asset-id");
   assert.ok(topAssetId, "The imported clothing-top piece must expose a stable asset ID");
-  const topPngSelect = cyberstreet.getByLabel("PNG para Chaqueta neón");
+  const topPngSelect = pngSwapComposer.getByLabel("PNG para Chaqueta neón");
   await topPngSelect.locator(`option[value="${topAssetId}"]`).waitFor({ state: "attached", timeout: 10000 });
   const beforeDownloadPromise = page.waitForEvent("download");
-  await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
+  await pngSwapComposer.getByRole("button", { name: "Exportar PNG" }).click();
   const beforeDownload = await beforeDownloadPromise;
   await mkdir(resolve(root, "artifacts/visual-qa"), { recursive: true });
-  const beforePath = resolve(root, "artifacts/visual-qa/cyberstreet-before-png-swap.png");
+  const beforePath = resolve(root, "artifacts/visual-qa/pngSwapComposer-before-png-swap.png");
   await beforeDownload.saveAs(beforePath);
   const beforePng = await readFile(beforePath);
   const beforeInfo = inspectRgbaPng(beforePng);
@@ -330,27 +330,27 @@ try {
 
   await topPngSelect.selectOption(topAssetId);
   await page.waitForFunction(async assetId => {
-    const image = document.querySelector('img[data-testid="cyberstreet-preview"]');
+    const image = document.querySelector('img[data-testid="pngSwapComposer-preview"]');
     if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
     const svg = await (await fetch(image.src)).text();
     return svg.includes(`data-user-asset-id="${assetId}"`) && svg.includes(`data-replaced-by-png="${assetId}"`);
   }, topAssetId, { timeout: 10000 });
-  const replacedSvg = await cyberstreet.locator('img[data-testid="cyberstreet-preview"]').evaluate(async image => await (await fetch(image.src)).text());
+  const replacedSvg = await pngSwapComposer.locator('img[data-testid="pngSwapComposer-preview"]').evaluate(async image => await (await fetch(image.src)).text());
   assert.ok(replacedSvg.includes(`data-user-asset-id="${topAssetId}"`), "The selected PNG must be embedded in the actual CyberStreet render");
 
-  await cyberstreet.getByLabel("Nombre del perfil CyberStreet").fill("QA PNG swap persistence");
-  await cyberstreet.getByRole("button", { name: "Guardar perfil" }).click();
+  await pngSwapComposer.getByLabel("Nombre del perfil CyberStreet").fill("QA PNG swap persistence");
+  await pngSwapComposer.getByRole("button", { name: "Guardar perfil" }).click();
   await page.waitForFunction(() => {
     const select = document.querySelector('select[aria-label="Perfiles CyberStreet guardados"]');
     return select instanceof HTMLSelectElement && Boolean(select.value);
   }, null, { timeout: 10000 });
-  const savedCyberstreetProfileId = await cyberstreet.getByLabel("Perfiles CyberStreet guardados").inputValue();
+  const savedCyberstreetProfileId = await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").inputValue();
   assert.ok(savedCyberstreetProfileId, "The profile containing the PNG override must have a persistent ID");
 
   const afterDownloadPromise = page.waitForEvent("download");
-  await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
+  await pngSwapComposer.getByRole("button", { name: "Exportar PNG" }).click();
   const afterDownload = await afterDownloadPromise;
-  const afterPath = resolve(root, "artifacts/visual-qa/cyberstreet-after-png-swap.png");
+  const afterPath = resolve(root, "artifacts/visual-qa/pngSwapComposer-after-png-swap.png");
   await afterDownload.saveAs(afterPath);
   const afterPng = await readFile(afterPath);
   const afterInfo = inspectRgbaPng(afterPng);
@@ -360,15 +360,15 @@ try {
   assert.ok(afterInfo.opaque > 0 && afterInfo.transparent > 0, "The replaced character PNG must retain visible and transparent pixels");
 
   await page.reload({ waitUntil: "domcontentloaded" });
-  await cyberstreet.getByLabel("Perfiles CyberStreet guardados").selectOption(savedCyberstreetProfileId);
-  await cyberstreet.getByRole("button", { name: "Restaurar perfil" }).click();
+  await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").selectOption(savedCyberstreetProfileId);
+  await pngSwapComposer.getByRole("button", { name: "Restaurar perfil" }).click();
   await page.waitForFunction(async assetId => {
-    const image = document.querySelector('img[data-testid="cyberstreet-preview"]');
+    const image = document.querySelector('img[data-testid="pngSwapComposer-preview"]');
     if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
     const svg = await (await fetch(image.src)).text();
     return svg.includes(`data-user-asset-id="${assetId}"`);
   }, topAssetId, { timeout: 10000 });
-  const restoredSvg = await cyberstreet.locator('img[data-testid="cyberstreet-preview"]').evaluate(async image => await (await fetch(image.src)).text());
+  const restoredSvg = await pngSwapComposer.locator('img[data-testid="pngSwapComposer-preview"]').evaluate(async image => await (await fetch(image.src)).text());
   assert.ok(restoredSvg.includes(`data-user-asset-id="${topAssetId}"`), "Reloading the saved profile must restore the same PNG asset ID");
 
   await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).check();
