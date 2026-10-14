@@ -210,18 +210,17 @@ export function AnimePngLibrary() {
       <p role="status" aria-live="polite" className="anime-png-note">{message}</p>
       {filtered.length ? <div className="anime-png-grid" style={{ marginTop: 14 }}>
         {filtered.map(item => {
-          const url = URL.createObjectURL(item.blob);
-          return <AnimePngCard key={item.id} item={item} src={url} onPreview={() => setSelected(item)} onDownload={() => download(item)} onDelete={() => void deleteItem(item)} />;
+          return <AnimePngCard key={item.id} item={item} onPreview={() => setSelected(item)} onDownload={() => download(item)} onDelete={() => void deleteItem(item)} />;
         })}
       </div> : <div className="anime-png-empty" style={{ marginTop: 14 }}>
         <strong>{items.length ? "No hay resultados con ese nombre." : "La biblioteca está lista para recibir tu colección."}</strong>
         <p style={{ marginTop: 8 }}>{items.length ? "Probá con otra búsqueda o borrá el filtro." : "Seleccioná cientos o miles de PNG desde tu PC. Se mostrarán como miniaturas y se conservarán localmente entre sesiones."}</p>
-        {!items.length && <button className="anime-png-primary" style={{ marginTop: 14 }} type="button" onClick={() => fileInput.current?.click()}>Elegir carpeta de PNG</button>}
+        {!items.length && <button className="anime-png-primary" style={{ marginTop: 14 }} type="button" onClick={() => fileInput.current?.click()}>Elegir archivos PNG</button>}
       </div>}
       {selected && <div className="anime-png-modal" role="dialog" aria-modal="true" aria-label={selected.name} onClick={() => setSelected(null)}>
         <div className="anime-png-modal-inner" onClick={event => event.stopPropagation()}>
           <div className="anime-png-head"><div><strong>{selected.name}</strong><p className="anime-png-note">{selected.width} × {selected.height} px · {formatBytes(selected.bytes)} · Clase universal: personaje completo</p></div><button type="button" onClick={() => setSelected(null)}>Cerrar ✕</button></div>
-          <img src={URL.createObjectURL(selected.blob)} alt={selected.name} />
+          <AnimePngImage blob={selected.blob} alt={selected.name} />
           <div className="anime-png-actions"><button className="anime-png-primary" type="button" onClick={() => download(selected)}>Descargar original</button><button type="button" onClick={() => void deleteItem(selected)}>Quitar de biblioteca</button></div>
         </div>
       </div>}
@@ -229,13 +228,13 @@ export function AnimePngLibrary() {
   );
 }
 
-function AnimePngCard({ item, src, onPreview, onDownload, onDelete }: {
-  item: CharacterPng; src: string; onPreview: () => void; onDownload: () => void; onDelete: () => void;
+function AnimePngCard({ item, onPreview, onDownload, onDelete }: {
+  item: CharacterPng; onPreview: () => void; onDownload: () => void; onDelete: () => void;
 }) {
   const [failed, setFailed] = useState(false);
   return <article className="anime-png-card">
     <button type="button" className="anime-png-thumb" aria-label={`Ver ${item.name}`} onClick={onPreview} style={{ width: "100%", border: 0, borderRadius: 0, padding: 8 }}>
-      {!failed ? <img src={src} alt={item.name} onError={() => setFailed(true)} /> : <span>PNG no disponible</span>}
+      {!failed ? <AnimePngImage blob={item.blob} alt={item.name} onError={() => setFailed(true)} /> : <span>PNG no disponible</span>}
     </button>
     <div className="anime-png-meta">
       <div className="anime-png-name" title={item.name}>{item.name}</div>
@@ -243,4 +242,14 @@ function AnimePngCard({ item, src, onPreview, onDownload, onDelete }: {
       <div className="anime-png-card-actions"><button type="button" onClick={onPreview}>Ver</button><button type="button" onClick={onDownload}>Bajar</button><button type="button" onClick={onDelete} aria-label={`Eliminar ${item.name}`}>✕</button></div>
     </div>
   </article>;
+}
+
+function AnimePngImage({ blob, alt, onError }: { blob: Blob; alt: string; onError?: () => void }) {
+  const [src, setSrc] = useState("");
+  useEffect(() => {
+    const url = URL.createObjectURL(blob);
+    setSrc(url);
+    return () => URL.revokeObjectURL(url);
+  }, [blob]);
+  return src ? <img src={src} alt={alt} onError={onError} /> : null;
 }
