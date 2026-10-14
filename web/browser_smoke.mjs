@@ -372,6 +372,14 @@ try {
   }, pngSwapAssetId, { timeout: 10000 });
   const restoredSvg = await pngSwapComposer.locator('img[data-testid="cyberstreet-preview"]').evaluate(async image => await (await fetch(image.src)).text());
   assert.ok(restoredSvg.includes(`data-user-asset-id="${pngSwapAssetId}"`), "Reloading the saved profile must restore the same PNG asset ID");
+  // Leave the following independent CyberStreet regression checks in their original baseline state.
+  await pngSwapComposer.getByLabel("Nombre del perfil CyberStreet").fill("Mi personaje CyberStreet");
+  await pngSwapComposer.getByLabel("PNG para Chaqueta neón").selectOption("");
+  await page.waitForFunction(async () => {
+    const image = document.querySelector('img[data-testid="cyberstreet-preview"]');
+    if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
+    return !(await (await fetch(image.src)).text()).includes("data-user-asset-id=");
+  }, null, { timeout: 10000 });
 
   await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).check();
   await splitTop.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-02" }).check();
