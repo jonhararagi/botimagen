@@ -330,12 +330,12 @@ try {
 
   await topPngSelect.selectOption(pngSwapAssetId);
   await page.waitForFunction(async assetId => {
-    const image = document.querySelector('img[data-testid="pngSwapComposer-preview"]');
+    const image = document.querySelector('img[data-testid="cyberstreet-preview"]');
     if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
     const svg = await (await fetch(image.src)).text();
     return svg.includes(`data-user-asset-id="${assetId}"`) && svg.includes(`data-replaced-by-png="${assetId}"`);
   }, pngSwapAssetId, { timeout: 10000 });
-  const replacedSvg = await pngSwapComposer.locator('img[data-testid="pngSwapComposer-preview"]').evaluate(async image => await (await fetch(image.src)).text());
+  const replacedSvg = await pngSwapComposer.locator('img[data-testid="cyberstreet-preview"]').evaluate(async image => await (await fetch(image.src)).text());
   assert.ok(replacedSvg.includes(`data-user-asset-id="${pngSwapAssetId}"`), "The selected PNG must be embedded in the actual CyberStreet render");
 
   await pngSwapComposer.getByLabel("Nombre del perfil CyberStreet").fill("QA PNG swap persistence");
@@ -365,12 +365,12 @@ try {
   await pngSwapComposer.getByLabel("Perfiles CyberStreet guardados").selectOption(savedCyberstreetProfileId);
   await pngSwapComposer.getByRole("button", { name: "Restaurar perfil" }).click();
   await page.waitForFunction(async assetId => {
-    const image = document.querySelector('img[data-testid="pngSwapComposer-preview"]');
+    const image = document.querySelector('img[data-testid="cyberstreet-preview"]');
     if (!(image instanceof HTMLImageElement) || !image.src.startsWith("blob:")) return false;
     const svg = await (await fetch(image.src)).text();
     return svg.includes(`data-user-asset-id="${assetId}"`);
   }, pngSwapAssetId, { timeout: 10000 });
-  const restoredSvg = await pngSwapComposer.locator('img[data-testid="pngSwapComposer-preview"]').evaluate(async image => await (await fetch(image.src)).text());
+  const restoredSvg = await pngSwapComposer.locator('img[data-testid="cyberstreet-preview"]').evaluate(async image => await (await fetch(image.src)).text());
   assert.ok(restoredSvg.includes(`data-user-asset-id="${pngSwapAssetId}"`), "Reloading the saved profile must restore the same PNG asset ID");
 
   await splitBody.getByRole("checkbox", { name: "Seleccionar pieza qa-alpha-sheet-pieza-01" }).check();
