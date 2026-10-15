@@ -26,6 +26,8 @@ jobs:
           test -s android/app/src/main/assets/index.html
           test -s android/app/src/main/java/com/botimagen/mobile/MainActivity.java
           grep -q 'BotImagen Mobile' android/app/src/main/assets/index.html
+      - name: Test PNG parts engine
+        run: node --test tests/mobile-parts.test.cjs
       - name: Build debug APK
         working-directory: android
         run: gradle --no-daemon --stacktrace :app:assembleDebug
