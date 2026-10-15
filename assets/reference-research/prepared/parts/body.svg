@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+<title id="title">BotImagen modular part: body</title><desc id="desc">Original standalone editable SVG part aligned to BotImagen modular base v1 canvas.</desc>
+<defs><linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9bf5ff"/><stop offset="1" stop-color="#d17cff"/></linearGradient><linearGradient id="jacketGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262c4c"/><stop offset="1" stop-color="#12162b"/></linearGradient></defs>
+<g id="body" data-part="body">
+<path d="M205 310 Q256 294 307 310 L332 415 Q352 467 365 545 L326 554 L294 438 L288 584 L224 584 L218 438 L186 554 L147 545 Q160 467 180 415 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="5" stroke-linejoin="round"/><path d="M224 574 L255 574 L251 689 L215 689 Q208 680 215 665 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="5"/><path d="M257 574 L288 574 L299 665 Q306 681 296 689 L260 689 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="5"/><path d="M211 682 Q230 673 252 686 L252 704 L195 704 Q190 692 211 682 Z M263 686 Q282 673 301 682 Q323 691 317 704 L261 704 Z" fill="#252943" stroke="#302a43" stroke-width="5"/>
+</g>
+</svg>
