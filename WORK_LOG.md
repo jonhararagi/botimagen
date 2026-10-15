@@ -22,3 +22,18 @@
 - Cost/provenance: no PixAI generation submitted and no credits spent; no external model weights or third-party images copied into the repository.
 - Verification: previous browser smoke CI #676 passed: https://github.com/jonhararagi/botimagen/actions/runs/38689078630. New CI for this work is running on latest commit `eff68d4fa8917d172da79915ada62386fde417fd`: https://github.com/jonhararagi/botimagen/actions/runs/38689968238. Do not mark this change PASS until that run completes successfully.
 - TIMER: 30–60 minutes estimated for CI follow-up and any needed fixes; visual review and Windows physical QA remain separate.
+
+
+## 2026-10-15 · BIMG-REFERENCE-BASE-003
+
+- Scope: extend the existing reference research on the same PR branch; record specific CC0 source pages and provide standalone editable original SVG parts for quick iteration.
+- Branch: `feature/bimg-anime-png-universal-library`; existing PR #15 remains open. No new branch, no merge, no `main` edits.
+- Research verified from source pages:
+  - Hordana, “Anime Girl / Michona”: OpenGameArt marks the page CC0 and lists three PNG sprite strips: https://opengameart.org/content/anime-girl
+  - FALLiNG_AiR, “Visual novel Character Sprite”: OpenGameArt marks the page CC0 and lists a 26.2 MB ZIP described as including PSD, Clip Studio and PNG files: https://opengameart.org/content/visual-novel-character-sprite
+  - PixAI licensing guide: check image references, model and LoRA terms separately: https://blog.pixai.art/en/pixai-commercial-use-licensing-guide/
+- Repository files added: `assets/reference-research/manifest.json` now records author, license label, direct file URLs and import status. Added original SVG base and six aligned standalone SVG parts under `assets/reference-research/prepared/`: body, clothing, head, eyes, hair and watermark. These SVGs are project-authored originals, not downloaded PixAI art.
+- External binary ingestion status: **PARTIAL**. Source license pages were checked and links recorded, but source ZIP/PNG bytes have not yet been mirrored into the repo. The ZIP must be inspected before any files inside are accepted as separate reusable layers. Do not state external assets are already downloaded.
+- PixAI generation: no image generation submitted and no credits spent.
+- Validation: latest known completed CI #686 passed at commit `37197d6e5bbcef25b760b0b5e6eb1d4a4eb2a4b8`: https://github.com/jonhararagi/botimagen/actions/runs/38691071772. CI #689 for the current head is still running: https://github.com/jonhararagi/botimagen/actions/runs/38692199311. Await final status before claiming the newest changes pass.
+- TIMER: 30–60 minutes of additional active work for external file ingestion, checking the ZIP's real layer structure, and testing imports. Manual visual review remains required.
