@@ -168,6 +168,13 @@ try {
   await dressup.getByRole("button", { name: "Guardar look" }).click();
   await dressup.getByText("¡Look guardado en este navegador!").waitFor({ state: "visible" });
   assert.deepEqual(pageErrors, [], "Dress-up interactions should not raise JavaScript errors");
+
+  // The PNG-backed mode reports the real local inventory instead of inventing assets.
+  const modularDressup = page.locator("[data-testid=modular-dressup]");
+  await modularDressup.waitFor({ state: "visible", timeout: 10000 });
+  await modularDressup.getByRole("heading", { name: "Vestuario con tus PNG reales" }).waitFor({ state: "visible" });
+  assert.match(await modularDressup.locator("[data-testid=modular-dressup-status]").textContent(), /AÚN NO|biblioteca|pieza/i,
+    "The PNG-backed mode should report the actual local asset inventory");
   assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
     "The user-facing CC0 studio must offer all five imported character sprites");
   await page.waitForFunction(() => {
