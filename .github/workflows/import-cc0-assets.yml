@@ -197,7 +197,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/reference-research/incoming/opengameart assets/reference-research/manifest.json
+          git add assets/reference-research/incoming/opengameart assets/reference-research/prepared/fallingair assets/reference-research/manifest.json
           if git diff --cached --quiet; then
             echo 'No asset changes to commit.'
             exit 0
