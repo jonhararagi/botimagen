@@ -92,5 +92,24 @@
     "require_sha256": true,
     "keep_original_unmodified": true,
     "package_model_weights_in_repository": false
-  }
+  },
+  "local_assets": [
+    {
+      "id": "botimagen-modular-base-v1",
+      "path": "assets/reference-research/prepared/botimagen-modular-base-v1.svg",
+      "creator": "BotImagen project workflow",
+      "origin": "original vector asset created for this repository",
+      "license_status": "project-authored; confirm repository license policy before redistribution outside this repo",
+      "format": "SVG",
+      "editable_parts": [
+        "body",
+        "clothing",
+        "head",
+        "eyes",
+        "hair",
+        "watermark"
+      ],
+      "notes": "Original base, not copied from PixAI or another artist. Groups are separated in SVG for editing; raster exports may still require manual cleanup before importing into the raster region builder."
+    }
+  ]
 }
