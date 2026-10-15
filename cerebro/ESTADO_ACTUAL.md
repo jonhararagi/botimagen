@@ -1,3 +1,20 @@
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-15 · FÁBRICA DE ASSETS PIXAI
+
+La tarea continúa en la rama existente `feature/bimg-anime-png-universal-library` y PR #15, sin modificar `main`, sin abrir ramas duplicadas y sin integrar automáticamente.
+
+## Incremento implementado
+- Se añadió `web/src/visual/PixAiAssetFactory.tsx` y se integró en `web/src/App.tsx`.
+- La fábrica permite seleccionar rasgos del catálogo real del motor (cuando la API local está disponible), preparar un prompt de pieza individual, abrir PixAI manualmente y ver el estado `HAY` / `AÚN NO` según los PNG importados para esa variante.
+- Importa PNG descargados mediante selección explícita del usuario; valida firma PNG, tamaño máximo de 20 MB y dimensiones de 64–8192 px; guarda el Blob y metadatos en IndexedDB local y permite volver a descargar o eliminar una pieza.
+- El prompt prioriza un solo asset, diseño original, fondo transparente si el modelo lo admite y, como alternativa, fondo magenta uniforme para retirada posterior. Se recomienda una imagen por pedido, Gen Pibara V1, tamaño pequeño/mediano y cola normal/de espera. La interfaz no selecciona opciones premium ni lanza generaciones por sí sola.
+- Por seguridad, la aplicación no puede leer la carpeta Descargas sin selección del usuario y no sube los PNG a GitHub automáticamente. Los recursos nuevos permanecen en la biblioteca local del navegador, no en el historial Git.
+- Se añadió cobertura Chromium para verificar que un rasgo vacío muestra `AÚN NO` y que un rasgo del catálogo habilita la preparación del prompt.
+- El perfil TinyFish `PixAI - BotImagen` abrió PixAI autenticado en comprobación de solo lectura; se observó perfil activo y saldo visible de 1.434.000 créditos. No se gastaron créditos durante esa comprobación. Aún no se ha confirmado el coste actual de Gen Pibara V1 ni ejecutado una generación de prueba en esta tarea.
+- La nueva CI debe confirmar build TypeScript/Vite y smoke test Chromium. Hasta que termine, este incremento está **PARTIAL / CI PENDING**.
+- Pendiente después de CI: probar una sola generación real económica en PixAI, verificar el PNG descargado e importado y revisar visualmente si el asset sirve para ensamblado modular. No afirmar que miles de piezas existen hasta que estén generadas y validadas.
+
+---
+
 # ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-15 · CREADOR CC0
 
 La rama activa para la entrega universal sigue siendo `feature/bimg-anime-png-universal-library`; PR #15 continúa abierto y sin integrar: https://github.com/jonhararagi/botimagen/pull/15. No modificar `main`, no abrir ramas duplicadas ni integrar sin autorización.
