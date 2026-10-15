@@ -1,3 +1,20 @@
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-15 · CREADOR CC0
+
+La rama activa para la entrega universal sigue siendo `feature/bimg-anime-png-universal-library`; PR #15 continúa abierto y sin integrar: https://github.com/jonhararagi/botimagen/pull/15. No modificar `main`, no abrir ramas duplicadas ni integrar sin autorización.
+
+## Incremento implementado en esta sesión
+- Se añadió `web/src/visual/Cc0CharacterStudio.tsx` y se integró en `web/src/App.tsx` antes del editor técnico.
+- El nuevo panel utiliza sprites reales del catálogo local `web/public/cc0-character-library/characters/`: selector de cinco personajes, selección de expresión según el personaje, nombre editable, preferencia de fondo (transparente/blanco/negro), persistencia local y exportación PNG normalizada a 512×768 sin deformar el sprite.
+- Se añadió cobertura Chromium en `web/browser_smoke.mjs` para comprobar los cinco personajes y que elegir el personaje 2 con expresión feliz carga el archivo de sprite real.
+- Los sprites de cuerpo completo y expresiones sí están disponibles; las 43 capas PNG extraídas de PSD continúan siendo regiones sin clasificación semántica validada. No afirmar que cabello, cuerpo y prendas de esas capas ya se recombinan automáticamente.
+- La exportación usa sprites originales completos; no reemplaza el trabajo futuro de ensamblado modular semántico ni la validación manual en Windows.
+- El último commit de código revisado antes de esta actualización documental fue `7b7d2de147be386bd7f1d2b8449a2d1b13491b5e`. La validación CI de esta nueva versión debe consultarse de nuevo en GitHub Actions antes de declarar PASS.
+
+## Criterio de cierre de este incremento
+PASS solo si el build TypeScript/Vite y el smoke test Chromium pasan en el HEAD final, las imágenes reales cargan, el cambio de personaje y expresión funciona y la descarga PNG funciona sin errores. La validación física en Windows y una generación con motor IA local instalado se informan por separado; no se inventan como realizadas.
+
+---
+
 # Estado de continuidad · BotImagen
 
 Última actualización de esta ficha: endpoint del manifiesto de assets y cobertura Chromium, 2026-10-10.
