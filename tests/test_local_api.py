@@ -599,13 +599,15 @@ class LocalApiTests(unittest.TestCase):
 
 
     def test_modular_png_import_anchor_confirmation_compose_and_export_round_trip(self):
-        def solid_png(color):
-            image = Image.new("RGBA", (32, 32), color)
+        def piece_png(color, bounds):
+            image = Image.new("RGBA", (512, 768), (0, 0, 0, 0))
+            ImageDraw.Draw(image).rectangle(bounds, fill=color)
             output = io.BytesIO()
             image.save(output, format="PNG")
             return output.getvalue()
 
         def image_payload(filename, data, category):
+            rig_category = category
             return {
                 "filename": filename,
                 "mime_type": "image/png",
@@ -615,6 +617,21 @@ class LocalApiTests(unittest.TestCase):
                 "kind": "modular_piece",
                 "view": "front",
                 "license": "USER_PROVIDED_REFERENCE",
+                "conversion": {
+                    "source_width": 512,
+                    "source_height": 768,
+                    "source_format": "image/png",
+                    "background_removed": True,
+                    "background_tolerance": 0,
+                    "scale_percent": 100,
+                    "offset_x": 0,
+                    "offset_y": 0,
+                    "pose": "front",
+                    "rig_category": rig_category,
+                    "content_bounds": {"x": 0, "y": 0, "width": 512, "height": 768},
+                    "anchors": {"waist": {"x": 0.5, "y": 0.5}},
+                    "anchor_status": "estimated_not_validated",
+                },
             }
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -644,12 +661,12 @@ class LocalApiTests(unittest.TestCase):
             try:
                 status, _, body = request(
                     "POST", "/api/modular-assets",
-                    image_payload("body.png", solid_png((20, 60, 220, 255)), "body"),
+                    image_payload("body.png", piece_png((20, 60, 220, 255), (20, 20, 200, 200)), "body"),
                 )
                 self.assertEqual(status, 201)
                 status, _, hair = request(
                     "POST", "/api/modular-assets",
-                    image_payload("hair.png", solid_png((240, 30, 150, 255)), "hair_front"),
+                    image_payload("hair.png", piece_png((240, 30, 150, 255), (300, 300, 500, 500)), "hair_front"),
                 )
                 self.assertEqual(status, 201)
 
@@ -669,28 +686,28 @@ class LocalApiTests(unittest.TestCase):
                 status, content_type, composed = request("POST", "/api/modular-compose", {
                     "pieces": [
                         {"schema_version": 1, "id": body["id"], "category": "body",
-                         "resource": body["id"], "dimensions": {"width": 32, "height": 32},
+                         "resource": body["id"], "dimensions": {"width": 512, "height": 768},
                          "anchors": {"waist": {"x": 0.5, "y": 0.5}}, "anchors_validated": True,
                          "layer_order": 20},
                         {"schema_version": 1, "id": hair["id"], "category": "hair_front",
-                         "resource": hair["id"], "dimensions": {"width": 32, "height": 32},
+                         "resource": hair["id"], "dimensions": {"width": 512, "height": 768},
                          "anchors": {"waist": {"x": 0.5, "y": 0.5}}, "anchors_validated": True,
                          "layer_order": 70},
                     ],
-                    "canvas_size": [64, 64],
+                    "canvas_size": [512, 768],
                 })
                 self.assertEqual(status, 200)
                 self.assertEqual(content_type, "application/json; charset=utf-8")
                 self.assertEqual(composed["mime_type"], "image/png")
-                self.assertEqual((composed["width"], composed["height"]), (64, 64))
+                self.assertEqual((composed["width"], composed["height"]), (512, 768))
                 png_bytes = base64.b64decode(composed["png_base64"], validate=True)
                 self.assertTrue(png_bytes.startswith(b"\\x89PNG\\r\\n\\x1a\\n"))
                 with Image.open(io.BytesIO(png_bytes)) as rendered:
                     rgba = rendered.convert("RGBA")
-                    self.assertEqual(rgba.size, (64, 64))
-                    self.assertEqual(rgba.getpixel((1, 1)), (20, 60, 220, 255))
-                    self.assertEqual(rgba.getpixel((62, 62)), (240, 30, 150, 255))
-                    self.assertEqual(rgba.getpixel((0, 63))[3], 0)
+                    self.assertEqual(rgba.size, (512, 768))
+                    self.assertEqual(rgba.getpixel((50, 50)), (20, 60, 220, 255))
+                    self.assertEqual(rgba.getpixel((400, 400)), (240, 30, 150, 255))
+                    self.assertEqual(rgba.getpixel((250, 250))[3], 0)
             finally:
                 server.shutdown()
                 server.server_close()
