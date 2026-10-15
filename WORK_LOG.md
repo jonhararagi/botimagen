@@ -37,3 +37,15 @@
 - PixAI generation: no image generation submitted and no credits spent.
 - Validation: latest known completed CI #686 passed at commit `37197d6e5bbcef25b760b0b5e6eb1d4a4eb2a4b8`: https://github.com/jonhararagi/botimagen/actions/runs/38691071772. CI #689 for the current head is still running: https://github.com/jonhararagi/botimagen/actions/runs/38692199311. Await final status before claiming the newest changes pass.
 - TIMER: 30–60 minutes of additional active work for external file ingestion, checking the ZIP's real layer structure, and testing imports. Manual visual review remains required.
+
+
+## 2026-10-15 · BIMG-REFERENCE-BASE-004
+
+- Estado: **PASS** para descarga, hashes, integridad del ZIP y preparación de recursos; **PARTIAL** para el mapeo semántico interno de capas PSD.
+- Rama autorizada: `feature/bimg-anime-png-universal-library`; PR #15 sigue abierto y sin integrar. No se creó otra rama ni se modificó `main`.
+- Recursos CC0 incorporados desde OpenGameArt: tres PNG de sprites/animación de Hordana y el ZIP original de FALLiNG_AiR. Las fichas de origen muestran CC0 1.0; URLs, autoría, tamaños y SHA-256 están en `assets/reference-research/manifest.json` y los inventarios.
+- Validación de descarga: PNG signatures/dimensiones y hashes exactos PASS; ZIP CRC PASS; rutas internas inseguras rechazadas; 96 miembros inspeccionados: 66 PNG, 10 PSD, 10 archivos Clip Studio y 10 directorios.
+- Preparación: `assets/reference-research/prepared/fallingair/` contiene 76 recursos listos/editales (66 PNG + 10 PSD), organizados por personaje, expresiones, masters y una ilustración. Inventario por archivo con miembro original del ZIP, tamaño y SHA-256.
+- Workflow de importación y preparación: [run #5 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38693611480). El workflow se limita a la rama existente y hace push sin force; no se alteró `main`.
+- Límite conocido: todavía no se han inspeccionado los nombres/funciones de cada capa dentro de los PSD. No presentar los PSD como capas semánticas listas hasta revisar su estructura. Próximo paso: integrar las PNG en la biblioteca del generador y probar apertura/edición de los PSD maestros.
+

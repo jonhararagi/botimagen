@@ -116,9 +116,14 @@
         "psd",
         "clip-studio"
       ],
-      "rights_status": "cc0-declared-on-source-page-review-archive-before-import",
-      "local_files": [],
-      "notes": "Source page reports CC0 and offers a large ZIP. Before committing extracted files, inspect archive contents and preserve source/license evidence."
+      "rights_status": "cc0-source-verified; archive-and-selected-files-hash-verified",
+      "local_files": [
+        "assets/reference-research/incoming/opengameart/character.zip",
+        "assets/reference-research/incoming/opengameart/archive-inventory.json",
+        "assets/reference-research/incoming/opengameart/download-inventory.json",
+        "assets/reference-research/prepared/fallingair/asset-inventory.json"
+      ],
+      "notes": "Legacy duplicate catalog entry synchronized after CC0 archive download, CRC validation, and extraction of 66 PNG exports plus 10 PSD masters. Clip Studio source files remain preserved in the original ZIP rather than duplicated as separate repository files."
     },
     {
       "id": "makehuman-cartoon01",
