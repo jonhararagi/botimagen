@@ -618,6 +618,8 @@ class LocalApiTests(unittest.TestCase):
                 "view": "front",
                 "license": "USER_PROVIDED_REFERENCE",
                 "conversion": {
+                    "schema_version": 1,
+                    "algorithm": "botimagen-png-stage-v1",
                     "normalized": True,
                     "canvas_width": 512,
                     "canvas_height": 768,
