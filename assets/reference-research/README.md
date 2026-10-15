@@ -44,3 +44,10 @@ Son piezas vectoriales originales, no arte copiado de PixAI u otro autor. Se pue
 5. No publicar imágenes de galerías de PixAI/Civitai/SeaArt sin permisos explícitos. No incluir checkpoints ni LoRA grandes en el repositorio; registrar enlaces a sus fichas.
 
 Una imagen plana no se convierte mágicamente en capas semánticas. La separación de cabeza, ojos, cabello, cuerpo y ropa requiere archivos por capas o revisión manual.
+
+
+## Recursos CC0 incorporados y preparados
+
+Los binarios fuente ya se descargan y verifican en la misma rama de trabajo mediante el flujo [Import verified CC0 character references](../../.github/workflows/import-cc0-assets.yml). La carpeta [incoming/opengameart](incoming/opengameart/) conserva los cuatro originales, hashes e inventarios. La carpeta [prepared/fallingair](prepared/fallingair/) incluye PNG listos para importar y archivos PSD maestros editables extraídos del ZIP CC0. El ZIP enumera 96 miembros: 66 PNG, 10 PSD y 10 archivos Clip Studio, además de 10 carpetas.
+
+Los PSD se conservan como fuentes editables, pero todavía no se afirma que sus capas internas tengan nombres semánticos utilizables por el generador. Las tiras de Hordana son sprites de animación y no se presentan como capas de ropa/cuerpo. Ver hashes y procedencia en los inventarios JSON de cada carpeta.

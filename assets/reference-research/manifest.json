@@ -11,7 +11,7 @@
       "author": "FALLiNG_AiR",
       "license": "CC0 1.0, explicitly displayed on source page",
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "rights_status": "cc0-source-verified; downloaded-binary-hash-verified",
+      "rights_status": "cc0-source-verified; archive-and-selected-files-hash-verified",
       "available_files": [
         {
           "name": "character.zip",
@@ -23,7 +23,7 @@
           "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         }
       ],
-      "notes": "Potentially valuable because source files may preserve layers. Archive contents have not yet been inspected, so do not claim individual layers or asset integrity until downloaded and checked."
+      "notes": "Downloaded archive passed ZIP CRC and safe-path checks. Inventory confirms 96 members: 66 PNGs, 10 PSDs, 10 Clip Studio files, and 10 directories. Selected PNG exports and PSD master files are prepared under assets/reference-research/prepared/fallingair; PSD internal layer semantics have not yet been audited."
     },
     {
       "id": "opengameart-hordana-michona",
@@ -63,7 +63,7 @@
           "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         }
       ],
-      "notes": "Source page labels the artwork CC0 and includes an attribution notice from the author. Useful as an external animation/reference source, but these sprite sheets are not layered character parts. Save the source page and attribution note with any future import."
+      "notes": "Source page labels the artwork CC0 and includes the author's attribution notice. The three PNG sprite strips are committed as unmodified animation/reference assets; they are not semantically separated body/clothing layers."
     },
     {
       "id": "pixai",
@@ -172,7 +172,25 @@
         "watermark"
       ],
       "notes": "Original base, not copied from PixAI or another artist. Groups are separated in SVG for editing; raster exports may still require manual cleanup before importing into the raster region builder."
+    },
+    {
+      "id": "fallingair-cc0-character-source",
+      "path": "assets/reference-research/prepared/fallingair/asset-inventory.json",
+      "creator": "FALLiNG_AiR",
+      "origin": "Extracted from the source archive linked on the OpenGameArt submission page",
+      "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
+      "license_status": "CC0 1.0 displayed on source page; original archive preserved under incoming/opengameart/character.zip",
+      "format": [
+        "PNG",
+        "PSD"
+      ],
+      "editable_parts": [
+        "per-character base PNGs",
+        "expression PNGs",
+        "PSD source masters"
+      ],
+      "notes": "Prepared PNGs are intended for direct import into the PNG library. PSD files are editable source masters, but their internal layer names/semantics are not yet validated."
     }
   ],
-  "ingestion_note": "The import workflow downloads pinned source bytes, checks SHA-256 against independently inspected files, validates PNG dimensions and ZIP CRC/path safety, writes archive-inventory.json, then commits to this feature branch."
+  "ingestion_note": "The import workflow downloads pinned source bytes, validates hashes and PNG dimensions, tests ZIP CRC and member paths, inventories all archive members, extracts selected PNGs and PSD masters into prepared/fallingair, and commits to this feature branch."
 }

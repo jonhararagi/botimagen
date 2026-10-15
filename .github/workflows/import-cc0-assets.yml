@@ -76,6 +76,64 @@ jobs:
               print(f"{item['bytes']:>10}  {item['path']}")
           PY
 
+
+      - name: Prepare editable PSD masters and PNGs for the character library
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, zipfile
+          research = Path('assets/reference-research')
+          archive = research / 'incoming/opengameart/character.zip'
+          out = research / 'prepared/fallingair'
+          out.mkdir(parents=True, exist_ok=True)
+          records = []
+          with zipfile.ZipFile(archive) as z:
+              for item in z.infolist():
+                  if item.is_dir():
+                      continue
+                  original = Path(item.filename)
+                  ext = original.suffix.lower()
+                  if ext not in {'.png', '.psd'}:
+                      continue
+                  parts = original.parts
+                  if parts[0].startswith('cha '):
+                      number = parts[0].split()[-1]
+                      base = Path('characters') / ('character-' + number)
+                      if len(parts) > 1 and parts[1] == 'image' and ext == '.png':
+                          rel = base / 'expressions' / original.name
+                      elif ext == '.psd':
+                          kind = 'face-master.psd' if 'face' in original.stem.lower() else 'master.psd'
+                          rel = base / 'layers' / kind
+                      elif ext == '.png' and len(parts) == 2:
+                          rel = base / 'base.png'
+                      else:
+                          continue
+                  elif original.name.lower() == 'illust.psd':
+                      rel = Path('illustration') / 'master.psd'
+                  elif original.name.lower() == 'illust.png':
+                      rel = Path('illustration') / 'preview.png'
+                  else:
+                      continue
+                  destination = out / rel
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  with z.open(item) as src:
+                      payload = src.read()
+                  destination.write_bytes(payload)
+                  records.append({'archive_member': item.filename, 'path': str(destination).replace('\\\\', '/'), 'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest(), 'format': ext[1:].upper()})
+          (out / 'asset-inventory.json').write_text(json.dumps({'source_page': 'https://opengameart.org/content/visual-novel-character-sprite', 'author': 'FALLiNG_AiR', 'license': 'CC0 1.0 as displayed on source page', 'archive_sha256': 'df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11', 'count': len(records), 'assets': records}, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+          (out / 'README.md').write_text('''# Prepared CC0 character source assets
+
+Source: FALLiNG_AiR, https://opengameart.org/content/visual-novel-character-sprite
+License shown on source page: CC0 1.0.
+
+This folder contains selected PNG exports for direct library import and the source PSD masters for editing. PSDs are retained as editable source files; individual PSD layer names/structure have not yet been audited, so the app should not assume semantic layer names. Expression PNGs are grouped per character. The original ZIP is preserved unchanged under incoming/opengameart/character.zip.
+
+Every extracted file has a SHA-256 entry in asset-inventory.json, along with its original ZIP member path.
+''', encoding='utf-8')
+          print(f'Prepared {len(records)} PNG/PSD assets from the verified CC0 archive.')
+          PY
+
       - name: Record verified source provenance
         shell: bash
         run: |
