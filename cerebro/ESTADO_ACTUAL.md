@@ -10,7 +10,7 @@ La rama activa para la entrega universal sigue siendo `feature/bimg-anime-png-un
 - El smoke test Chromium se amplió para comprobar que una sugerencia de expresión se aplica solo tras confirmación manual.
 - Los sprites de cuerpo completo y expresiones sí están disponibles; las 43 capas PNG extraídas de PSD continúan siendo regiones sin clasificación semántica validada. No afirmar que cabello, cuerpo y prendas de esas capas ya se recombinan automáticamente.
 - La exportación usa sprites originales completos; no reemplaza el trabajo futuro de ensamblado modular semántico ni la validación manual en Windows.
-- El último commit de código revisado antes de esta actualización documental fue `7b7d2de147be386bd7f1d2b8449a2d1b13491b5e`. La validación CI de esta nueva versión debe consultarse de nuevo en GitHub Actions antes de declarar PASS.
+- CI #761 finalizó SUCCESS en el HEAD `fe663dc71695620574fd8a8295fbb238649873c9`: build TypeScript/Vite y smoke test Chromium pasaron, incluidos selección de personaje real, cambio de expresión y sugerencias de rol PSD con confirmación manual. Evidencia: https://github.com/jonhararagi/botimagen/actions/runs/38746099453. La prueba física en Windows y generación con un checkpoint IA local siguen sin realizarse.
 
 ## Criterio de cierre de este incremento
 PASS solo si el build TypeScript/Vite y el smoke test Chromium pasan en el HEAD final, las imágenes reales cargan, el cambio de personaje y expresión funciona y la descarga PNG funciona sin errores. La validación física en Windows y una generación con motor IA local instalado se informan por separado; no se inventan como realizadas.
