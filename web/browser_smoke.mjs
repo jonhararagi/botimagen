@@ -1756,7 +1756,7 @@ try {
     throw new Error("CC0 PSD layer import failed: " + (await psdError.textContent()));
   }
   const psdStatusText = await psdStatus.textContent();
-  assert.match(psdStatusText || "", new RegExp(psdCatalogResponse.layer_count + " capas verificadas; 0 omitidas\\\\."), "All extracted PSD layer PNGs should import without skips.");
+  assert.match(psdStatusText || "", new RegExp(psdCatalogResponse.layer_count + " capas verificadas; 0 omitidas\\."), "All extracted PSD layer PNGs should import without skips.");
   const importedPsdLayers = await page.evaluate(async () => {
     const response = await fetch("/api/modular-assets");
     if (!response.ok) throw new Error("Could not read the local modular asset catalogue after PSD layer import");
