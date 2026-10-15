@@ -141,6 +141,19 @@ try {
   }, undefined, { timeout: 10000 });
   assert.ok(await pixaiFactory.getByRole("button", { name: "Abrir PixAI · modo económico" }).isEnabled(),
     "The low-cost PixAI action must be available only after selecting a real catalog trait");
+  await pixaiFactory.locator('input[type="file"]').setInputFiles({
+    name: "qa-pixai-hair.png", mimeType: "image/png", buffer: makeQaPng(),
+  });
+  await page.waitForFunction(
+    () => document.querySelector('[data-testid="pixai-slot-status"]')?.textContent?.includes("HAY · 1 pieza") ?? false,
+    undefined,
+    { timeout: 15000 },
+  );
+  await page.waitForFunction(
+    () => document.querySelector('[data-testid="pixai-asset-factory"]')?.textContent?.includes("Pieza importada y guardada") ?? false,
+    undefined,
+    { timeout: 10000 },
+  );
   assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
     "The user-facing CC0 studio must offer all five imported character sprites");
   await page.waitForFunction(() => {
