@@ -171,19 +171,14 @@ jobs:
               character_key = path.parents[1].name if path.parent.name == 'layers' else path.parent.name
               layer_dir = prepared / 'psd-layers' / character_key / source_stem
               exported = []
-              export_index = 0
-              def export_leaf_layers(group, prefix=''):
-                  nonlocal_dummy = None
-                  global_unused = None
-                  nonlocal_export_layers(group, prefix)
-              def nonlocal_export_layers(group, prefix=''):
-                  nonlocal export_index
+              export_index = [0]
+              def export_layers(group, prefix=''):
                   for layer in group:
                       name = str(layer.name)
                       layer_path = (prefix + '/' + name).strip('/')
                       is_group = bool(getattr(layer, 'is_group', lambda: False)())
                       if is_group:
-                          nonlocal_export_layers(layer, layer_path)
+                          export_layers(layer, layer_path)
                           continue
                       if not bool(getattr(layer, 'visible', True)):
                           continue
@@ -200,14 +195,14 @@ jobs:
                       if image.width < 24 or image.height < 24:
                           continue
                       safe_name = re.sub(r'[^A-Za-z0-9_-]+', '-', name).strip('-') or 'layer'
-                      export_index += 1
-                      filename = f'layer-{export_index:03d}-{safe_name[:48]}.png'
+                      export_index[0] += 1
+                      filename = f'layer-{export_index[0]:03d}-{safe_name[:48]}.png'
                       destination = layer_dir / filename
                       destination.parent.mkdir(parents=True, exist_ok=True)
                       image.save(destination, format='PNG', optimize=True)
                       payload = destination.read_bytes()
                       exported.append({'name': name, 'layer_path': layer_path, 'kind': str(getattr(layer, 'kind', 'unknown')), 'bbox': list(bbox), 'path': str(destination).replace('\\\\', '/'), 'width': image.width, 'height': image.height, 'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest(), 'source_member': record['archive_member']})
-              nonlocal_export_layers(psd)
+              export_layers(psd)
               layer_report.append({'path': str(path).replace('\\\\', '/'), 'source_member': record['archive_member'], 'canvas': {'width': psd.width, 'height': psd.height}, 'layer_count': len(layers), 'top_level_names': [str(layer.name) for layer in psd], 'layers': layers, 'exported_layers': exported, 'status': 'PASS'})
           if not layer_report:
               raise SystemExit('No PSD master files were inspected.')
