@@ -1,5 +1,14 @@
 # Progreso global de BotImagen
 
+## Incremento posterior · 2026-10-15 · Fábrica local de assets PixAI
+
+- Nueva sección web integrada: inventario por rasgo del catálogo, estado `HAY` / `AÚN NO`, preparación de prompt individual y apertura manual de PixAI.
+- Importación explícita de PNG con validación de firma/tamaño/dimensiones; almacenamiento local en IndexedDB, descarga y eliminación por usuario.
+- El saldo y la sesión de PixAI se comprobaron sin generar ni gastar créditos; el coste actual por generación y la importación de un PNG real siguen pendientes.
+- La interfaz no automatiza clicks de pago, no elige Premium, no lee Descargas a escondidas ni publica automáticamente imágenes en GitHub.
+- BIMG-007 pasa de 0% a 25% estimado: ya hay una biblioteca local indexada por rasgo con importación y exportación, pero faltan miniaturas persistentes optimizadas, búsqueda/filtros completos, evaluación de licencias y prueba visual de ensamblado.
+- CI para el HEAD con la fábrica añadida: pendiente de finalizar. El porcentaje es estimación de fase, no evidencia de pruebas.
+
 ## Incremento posterior · 2026-10-15 · Creador con sprites CC0
 
 El porcentaje global de 63% indicado más abajo corresponde al cálculo histórico del 2026-10-12 y no fue recalculado en esta sesión.
@@ -14,9 +23,9 @@ El porcentaje global de 63% indicado más abajo corresponde al cálculo históri
 - Prueba manual en Windows y prueba real de generación con motor/checkpoint local: no realizadas en esta sesión.
 
 
-**Último cálculo:** 2026-10-12  
+**Último cálculo:** 2026-10-15  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 63%**
+**Progreso global actual: 66%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -32,13 +41,13 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-005 · Editor completo por categorías | 18% | 87% · PARTIAL | 15,66 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
-| BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
+| BIMG-007 · Biblioteca visual local | 12% | 25% · PARTIAL | 3,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 10% · PARTIAL | 0,8 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **62,96 / 100 → 63%** |
+| **Total ponderado** | **100%** | | **65,96 / 100 → 66%** |
 
-BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **62,96 / 100 (63%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
+BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **65,96 / 100 (66%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
 
 ## Evidencia más reciente
 
