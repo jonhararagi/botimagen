@@ -1,0 +1,583 @@
+{
+  "source_page": "https://opengameart.org/content/visual-novel-character-sprite",
+  "license": "CC0 1.0 as displayed on source page",
+  "archive_sha256": "df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11",
+  "members": [
+    {
+      "path": "cha 1/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 1/image/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 1/image/pl1 angry.png",
+      "bytes": 102735,
+      "compressed_bytes": 84644,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 blink.png",
+      "bytes": 100692,
+      "compressed_bytes": 82469,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 concept.png",
+      "bytes": 101849,
+      "compressed_bytes": 83724,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 happy.png",
+      "bytes": 100908,
+      "compressed_bytes": 82875,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 hate.png",
+      "bytes": 101525,
+      "compressed_bytes": 83462,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 plot.png",
+      "bytes": 100533,
+      "compressed_bytes": 82306,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 sad.png",
+      "bytes": 102318,
+      "compressed_bytes": 84160,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 sadhappy.png",
+      "bytes": 102399,
+      "compressed_bytes": 84250,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 serious.png",
+      "bytes": 102138,
+      "compressed_bytes": 83971,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 surprise.png",
+      "bytes": 101455,
+      "compressed_bytes": 83322,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wangry.png",
+      "bytes": 142577,
+      "compressed_bytes": 131466,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wblink.png",
+      "bytes": 140317,
+      "compressed_bytes": 129538,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wconcept.png",
+      "bytes": 141587,
+      "compressed_bytes": 130717,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 whappy.png",
+      "bytes": 140545,
+      "compressed_bytes": 129583,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 whate.png",
+      "bytes": 141229,
+      "compressed_bytes": 130248,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wplot.png",
+      "bytes": 140038,
+      "compressed_bytes": 128975,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wsad.png",
+      "bytes": 142046,
+      "compressed_bytes": 131131,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wsadhappy.png",
+      "bytes": 142128,
+      "compressed_bytes": 131197,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wserious.png",
+      "bytes": 141863,
+      "compressed_bytes": 130807,
+      "directory": false
+    },
+    {
+      "path": "cha 1/image/pl1 wsurprise.png",
+      "bytes": 141149,
+      "compressed_bytes": 130163,
+      "directory": false
+    },
+    {
+      "path": "cha 1/pl1.clip",
+      "bytes": 1539581,
+      "compressed_bytes": 891010,
+      "directory": false
+    },
+    {
+      "path": "cha 1/pl1.png",
+      "bytes": 33688,
+      "compressed_bytes": 32106,
+      "directory": false
+    },
+    {
+      "path": "cha 1/pl1.psd",
+      "bytes": 1536790,
+      "compressed_bytes": 411310,
+      "directory": false
+    },
+    {
+      "path": "cha 2/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 2/image/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 2/image/pl2 angry.png",
+      "bytes": 186340,
+      "compressed_bytes": 169108,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 blink.png",
+      "bytes": 185795,
+      "compressed_bytes": 168592,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 concept.png",
+      "bytes": 188155,
+      "compressed_bytes": 170800,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 happy.png",
+      "bytes": 185420,
+      "compressed_bytes": 168315,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 hate.png",
+      "bytes": 186707,
+      "compressed_bytes": 169308,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 plot.png",
+      "bytes": 185792,
+      "compressed_bytes": 168340,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 sad.png",
+      "bytes": 187227,
+      "compressed_bytes": 169990,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 shy.png",
+      "bytes": 186550,
+      "compressed_bytes": 169500,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 surprise.png",
+      "bytes": 185601,
+      "compressed_bytes": 168473,
+      "directory": false
+    },
+    {
+      "path": "cha 2/image/pl2 worry.png",
+      "bytes": 186130,
+      "compressed_bytes": 169011,
+      "directory": false
+    },
+    {
+      "path": "cha 2/pl2 face.clip",
+      "bytes": 1215553,
+      "compressed_bytes": 811729,
+      "directory": false
+    },
+    {
+      "path": "cha 2/pl2 face.psd",
+      "bytes": 1459524,
+      "compressed_bytes": 526063,
+      "directory": false
+    },
+    {
+      "path": "cha 2/pl2.clip",
+      "bytes": 1855962,
+      "compressed_bytes": 1283872,
+      "directory": false
+    },
+    {
+      "path": "cha 2/pl2.png",
+      "bytes": 42039,
+      "compressed_bytes": 39288,
+      "directory": false
+    },
+    {
+      "path": "cha 2/pl2.psd",
+      "bytes": 2178786,
+      "compressed_bytes": 669203,
+      "directory": false
+    },
+    {
+      "path": "cha 3/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 3/image/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 3/image/pl3 avoid.png",
+      "bytes": 143642,
+      "compressed_bytes": 126197,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 blink.png",
+      "bytes": 142747,
+      "compressed_bytes": 125215,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 concept.png",
+      "bytes": 146091,
+      "compressed_bytes": 128737,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 confusion.png",
+      "bytes": 143176,
+      "compressed_bytes": 125749,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 doubt.png",
+      "bytes": 143403,
+      "compressed_bytes": 125921,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 happy.png",
+      "bytes": 143229,
+      "compressed_bytes": 125784,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 plot.png",
+      "bytes": 144328,
+      "compressed_bytes": 126938,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 sad.png",
+      "bytes": 145007,
+      "compressed_bytes": 127581,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 shy.png",
+      "bytes": 144295,
+      "compressed_bytes": 126670,
+      "directory": false
+    },
+    {
+      "path": "cha 3/image/pl3 surprise.png",
+      "bytes": 143223,
+      "compressed_bytes": 125822,
+      "directory": false
+    },
+    {
+      "path": "cha 3/pl3 face.clip",
+      "bytes": 1259031,
+      "compressed_bytes": 764269,
+      "directory": false
+    },
+    {
+      "path": "cha 3/pl3 face.psd",
+      "bytes": 1617762,
+      "compressed_bytes": 365816,
+      "directory": false
+    },
+    {
+      "path": "cha 3/pl3.clip",
+      "bytes": 1517261,
+      "compressed_bytes": 969340,
+      "directory": false
+    },
+    {
+      "path": "cha 3/pl3.png",
+      "bytes": 33417,
+      "compressed_bytes": 31553,
+      "directory": false
+    },
+    {
+      "path": "cha 3/pl3.psd",
+      "bytes": 1909931,
+      "compressed_bytes": 439961,
+      "directory": false
+    },
+    {
+      "path": "cha 4/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 4/image/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 4/image/pl4 angry.png",
+      "bytes": 170724,
+      "compressed_bytes": 157529,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 blink.png",
+      "bytes": 168961,
+      "compressed_bytes": 155602,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 concept.png",
+      "bytes": 170895,
+      "compressed_bytes": 157643,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 happy.png",
+      "bytes": 169838,
+      "compressed_bytes": 156596,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 normal.png",
+      "bytes": 172681,
+      "compressed_bytes": 159352,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 plot.png",
+      "bytes": 168908,
+      "compressed_bytes": 155657,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 sad.png",
+      "bytes": 170521,
+      "compressed_bytes": 157321,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 scoff.png",
+      "bytes": 169716,
+      "compressed_bytes": 156502,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 shy.png",
+      "bytes": 171080,
+      "compressed_bytes": 157824,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 surprise.png",
+      "bytes": 170174,
+      "compressed_bytes": 156950,
+      "directory": false
+    },
+    {
+      "path": "cha 4/image/pl4 worry.png",
+      "bytes": 169713,
+      "compressed_bytes": 156547,
+      "directory": false
+    },
+    {
+      "path": "cha 4/pl4 face.clip",
+      "bytes": 1788338,
+      "compressed_bytes": 1113898,
+      "directory": false
+    },
+    {
+      "path": "cha 4/pl4 face.psd",
+      "bytes": 1851162,
+      "compressed_bytes": 393118,
+      "directory": false
+    },
+    {
+      "path": "cha 4/pl4.clip",
+      "bytes": 2182235,
+      "compressed_bytes": 1669709,
+      "directory": false
+    },
+    {
+      "path": "cha 4/pl4.png",
+      "bytes": 36016,
+      "compressed_bytes": 33887,
+      "directory": false
+    },
+    {
+      "path": "cha 4/pl4.psd",
+      "bytes": 2800643,
+      "compressed_bytes": 661732,
+      "directory": false
+    },
+    {
+      "path": "cha 5/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 5/image/",
+      "bytes": 0,
+      "compressed_bytes": 0,
+      "directory": true
+    },
+    {
+      "path": "cha 5/image/pl5 blink.png",
+      "bytes": 122486,
+      "compressed_bytes": 103129,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 doubt.png",
+      "bytes": 123162,
+      "compressed_bytes": 103870,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 hate.png",
+      "bytes": 132414,
+      "compressed_bytes": 112501,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 plot.png",
+      "bytes": 122837,
+      "compressed_bytes": 103685,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 sad.png",
+      "bytes": 124893,
+      "compressed_bytes": 105530,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 scoff.png",
+      "bytes": 123907,
+      "compressed_bytes": 104542,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 shy.png",
+      "bytes": 125675,
+      "compressed_bytes": 106510,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5 surprise.png",
+      "bytes": 123760,
+      "compressed_bytes": 104483,
+      "directory": false
+    },
+    {
+      "path": "cha 5/image/pl5.png",
+      "bytes": 123784,
+      "compressed_bytes": 104393,
+      "directory": false
+    },
+    {
+      "path": "cha 5/pl5 face.clip",
+      "bytes": 1290711,
+      "compressed_bytes": 653809,
+      "directory": false
+    },
+    {
+      "path": "cha 5/pl5 face.psd",
+      "bytes": 1683759,
+      "compressed_bytes": 326383,
+      "directory": false
+    },
+    {
+      "path": "cha 5/pl5.clip",
+      "bytes": 1444966,
+      "compressed_bytes": 933034,
+      "directory": false
+    },
+    {
+      "path": "cha 5/pl5.png",
+      "bytes": 24585,
+      "compressed_bytes": 22515,
+      "directory": false
+    },
+    {
+      "path": "cha 5/pl5.psd",
+      "bytes": 2077326,
+      "compressed_bytes": 425745,
+      "directory": false
+    },
+    {
+      "path": "illust.clip",
+      "bytes": 4100046,
+      "compressed_bytes": 3564085,
+      "directory": false
+    },
+    {
+      "path": "illust.png",
+      "bytes": 266449,
+      "compressed_bytes": 251699,
+      "directory": false
+    },
+    {
+      "path": "illust.psd",
+      "bytes": 3593473,
+      "compressed_bytes": 1099215,
+      "directory": false
+    }
+  ]
+}

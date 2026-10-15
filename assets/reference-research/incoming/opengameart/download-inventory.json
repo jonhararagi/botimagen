@@ -1,0 +1,42 @@
+{
+  "verified_at_utc": "2026-10-15T06:34:00.232244+00:00",
+  "source_pages": [
+    "https://opengameart.org/content/anime-girl",
+    "https://opengameart.org/content/visual-novel-character-sprite"
+  ],
+  "license": "CC0 1.0 as displayed on each source page",
+  "assets": [
+    {
+      "name": "13jump_1.png",
+      "type": "PNG",
+      "bytes": 715613,
+      "width": 3250,
+      "height": 221,
+      "sha256": "f8597238ebe3b9d761fe40e6169042fa9247f771d44328345f8dc4514634f259"
+    },
+    {
+      "name": "11walk_4.png",
+      "type": "PNG",
+      "bytes": 656731,
+      "width": 2750,
+      "height": 221,
+      "sha256": "1b6537b1bea0c93da1f1b27f52786a9c3e0de2b5b2f89dca045af7631e942337"
+    },
+    {
+      "name": "blink strip 5.png",
+      "type": "PNG",
+      "bytes": 77978,
+      "width": 1105,
+      "height": 221,
+      "sha256": "4a42ed4aaeca1f034a1fa3429e8db59bfc6d7501b92680feaf8292160bd67212"
+    },
+    {
+      "name": "character.zip",
+      "type": "ZIP",
+      "bytes": 26170320,
+      "sha256": "df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11",
+      "zip_integrity": "PASS",
+      "member_count": 96
+    }
+  ]
+}
