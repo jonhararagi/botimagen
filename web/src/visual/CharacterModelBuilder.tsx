@@ -400,7 +400,7 @@ export function CharacterModelBuilder() {
         <label className="model-builder-upload">Importar varias imágenes directamente<input aria-label="Importar varias imágenes directamente" type="file" accept="image/png,image/jpeg,image/webp" multiple disabled={busy} onChange={event=>{void importReferenceFiles(event.currentTarget.files);event.currentTarget.value="";}}/><small>PNG, JPEG o WebP. Las imágenes se guardan como referencias con SHA-256, procedencia y vista sin clasificar automáticamente como prendas.</small></label>
         <label className="model-builder-search">Filtrar recursos<input value={filter} onChange={event=>setFilter(event.target.value)} placeholder="Nombre, archivo o categoría…" /></label>
         <button type="button" className="model-builder-secondary" disabled={busy} onClick={refreshLibrary}>Actualizar biblioteca local</button>
-        <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>void importCc0References()>{busy?"Importando CC0…":"Importar colección CC0 al constructor"}</button>
+        <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>void importCc0References()}>{busy?"Importando CC0…":"Importar colección CC0 al constructor"}</button>
         <div className="model-builder-asset-list">
           {filteredAssets.map(asset=><label className={selectedIds.includes(asset.id)?"model-builder-asset selected":"model-builder-asset"} key={asset.id}>
             <input type="checkbox" checked={selectedIds.includes(asset.id)} onChange={()=>toggleAsset(asset.id)} />
