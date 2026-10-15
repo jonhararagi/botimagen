@@ -4,6 +4,52 @@
   "purpose": "Research anime character references and model/LoRA candidates for BotImagen; do not treat a search result as redistribution permission.",
   "sources": [
     {
+      "id": "opengameart-fallingair-visual-novel-character-sprite",
+      "platform": "OpenGameArt",
+      "title": "Visual novel Character Sprite",
+      "url": "https://opengameart.org/content/visual-novel-character-sprite",
+      "author": "FALLiNG_AiR",
+      "license": "CC0 1.0, explicitly displayed on source page",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_status": "license-verified-at-source; archive-not-yet-mirrored",
+      "available_files": [
+        {
+          "name": "character.zip",
+          "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
+          "type": "ZIP (26.2 MB; page states it includes PSD, Clip Studio files and PNGs)"
+        }
+      ],
+      "notes": "Potentially valuable because source files may preserve layers. Archive contents have not yet been inspected, so do not claim individual layers or asset integrity until downloaded and checked."
+    },
+    {
+      "id": "opengameart-hordana-michona",
+      "platform": "OpenGameArt",
+      "title": "Anime Girl / Michona the creepy and cute warrior",
+      "url": "https://opengameart.org/content/anime-girl",
+      "author": "Hordana",
+      "license": "CC0 1.0, explicitly displayed on source page",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_status": "license-verified-at-source; files-not-yet-mirrored",
+      "available_files": [
+        {
+          "name": "13jump.png",
+          "source_url": "https://opengameart.org/sites/default/files/13jump_1.png",
+          "type": "PNG sprite animation"
+        },
+        {
+          "name": "11walk.png",
+          "source_url": "https://opengameart.org/sites/default/files/11walk_4.png",
+          "type": "PNG sprite animation"
+        },
+        {
+          "name": "blink strip 5.png",
+          "source_url": "https://opengameart.org/sites/default/files/blink%20strip%205.png",
+          "type": "PNG sprite strip"
+        }
+      ],
+      "notes": "Source page labels the artwork CC0 and includes an attribution notice from the author. Useful as an external animation/reference source, but these sprite sheets are not layered character parts. Save the source page and attribution note with any future import."
+    },
+    {
       "id": "pixai",
       "platform": "PixAI",
       "url": "https://pixai.art/en/generator/image",
@@ -99,7 +145,7 @@
       "path": "assets/reference-research/prepared/botimagen-modular-base-v1.svg",
       "creator": "BotImagen project workflow",
       "origin": "original vector asset created for this repository",
-      "license_status": "project-authored; confirm repository license policy before redistribution outside this repo",
+      "license_status": "original project asset; repository-wide license file not verified in this task; do not treat this note as a standalone license grant",
       "format": "SVG",
       "editable_parts": [
         "body",
