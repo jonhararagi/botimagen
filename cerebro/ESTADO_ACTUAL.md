@@ -969,3 +969,13 @@ DONE solo si el usuario puede cargar un PNG con múltiples sprites ya separados 
 - Estado: `PARTIAL`, implementación inicial persistida; falta validar la compilación CI y corregir cualquier fallo, comprobar artefacto, y probar el ciclo editor/PNG/generación con un endpoint compatible.
 
 - Resultado posterior de BIMG-MOBILE-001: CI Android #5 PASS_REAL en el SHA indicado arriba; la APK se materializó y su contenido se inspeccionó. El enlace de distribución para esta conversación es temporalmente el artefacto local generado, no una publicación/release de GitHub. TIMER restante estimado para una ronda de instalación manual + prueba con proveedor compatible: 1–3 horas; tiempo real NOT_MEASURED.
+
+
+## BIMG-MOBILE-002 · Piezas PNG independientes (2026-10-15)
+
+- Rama autorizada: `feature/bimg-engine-001-cyberstreet-visual-renderer`. No se creó otra rama, no se modificó `main` y PR #15 permanece sin fusionar.
+- Implementación: `android/app/src/main/assets/parts-engine.js` añade slots independientes `hair`, `face`, `body`, `clothes`; validación de PNG data URL, persistencia en localStorage, eliminación individual y composición como elementos SVG `image`. La UI móvil incluye selectores PNG, límites de tamaño y botón para retirar piezas.
+- Perfiles: la instantánea nueva incluye las piezas PNG; restaurar perfil recupera las piezas y el editor vuelve a renderizarlas. Los datos se mantienen en el dispositivo, no en una cuenta remota. El espacio disponible de localStorage puede limitar cuántas piezas grandes caben.
+- Pruebas automatizadas añadidas: `tests/mobile-parts.test.cjs`, ejecutadas por el workflow Android antes de construir el APK con `node --test`. Cubren formato/límite, persistencia independiente, eliminación por categoría y entradas inválidas.
+- TIMER: esta iteración estimada en 2–4 horas activas; tiempo real no medido. La ejecución CI #9 se inició para el SHA `d91d9d29b80fc7f264a4892e35514cede08d661e`: https://github.com/jonhararagi/botimagen/actions/runs/38693985611. En el momento de esta nota figura `QUEUED`; no declarar las pruebas ni la nueva APK como PASS hasta consultar el resultado final.
+- QA pendiente: instalación física Android, prueba visual con PNG de usuarios, compatibilidad con PNG muy grandes y confirmación de almacenamiento bajo cuota. Las posiciones/tamaños son encuadres fijos iniciales, no segmentación automática ni rig de deformación. Estado actual de esta iteración: `PARTIAL / CI_PENDING`.
