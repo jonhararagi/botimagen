@@ -60,6 +60,7 @@ public final class MainActivity extends Activity {
                         throw new IllegalArgumentException("Se requiere endpoint HTTPS y clave de sesión.");
                     }
                     connection = (HttpURLConnection) url.openConnection();
+                    connection.setInstanceFollowRedirects(false);
                     connection.setRequestMethod("POST");
                     connection.setConnectTimeout(15000);
                     connection.setReadTimeout(180000);
