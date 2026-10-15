@@ -16,6 +16,7 @@ import { AnimePngLibrary } from "./visual/AnimePngLibrary";
 import { PsdLayerRoleMapper } from "./visual/PsdLayerRoleMapper";
 import { CharacterCatalogStudio } from "./visual/CharacterCatalogStudio";
 import { Cc0CharacterStudio } from "./visual/Cc0CharacterStudio";
+import { PixAiAssetFactory } from "./visual/PixAiAssetFactory";
 import { ModelLoraFinder } from "./visual/ModelLoraFinder";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
@@ -346,6 +347,7 @@ export default function App(){
   <main className="main">
    <header className="topbar"><div className="crumb">WORKSPACE <span>/</span> <b>CHARACTER DESIGN</b></div><div className="top-actions"><span className="local-pill"><i/> {catalog?"LOCAL · CONECTADO":"LOCAL · DESCONECTADO"}</span><span className="avatar">BW</span></div></header>
    <Cc0CharacterStudio />
+   <PixAiAssetFactory />
    <CharacterCatalogStudio />
    <section className="heading"><div><div className="eyebrow"><i/> MODO AVANZADO <span>BIMG-004</span></div><h1>Editor técnico del personaje</h1><p>Para ajustar recetas visuales y controles avanzados. El creador simple está arriba.</p></div><div className="heading-buttons"><button className="btn muted" onClick={reset} type="button" disabled={generating}>Restaurar ejemplo</button><button className="btn primary" onClick={() => void saveProfile()} type="button" disabled={!generated||draftDirty||generating}>＋ {draftDirty?"Genera para guardar":saved?"Perfil guardado":"Guardar perfil local"}</button></div></section>
    <div className="workspace">
