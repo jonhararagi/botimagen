@@ -51,3 +51,12 @@ Una imagen plana no se convierte mágicamente en capas semánticas. La separaci�
 Los binarios fuente ya se descargan y verifican en la misma rama de trabajo mediante el flujo [Import verified CC0 character references](../../.github/workflows/import-cc0-assets.yml). La carpeta [incoming/opengameart](incoming/opengameart/) conserva los cuatro originales, hashes e inventarios. La carpeta [prepared/fallingair](prepared/fallingair/) incluye PNG listos para importar y archivos PSD maestros editables extraídos del ZIP CC0. El ZIP enumera 96 miembros: 66 PNG, 10 PSD y 10 archivos Clip Studio, además de 10 carpetas.
 
 Los PSD se conservan como fuentes editables, pero todavía no se afirma que sus capas internas tengan nombres semánticos utilizables por el generador. Las tiras de Hordana son sprites de animación y no se presentan como capas de ropa/cuerpo. Ver hashes y procedencia en los inventarios JSON de cada carpeta.
+
+
+## Inspección de capas e integración con BotImagen
+
+- `prepared/fallingair/psd-layer-inventory.json` registra los nombres, visibilidad, tipo y límites de las 82 capas de los 10 PSD maestros inspeccionados.
+- Los PSD de expresiones tienen capas con nombres de estados faciales; varias están etiquetadas en coreano. Las capas de algunos PSD de cuerpo usan nombres genéricos y requieren clasificación manual.
+- `web/public/cc0-character-library/manifest.json` cataloga 66 PNG, sus rutas públicas, hashes, autoría y licencia declarada.
+- La biblioteca universal ofrece **Añadir colección CC0** para guardar la colección en IndexedDB. El constructor de modelos ofrece **Importar colección CC0 al constructor**, que envía 65 PNG como referencias con metadatos CC0 al API local. Se mantienen como referencias hasta que alguien asigne sus roles, no se presentan como piezas semánticas ya separadas.
+- Validación de código y smoke test Chromium: [run #734 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38695428134).

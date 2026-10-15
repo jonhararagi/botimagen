@@ -49,3 +49,15 @@
 - Workflow de importación y preparación: [run #5 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38693611480). El workflow se limita a la rama existente y hace push sin force; no se alteró `main`.
 - Límite conocido: todavía no se han inspeccionado los nombres/funciones de cada capa dentro de los PSD. No presentar los PSD como capas semánticas listas hasta revisar su estructura. Próximo paso: integrar las PNG en la biblioteca del generador y probar apertura/edición de los PSD maestros.
 
+
+
+## 2026-10-15 · BIMG-REFERENCE-BASE-005
+
+- Estado: **PASS** para inspección de PSD, catálogo web CC0, integración en el constructor y CI completo.
+- Rama única: `feature/bimg-anime-png-universal-library`; PR #15 abierta. No se creó rama nueva, no se integró la PR y `main` permanece intacta.
+- Catálogo fuente: 66 PNG publicados en `web/public/cc0-character-library/` con manifiesto JSON válido, URL de origen, creador, licencia CC0 declarada y SHA-256 por archivo. El botón de la biblioteca universal permite añadir la colección al almacenamiento IndexedDB.
+- Constructor de modelos: añadido el control **Importar colección CC0 al constructor**. Descarga 65 PNG (bases de personajes y expresiones; excluye la ilustración editorial), verifica la firma PNG y SHA-256 y los registra en `/api/modular-assets` como referencias CC0, con procedencia original y sin asignarles falsamente roles de ropa/cabello.
+- PSD: inspección con `psd-tools` de 10 maestros, 82 capas totales, canvas 2000×3000. Las capas faciales de personajes 2–5 incluyen nombres de expresiones reconocibles (varios en coreano); la mayoría de las capas de cuerpo siguen con nombres genéricos como `레이어 1`. Se conserva inventario completo en `assets/reference-research/prepared/fallingair/psd-layer-inventory.json`. Esto permite inspección manual, pero **no** demuestra separación semántica automática de cabello, cuerpo y prendas.
+- Integridad: inventario preparado 76 archivos (66 PNG + 10 PSD), hashes SHA-256 y CRC ZIP validados.
+- CI final para HEAD `efbf9a1b1738f5c1503569fe010dd7a49c74a91b`: [run #734 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38695428134). Incluye contratos, generador, build TypeScript/Vite y smoke test de Chromium.
+- Límite de verificación: el smoke test general de Chromium pasó, pero el clic real que importa las 65 imágenes al backend no se ejercitó como flujo E2E independiente. Debe comprobarse con la app y el API local activos antes de declarar esa operación verificada de punta a punta.
