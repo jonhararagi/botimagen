@@ -152,3 +152,12 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - **Estado: EN PROGRESO / NO ACEPTADO.** Aún faltan ejecución CI del HEAD actual, E2E real de cambio de cabello/prendas, perfil modular conectado al sistema persistente de perfiles y revisión de capturas.
 - No se incrementa el porcentaje global del producto con esta entrega parcial. `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - Estimación restante de ingeniería: **8–16 horas activas**, más producción y calibración de recursos artísticos independientes.
+
+
+## BIMG-PIXAI-001 · receta de bajo consumo para Gen Pibara V1 · 2026-10-15
+
+- **PARTIAL; no sumar porcentaje global todavía.** BotImagen incluye ahora un enlace a la ficha oficial de PixAI y botones para copiar un prompt positivo/negative prompt derivados de la ficha de personaje actual.
+- Se documentó el protocolo de bajo consumo y procedencia en `docs/PIXAI-GEN-PIBARA-V1.md`. La LoRA sigue alojada en PixAI; no se distribuye ni se afirma integración automática con el motor local.
+- CI #673 (run `38682122703`) está `IN_PROGRESS`: https://github.com/jonhararagi/botimagen/actions/runs/38682122703.
+- Generación PixAI y validación visual: `NOT_RUN`, pendiente de que el usuario guarde el perfil TinyFish. Créditos gastados por esta tarea: **0**.
+- **TIMER restante:** 1–2 horas activas estimadas para verificar CI y realizar una prueba visual individual, sin lotes.
