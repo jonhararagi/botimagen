@@ -1796,8 +1796,19 @@ try {
   await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("unassigned");
   assert.equal(await roleMapper.locator(".psd-role-card").count(), 42, "Unassigned filter should exclude the one manually classified layer.");
   await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("all");
+  await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("all");
+  await roleMapper.getByRole("checkbox", { name: "Seleccionar capa fallingair-layer-002" }).check();
+  await roleMapper.getByRole("checkbox", { name: "Seleccionar capa fallingair-layer-003" }).check();
+  await roleMapper.getByRole("combobox", { name: "Rol para selección" }).selectOption("accessory");
+  await roleMapper.getByRole("button", { name: "Aplicar rol a seleccionadas" }).click();
+  const bulkRoles = await page.evaluate(() => {
+    const payload = JSON.parse(localStorage.getItem("botimagen-cc0-psd-layer-roles-v1") || "{}");
+    return [payload["fallingair-layer-002"]?.role ?? null, payload["fallingair-layer-003"]?.role ?? null];
+  });
+  assert.deepEqual(bulkRoles, ["accessory", "accessory"], "Bulk role assignment should persist the selected semantic role for every selected layer.");
+  assert.equal(await roleMapper.locator(".psd-role-card.is-selected").count(), 0, "Bulk assignment should clear the selection after applying the role.");
   await roleMapper.getByRole("button", { name: "Exportar asignaciones JSON" }).waitFor({ state: "visible" });
-  console.log("PASS_REAL: Chromium displayed all 43 PSD layer previews, saved a manual semantic role, filtered pending layers, and exposed JSON export with provenance.");
+  console.log("PASS_REAL: Chromium displayed all 43 PSD layer previews, saved a manual role, filtered pending layers, bulk-assigned two selected layers, cleared selection, and exposed JSON export with provenance.");
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {

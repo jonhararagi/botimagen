@@ -30,6 +30,8 @@ export function PsdLayerRoleMapper() {
  const [query,setQuery]=useState("");
  const [sourceFilter,setSourceFilter]=useState("all");
  const [roleFilter,setRoleFilter]=useState<"all"|"assigned"|"unassigned">("all");
+ const [selectedLayerIds,setSelectedLayerIds]=useState<string[]>([]);
+ const [bulkRole,setBulkRole]=useState<LayerRole>("hair");
  const [status,setStatus]=useState("Cargando las 43 capas PSD CC0…");
  const [error,setError]=useState("");
  useEffect(()=>{
@@ -60,10 +62,26 @@ export function PsdLayerRoleMapper() {
    return (!needle||text.includes(needle))&&(sourceFilter==="all"||psdLabel(asset)===sourceFilter)&&(roleFilter==="all"||(roleFilter==="assigned"?role!=="unassigned":role==="unassigned"));
   });
  },[assignments,catalog,query,roleFilter,sourceFilter]);
- const assigned=useMemo(()=>Object.values(assignments).filter(item=>item.role!=="unassigned").length,[assignments]);
+ const assigned=useMemo(()=>catalog?catalog.assets.filter(asset=>(assignments[asset.id]?.role??"unassigned")!=="unassigned").length:0,[assignments,catalog]);
+ const selectedCount=selectedLayerIds.length;
  const update=(asset:LayerAsset,changes:Partial<Assignment>)=>{
   setAssignments(previous=>{const current=previous[asset.id]??{role:"unassigned" as LayerRole,note:"",updatedAt:""};return {...previous,[asset.id]:{...current,...changes,updatedAt:new Date().toISOString()}};});
   setStatus("Asignación guardada: "+asset.id+".");
+ };
+ const toggleLayerSelection=(id:string,checked:boolean)=>setSelectedLayerIds(previous=>checked?Array.from(new Set([...previous,id])):previous.filter(item=>item!==id));
+ const selectFiltered=()=>setSelectedLayerIds(previous=>Array.from(new Set([...previous,...filtered.map(asset=>asset.id)])));
+ const clearSelection=()=>setSelectedLayerIds([]);
+ const applyBulkRole=()=>{
+  if(!catalog||selectedLayerIds.length===0){setStatus("Seleccioná una o más capas antes de aplicar un rol.");return;}
+  const selected=new Set(selectedLayerIds);
+  const timestamp=new Date().toISOString();
+  setAssignments(previous=>{
+   const next={...previous};
+   for(const asset of catalog.assets){if(selected.has(asset.id)){const current=next[asset.id]??{role:"unassigned" as LayerRole,note:"",updatedAt:""};next[asset.id]={...current,role:bulkRole,updatedAt:timestamp};}}
+   return next;
+  });
+  setStatus("Rol «"+(ROLES.find(role=>role.value===bulkRole)?.label??bulkRole)+"» aplicado a "+selectedLayerIds.length+" capas seleccionadas.");
+  clearSelection();
  };
  const exportJson=()=>{
   if(!catalog)return;
@@ -80,7 +98,8 @@ export function PsdLayerRoleMapper() {
    ".psd-role-mapper h2{margin:0 0 7px;font-size:21px}.psd-role-mapper p{margin:0;color:#bcb5d0;line-height:1.5}",
    ".psd-role-counts,.psd-role-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.psd-role-chip{border:1px solid #514568;border-radius:999px;padding:5px 9px;font-size:12px;color:#e2d4ff;background:#231d31}",
    ".psd-role-mapper button,.psd-role-mapper select,.psd-role-mapper input,.psd-role-mapper textarea{font:inherit}.psd-role-mapper button{border:1px solid #5a4b76;border-radius:10px;padding:10px 12px;background:#292238;color:#fff;cursor:pointer}.psd-role-mapper button:disabled{opacity:.55;cursor:not-allowed}.psd-role-mapper .psd-role-primary{background:#bba1ff;border-color:#d1c2ff;color:#171021;font-weight:750}",
-   ".psd-role-toolbar{display:grid;grid-template-columns:minmax(180px,1.5fr) repeat(2,minmax(150px,1fr));gap:10px;margin:18px 0}.psd-role-toolbar input,.psd-role-toolbar select,.psd-role-card select,.psd-role-note{width:100%;min-width:0;border:1px solid #49445d;border-radius:9px;padding:10px;background:#0d0c14;color:#f8f3ff}",
+   ".psd-role-toolbar{display:grid;grid-template-columns:minmax(180px,1.5fr) repeat(2,minmax(150px,1fr));gap:10px;margin:18px 0}.psd-role-toolbar input,.psd-role-toolbar select,.psd-role-card select,.psd-role-note,.psd-role-bulk select{width:100%;min-width:0;border:1px solid #49445d;border-radius:9px;padding:10px;background:#0d0c14;color:#f8f3ff}",
+   ".psd-role-bulk{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px;margin:0 0 16px;border:1px solid #393348;border-radius:12px;background:#13111c}.psd-role-bulk label{display:flex;gap:8px;align-items:center;flex:1;min-width:180px}.psd-role-bulk select{max-width:250px}.psd-role-select{display:flex;gap:8px;align-items:center;font-size:12px;color:#ded4f4}.psd-role-select input{width:18px;height:18px;accent-color:#bba1ff}.psd-role-card.is-selected{border-color:#bba1ff;box-shadow:0 0 0 1px #bba1ff55}"
    ".psd-role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:12px}.psd-role-card{min-width:0;overflow:hidden;border:1px solid #393348;border-radius:12px;background:#12111b}",
    ".psd-role-preview{height:190px;display:flex;align-items:center;justify-content:center;padding:8px;background-color:#222131;background-image:linear-gradient(45deg,#2c2a3c 25%,transparent 25%),linear-gradient(-45deg,#2c2a3c 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#2c2a3c 75%),linear-gradient(-45deg,transparent 75%,#2c2a3c 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}.psd-role-preview img{display:block;width:100%;height:100%;object-fit:contain}",
    ".psd-role-card-content{padding:10px;display:grid;gap:8px}.psd-role-layer-name{font-size:13px;font-weight:700;overflow-wrap:anywhere}.psd-role-source{font-size:11px;color:#b5aec9;overflow-wrap:anywhere}.psd-role-dims{font-size:11px;color:#a49cb9}.psd-role-note{resize:vertical;min-height:58px;font-size:12px}.psd-role-mapper .psd-role-status{margin-top:12px;font-size:12px;color:#d3c5ff}.psd-role-mapper .psd-role-error{margin-top:12px;color:#ffb8c5}.psd-role-empty{padding:24px;text-align:center;border:1px dashed #514568;border-radius:12px;color:#c9c0dc}",
@@ -96,10 +115,17 @@ export function PsdLayerRoleMapper() {
    <select aria-label="Filtrar capas por archivo PSD" value={sourceFilter} onChange={event=>setSourceFilter(event.target.value)}><option value="all">Todos los PSD de origen</option>{sources.map(source=><option key={source} value={source}>{source}</option>)}</select>
    <select aria-label="Filtrar capas por asignación" value={roleFilter} onChange={event=>setRoleFilter(event.target.value as "all"|"assigned"|"unassigned")}><option value="all">Todas las asignaciones</option><option value="unassigned">Solo pendientes</option><option value="assigned">Solo asignadas</option></select>
   </div>
+  <div className="psd-role-bulk" aria-label="Asignación por lote">
+   <label><span className="psd-role-source">Rol para selección ({selectedCount})</span><select aria-label="Rol para selección" value={bulkRole} onChange={event=>setBulkRole(event.target.value as LayerRole)}>{ROLES.filter(role=>role.value!=="unassigned").map(role=><option key={role.value} value={role.value}>{role.label}</option>)}</select></label>
+   <button type="button" onClick={selectFiltered} disabled={!filtered.length}>Seleccionar visibles ({filtered.length})</button>
+   <button type="button" onClick={clearSelection} disabled={selectedCount===0}>Limpiar selección</button>
+   <button type="button" className="psd-role-primary" onClick={applyBulkRole} disabled={selectedCount===0}>Aplicar rol a seleccionadas</button>
+  </div>
   {error&&<p className="psd-role-error" role="alert">{error}</p>}
   <div className="psd-role-grid" aria-live="polite">{filtered.map(asset=>{
    const assignment=assignments[asset.id]??{role:"unassigned" as LayerRole,note:"",updatedAt:""};
-   return <article className="psd-role-card" data-layer-id={asset.id} key={asset.id}>
+   return <article className={"psd-role-card"+(selectedLayerIds.includes(asset.id)?" is-selected":"")} data-layer-id={asset.id} key={asset.id}>
+    <label className="psd-role-select"><input type="checkbox" aria-label={"Seleccionar capa "+asset.id} checked={selectedLayerIds.includes(asset.id)} onChange={event=>toggleLayerSelection(asset.id,event.target.checked)}/><span>Seleccionar capa</span></label>
     <div className="psd-role-preview"><img src={asset.path} alt={"Vista previa de "+asset.label} loading="lazy"/></div>
     <div className="psd-role-card-content"><div className="psd-role-layer-name">{asset.id} · {asset.label}</div><div className="psd-role-source">{sourceLabel(asset)}</div><div className="psd-role-source">{psdLabel(asset)}</div><div className="psd-role-dims">{asset.width} × {asset.height} px · {Math.max(1,Math.round(asset.bytes/1024))} KB</div>
      <label><span className="psd-role-source">Rol semántico</span><select aria-label={"Rol para "+asset.id} value={assignment.role} onChange={event=>update(asset,{role:event.target.value as LayerRole})}>{ROLES.map(role=><option key={role.value} value={role.value}>{role.label}</option>)}</select></label>
