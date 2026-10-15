@@ -121,7 +121,7 @@ jobs:
                       payload = src.read()
                   destination.write_bytes(payload)
                   records.append({'archive_member': item.filename, 'path': str(destination).replace('\\\\', '/'), 'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest(), 'format': ext[1:].upper()})
-          (out / 'asset-inventory.json').write_text(json.dumps({'source_page': 'https://opengameart.org/content/visual-novel-character-sprite', 'author': 'FALLiNG_AiR', 'license': 'CC0 1.0 as displayed on source page', 'archive_sha256': 'df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11', 'count': len(records), 'assets': records}, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+          (out / 'asset-inventory.json').write_text(json.dumps({'source_page': 'https://opengameart.org/content/visual-novel-character-sprite', 'author': 'FALLiNG_AiR', 'license': 'CC0 1.0 as displayed on source page', 'archive_sha256': 'df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11', 'count': len(records), 'assets': records}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           readme_lines = [
               '# Prepared CC0 character source assets',
               '',
