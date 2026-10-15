@@ -618,6 +618,9 @@ class LocalApiTests(unittest.TestCase):
                 "view": "front",
                 "license": "USER_PROVIDED_REFERENCE",
                 "conversion": {
+                    "normalized": True,
+                    "canvas_width": 512,
+                    "canvas_height": 768,
                     "source_width": 512,
                     "source_height": 768,
                     "source_format": "image/png",
