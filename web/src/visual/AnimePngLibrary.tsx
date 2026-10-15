@@ -335,7 +335,7 @@ export function AnimePngLibrary() {
       </div>}
       {selected && <div className="anime-png-modal" role="dialog" aria-modal="true" aria-label={selected.name} onClick={() => setSelected(null)}>
         <div className="anime-png-modal-inner" onClick={event => event.stopPropagation()}>
-          <div className="anime-png-head"><div><strong>{selected.name}</strong><p className="anime-png-note">{selected.width} × {selected.height} px · {formatBytes(selected.bytes)} · Clase universal: personaje completo</p></div><button type="button" onClick={() => setSelected(null)}>Cerrar ✕</button></div>
+          <div className="anime-png-head"><div><strong>{selected.name}</strong><p className="anime-png-note">{selected.width} × {selected.height} px · {formatBytes(selected.bytes)} · Clase universal: personaje completo</p><p className="anime-png-note">{selected.license && `Licencia: ${selected.license} · `}{selected.sourceUrl && <a href={selected.sourceUrl} target="_blank" rel="noreferrer">Ver procedencia ↗</a>}</p></div><button type="button" onClick={() => setSelected(null)}>Cerrar ✕</button></div>
           <AnimePngImage blob={selected.blob} alt={selected.name} />
           <div className="anime-png-actions"><button className="anime-png-primary" type="button" onClick={() => download(selected)}>Descargar original</button><button type="button" onClick={() => void downloadWatermarkedBase(selected)}>Descargar base con huella 🐾</button><button type="button" onClick={() => void deleteItem(selected)}>Quitar de biblioteca</button></div>
         </div>

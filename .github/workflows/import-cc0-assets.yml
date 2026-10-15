@@ -168,7 +168,7 @@ jobs:
               layer_report.append({'path': str(path).replace('\\\\', '/'), 'source_member': record['archive_member'], 'canvas': {'width': psd.width, 'height': psd.height}, 'layer_count': len(layers), 'top_level_names': [str(layer.name) for layer in psd], 'layers': layers, 'status': 'PASS'})
           if not layer_report:
               raise SystemExit('No PSD master files were inspected.')
-          (prepared / 'psd-layer-inventory.json').write_text(json.dumps({'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 displayed on source page', 'inspected_with': 'psd-tools', 'psd_count': len(layer_report), 'psd_files': layer_report}, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+          (prepared / 'psd-layer-inventory.json').write_text(json.dumps({'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 displayed on source page', 'inspected_with': 'psd-tools', 'psd_count': len(layer_report), 'psd_files': layer_report}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           public_root = Path('web/public/cc0-character-library')
           public_root.mkdir(parents=True, exist_ok=True)
           catalog = []
@@ -183,9 +183,9 @@ jobs:
               payload = destination.read_bytes()
               if hashlib.sha256(payload).hexdigest() != record['sha256']:
                   raise SystemExit(f'PNG copy hash mismatch: {rel}')
-              catalog.append({'id': 'fallingair-' + str(len(catalog) + 1).zfill(3), 'name': rel.name, 'label': rel.stem.replace('_', ' ').replace('-', ' '), 'path': '/cc0-character-library/' + str(rel).replace('\\\\', '/'), 'bytes': len(payload), 'sha256': record['sha256'], 'character': rel.parts[0] if len(rel.parts) > 1 else 'illustration', 'category': 'expression' if 'expressions' in rel.parts else ('illustration' if 'illustration' in rel.parts else 'character-base'), 'source_member': record['archive_member'], 'creator': 'FALLiNG_AiR', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 (as displayed on source page)'})
+              catalog.append({'id': 'fallingair-' + str(len(catalog) + 1).zfill(3), 'name': rel.name, 'label': rel.stem.replace('_', ' ').replace('-', ' '), 'path': '/cc0-character-library/' + str(rel), 'bytes': len(payload), 'sha256': record['sha256'], 'character': rel.parts[0] if len(rel.parts) > 1 else 'illustration', 'category': 'expression' if 'expressions' in rel.parts else ('illustration' if 'illustration' in rel.parts else 'character-base'), 'source_member': record['archive_member'], 'creator': 'FALLiNG_AiR', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 (as displayed on source page)'})
           catalog_path = public_root / 'manifest.json'
-          catalog_path.write_text(json.dumps({'schema_version': 1, 'title': 'OpenGameArt CC0 Visual Novel Character Sprite', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'creator': 'FALLiNG_AiR', 'license': 'CC0 1.0 (as displayed on source page)', 'asset_count': len(catalog), 'assets': catalog}, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+          catalog_path.write_text(json.dumps({'schema_version': 1, 'title': 'OpenGameArt CC0 Visual Novel Character Sprite', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'creator': 'FALLiNG_AiR', 'license': 'CC0 1.0 (as displayed on source page)', 'asset_count': len(catalog), 'assets': catalog}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           print(f'PSD layer inspection PASS: {len(layer_report)} PSD files; {sum(x["layer_count"] for x in layer_report)} layers enumerated.')
           print(f'CC0 public PNG catalog PASS: {len(catalog)} PNGs copied with matching SHA-256.')
           for report in layer_report:
