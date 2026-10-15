@@ -1698,6 +1698,33 @@ try {
   assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 3/);
   console.log("PASS_REAL: Chromium imported a multi-file-capable reference through the builder, edited a mask with the canvas brush, persisted the new model revision, and restored the original mask through the API.");
 
+  // Exercise the actual CC0 catalogue-to-model-builder path, not just its static manifest.
+  const cc0ImportButton = modelBuilder.getByRole("button", { name: "Importar colección CC0 al constructor" });
+  await cc0ImportButton.click();
+  await modelBuilder.getByRole("status").filter({
+    hasText: "Colección CC0 incorporada al constructor: 65 referencias verificadas; 0 omitidas."
+  }).waitFor({ state: "visible", timeout: 120000 });
+  const cc0Imported = await page.evaluate(async () => {
+    const response = await fetch("/api/modular-assets");
+    if (!response.ok) throw new Error("Could not read the local modular asset catalogue after CC0 import");
+    const payload = await response.json();
+    const assets = Array.isArray(payload) ? payload : payload.assets;
+    if (!Array.isArray(assets)) throw new Error("The local modular asset catalogue has an unexpected shape");
+    const imported = assets.filter(asset => typeof asset.label === "string" && asset.label.startsWith("CC0 "));
+    return {
+      count: imported.length,
+      withoutSource: imported.filter(asset => !asset.source_url || !asset.license || !asset.source_filename).length,
+      uniqueSources: new Set(imported.map(asset => asset.source_filename)).size,
+      categories: [...new Set(imported.map(asset => asset.kind))],
+    };
+  });
+  assert.equal(cc0Imported.count, 65, "The builder should persist all 65 verified character and expression PNGs, excluding the editorial illustration");
+  assert.equal(cc0Imported.withoutSource, 0, "Every imported CC0 asset must retain source URL, declared license, and original archive member");
+  assert.equal(cc0Imported.uniqueSources, 65, "Every imported reference should preserve a distinct original archive member");
+  assert.ok(cc0Imported.categories.every(kind => kind === "reference"), "External character art must stay a reference until a person classifies its layers");
+  console.log("PASS_REAL: Chromium imported 65 CC0 PNG references through the real constructor UI, verified SHA-256 in the browser, and checked that source/license provenance persisted through the local API.");
+
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
