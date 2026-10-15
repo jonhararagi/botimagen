@@ -54,12 +54,30 @@ export function CharacterCatalogStudio() {
   const [character,setCharacter]=useState<Character>(defaults);
   const [saved,setSaved]=useState<Character[]>([]);
   const [notice,setNotice]=useState("");
+  const [pixaiNotice,setPixaiNotice]=useState("");
   useEffect(()=>setSaved(readSaved()),[]);
   const update=(key:keyof Character,value:string)=>setCharacter(current=>({...current,[key]:value}));
   const fields: Array<[keyof Character,string,string]> = [
     ["body","Cuerpo","body"],["skin","Piel","skin"],["hairstyle","Peinado","hairstyle"],["hair","Color del cabello","hair"],["eyes","Ojos","eyes"],["top","Prenda superior","top"],["bottom","Prenda inferior","bottom"],["accessory","Accesorio","accessory"],["pose","Pose","pose"]
   ];
   const description=useMemo(()=>[label("body",character.body),label("hairstyle",character.hairstyle),label("hair",character.hair),label("eyes",character.eyes),label("top",character.top),label("bottom",character.bottom),label("accessory",character.accessory)].join(" · "),[character]);
+  const pixaiPrompt=useMemo(()=>[
+    "pibara gen",
+    "masterpiece, best quality, clean 2D anime illustration, original adult anime character design, solo, full body from head to toe, directly facing forward, centered composition, symmetrical relaxed standing pose, arms slightly away from torso, hands visible, both feet and shoes visible, consistent body proportions, clean silhouette, expressive anime eyes, clean lineart, carefully drawn hair strands, illustrated clothing with visible fabric folds, clean cel shading, coherent color palette, polished character sheet, plain pure white background, even neutral lighting, no dramatic perspective",
+    `character name or identity: ${character.name || "original character"}`,
+    `body build: ${label("body",character.body)}`,
+    `skin tone: ${label("skin",character.skin)}`,
+    `hairstyle: ${label("hairstyle",character.hairstyle)}`,
+    `hair color: ${label("hair",character.hair)}`,
+    `eye color: ${label("eyes",character.eyes)}`,
+    `top clothing: ${label("top",character.top)}`,
+    `bottom clothing: ${label("bottom",character.bottom)}`,
+    `accessory: ${label("accessory",character.accessory)}`,
+    "preserve the listed design traits, one character only"
+  ].join(", "),[character]);
+  const pixaiNegative="photorealistic, realistic photograph, 3D render, CGI, painterly blur, sketch, messy lineart, low detail, multiple characters, duplicate body, extra arms, extra legs, extra fingers, missing fingers, cropped head, cropped feet, side view, back view, extreme perspective, dynamic action pose, sitting, running, floating accessories, fused clothing, merged hair and clothes, text, logo, watermark, scenery, busy background, shadows obscuring the silhouette";
+  const copyPixAI=async(text:string,labelText:string)=>{try{await navigator.clipboard.writeText(text);setPixaiNotice(labelText+" copiado. Todavía no se generó ninguna imagen.");}catch{setPixaiNotice("No se pudo acceder al portapapeles. Selecciona y copia el texto manualmente.");}};
+
   const save=()=>{const item={...character,id:character.id||crypto.randomUUID()};const next=[item,...saved.filter(old=>old.id!==item.id)];setSaved(next);setCharacter(item);localStorage.setItem(STORE_KEY,JSON.stringify(next));setNotice("Personaje guardado en esta computadora.");};
   const load=(item:Character)=>{setCharacter({...item});setNotice("Ficha cargada. Puedes editar sus opciones.");};
   const remove=(id:string)=>{const next=saved.filter(item=>item.id!==id);setSaved(next);localStorage.setItem(STORE_KEY,JSON.stringify(next));setNotice("Ficha eliminada de la biblioteca local.");};
@@ -94,6 +112,18 @@ export function CharacterCatalogStudio() {
         ].map(item=><article className="cc-reference-card" key={item.src}><a href={item.src} target="_blank" rel="noreferrer"><img src={item.src} loading="lazy" alt={item.title}/><div><strong>{item.title}</strong><small>{item.detail}</small></div></a></article>)}
       </div>
       <p className="cc-reference-note">Fuente: <a href="https://huggingface.co/dreamlike-art/dreamlike-anime-1.0" target="_blank" rel="noreferrer" style={{color:"#c7b8ff"}}>ficha oficial de Dreamlike Anime 1.0 en Hugging Face</a>. Estas imágenes son referencias del estilo del modelo, no una garantía de que cada opción del selector produzca exactamente ese resultado. La vista previa de arriba es un boceto esquemático; el catálogo aún necesita piezas ilustradas reales para previsualizar con precisión cada cabello, ojo y accesorio.</p>
+    </div>
+
+    <div className="cc-reference" aria-labelledby="cc-pixai-title">
+      <h3 id="cc-pixai-title">Prueba económica · PixAI Gen Pibara V1</h3>
+      <p className="cc-reference-intro">Prepara una receta a partir de las opciones que elegiste arriba. Estos botones solo copian texto; no generan imágenes ni gastan créditos.</p>
+      <div className="cc-buttons">
+        <a className="cc-button primary" href="https://pixai.art/en/model/2035047104781084932/2035126237569336174" target="_blank" rel="noreferrer">Abrir Gen Pibara V1 en PixAI ↗</a>
+        <button type="button" className="cc-button" onClick={()=>void copyPixAI(pixaiPrompt,"Prompt positivo")}>Copiar prompt positivo</button>
+        <button type="button" className="cc-button" onClick={()=>void copyPixAI(pixaiNegative,"Negative prompt")}>Copiar negative prompt</button>
+      </div>
+      <p className="cc-notice" role="status" aria-live="polite">{pixaiNotice}</p>
+      <p className="cc-reference-note"><strong>Primera prueba recomendada:</strong> selecciona manualmente la LoRA Gen Pibara V1 en PixAI, usa intensidad 0,7 como punto de partida si el control está disponible, genera una sola imagen a resolución moderada y conserva la semilla. No uses lotes. Si la LoRA impone rasgos de su personaje y rompe el diseño elegido, compara una única prueba sin el trigger <code>pibara gen</code>. BotImagen no se conecta a PixAI ni inicia generación automática; así evitamos gasto accidental y respetamos que la LoRA se usa dentro de la plataforma.</p>
     </div>
   </section>;
 }
