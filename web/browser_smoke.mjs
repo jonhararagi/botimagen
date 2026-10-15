@@ -175,6 +175,13 @@ try {
   await modularDressup.getByRole("heading", { name: "Vestuario con tus PNG reales" }).waitFor({ state: "visible" });
   assert.match(await modularDressup.locator("[data-testid=modular-dressup-status]").textContent(), /AÚN NO|biblioteca|pieza/i,
     "The PNG-backed mode should report the actual local asset inventory");
+  await modularDressup.getByRole("button", { name: "Actualizar biblioteca" }).click();
+  await page.waitForFunction(() => {
+    const status = document.querySelector('[data-testid="modular-dressup-status"]');
+    return status instanceof HTMLElement && /Biblioteca actualizada|Biblioteca leída|No hay piezas|AÚN NO/i.test(status.textContent ?? "");
+  }, undefined, { timeout: 10000 });
+  assert.ok(await modularDressup.getByRole("button", { name: "Componer personaje" }).isDisabled(),
+    "Composing must stay disabled until at least one real modular asset is selected");
   assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
     "The user-facing CC0 studio must offer all five imported character sprites");
   await page.waitForFunction(() => {
