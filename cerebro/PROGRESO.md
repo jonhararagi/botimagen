@@ -177,3 +177,12 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Esto cierra el hueco concreto de conexión biblioteca PNG → compositor CyberStreet → exportación → perfil. No cierra por sí solo todas las tareas BIMG-007/008/009/010 ni la beta completa; por ello el porcentaje ponderado global queda en **63%**, sin recalcular fases ajenas a este alcance.
 - QA física en Windows: `NOT_RUN`. El fixture es sintético; la evaluación de assets artísticos reales sigue siendo independiente.
 - TIMER estimado original: 4–8 horas activas; tiempo real medido: `NOT_MEASURED`.
+
+
+## Tarea adicional fuera del denominador de beta web · BIMG-MOBILE-001 · 2026-10-15
+
+- Se añadió un proyecto Android mínimo y workflow de compilación APK en la rama autorizada para empezar la variante móvil sin alterar los pesos de la beta web.
+- Archivos: `android/settings.gradle`, `android/build.gradle`, `android/app/build.gradle`, manifiesto, Activity WebView, `android/app/src/main/assets/index.html`, `.github/workflows/android-apk.yml`.
+- TIMER global estimado del MVP móvil: 24–40 horas activas. Esta tanda de scaffolding/UI: 2–4 horas estimadas; tiempo real NOT_MEASURED.
+- Estado funcional: PARTIAL. Build APK, instalación, pruebas en Xiaomi y generación online real quedan NOT_RUN hasta comprobar GitHub Actions y disponer de un endpoint de imágenes compatible.
+- El progreso ponderado de la beta web se conserva en **63%**. Esta tarea es un alcance móvil adicional y no justifica inflar el porcentaje del denominador histórico.
