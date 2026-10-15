@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import type { PointerEvent } from "react";
 
 type Layer = { id: string; name: string; src: string; x: number; y: number; width: number; rotation: number };
 const uid = () => `layer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -45,7 +46,7 @@ export function QuickImageEditor() {
     setLayers(previous => previous.map(layer => layer.id === id ? { ...layer, ...patch } : layer));
   }
 
-  function startDrag(event: React.PointerEvent<HTMLImageElement>, layer: Layer) {
+  function startDrag(event: PointerEvent<HTMLImageElement>, layer: Layer) {
     event.preventDefault();
     event.stopPropagation();
     setSelected(layer.id);
@@ -55,7 +56,7 @@ export function QuickImageEditor() {
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
-  function moveDrag(event: React.PointerEvent<HTMLImageElement>) {
+  function moveDrag(event: PointerEvent<HTMLImageElement>) {
     const drag = dragRef.current;
     const rect = stageRef.current?.getBoundingClientRect();
     if (!drag || !rect) return;
