@@ -11,7 +11,7 @@ La tarea continúa en la rama existente `feature/bimg-anime-png-universal-librar
 - Se añadió cobertura Chromium para verificar que un rasgo vacío muestra `AÚN NO` y que un rasgo del catálogo habilita la preparación del prompt.
 - El perfil TinyFish `PixAI - BotImagen` abrió PixAI autenticado en comprobación de solo lectura; se observó perfil activo y saldo visible de 1.434.000 créditos. No se gastaron créditos durante esa comprobación. Aún no se ha confirmado el coste actual de Gen Pibara V1 ni ejecutado una generación de prueba en esta tarea.
 - La nueva CI debe confirmar build TypeScript/Vite y smoke test Chromium. Hasta que termine, este incremento está **PARTIAL / CI PENDING**.
-- Pendiente después de CI: probar una sola generación real económica en PixAI, verificar el PNG descargado e importado y revisar visualmente si el asset sirve para ensamblado modular. No afirmar que miles de piezas existen hasta que estén generadas y validadas.
+- Pendiente después de CI: encontrar la configuración/LoRA correcta o una alternativa cuyo coste el usuario apruebe; después generar una sola pieza, descargar el PNG e importarlo para revisar visualmente su utilidad modular. No afirmar que miles de piezas existen hasta que estén generadas y validadas.
 
 ---
 
