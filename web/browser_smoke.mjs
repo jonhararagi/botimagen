@@ -1698,12 +1698,24 @@ try {
   assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 3/);
   console.log("PASS_REAL: Chromium imported a multi-file-capable reference through the builder, edited a mask with the canvas brush, persisted the new model revision, and restored the original mask through the API.");
 
+  // Close the inline mask editor before testing the next constructor action.
+  await maskEditor.getByRole("button", { name: "Cerrar editor" }).click();
+  await maskEditor.waitFor({ state: "detached", timeout: 5000 });
+
   // Exercise the actual CC0 catalogue-to-model-builder path, not just its static manifest.
   const cc0ImportButton = modelBuilder.getByRole("button", { name: "Importar colección CC0 al constructor" });
   await cc0ImportButton.click();
-  await modelBuilder.getByRole("status").filter({
-    hasText: "Colección CC0 incorporada al constructor: 65 referencias verificadas; 0 omitidas."
-  }).waitFor({ state: "visible", timeout: 120000 });
+  const cc0Status = modelBuilder.getByRole("status").filter({ hasText: "Colección CC0 incorporada al constructor:" });
+  const cc0Error = modelBuilder.getByRole("alert");
+  await Promise.race([
+    cc0Status.waitFor({ state: "visible", timeout: 120000 }),
+    cc0Error.waitFor({ state: "visible", timeout: 120000 }),
+  ]);
+  if (await cc0Error.isVisible().catch(() => false)) {
+    throw new Error("CC0 constructor import failed: " + (await cc0Error.textContent()));
+  }
+  const cc0StatusText = await cc0Status.textContent();
+  assert.match(cc0StatusText || "", /65 referencias verificadas; 0 omitidas\./, "All 65 CC0 character/expression PNGs should import without skips.");
   const cc0Imported = await page.evaluate(async () => {
     const response = await fetch("/api/modular-assets");
     if (!response.ok) throw new Error("Could not read the local modular asset catalogue after CC0 import");
