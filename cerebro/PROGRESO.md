@@ -7,6 +7,8 @@ El porcentaje global de 63% indicado más abajo corresponde al cálculo históri
 - Implementado en la rama existente `feature/bimg-anime-png-universal-library`: panel de creación con cinco sprites CC0 completos y sus expresiones disponibles, selección de personaje/expresión, nombre, opciones de fondo, persistencia local y exportación PNG 512×768 con proporción conservada.
 - Integrado en el workspace principal antes del editor técnico.
 - Se agregó prueba Chromium para contar los cinco personajes y verificar que el selector cambia al archivo real de expresión feliz del personaje 2.
+- El manifiesto de las 43 capas ofrece sugerencias conservadoras y justificadas: cuatro recortes de PSD de rostro se proponen como expresiones con confianza alta; regiones sin evidencia suficiente quedan sin asignar o marcadas para revisión. El clasificador permite aplicar las sugerencias de alta confianza solo mediante acción explícita del usuario.
+- El smoke test de Chromium también comprueba esa confirmación manual. CI para el HEAD actualizado aún debe finalizar.
 - No equivale todavía a un creador modular que permita intercambiar cabello, cuerpo y ropa entre personajes. Las 43 capas PSD están extraídas y visibles en el clasificador, pero su clasificación semántica aún requiere validación visual.
 - Evidencia de CI de este incremento: pendiente de consultar en el HEAD final. No marcar como cerrado hasta ver el resultado de Actions.
 - Prueba manual en Windows y prueba real de generación con motor/checkpoint local: no realizadas en esta sesión.
