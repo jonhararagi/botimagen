@@ -4,7 +4,7 @@
 
 - Nueva sección web integrada: inventario por rasgo del catálogo, estado `HAY` / `AÚN NO`, preparación de prompt individual y apertura manual de PixAI.
 - Importación explícita de PNG con validación de firma/tamaño/dimensiones; almacenamiento local en IndexedDB, descarga y eliminación por usuario.
-- El saldo y la sesión de PixAI se comprobaron sin generar ni gastar créditos; el coste actual por generación y la importación de un PNG real siguen pendientes.
+- PixAI quedó autenticado y se comprobó el coste sin generar: una imagen, tamaño L disponible (944×1584), cola Low Priority (~21 min) cuesta 3.000 créditos; la LoRA Gen Pibara V1 XL no aparece en el selector. No se gastaron créditos ni se produjo PNG. La generación queda bloqueada hasta hallar la configuración económica correcta o decidir un presupuesto distinto.
 - La interfaz no automatiza clicks de pago, no elige Premium, no lee Descargas a escondidas ni publica automáticamente imágenes en GitHub.
 - BIMG-007 pasa de 0% a 25% estimado: ya hay una biblioteca local indexada por rasgo con importación y exportación, pero faltan miniaturas persistentes optimizadas, búsqueda/filtros completos, evaluación de licencias y prueba visual de ensamblado.
 - CI para el HEAD con la fábrica añadida: pendiente de finalizar. El porcentaje es estimación de fase, no evidencia de pruebas.
