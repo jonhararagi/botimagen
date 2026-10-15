@@ -170,6 +170,61 @@ export function AnimePngLibrary() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  const downloadWatermarkedBase = async (item: CharacterPng) => {
+    let bitmap: ImageBitmap | null = null;
+    try {
+      bitmap = await createImageBitmap(item.blob);
+      const footerHeight = Math.max(44, Math.round(bitmap.width * 0.075));
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height + footerHeight;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("No se pudo preparar el lienzo de exportación.");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(bitmap, 0, 0);
+      const scale = Math.max(1, bitmap.width / 512);
+      const pad = Math.round(10 * scale);
+      const fontSize = Math.max(11, Math.round(14 * scale));
+      const label = "BotImagen · BASE";
+      context.font = `600 ${fontSize}px Segoe UI, Arial, sans-serif`;
+      const textWidth = context.measureText(label).width;
+      const pillWidth = textWidth + pad * 3 + 25 * scale;
+      const pillHeight = Math.min(footerHeight - 8 * scale, fontSize + pad * 1.5);
+      const x = Math.max(4, canvas.width - pillWidth - 8 * scale);
+      const y = bitmap.height + (footerHeight - pillHeight) / 2;
+      context.fillStyle = "rgba(20, 15, 31, 0.94)";
+      context.beginPath();
+      context.roundRect(x, y, pillWidth, pillHeight, pillHeight / 2);
+      context.fill();
+      context.fillStyle = "#e6c5f0";
+      const pawX = x + pad + 5 * scale;
+      const pawY = y + pillHeight / 2;
+      context.beginPath();
+      context.ellipse(pawX, pawY + 2 * scale, 5 * scale, 4 * scale, 0, 0, Math.PI * 2);
+      context.fill();
+      for (const [dx, dy] of [[-4, -5], [2, -7], [7, -3], [0, -1]] as Array<[number, number]>) {
+        context.beginPath();
+        context.arc(pawX + dx * scale, pawY + dy * scale, 2.1 * scale, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.fillStyle = "#fff7ff";
+      context.textBaseline = "middle";
+      context.fillText(label, pawX + 13 * scale, pawY + 0.5 * scale);
+      const output = await new Promise<Blob>((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("No se pudo exportar el PNG.")), "image/png"));
+      const url = URL.createObjectURL(output);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = item.name.replace(/\\.png$/i, "") + "-botimagen-base.png";
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage("Base marcada descargada. El original de la biblioteca no se modificó; la huella queda en una franja añadida debajo del dibujo.");
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : "No se pudo crear la copia marcada.");
+    } finally {
+      bitmap?.close();
+    }
+  };
+
   const deleteItem = async (item: CharacterPng) => {
     if (!window.confirm(`¿Eliminar "${item.name}" de la biblioteca local? El archivo original de tu PC no se toca.`)) return;
     await removeCharacter(item.id);
@@ -204,7 +259,7 @@ export function AnimePngLibrary() {
         <div>
           <h2 id="anime-png-library-title">Biblioteca universal de personajes anime PNG</h2>
           <p>Galería universal para personajes completos, sprites y referencias de arte real. Importá una carpeta con cientos o miles de PNG, buscá por nombre y revisá cada imagen sobre fondo de transparencia.</p>
-          <p className="anime-png-note">Los archivos quedan en este navegador, no se suben a GitHub ni a ningún servidor. Importá solo arte propio o con permiso/licencia de uso.</p>
+          <p className="anime-png-note">Los archivos quedan en este navegador, no se suben a GitHub ni a ningún servidor. Importá solo arte propio o con permiso/licencia de uso. La copia «base con huella» añade una franja debajo de la imagen para identificarla sin tapar la figura; el original queda intacto.</p>
         </div>
         <div className="anime-png-actions">
           <input ref={fileInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
@@ -240,7 +295,7 @@ export function AnimePngLibrary() {
         <div className="anime-png-modal-inner" onClick={event => event.stopPropagation()}>
           <div className="anime-png-head"><div><strong>{selected.name}</strong><p className="anime-png-note">{selected.width} × {selected.height} px · {formatBytes(selected.bytes)} · Clase universal: personaje completo</p></div><button type="button" onClick={() => setSelected(null)}>Cerrar ✕</button></div>
           <AnimePngImage blob={selected.blob} alt={selected.name} />
-          <div className="anime-png-actions"><button className="anime-png-primary" type="button" onClick={() => download(selected)}>Descargar original</button><button type="button" onClick={() => void deleteItem(selected)}>Quitar de biblioteca</button></div>
+          <div className="anime-png-actions"><button className="anime-png-primary" type="button" onClick={() => download(selected)}>Descargar original</button><button type="button" onClick={() => void downloadWatermarkedBase(selected)}>Descargar base con huella 🐾</button><button type="button" onClick={() => void deleteItem(selected)}>Quitar de biblioteca</button></div>
         </div>
       </div>}
     </section>
