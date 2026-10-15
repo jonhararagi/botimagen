@@ -80,9 +80,9 @@ export function PixAiAssetFactory() {
   const [busy, setBusy] = useState(false);
   const slot = slots.find(item => item.field === field) ?? slots[0];
   const options = catalog?.categories?.[field] ?? [];
-  const selectedTrait = options.find(item => item.id === trait) ?? options[0];
+  const selectedTrait = options.find(item => item.id === trait);
   const prompt = useMemo(() => {
-    const label = selectedTrait?.label ?? trait || "rasgo por definir";
+    const label = selectedTrait?.label ?? (trait || "rasgo por definir");
     return [
       "original anime game asset, clean professional anime gacha illustration, isolated reusable character component",
       slot.description,
@@ -94,6 +94,8 @@ export function PixAiAssetFactory() {
     ].join(", ");
   }, [selectedTrait?.label, trait, slot]);
   const found = assets.filter(item => item.field === field && item.trait === (selectedTrait?.id ?? trait));
+  const assetUrls = useMemo(() => new Map(assets.map(asset => [asset.id, URL.createObjectURL(asset.blob)])), [assets]);
+  useEffect(() => () => { for (const url of assetUrls.values()) URL.revokeObjectURL(url); }, [assetUrls]);
   const status = found.length ? "HAY · " + found.length + (found.length === 1 ? " pieza" : " piezas") : "AÚN NO";
 
   async function refresh() {
@@ -219,7 +221,7 @@ export function PixAiAssetFactory() {
         <p>{found.length ? "Estas piezas están guardadas en la biblioteca local y pueden volver a descargarse." : "Aún no hay una pieza etiquetada para esta variante. Al importarla, el estado cambiará a HAY."}</p>
         <div className="pixai-factory-assets">
           {found.map(asset => <article className="pixai-factory-asset" key={asset.id}>
-            <img src={URL.createObjectURL(asset.blob)} alt={asset.traitLabel} />
+            <img src={assetUrls.get(asset.id)} alt={asset.traitLabel} />
             <div><strong>{asset.traitLabel}</strong><small>{asset.filename}</small><button type="button" onClick={() => void exportAsset(asset)}>Descargar</button> <button type="button" onClick={() => void deleteAsset(asset)}>Quitar</button></div>
           </article>)}
         </div>
