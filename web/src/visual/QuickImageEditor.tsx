@@ -27,11 +27,8 @@ export function QuickImageEditor() {
         const src = String(reader.result || "");
         if (!src.startsWith("data:image/")) return;
         const id = uid();
-        setLayers(previous => {
-          const next = [...previous, { id, name: file.name, src, x: Math.min(12 + previous.length * 3, 30), y: Math.min(12 + previous.length * 3, 30), width: 54, rotation: 0 }];
-          setSelected(id);
-          return next;
-        });
+        setSelected(id);
+        setLayers(previous => [...previous, { id, name: file.name, src, x: Math.min(12 + previous.length * 3, 30), y: Math.min(12 + previous.length * 3, 30), width: 54, rotation: 0 }]);
         setMessage("Imagen agregada al lienzo. Tocala y arrastrala para ubicarla.");
       };
       reader.onerror = () => setMessage("No se pudo leer " + file.name + ".");
@@ -113,7 +110,7 @@ export function QuickImageEditor() {
       .qie-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.qie-head h2{margin:0;font-size:clamp(20px,3vw,27px);letter-spacing:-.04em}.qie-head p{margin:5px 0 0;color:#a9acc2;font-size:13px}
       .qie-actions{display:flex;gap:8px;flex-wrap:wrap}.qie-btn{border:1px solid #42435b;border-radius:11px;padding:10px 13px;background:#222438;color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:42px}.qie-btn.primary{background:#c6a5ff;border-color:#c6a5ff;color:#20152f}.qie-btn:disabled{opacity:.55}
       .qie-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,270px);gap:14px;align-items:start}.qie-stage-wrap{min-width:0;background:#0a0b11;border:1px solid #303044;border-radius:15px;padding:10px}
-      .qie-stage{position:relative;width:100%;aspect-ratio:3/4;max-height:72vh;margin:auto;overflow:hidden;touch-action:pan-y;background-color:#202130;background-image:linear-gradient(45deg,#292a3a 25%,transparent 25%),linear-gradient(-45deg,#292a3a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#292a3a 75%),linear-gradient(-45deg,transparent 75%,#292a3a 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+      .qie-stage{position:relative;width:100%;aspect-ratio:3/4;max-height:72vh;margin:auto;overflow:hidden;touch-action:none;background-color:#202130;background-image:linear-gradient(45deg,#292a3a 25%,transparent 25%),linear-gradient(-45deg,#292a3a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#292a3a 75%),linear-gradient(-45deg,transparent 75%,#292a3a 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
       .qie-layer{position:absolute;max-width:none;height:auto;object-fit:contain;touch-action:none;user-select:none;cursor:move;transform-origin:center center}.qie-layer.selected{outline:2px solid #c6a5ff;outline-offset:2px}
       .qie-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;color:#a9acc2}.qie-empty b{font-size:18px;color:#e9e2ff}.qie-empty span{margin-top:8px;font-size:12px;line-height:1.6}
       .qie-panel{display:grid;gap:12px}.qie-card{padding:13px;border:1px solid #303248;border-radius:13px;background:#181a28;min-width:0}.qie-card h3{font-size:13px;margin:0 0 10px;color:#e9dfff}.qie-card label{display:grid;gap:7px;margin:10px 0;color:#bfc1d7;font-size:12px}.qie-card input[type=range]{width:100%;accent-color:#c6a5ff}.qie-card input[type=text]{width:100%;min-width:0;padding:10px;border:1px solid #3c3e55;border-radius:9px;background:#0e1019;color:white;font:inherit}.qie-layer-list{display:grid;gap:6px}.qie-layer-row{display:flex;gap:7px;align-items:center}.qie-layer-row button{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}.qie-layer-row button.active{border-color:#c6a5ff;background:#30263f}.qie-status{margin:12px 0 0;color:#bdbbd2;font-size:12px;line-height:1.5}
