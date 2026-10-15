@@ -136,6 +136,62 @@ jobs:
           print(f'Prepared {len(records)} PNG/PSD assets from the verified CC0 archive.')
           PY
 
+
+      - name: Inspect PSD layer trees and publish CC0 PNG library
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet psd-tools
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, shutil
+          from psd_tools import PSDImage
+          prepared = Path('assets/reference-research/prepared/fallingair')
+          inventory = json.loads((prepared / 'asset-inventory.json').read_text(encoding='utf-8'))
+          layer_report = []
+          for record in inventory['assets']:
+              if record['format'] != 'PSD':
+                  continue
+              path = Path(record['path'])
+              psd = PSDImage.open(path)
+              layers = []
+              def walk(group, prefix=''):
+                  for layer in group:
+                      name = str(layer.name)
+                      bbox = list(layer.bbox) if getattr(layer, 'bbox', None) else None
+                      is_group = bool(getattr(layer, 'is_group', lambda: False)())
+                      item = {'name': name, 'path': (prefix + '/' + name).strip('/'), 'kind': str(getattr(layer, 'kind', 'unknown')), 'visible': bool(getattr(layer, 'visible', True)), 'bbox': bbox, 'is_group': is_group}
+                      layers.append(item)
+                      if is_group:
+                          walk(layer, item['path'])
+              walk(psd)
+              layer_report.append({'path': str(path).replace('\\\\', '/'), 'source_member': record['archive_member'], 'canvas': {'width': psd.width, 'height': psd.height}, 'layer_count': len(layers), 'top_level_names': [str(layer.name) for layer in psd], 'layers': layers, 'status': 'PASS'})
+          if not layer_report:
+              raise SystemExit('No PSD master files were inspected.')
+          (prepared / 'psd-layer-inventory.json').write_text(json.dumps({'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 displayed on source page', 'inspected_with': 'psd-tools', 'psd_count': len(layer_report), 'psd_files': layer_report}, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+          public_root = Path('web/public/cc0-character-library')
+          public_root.mkdir(parents=True, exist_ok=True)
+          catalog = []
+          for record in inventory['assets']:
+              if record['format'] != 'PNG':
+                  continue
+              source = Path(record['path'])
+              rel = source.relative_to(prepared)
+              destination = public_root / rel
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(source, destination)
+              payload = destination.read_bytes()
+              if hashlib.sha256(payload).hexdigest() != record['sha256']:
+                  raise SystemExit(f'PNG copy hash mismatch: {rel}')
+              catalog.append({'id': 'fallingair-' + str(len(catalog) + 1).zfill(3), 'name': rel.name, 'label': rel.stem.replace('_', ' ').replace('-', ' '), 'path': '/' + str(destination).replace('\\\\', '/'), 'bytes': len(payload), 'sha256': record['sha256'], 'character': rel.parts[0] if len(rel.parts) > 1 else 'illustration', 'category': 'expression' if 'expressions' in rel.parts else ('illustration' if 'illustration' in rel.parts else 'character-base'), 'source_member': record['archive_member'], 'creator': 'FALLiNG_AiR', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 (as displayed on source page)'})
+          catalog_path = public_root / 'manifest.json'
+          catalog_path.write_text(json.dumps({'schema_version': 1, 'title': 'OpenGameArt CC0 Visual Novel Character Sprite', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'creator': 'FALLiNG_AiR', 'license': 'CC0 1.0 (as displayed on source page)', 'asset_count': len(catalog), 'assets': catalog}, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+          print(f'PSD layer inspection PASS: {len(layer_report)} PSD files; {sum(x["layer_count"] for x in layer_report)} layers enumerated.')
+          print(f'CC0 public PNG catalog PASS: {len(catalog)} PNGs copied with matching SHA-256.')
+          for report in layer_report:
+              print(f'PSD {report["path"]}: {report["canvas"]["width"]}x{report["canvas"]["height"]}; {report["layer_count"]} layers; {report["top_level_names"][:8]}')
+          PY
+
       - name: Record verified source provenance
         shell: bash
         run: |
@@ -197,7 +253,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/reference-research/incoming/opengameart assets/reference-research/prepared/fallingair assets/reference-research/manifest.json
+          git add assets/reference-research/incoming/opengameart assets/reference-research/prepared/fallingair assets/reference-research/manifest.json web/public/cc0-character-library
           if git diff --cached --quiet; then
             echo 'No asset changes to commit.'
             exit 0

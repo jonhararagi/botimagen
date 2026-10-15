@@ -9,6 +9,8 @@ type CharacterPng = {
   bytes: number;
   category: "universal-character";
   blob: Blob;
+  sourceUrl?: string;
+  license?: string;
 };
 
 const DB_NAME = "botimagen-anime-png-library";
@@ -225,6 +227,42 @@ export function AnimePngLibrary() {
     }
   };
 
+  const importCc0Collection = async () => {
+    setBusy(true);
+    setMessage("Descargando y verificando la colección CC0…");
+    try {
+      const response = await fetch("/cc0-character-library/manifest.json", { cache: "no-cache" });
+      if (!response.ok) throw new Error("No se pudo cargar el catálogo CC0 integrado.");
+      const catalog = await response.json() as { assets: Array<{id:string;name:string;path:string;source_url:string;license:string}> };
+      let added = 0, skipped = 0;
+      for (const asset of catalog.assets) {
+        const fileResponse = await fetch(asset.path);
+        if (!fileResponse.ok) { skipped++; continue; }
+        const blob = await fileResponse.blob();
+        if (!blob.size || blob.size > MAX_FILE_BYTES) { skipped++; continue; }
+        const signature = new Uint8Array(await blob.slice(0, 8).arrayBuffer());
+        if (signature.length !== 8 || signature.some((value, index) => value !== [137,80,78,71,13,10,26,10][index])) { skipped++; continue; }
+        const bitmap = await createImageBitmap(blob);
+        const width = bitmap.width, height = bitmap.height;
+        bitmap.close();
+        if (width < 128 || height < 128) { skipped++; continue; }
+        await storeCharacter({
+          id: "cc0-fallingair-" + asset.id, name: "CC0 · " + asset.name,
+          addedAt: Date.now(), width, height, bytes: blob.size,
+          category: "universal-character", blob: blob.slice(0, blob.size, "image/png"),
+          sourceUrl: asset.source_url, license: asset.license,
+        });
+        added++;
+      }
+      await refresh();
+      setMessage("Colección CC0 incorporada: " + added + " PNG añadidos; " + skipped + " omitidos por formato, tamaño o resolución. Procedencia: FALLiNG_AiR · CC0 1.0.");
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : "No se pudo importar la colección CC0.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const deleteItem = async (item: CharacterPng) => {
     if (!window.confirm(`¿Eliminar "${item.name}" de la biblioteca local? El archivo original de tu PC no se toca.`)) return;
     await removeCharacter(item.id);
@@ -259,13 +297,14 @@ export function AnimePngLibrary() {
         <div>
           <h2 id="anime-png-library-title">Biblioteca universal de personajes anime PNG</h2>
           <p>Galería universal para personajes completos, sprites y referencias de arte real. Importá una carpeta con cientos o miles de PNG, buscá por nombre y revisá cada imagen sobre fondo de transparencia.</p>
-          <p className="anime-png-note">Los archivos quedan en este navegador, no se suben a GitHub ni a ningún servidor. Importá solo arte propio o con permiso/licencia de uso. La copia «base con huella» añade una franja debajo de la imagen para identificarla sin tapar la figura; el original queda intacto.</p>
+          <p className="anime-png-note">Los archivos quedan en este navegador, no se suben a GitHub ni a ningún servidor. Importá solo arte propio o con permiso/licencia de uso. La copia «base con huella» añade una franja debajo de la imagen para identificarla sin tapar la figura; el original queda intacto. La colección CC0 integrada conserva la procedencia y licencia en su catálogo.</p>
         </div>
         <div className="anime-png-actions">
           <input ref={fileInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
           <input ref={folderInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
           <button className="anime-png-primary" type="button" disabled={busy} onClick={() => fileInput.current?.click()}>{busy ? "Importando…" : "＋ Importar PNG"}</button>
           <button type="button" disabled={busy} onClick={() => folderInput.current?.click()}>Importar carpeta completa</button>
+          <button type="button" disabled={busy} onClick={() => void importCc0Collection()}>{busy ? "Importando…" : "＋ Añadir colección CC0"}</button>
         </div>
       </div>
       <div className="anime-png-toolbar">
