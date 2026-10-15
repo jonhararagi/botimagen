@@ -125,6 +125,24 @@ try {
   page.on("pageerror", error => pageErrors.push(error.message));
 
   await page.goto(appUrl, { waitUntil: "domcontentloaded", timeout: 20000 });
+  // Exercise the new Picsart-style quick editor: import, select, add text and export.
+  const imageEditor = page.locator("#quick-image-editor");
+  await imageEditor.waitFor({ state: "visible", timeout: 10000 });
+  await imageEditor.getByRole("heading", { name: "Editor de imágenes" }).waitFor({ state: "visible" });
+  await imageEditor.locator('input[type="file"]').setInputFiles({
+    name: "qa-editor-image.png", mimeType: "image/png", buffer: makeQaPng(),
+  });
+  const importedLayer = imageEditor.locator(".qie-layer");
+  await importedLayer.waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await importedLayer.count(), 1, "The editor must place an imported image on the canvas");
+  await imageEditor.getByRole("button", { name: "T Texto" }).click();
+  await imageEditor.getByLabel("Texto para el lienzo").fill("AnimeArt QA");
+  await imageEditor.getByText("AnimeArt QA", { exact: true }).waitFor({ state: "visible" });
+  const editorDownload = page.waitForEvent("download", { timeout: 10000 });
+  await imageEditor.getByRole("button", { name: "Exportar PNG" }).click();
+  assert.equal((await editorDownload).suggestedFilename(), "botimagen-edicion.png",
+    "The image editor must export the composed canvas as PNG");
+
   // Verify the CC0 character studio is connected to the real repository sprites.
   const cc0Studio = page.locator('[data-testid="cc0-character-studio"]');
   await cc0Studio.waitFor({ state: "visible", timeout: 10000 });
