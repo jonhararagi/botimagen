@@ -154,6 +154,20 @@ try {
     undefined,
     { timeout: 10000 },
   );
+
+  // Exercise the actual dress-up mini game: hair, clothing, colors and save.
+  const dressup = page.locator('[data-testid="dressup-game"]');
+  await dressup.waitFor({ state: "visible", timeout: 10000 });
+  await dressup.getByRole("button", { name: "Dos coletas" }).click();
+  assert.equal(await dressup.getByRole("button", { name: "Dos coletas" }).getAttribute("aria-pressed"), "true");
+  await dressup.getByRole("button", { name: "Cyberpunk" }).click();
+  assert.equal(await dressup.getByRole("button", { name: "Cyberpunk" }).getAttribute("aria-pressed"), "true");
+  await dressup.getByRole("button", { name: "Rosa", exact: true }).last().click().catch(async () => {
+    await dressup.getByRole("button", { name: "Rosa", exact: true }).first().click();
+  });
+  await dressup.getByRole("button", { name: "Guardar look" }).click();
+  await dressup.getByText("¡Look guardado en este navegador!").waitFor({ state: "visible" });
+  assert.deepEqual(pageErrors, [], "Dress-up interactions should not raise JavaScript errors");
   assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
     "The user-facing CC0 studio must offer all five imported character sprites");
   await page.waitForFunction(() => {
