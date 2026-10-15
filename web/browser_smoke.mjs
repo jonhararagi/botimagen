@@ -1825,8 +1825,16 @@ try {
   });
   assert.deepEqual(bulkRoles, ["accessory", "accessory"], "Bulk role assignment should persist the selected semantic role for every selected layer.");
   assert.equal(await roleMapper.locator(".psd-role-card.is-selected").count(), 0, "Bulk assignment should clear the selection after applying the role.");
+  const suggestedExpression = roleMapper.locator('[data-layer-id="fallingair-layer-006"]');
+  await suggestedExpression.locator(".psd-role-suggestion").getByText(/Sugerencia orientativa/).waitFor({ state: "visible" });
+  await suggestedExpression.getByRole("button", { name: "Aplicar sugerencia" }).click();
+  const suggestedRole = await page.evaluate(() => {
+    const payload = JSON.parse(localStorage.getItem("botimagen-cc0-psd-layer-roles-v1") || "{}");
+    return payload["fallingair-layer-006"]?.role ?? null;
+  });
+  assert.equal(suggestedRole, "expression", "A high-confidence suggestion must only apply after the user explicitly confirms it.");
   await roleMapper.getByRole("button", { name: "Exportar asignaciones JSON" }).waitFor({ state: "visible" });
-  console.log("PASS_REAL: Chromium displayed all 43 PSD layer previews, saved a manual role, filtered pending layers, bulk-assigned two selected layers, cleared selection, and exposed JSON export with provenance.");
+  console.log("PASS_REAL: Chromium displayed all 43 PSD layer previews, saved manual and bulk roles, filtered pending layers, applied a high-confidence expression suggestion only after user confirmation, and exposed JSON export with provenance.");
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
