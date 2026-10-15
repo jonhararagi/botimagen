@@ -10,7 +10,7 @@ El porcentaje global de 63% indicado más abajo corresponde al cálculo históri
 - El manifiesto de las 43 capas ofrece sugerencias conservadoras y justificadas: cuatro recortes de PSD de rostro se proponen como expresiones con confianza alta; regiones sin evidencia suficiente quedan sin asignar o marcadas para revisión. El clasificador permite aplicar las sugerencias de alta confianza solo mediante acción explícita del usuario.
 - El smoke test de Chromium también comprueba esa confirmación manual. CI para el HEAD actualizado aún debe finalizar.
 - No equivale todavía a un creador modular que permita intercambiar cabello, cuerpo y ropa entre personajes. Las 43 capas PSD están extraídas y visibles en el clasificador, pero su clasificación semántica aún requiere validación visual.
-- Evidencia de CI de este incremento: pendiente de consultar en el HEAD final. No marcar como cerrado hasta ver el resultado de Actions.
+- CI #761 SUCCESS para el HEAD `fe663dc71695620574fd8a8295fbb238649873c9`: build web y smoke test Chromium pasaron, incluido el flujo real de sprites y confirmación de sugerencias. https://github.com/jonhararagi/botimagen/actions/runs/38746099453. El siguiente cambio documental posterior necesita su propia ejecución de CI.
 - Prueba manual en Windows y prueba real de generación con motor/checkpoint local: no realizadas en esta sesión.
 
 
