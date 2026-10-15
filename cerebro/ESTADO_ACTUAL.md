@@ -750,3 +750,15 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - Restricción importante: el presupuesto RAM actual solo comprueba memoria libre antes de iniciar, no impone un límite duro al proceso externo; el timeout intenta enviar `/sdapi/v1/interrupt`, pero la detención efectiva depende del motor. No afirmar control duro de RAM/CPU ni consistencia perfecta de personaje.
 - Pruebas añadidas: `tests/test_mini_ai_generator.py`, incluidas en el workflow de validación. Build, smoke test y conexión real con motor local todavía deben confirmarse en CI/Windows.
 - La CI anterior de la rama (run #658, SHA `56eddfae6015096811c1d5602496fa6e9f1e38ad`) falló en el smoke test preexistente de máscaras: Playwright no pudo pulsar «Guardar máscara corregida» porque el botón seguía deshabilitado. No atribuir ese fallo a la mini IA sin evidencia ni declarar la rama verde hasta una nueva ejecución.
+
+
+## BIMG-PIXAI-001 · Receta PixAI Gen Pibara V1 · 2026-10-15
+
+- **Estado: PARTIAL · CI pendiente.** Se añadió al creador simple una receta PixAI basada en los rasgos seleccionados (cuerpo, piel, peinado, color de cabello, ojos, prendas y accesorio), con botones para copiar prompt positivo/negative prompt y abrir la ficha oficial de Gen Pibara V1.
+- Nuevo documento: `docs/PIXAI-GEN-PIBARA-V1.md`, con protocolo de prueba de bajo consumo, límites de integración y procedencia.
+- La página pública de PixAI identifica la LoRA como Gen Pibara V1 de eltio otaku y muestra `pibara gen` entre las etiquetas. El token puede sesgar el resultado hacia la identidad entrenada; se documentó una comparación controlada opcional sin ese token si interfiere con el diseño.
+- No se descarga ni se empaqueta la LoRA, no se añadió una API externa ni se almacenaron credenciales. Los botones de copia y el enlace no consumen créditos de generación.
+- **HEAD BEFORE:** `32eac0e75c409a37c54d0c5ed287729090d78766` (rama de PR #15). **HEAD AFTER observado:** `61ee5242acbccb529cebab542d49a6c3cdf70ec2`. Commits de esta tarea: `46e1199ea9d491daef7da388d8f786a70d267e23` y `61ee5242acbccb529cebab542d49a6c3cdf70ec2`.
+- **CI #673:** run `38682122703`, en curso al actualizar esta nota: https://github.com/jonhararagi/botimagen/actions/runs/38682122703. No declarar PASS hasta que termine.
+- **PixAI real:** NOT_RUN; no se ha generado ninguna imagen ni gastado créditos. El perfil TinyFish requiere que el usuario complete el inicio de sesión y pulse Save profile.
+- **TIMER:** 1–2 horas activas estimadas para revisar CI, corregir fallos si aparecen y hacer una única prueba visual controlada después de confirmar la sesión; no incluye esperas de servicio ni QA físico Windows.
