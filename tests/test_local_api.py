@@ -681,7 +681,7 @@ class LocalApiTests(unittest.TestCase):
                         {"confirm": True, "anchors": {"waist": {"x": 0.5, "y": 0.5}}},
                     )
                     self.assertEqual(status, 200)
-                    self.assertTrue(confirmed["asset"]["anchors_validated"])
+                    self.assertTrue(confirmed["anchors_validated"])
 
                 status, _, catalog = request("GET", "/api/modular-assets")
                 self.assertEqual(status, 200)
