@@ -350,6 +350,7 @@ export default function App(){
   <main className="main">
    <header className="topbar"><div className="crumb">WORKSPACE <span>/</span> <b>CHARACTER DESIGN</b></div><div className="top-actions"><span className="local-pill"><i/> {catalog?"LOCAL · CONECTADO":"LOCAL · DESCONECTADO"}</span><span className="avatar">BW</span></div></header>
    <DressUpGame />
+    <ModularDressUp />
    <Cc0CharacterStudio />
    <PixAiAssetFactory />
    <CharacterCatalogStudio />
