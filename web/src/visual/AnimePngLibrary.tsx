@@ -249,8 +249,10 @@ export function AnimePngLibrary() {
         const width = bitmap.width, height = bitmap.height;
         bitmap.close();
         if (width < 128 || height < 128) { skipped++; continue; }
+        const pathParts = asset.path.split("/").filter(Boolean);
+        const characterLabel = pathParts[1] === "characters" ? pathParts[2] : "illustration";
         await storeCharacter({
-          id: "cc0-fallingair-" + asset.id, name: "CC0 · " + asset.character + " · " + asset.name,
+          id: "cc0-fallingair-" + asset.id, name: "CC0 · " + characterLabel + " · " + asset.name,
           addedAt: Date.now(), width, height, bytes: blob.size,
           category: "universal-character", blob: blob.slice(0, blob.size, "image/png"),
           sourceUrl: asset.source_url, license: asset.license,
