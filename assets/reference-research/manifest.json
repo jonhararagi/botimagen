@@ -11,7 +11,7 @@
       "author": "FALLiNG_AiR",
       "license": "CC0 1.0, explicitly displayed on source page",
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "rights_status": "cc0-source-verified; archive-and-selected-files-hash-verified",
+      "rights_status": "cc0-source-verified; downloaded-binary-hash-verified",
       "available_files": [
         {
           "name": "character.zip",
@@ -192,5 +192,5 @@
       "notes": "Prepared PNGs are intended for direct import into the PNG library. PSD files are editable source masters, but their internal layer names/semantics are not yet validated."
     }
   ],
-  "ingestion_note": "The import workflow downloads pinned source bytes, validates hashes and PNG dimensions, tests ZIP CRC and member paths, inventories all archive members, extracts selected PNGs and PSD masters into prepared/fallingair, and commits to this feature branch."
+  "ingestion_note": "The import workflow downloads pinned source bytes, checks SHA-256 against independently inspected files, validates PNG dimensions and ZIP CRC/path safety, writes archive-inventory.json, then commits to this feature branch."
 }
