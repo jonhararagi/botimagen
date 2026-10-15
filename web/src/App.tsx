@@ -339,7 +339,7 @@ export default function App(){
    <button className="nav" type="button" onClick={() => document.getElementById("anime-png-library")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▦</span> Biblioteca de PNG <small>LOCAL</small></button>
    <button className="nav" type="button" onClick={() => document.getElementById("mini-anime-ai")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>✦</span> Mini IA anime <small>LOCAL</small></button>
    <button className="nav" type="button" disabled title="Función futura"><span>⇄</span> Comparar variantes</button>
-   <button className="nav" type="button" disabled title="Integración futura"><span>▤</span> Assets</button>
+   <button className="nav" type="button" onClick={() => document.querySelector('[data-testid="pixai-asset-factory"]')?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▤</span> Fábrica de assets <small>PIXAI</small></button>
    <div className="side-spacer"/>
    <div className="local-card"><div className="online"><i/> MOTOR LOCAL</div><b>{catalog?"Motor detectado":"Conectando motor"}</b><p>{catalog?"Catálogo y prompts procesados por Python. Sin API de IA externa.":"Inicia el servicio Python para habilitar el catálogo real."}</p><div className="progress"><i/></div><small>{catalog?catalog.style.id:"API LOCAL · 127.0.0.1"}</small></div>
    <footer className="side-footer"><span>v0.2.0</span><span>OFFLINE-FIRST</span></footer>
