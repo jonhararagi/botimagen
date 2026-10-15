@@ -823,8 +823,9 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - Commits de esta tanda: `379512f054f329db0268cf6f38ac4cb95681d373` (componente inicial), `dbd72c1e585a6cd36d97e15f063ef8e4337a2c0b` (integración), `56d10686b8ba8c26ab201f5f43dd1fa0a41ee092` (smoke inicial), `8364ed936c38d1cbbfcc231ee290a18dab302875` (actualización de inventario/slots), `de922bb4f2d8945f1254e35fcf24680cd22465de` (smoke de recarga/estado vacío).
 - CI anterior `38783783324` para SHA `56d10686b8ba8c26ab201f5f43dd1fa0a41ee092`: **SUCCESS**, incluidos build web y smoke test Chromium. Esta evidencia es del código anterior a los cambios de recarga.
 - **CI de corrección:** run `38785555327` falló solo en el smoke Chromium: `getByRole('button', { name: 'Actualizar biblioteca' })` agotó 30 segundos. El build web y las validaciones previas pasaron. Causa confirmada al inspeccionar JSX: se había implementado `refreshAssets`, pero faltaba renderizar el botón en la sección de acciones.
-- **Corrección aplicada:** commit `c78c851bce17fec0889b9bc1f701749d1a8266ed` añade el botón visible y conectado a `refreshAssets`. Nueva CI run `38787715522`: **QUEUED** al actualizar esta nota, no declarar PASS hasta que termine.
+- **Corrección aplicada:** commit `c78c851bce17fec0889b9bc1f701749d1a8266ed` añade el botón visible y conectado a `refreshAssets`; commit `6bdba108ae7fb51c8d3a6ce722e0deaf23d9d852` registra el diagnóstico.
+- **CI de corrección:** run `38787715522`: **SUCCESS**, job `validate` completado. Pasaron las validaciones Python, el build web y el smoke test Chromium, incluida la prueba de la UI actualizada. Evidencia: https://github.com/jonhararagi/botimagen/actions/runs/38787715522.
 - **Límite de prueba:** el smoke comprueba UI, recarga del inventario y bloqueo seguro cuando no hay piezas. Todavía no demuestra una composición de extremo a extremo con piezas modulares reales importadas, ni QA manual de Windows.
-- **Siguiente paso:** confirmar la CI nueva; después añadir una prueba real de composición con fixture PNG modular y validar anclas/orden de capas y descarga.
+- **Siguiente paso:** añadir una prueba real de composición con fixture PNG modular y validar anclas, orden de capas y descarga.
 - **TIMER:** 1–3 horas activas estimadas para cerrar la validación y prueba de composición con recursos compatibles; no es tiempo medido.
 
