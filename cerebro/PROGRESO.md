@@ -184,5 +184,5 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Se añadió un proyecto Android mínimo y workflow de compilación APK en la rama autorizada para empezar la variante móvil sin alterar los pesos de la beta web.
 - Archivos: `android/settings.gradle`, `android/build.gradle`, `android/app/build.gradle`, manifiesto, Activity WebView, `android/app/src/main/assets/index.html`, `.github/workflows/android-apk.yml`.
 - TIMER global estimado del MVP móvil: 24–40 horas activas. Esta tanda de scaffolding/UI: 2–4 horas estimadas; tiempo real NOT_MEASURED.
-- Estado funcional: PARTIAL. Build APK, instalación, pruebas en Xiaomi y generación online real quedan NOT_RUN hasta comprobar GitHub Actions y disponer de un endpoint de imágenes compatible.
+- Estado funcional: PARTIAL. Build APK `PASS_REAL` en CI Android #5 para SHA `0f4e3a573df4fd2599f4f58fa6fccc7ddb670a8e` (run https://github.com/jonhararagi/botimagen/actions/runs/38693426173). APK extraído y ZIP interno validado; JavaScript embebido pasa `node --check`. Instalación física en Xiaomi y generación online real con proveedor compatible siguen `NOT_RUN`.
 - El progreso ponderado de la beta web se conserva en **63%**. Esta tarea es un alcance móvil adicional y no justifica inflar el porcentaje del denominador histórico.
