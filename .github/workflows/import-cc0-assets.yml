@@ -165,11 +165,67 @@ jobs:
                       if is_group:
                           walk(layer, item['path'])
               walk(psd)
-              layer_report.append({'path': str(path).replace('\\\\', '/'), 'source_member': record['archive_member'], 'canvas': {'width': psd.width, 'height': psd.height}, 'layer_count': len(layers), 'top_level_names': [str(layer.name) for layer in psd], 'layers': layers, 'status': 'PASS'})
+              # Export useful non-empty leaf layers as transparent PNG references while preserving their source PSD and coordinates.
+              import re
+              source_stem = re.sub(r'[^A-Za-z0-9_-]+', '-', path.stem).strip('-') or 'source'
+              character_key = path.parents[1].name if path.parent.name == 'layers' else path.parent.name
+              layer_dir = prepared / 'psd-layers' / character_key / source_stem
+              exported = []
+              export_index = 0
+              def export_leaf_layers(group, prefix=''):
+                  nonlocal_dummy = None
+                  global_unused = None
+                  nonlocal_export_layers(group, prefix)
+              def nonlocal_export_layers(group, prefix=''):
+                  nonlocal export_index
+                  for layer in group:
+                      name = str(layer.name)
+                      layer_path = (prefix + '/' + name).strip('/')
+                      is_group = bool(getattr(layer, 'is_group', lambda: False)())
+                      if is_group:
+                          nonlocal_export_layers(layer, layer_path)
+                          continue
+                      if not bool(getattr(layer, 'visible', True)):
+                          continue
+                      bbox = tuple(layer.bbox) if getattr(layer, 'bbox', None) else (0, 0, 0, 0)
+                      left, top, right, bottom = bbox
+                      width, height = right-left, bottom-top
+                      if width < 24 or height < 24 or (left == 0 and top == 0 and right == psd.width and bottom == psd.height):
+                          continue
+                      image = layer.topil()
+                      if image is None:
+                          continue
+                      if image.size == (psd.width, psd.height):
+                          image = image.crop(bbox)
+                      if image.width < 24 or image.height < 24:
+                          continue
+                      safe_name = re.sub(r'[^A-Za-z0-9_-]+', '-', name).strip('-') or 'layer'
+                      export_index += 1
+                      filename = f'layer-{export_index:03d}-{safe_name[:48]}.png'
+                      destination = layer_dir / filename
+                      destination.parent.mkdir(parents=True, exist_ok=True)
+                      image.save(destination, format='PNG', optimize=True)
+                      payload = destination.read_bytes()
+                      exported.append({'name': name, 'layer_path': layer_path, 'kind': str(getattr(layer, 'kind', 'unknown')), 'bbox': list(bbox), 'path': str(destination).replace('\\\\', '/'), 'width': image.width, 'height': image.height, 'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest(), 'source_member': record['archive_member']})
+              nonlocal_export_layers(psd)
+              layer_report.append({'path': str(path).replace('\\\\', '/'), 'source_member': record['archive_member'], 'canvas': {'width': psd.width, 'height': psd.height}, 'layer_count': len(layers), 'top_level_names': [str(layer.name) for layer in psd], 'layers': layers, 'exported_layers': exported, 'status': 'PASS'})
           if not layer_report:
               raise SystemExit('No PSD master files were inspected.')
-          (prepared / 'psd-layer-inventory.json').write_text(json.dumps({'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 displayed on source page', 'inspected_with': 'psd-tools', 'psd_count': len(layer_report), 'psd_files': layer_report}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          (prepared / 'psd-layer-inventory.json').write_text(json.dumps({'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 displayed on source page', 'inspected_with': 'psd-tools', 'psd_count': len(layer_report), 'exported_layer_count': sum(len(x['exported_layers']) for x in layer_report), 'psd_files': layer_report}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           public_root = Path('web/public/cc0-character-library')
+          psd_layer_catalog = []
+          for report in layer_report:
+              for layer in report['exported_layers']:
+                  source = Path(layer['path'])
+                  rel = source.relative_to(prepared / 'psd-layers')
+                  destination = public_root / 'psd-layers' / rel
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copyfile(source, destination)
+                  payload = destination.read_bytes()
+                  if hashlib.sha256(payload).hexdigest() != layer['sha256']:
+                      raise SystemExit(f'PSD layer PNG hash mismatch: {rel}')
+                  psd_layer_catalog.append({'id': 'fallingair-layer-' + str(len(psd_layer_catalog)+1).zfill(3), 'name': destination.name, 'label': layer['name'], 'layer_path': layer['layer_path'], 'path': '/cc0-character-library/psd-layers/' + str(rel), 'bytes': len(payload), 'width': layer['width'], 'height': layer['height'], 'sha256': layer['sha256'], 'source_member': layer['source_member'], 'source_psd': report['path'], 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 (as displayed on source page)', 'category': 'psd-layer'})
+          (public_root / 'psd-layers-manifest.json').write_text(json.dumps({'schema_version': 1, 'title': 'FALLiNG_AiR CC0 PSD layer references', 'source_url': 'https://opengameart.org/content/visual-novel-character-sprite', 'creator': 'FALLiNG_AiR', 'license': 'CC0 1.0 (as displayed on source page)', 'psd_count': len(layer_report), 'layer_count': len(psd_layer_catalog), 'assets': psd_layer_catalog}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           public_root.mkdir(parents=True, exist_ok=True)
           catalog = []
           for record in inventory['assets']:
