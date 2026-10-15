@@ -147,6 +147,7 @@ export function ModularDressUp() {
           })}
         </div>
         <div className="modular-dressup-actions">
+          <button type="button" disabled={busy} onClick={()=>void refreshAssets()}>Actualizar biblioteca</button>
           <button type="button" disabled={busy || !Object.values(selection).some(Boolean)} onClick={()=>void compose()}>{busy ? "Componiendo…" : "Componer personaje"}</button>
           <button type="button" disabled={!preview} onClick={download}>Descargar PNG</button>
           <button type="button" disabled={busy} onClick={()=>{setSelection({});setPreview("");setStatus("Selección reiniciada. Elige piezas PNG disponibles.");}}>Reiniciar piezas</button>
