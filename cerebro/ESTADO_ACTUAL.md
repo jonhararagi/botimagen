@@ -813,3 +813,16 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - **CI #673:** run `38682122703`, en curso al actualizar esta nota: https://github.com/jonhararagi/botimagen/actions/runs/38682122703. No declarar PASS hasta que termine.
 - **PixAI real:** NOT_RUN; no se ha generado ninguna imagen ni gastado créditos. El perfil TinyFish requiere que el usuario complete el inicio de sesión y pulse Save profile.
 - **TIMER:** 1–2 horas activas estimadas para revisar CI, corregir fallos si aparecen y hacer una única prueba visual controlada después de confirmar la sesión; no incluye esperas de servicio ni QA físico Windows.
+
+## BIMG-MODULAR-DRESSUP-PNG · 2026-10-15
+
+- Se integró `web/src/visual/ModularDressUp.tsx` debajo del mini juego vectorial: lee `/api/modular-assets`, filtra piezas `modular_piece` por categorías reconocidas y llama al compositor local `/api/modular-compose` para exportar PNG de 512×768.
+- Los slots de ropa/cabello/cuerpo y rasgos faciales incluyen ahora cejas y boca, mapeadas a las categorías que ya reconoce `ModularAssetLibrary.tsx`.
+- Corrección de usabilidad: botón **Actualizar biblioteca** para volver a leer piezas después de importarlas sin reiniciar la aplicación; conserva solo selecciones todavía existentes.
+- La interfaz mantiene `AÚN NO` cuando falta una categoría y bloquea la composición si no hay ninguna pieza seleccionada. No se ha afirmado que exista un catálogo de prendas completo.
+- Commits de esta tanda: `379512f054f329db0268cf6f38ac4cb95681d373` (componente inicial), `dbd72c1e585a6cd36d97e15f063ef8e4337a2c0b` (integración), `56d10686b8ba8c26ab201f5f43dd1fa0a41ee092` (smoke inicial), `8364ed936c38d1cbbfcc231ee290a18dab302875` (actualización de inventario/slots), `de922bb4f2d8945f1254e35fcf24680cd22465de` (smoke de recarga/estado vacío).
+- CI anterior #? run `38783783324` para SHA `56d10686b8ba8c26ab201f5f43dd1fa0a41ee092`: **SUCCESS**, incluidos build web y smoke test Chromium. Esta evidencia es del código anterior a los dos commits de corrección; CI de los cambios más recientes queda pendiente.
+- **Límite de prueba:** el smoke actual comprueba UI, recarga del inventario y bloqueo seguro cuando no hay piezas. Todavía no demuestra una composición de extremo a extremo con piezas modulares reales importadas, ni QA manual de Windows.
+- **Siguiente paso:** esperar CI del HEAD nuevo; corregir fallos y, cuando exista un fixture modular compatible, añadir prueba real de composición y validar las anclas/orden de capas.
+- **TIMER:** 1–3 horas activas estimadas para cerrar la validación y prueba de composición con recursos compatibles; no es tiempo medido.
+
