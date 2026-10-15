@@ -115,14 +115,14 @@ export function PixAiAssetFactory() {
   }, []);
 
   async function preparePixAI() {
-    const text = prompt;
-    try {
-      await navigator.clipboard.writeText(text);
-      setMessage("Prompt copiado. PixAI se abrirá; elegí Gen Pibara V1 y la cola económica/de espera, 1 imagen y el tamaño más pequeño útil. No uses generación rápida premium.");
-    } catch {
-      setMessage("PixAI se abrirá. Copiá el prompt visible de abajo y pegalo en la generación.");
-    }
+    // Open synchronously in the click handler so Chromium's popup blocker does not swallow it.
     window.open(PIXAI_URL, "_blank", "noopener,noreferrer");
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setMessage("Prompt copiado. PixAI se abrió; revisá modelo, coste total, 1 imagen y cola económica/de espera antes de generar. No uses generación rápida premium.");
+    } catch {
+      setMessage("PixAI se abrió. Copiá el prompt visible de abajo y pegalo en la generación.");
+    }
   }
   async function importPng(file?: File) {
     if (!file) return;
