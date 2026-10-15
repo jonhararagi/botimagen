@@ -1682,7 +1682,14 @@ try {
   const maskCanvas = maskEditor.getByTestId("mask-preview");
   const maskBox = await maskCanvas.boundingBox();
   assert.ok(maskBox, "The mask editor must show the source image with a real canvas overlay");
-  await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
+  // Use Playwright's locator interaction so the canvas is scrolled into view and receives a real pointer sequence.
+  // The old page.mouse click could land against a stale/off-viewport bounding box, leaving maskDirty=false.
+  await maskCanvas.click({ position: { x: Math.round(maskBox.width * 0.5), y: Math.round(maskBox.height * 0.5) } });
+  await maskEditor.getByRole("button", { name: "Guardar máscara corregida" }).waitFor({ state: "visible" });
+  await page.waitForFunction(() => {
+    const button = document.querySelector('[data-testid="mask-editor"] button.model-builder-primary');
+    return button instanceof HTMLButtonElement && !button.disabled;
+  }, null, { timeout: 5000 });
   await maskEditor.getByRole("button", { name: "Guardar máscara corregida" }).click();
   await modelBuilder.getByRole("status").filter({ hasText: "Máscara guardada" }).waitFor({ state: "visible", timeout: 15000 });
   assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 2/);
