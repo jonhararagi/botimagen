@@ -128,6 +128,19 @@ try {
   // Verify the CC0 character studio is connected to the real repository sprites.
   const cc0Studio = page.locator('[data-testid="cc0-character-studio"]');
   await cc0Studio.waitFor({ state: "visible", timeout: 10000 });
+  // Verify the PixAI asset factory is visible and missing variants are explicitly marked.
+  const pixaiFactory = page.locator('[data-testid="pixai-asset-factory"]');
+  await pixaiFactory.waitFor({ state: "visible", timeout: 10000 });
+  assert.match(await pixaiFactory.locator('[data-testid="pixai-slot-status"]').textContent(), /AÚN NO/,
+    "An unfilled trait must be marked AÚN NO rather than pretending an image exists");
+  await pixaiFactory.getByLabel("¿Qué pieza querés completar?").selectOption("hairstyle");
+  await pixaiFactory.getByLabel("Variante del catálogo").selectOption({ index: 1 });
+  await page.waitForFunction(() => {
+    const prompt = document.querySelector("#pixai-prompt-preview");
+    return prompt instanceof HTMLTextAreaElement && prompt.value.includes("Trait: ");
+  }, undefined, { timeout: 10000 });
+  assert.ok(await pixaiFactory.getByRole("button", { name: "Abrir PixAI · modo económico" }).isEnabled(),
+    "The low-cost PixAI action must be available only after selecting a real catalog trait");
   assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
     "The user-facing CC0 studio must offer all five imported character sprites");
   await page.waitForFunction(() => {
