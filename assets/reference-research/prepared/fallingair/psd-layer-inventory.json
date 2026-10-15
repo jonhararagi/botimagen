@@ -3,6 +3,7 @@
   "license": "CC0 1.0 displayed on source page",
   "inspected_with": "psd-tools",
   "psd_count": 10,
+  "exported_layer_count": 43,
   "psd_files": [
     {
       "path": "assets/reference-research/prepared/fallingair/characters/character-1/layers/master.psd",
@@ -70,6 +71,76 @@
             963
           ],
           "is_group": false
+        }
+      ],
+      "exported_layers": [
+        {
+          "name": "레이어 5",
+          "layer_path": "레이어 5",
+          "kind": "pixel",
+          "bbox": [
+            463,
+            418,
+            1371,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-1/master/layer-001-5.png",
+          "width": 908,
+          "height": 2582,
+          "bytes": 23481,
+          "sha256": "728f7c1d5a17519647d3ce939b3290650c91277cf23a8a04386ed533ba4af6d2",
+          "source_member": "cha 1/pl1.psd"
+        },
+        {
+          "name": "레이어 3",
+          "layer_path": "레이어 3",
+          "kind": "pixel",
+          "bbox": [
+            468,
+            424,
+            1357,
+            2954
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-1/master/layer-002-3.png",
+          "width": 889,
+          "height": 2530,
+          "bytes": 41164,
+          "sha256": "cf47c013a6b04c145c6a9d607d6aad2b0860ccaa6f3bc213c17469ddcddab30f",
+          "source_member": "cha 1/pl1.psd"
+        },
+        {
+          "name": "레이어 2",
+          "layer_path": "레이어 2",
+          "kind": "pixel",
+          "bbox": [
+            463,
+            418,
+            1371,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-1/master/layer-003-2.png",
+          "width": 908,
+          "height": 2582,
+          "bytes": 56060,
+          "sha256": "ee625fbf00ac119fdcc2d37f484e00c754c36dafc75a445771fa721cc482c8d8",
+          "source_member": "cha 1/pl1.psd"
+        },
+        {
+          "name": "레이어 1",
+          "layer_path": "레이어 1",
+          "kind": "pixel",
+          "bbox": [
+            726,
+            706,
+            1047,
+            963
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-1/master/layer-004-1.png",
+          "width": 321,
+          "height": 257,
+          "bytes": 2950,
+          "sha256": "481f228aa944210ccf4ec3339853d5924f8b44e45f30a3051fbe47acebbc0994",
+          "source_member": "cha 1/pl1.psd"
         }
       ],
       "status": "PASS"
@@ -226,6 +297,42 @@
           "is_group": false
         }
       ],
+      "exported_layers": [
+        {
+          "name": "pl2 concept",
+          "layer_path": "pl2 concept",
+          "kind": "pixel",
+          "bbox": [
+            323,
+            99,
+            1735,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/face-master/layer-001-pl2-concept.png",
+          "width": 1412,
+          "height": 2901,
+          "bytes": 164367,
+          "sha256": "2e9d528907c3ff1167c3a71adb4543f33d5b0341719b2b5bb96e96348bfa2762",
+          "source_member": "cha 2/pl2 face.psd"
+        },
+        {
+          "name": "혐오",
+          "layer_path": "혐오",
+          "kind": "pixel",
+          "bbox": [
+            930,
+            246,
+            1184,
+            551
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/face-master/layer-002-layer.png",
+          "width": 254,
+          "height": 305,
+          "bytes": 3712,
+          "sha256": "a8ea7977d9888d19e0ca756d8528468073eb86e0303b2ad3f01d959983a6de0b",
+          "source_member": "cha 2/pl2 face.psd"
+        }
+      ],
       "status": "PASS"
     },
     {
@@ -364,6 +471,144 @@
             505
           ],
           "is_group": false
+        }
+      ],
+      "exported_layers": [
+        {
+          "name": "레이어 9",
+          "layer_path": "레이어 9",
+          "kind": "pixel",
+          "bbox": [
+            333,
+            104,
+            1725,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-001-9.png",
+          "width": 1392,
+          "height": 2896,
+          "bytes": 73232,
+          "sha256": "7685914136b5d9aac8432ef1e2493e9d8fad540ac71169648b8e165edf951419",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 5",
+          "layer_path": "레이어 5",
+          "kind": "pixel",
+          "bbox": [
+            360,
+            951,
+            628,
+            1207
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-002-5.png",
+          "width": 268,
+          "height": 256,
+          "bytes": 8356,
+          "sha256": "4323ab55baccc726ec6ed9c7c0658bfaf64ac79d8c3afe0f81105fd2f6681490",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 6",
+          "layer_path": "레이어 6",
+          "kind": "pixel",
+          "bbox": [
+            948,
+            330,
+            1155,
+            456
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-003-6.png",
+          "width": 207,
+          "height": 126,
+          "bytes": 2306,
+          "sha256": "4f5940f32cbc2d1c4f5075c1b6cd8e798682dc6fe8158cd5b531f091c9c3099d",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 3",
+          "layer_path": "레이어 3",
+          "kind": "pixel",
+          "bbox": [
+            324,
+            99,
+            1735,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-004-3.png",
+          "width": 1411,
+          "height": 2901,
+          "bytes": 130259,
+          "sha256": "daa8d5afacb724a00ec196d64da432cd25ce26690cb71102d9012c5bde1d58da",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 8",
+          "layer_path": "레이어 8",
+          "kind": "pixel",
+          "bbox": [
+            585,
+            2690,
+            679,
+            2849
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-005-8.png",
+          "width": 94,
+          "height": 159,
+          "bytes": 1114,
+          "sha256": "716b3268e104ff28002705b24cf8edc24ec5d291cfe7ddef954d2de0ad44de98",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 1",
+          "layer_path": "레이어 1",
+          "kind": "pixel",
+          "bbox": [
+            323,
+            99,
+            1735,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-006-1.png",
+          "width": 1412,
+          "height": 2901,
+          "bytes": 106700,
+          "sha256": "97c535fca8168f4230251c1a7fdc89b8f676f6b2d9bdb088cb4afca1cb582766",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 4",
+          "layer_path": "레이어 4",
+          "kind": "pixel",
+          "bbox": [
+            1218,
+            104,
+            1542,
+            1629
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-007-4.png",
+          "width": 324,
+          "height": 1525,
+          "bytes": 5257,
+          "sha256": "ee55f5d88b16419b387015db808a893545c1f32ea9d96c8ced27dd3d540bb8ed",
+          "source_member": "cha 2/pl2.psd"
+        },
+        {
+          "name": "레이어 2",
+          "layer_path": "레이어 2",
+          "kind": "pixel",
+          "bbox": [
+            933,
+            327,
+            1199,
+            505
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-2/master/layer-008-2.png",
+          "width": 266,
+          "height": 178,
+          "bytes": 1725,
+          "sha256": "4fa89d69ff9379046e7aa9e9d2d9187620e2a47554395ccec8702b0f585688eb",
+          "source_member": "cha 2/pl2.psd"
         }
       ],
       "status": "PASS"
@@ -534,6 +779,42 @@
           "is_group": false
         }
       ],
+      "exported_layers": [
+        {
+          "name": "pl3 concept",
+          "layer_path": "pl3 concept",
+          "kind": "pixel",
+          "bbox": [
+            221,
+            285,
+            1863,
+            2822
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/face-master/layer-001-pl3-concept.png",
+          "width": 1642,
+          "height": 2537,
+          "bytes": 117329,
+          "sha256": "46ed5a325184ccf77069390b914c6142eb7fb036480834f8e750b3f4ad33d01d",
+          "source_member": "cha 3/pl3 face.psd"
+        },
+        {
+          "name": "수줍음",
+          "layer_path": "수줍음",
+          "kind": "pixel",
+          "bbox": [
+            882,
+            871,
+            1250,
+            1074
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/face-master/layer-002-layer.png",
+          "width": 368,
+          "height": 203,
+          "bytes": 3110,
+          "sha256": "989cb126d329c911d98a978874912e4009d79b39581e17400d2b40aed33b91ae",
+          "source_member": "cha 3/pl3 face.psd"
+        }
+      ],
       "status": "PASS"
     },
     {
@@ -630,6 +911,110 @@
             1084
           ],
           "is_group": false
+        }
+      ],
+      "exported_layers": [
+        {
+          "name": "레이어 7",
+          "layer_path": "레이어 7",
+          "kind": "pixel",
+          "bbox": [
+            228,
+            461,
+            1736,
+            2816
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/master/layer-001-7.png",
+          "width": 1508,
+          "height": 2355,
+          "bytes": 58204,
+          "sha256": "945843e498c8f83c2dd24ccc3348332e34c176446a85385b02783b851c21ca4e",
+          "source_member": "cha 3/pl3.psd"
+        },
+        {
+          "name": "레이어 4",
+          "layer_path": "레이어 4",
+          "kind": "pixel",
+          "bbox": [
+            222,
+            484,
+            1588,
+            2790
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/master/layer-002-4.png",
+          "width": 1366,
+          "height": 2306,
+          "bytes": 63871,
+          "sha256": "343ebc374dc0eb6c105a10497d157f7a3edae01c897ebd646d6b8f05c4c38361",
+          "source_member": "cha 3/pl3.psd"
+        },
+        {
+          "name": "레이어 3",
+          "layer_path": "레이어 3",
+          "kind": "pixel",
+          "bbox": [
+            327,
+            638,
+            1310,
+            2789
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/master/layer-003-3.png",
+          "width": 983,
+          "height": 2151,
+          "bytes": 18165,
+          "sha256": "f9b1405c32fc9a2c077ed65b74d52e8ce6c9989fa24355153fe236782049f4fc",
+          "source_member": "cha 3/pl3.psd"
+        },
+        {
+          "name": "레이어 5",
+          "layer_path": "레이어 5",
+          "kind": "pixel",
+          "bbox": [
+            788,
+            459,
+            1377,
+            1605
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/master/layer-004-5.png",
+          "width": 589,
+          "height": 1146,
+          "bytes": 32460,
+          "sha256": "c6b2580db025ae624448a42c9ac52f2e627a45d0113c8e4586d9d9d517c1a468",
+          "source_member": "cha 3/pl3.psd"
+        },
+        {
+          "name": "레이어 1",
+          "layer_path": "레이어 1",
+          "kind": "pixel",
+          "bbox": [
+            221,
+            444,
+            1624,
+            2822
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/master/layer-005-1.png",
+          "width": 1403,
+          "height": 2378,
+          "bytes": 64990,
+          "sha256": "389d339adbae618c310706d5eac3970b4dc8ca28d882ca2a45562f84ef3ee37a",
+          "source_member": "cha 3/pl3.psd"
+        },
+        {
+          "name": "레이어 2",
+          "layer_path": "레이어 2",
+          "kind": "pixel",
+          "bbox": [
+            334,
+            285,
+            1863,
+            1084
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-3/master/layer-006-2.png",
+          "width": 1529,
+          "height": 799,
+          "bytes": 18054,
+          "sha256": "5fe28ada111f2835c4a41d53c7a9dca90c4344db47dfcc00332d741ff9b56dc8",
+          "source_member": "cha 3/pl3.psd"
         }
       ],
       "status": "PASS"
@@ -814,6 +1199,42 @@
           "is_group": false
         }
       ],
+      "exported_layers": [
+        {
+          "name": "pl4 concept",
+          "layer_path": "pl4 concept",
+          "kind": "pixel",
+          "bbox": [
+            0,
+            236,
+            1996,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-4/face-master/layer-001-pl4-concept.png",
+          "width": 1996,
+          "height": 2764,
+          "bytes": 151019,
+          "sha256": "5469f737a656b81a8f30d5c11161a8827a5730f7cfb5350d8635ca8a7cadc4d7",
+          "source_member": "cha 4/pl4 face.psd"
+        },
+        {
+          "name": "scoff",
+          "layer_path": "scoff",
+          "kind": "pixel",
+          "bbox": [
+            957,
+            605,
+            1241,
+            870
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-4/face-master/layer-002-scoff.png",
+          "width": 284,
+          "height": 265,
+          "bytes": 2434,
+          "sha256": "f934ee817188f059b1bd1479bf2d1e7e9505a18ad77058b6b5525328cc31ec52",
+          "source_member": "cha 4/pl4 face.psd"
+        }
+      ],
       "status": "PASS"
     },
     {
@@ -896,6 +1317,76 @@
             1435
           ],
           "is_group": false
+        }
+      ],
+      "exported_layers": [
+        {
+          "name": "레이어 5",
+          "layer_path": "레이어 5",
+          "kind": "pixel",
+          "bbox": [
+            0,
+            242,
+            1992,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-4/master/layer-001-5.png",
+          "width": 1992,
+          "height": 2758,
+          "bytes": 91186,
+          "sha256": "cb7030d0920a110ebb25c36c014a5a7dbeff52fef5a4cc000eee1cc0dd3793f9",
+          "source_member": "cha 4/pl4.psd"
+        },
+        {
+          "name": "레이어 3",
+          "layer_path": "레이어 3",
+          "kind": "pixel",
+          "bbox": [
+            0,
+            240,
+            1993,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-4/master/layer-002-3.png",
+          "width": 1993,
+          "height": 2760,
+          "bytes": 207659,
+          "sha256": "1258964dd6dd11349db72ea2c8f2174a5a4de948615369579e4ec2b99dbe84c0",
+          "source_member": "cha 4/pl4.psd"
+        },
+        {
+          "name": "레이어 1",
+          "layer_path": "레이어 1",
+          "kind": "pixel",
+          "bbox": [
+            0,
+            236,
+            1996,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-4/master/layer-003-1.png",
+          "width": 1996,
+          "height": 2764,
+          "bytes": 114370,
+          "sha256": "6392a565aa495829430e0defe74b969a31ca34f54c4eb77c85a85f3435bb1540",
+          "source_member": "cha 4/pl4.psd"
+        },
+        {
+          "name": "레이어 2",
+          "layer_path": "레이어 2",
+          "kind": "pixel",
+          "bbox": [
+            691,
+            565,
+            1244,
+            1435
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-4/master/layer-004-2.png",
+          "width": 553,
+          "height": 870,
+          "bytes": 6550,
+          "sha256": "485b95436ce023d7eced12d771975e6970143ffa7b1d549cdc98433ce116a709",
+          "source_member": "cha 4/pl4.psd"
         }
       ],
       "status": "PASS"
@@ -1052,6 +1543,42 @@
           "is_group": false
         }
       ],
+      "exported_layers": [
+        {
+          "name": "pl5 concept",
+          "layer_path": "pl5 concept",
+          "kind": "pixel",
+          "bbox": [
+            474,
+            295,
+            1553,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-5/face-master/layer-001-pl5-concept.png",
+          "width": 1079,
+          "height": 2705,
+          "bytes": 81852,
+          "sha256": "a439ad9934bde88ac00c8df7a2253a5fcd57fb3921618c30c3a523bcaa775dba",
+          "source_member": "cha 5/pl5 face.psd"
+        },
+        {
+          "name": "scoff",
+          "layer_path": "scoff",
+          "kind": "pixel",
+          "bbox": [
+            794,
+            521,
+            1195,
+            903
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-5/face-master/layer-002-scoff.png",
+          "width": 401,
+          "height": 382,
+          "bytes": 4844,
+          "sha256": "8c78293c384d651e8a4610146e7094b4b8437cfc27e7b240a2422f47711928d0",
+          "source_member": "cha 5/pl5 face.psd"
+        }
+      ],
       "status": "PASS"
     },
     {
@@ -1134,6 +1661,76 @@
             1826
           ],
           "is_group": false
+        }
+      ],
+      "exported_layers": [
+        {
+          "name": "레이어 5",
+          "layer_path": "레이어 5",
+          "kind": "pixel",
+          "bbox": [
+            479,
+            301,
+            1548,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-5/master/layer-001-5.png",
+          "width": 1069,
+          "height": 2699,
+          "bytes": 57414,
+          "sha256": "61c2691e864dd1c9548528b2407f26cde7ba6ec2a780f6efd46c2c6934bf34a1",
+          "source_member": "cha 5/pl5.psd"
+        },
+        {
+          "name": "레이어 3",
+          "layer_path": "레이어 3",
+          "kind": "pixel",
+          "bbox": [
+            477,
+            299,
+            1411,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-5/master/layer-002-3.png",
+          "width": 934,
+          "height": 2701,
+          "bytes": 85888,
+          "sha256": "ab60693806591278e675d74da4a911ece3de305e0f0a492e9d1b2525f87f4062",
+          "source_member": "cha 5/pl5.psd"
+        },
+        {
+          "name": "레이어 1",
+          "layer_path": "레이어 1",
+          "kind": "pixel",
+          "bbox": [
+            474,
+            295,
+            1553,
+            3000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-5/master/layer-003-1.png",
+          "width": 1079,
+          "height": 2705,
+          "bytes": 65532,
+          "sha256": "745a9bb66ec029a6d2ec4e99253ca7fcfbd613a7bdd9c3bb32f753ea865c72b5",
+          "source_member": "cha 5/pl5.psd"
+        },
+        {
+          "name": "레이어 2",
+          "layer_path": "레이어 2",
+          "kind": "pixel",
+          "bbox": [
+            669,
+            558,
+            1276,
+            1826
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/character-5/master/layer-004-2.png",
+          "width": 607,
+          "height": 1268,
+          "bytes": 12293,
+          "sha256": "dd882068b9f90269f921ca0b521cd76196453c649d158763bfd4971ed26c68fc",
+          "source_member": "cha 5/pl5.psd"
         }
       ],
       "status": "PASS"
@@ -1288,6 +1885,161 @@
             1740
           ],
           "is_group": false
+        }
+      ],
+      "exported_layers": [
+        {
+          "name": "pl4 채색",
+          "layer_path": "pl4 채색",
+          "kind": "pixel",
+          "bbox": [
+            1237,
+            108,
+            2077,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-001-pl4.png",
+          "width": 840,
+          "height": 1892,
+          "bytes": 66590,
+          "sha256": "e9917069f14632ad85c47259ceb73a9fc9a8622418bbd3344ea9d8c042c37ee6",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl4",
+          "layer_path": "pl4",
+          "kind": "pixel",
+          "bbox": [
+            1160,
+            99,
+            1997,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-002-pl4.png",
+          "width": 837,
+          "height": 1901,
+          "bytes": 32333,
+          "sha256": "79406a1ab4357c5ec0c2087a3b8db9a952b5b8df6cec7a55328fbf91fe8d9411",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl5 채색",
+          "layer_path": "pl5 채색",
+          "kind": "pixel",
+          "bbox": [
+            827,
+            580,
+            1239,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-003-pl5.png",
+          "width": 412,
+          "height": 1420,
+          "bytes": 11973,
+          "sha256": "d5413f9f4e0d699f9828f15f6d46606c0d2bc2c3be948a7283f1f007817e8bdd",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl5",
+          "layer_path": "pl5",
+          "kind": "pixel",
+          "bbox": [
+            806,
+            59,
+            2081,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-004-pl5.png",
+          "width": 1275,
+          "height": 1941,
+          "bytes": 59251,
+          "sha256": "cdc3de8435af89c995208983d45bb62bfaa4b3aaa80c261a386b0ac2fc223293",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl3채색",
+          "layer_path": "pl3채색",
+          "kind": "pixel",
+          "bbox": [
+            273,
+            455,
+            947,
+            1883
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-005-pl3.png",
+          "width": 674,
+          "height": 1428,
+          "bytes": 17083,
+          "sha256": "470d7de24e24f18543337bb23e88c981e930870ad8bee205a3b193468f966dc8",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl3",
+          "layer_path": "pl3",
+          "kind": "pixel",
+          "bbox": [
+            0,
+            62,
+            1324,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-006-pl3.png",
+          "width": 1324,
+          "height": 1938,
+          "bytes": 54581,
+          "sha256": "a7fab6ea440854cce5aedb3746898f10a99e903030917a71ac65eab9d297f1ef",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl2 채색",
+          "layer_path": "pl2 채색",
+          "kind": "pixel",
+          "bbox": [
+            1946,
+            270,
+            3000,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-007-pl2.png",
+          "width": 1054,
+          "height": 1730,
+          "bytes": 71485,
+          "sha256": "3304204bcd06b03203ad1d69ffae2756a7f771a044235a9f911200ffeec812f6",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "pl2",
+          "layer_path": "pl2",
+          "kind": "pixel",
+          "bbox": [
+            1901,
+            74,
+            3000,
+            2000
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-008-pl2.png",
+          "width": 1099,
+          "height": 1926,
+          "bytes": 75545,
+          "sha256": "40bd5cbdd520ccba759b782ce2d4a27dca417fccabcf42004701fcd2ceedb18d",
+          "source_member": "illust.psd"
+        },
+        {
+          "name": "하이라이트",
+          "layer_path": "하이라이트",
+          "kind": "pixel",
+          "bbox": [
+            1288,
+            86,
+            2716,
+            1740
+          ],
+          "path": "assets/reference-research/prepared/fallingair/psd-layers/illustration/master/layer-009-layer.png",
+          "width": 1428,
+          "height": 1654,
+          "bytes": 16000,
+          "sha256": "e6ef952fcb68b6adb51e7f45f50b930f9e0b6fc8ac428fd08b76ffd460b904f9",
+          "source_member": "illust.psd"
         }
       ],
       "status": "PASS"
