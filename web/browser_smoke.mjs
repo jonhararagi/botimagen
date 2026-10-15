@@ -125,6 +125,24 @@ try {
   page.on("pageerror", error => pageErrors.push(error.message));
 
   await page.goto(appUrl, { waitUntil: "domcontentloaded", timeout: 20000 });
+  // Verify the CC0 character studio is connected to the real repository sprites.
+  const cc0Studio = page.locator('[data-testid="cc0-character-studio"]');
+  await cc0Studio.waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
+    "The user-facing CC0 studio must offer all five imported character sprites");
+  await page.waitForFunction(() => {
+    const image = document.querySelector('[data-testid="cc0-character-preview"]');
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
+  }, undefined, { timeout: 10000 });
+  await cc0Studio.getByRole("button", { name: "Elegir Personaje 2" }).click();
+  await cc0Studio.getByRole("combobox", { name: "Expresión del personaje" }).selectOption("happy");
+  await page.waitForFunction(() => {
+    const image = document.querySelector('[data-testid="cc0-character-preview"]');
+    return image instanceof HTMLImageElement && image.src.includes("pl2%20happy.png")
+      && image.complete && image.naturalWidth > 0;
+  }, undefined, { timeout: 10000 });
+  assert.equal(await cc0Studio.locator('[aria-pressed="true"]').getAttribute("data-character-id"), "character-2",
+    "Selecting a character must update the real sprite, not just a decorative label");
   await page.waitForFunction(
     () => document.querySelector(".main-footer")?.textContent?.includes("Motor Python conectado"),
     undefined,
