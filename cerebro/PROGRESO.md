@@ -1,5 +1,17 @@
 # Progreso global de BotImagen
 
+## Incremento posterior · 2026-10-15 · Creador con sprites CC0
+
+El porcentaje global de 63% indicado más abajo corresponde al cálculo histórico del 2026-10-12 y no fue recalculado en esta sesión.
+
+- Implementado en la rama existente `feature/bimg-anime-png-universal-library`: panel de creación con cinco sprites CC0 completos y sus expresiones disponibles, selección de personaje/expresión, nombre, opciones de fondo, persistencia local y exportación PNG 512×768 con proporción conservada.
+- Integrado en el workspace principal antes del editor técnico.
+- Se agregó prueba Chromium para contar los cinco personajes y verificar que el selector cambia al archivo real de expresión feliz del personaje 2.
+- No equivale todavía a un creador modular que permita intercambiar cabello, cuerpo y ropa entre personajes. Las 43 capas PSD están extraídas y visibles en el clasificador, pero su clasificación semántica aún requiere validación visual.
+- Evidencia de CI de este incremento: pendiente de consultar en el HEAD final. No marcar como cerrado hasta ver el resultado de Actions.
+- Prueba manual en Windows y prueba real de generación con motor/checkpoint local: no realizadas en esta sesión.
+
+
 **Último cálculo:** 2026-10-12  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
 **Progreso global actual: 63%**
