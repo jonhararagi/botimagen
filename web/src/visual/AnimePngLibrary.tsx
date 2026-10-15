@@ -233,13 +233,16 @@ export function AnimePngLibrary() {
     try {
       const response = await fetch("/cc0-character-library/manifest.json", { cache: "no-cache" });
       if (!response.ok) throw new Error("No se pudo cargar el catálogo CC0 integrado.");
-      const catalog = await response.json() as { assets: Array<{id:string;name:string;path:string;source_url:string;license:string}> };
+      const catalog = await response.json() as { assets: Array<{id:string;name:string;path:string;character:string;source_url:string;license:string;sha256:string}> };
       let added = 0, skipped = 0;
       for (const asset of catalog.assets) {
         const fileResponse = await fetch(asset.path);
         if (!fileResponse.ok) { skipped++; continue; }
         const blob = await fileResponse.blob();
         if (!blob.size || blob.size > MAX_FILE_BYTES) { skipped++; continue; }
+        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await blob.arrayBuffer()));
+        const actualSha256 = Array.from(digest, value => value.toString(16).padStart(2, "0")).join("");
+        if (actualSha256 !== asset.sha256) { skipped++; continue; }
         const signature = new Uint8Array(await blob.slice(0, 8).arrayBuffer());
         if (signature.length !== 8 || signature.some((value, index) => value !== [137,80,78,71,13,10,26,10][index])) { skipped++; continue; }
         const bitmap = await createImageBitmap(blob);
@@ -247,7 +250,7 @@ export function AnimePngLibrary() {
         bitmap.close();
         if (width < 128 || height < 128) { skipped++; continue; }
         await storeCharacter({
-          id: "cc0-fallingair-" + asset.id, name: "CC0 · " + asset.name,
+          id: "cc0-fallingair-" + asset.id, name: "CC0 · " + asset.character + " · " + asset.name,
           addedAt: Date.now(), width, height, bytes: blob.size,
           category: "universal-character", blob: blob.slice(0, blob.size, "image/png"),
           sourceUrl: asset.source_url, license: asset.license,
