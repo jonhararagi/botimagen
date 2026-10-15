@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type ModularAsset = {
   id: string;
@@ -22,6 +22,8 @@ const slots: Slot[] = [
   { category: "head", label: "Cabeza", compositor: "head", order: 48 },
   { category: "face", label: "Rostro", compositor: "face", order: 50 },
   { category: "eyes", label: "Ojos", compositor: "eyes", order: 52 },
+  { category: "brows", label: "Cejas", compositor: "brows", order: 54 },
+  { category: "mouth", label: "Boca", compositor: "mouth", order: 56 },
   { category: "hair_front", label: "Cabello frontal", compositor: "hair_front", order: 70 },
   { category: "footwear", label: "Calzado", compositor: "footwear", order: 28 },
   { category: "accessory_back", label: "Accesorio posterior", compositor: "accessory", order: 58 },
@@ -37,22 +39,26 @@ export function ModularDressUp() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Cargando piezas PNG de la biblioteca local…");
 
-  useEffect(() => {
-    let active = true;
-    fetch("/api/modular-assets")
-      .then(async response => {
-        if (!response.ok) throw new Error("El servidor local de piezas no está disponible. Abre BotImagen con su lanzador local.");
-        return response.json();
-      })
-      .then(data => {
-        if (!active) return;
-        const list = Array.isArray(data.assets) ? data.assets as ModularAsset[] : [];
-        setAssets(list.filter(asset => asset.kind === "modular_piece" && slots.some(slot => slot.category === asset.category)));
-        setStatus("Biblioteca leída. Selecciona las piezas que ya tengas preparadas.");
-      })
-      .catch(error => { if (active) setStatus(error instanceof Error ? error.message : "No se pudo leer la biblioteca."); });
-    return () => { active = false; };
+  const refreshAssets = useCallback(async () => {
+    setStatus("Actualizando inventario de piezas PNG…");
+    try {
+      const response = await fetch("/api/modular-assets");
+      if (!response.ok) throw new Error("El servidor local de piezas no está disponible. Abre BotImagen con su lanzador local.");
+      const data = await response.json();
+      const list = Array.isArray(data.assets) ? data.assets as ModularAsset[] : [];
+      const modular = list.filter(asset => asset.kind === "modular_piece" && slots.some(slot => slot.category === asset.category));
+      setAssets(modular);
+      setSelection(current => Object.fromEntries(Object.entries(current).filter(([category, id]) =>
+        modular.some(asset => asset.category === category && asset.id === id))));
+      setStatus(modular.length
+        ? `Biblioteca actualizada. Hay ${modular.length} pieza(s) modular(es) reconocida(s).`
+        : "Biblioteca leída: todavía no hay piezas modulares confirmadas. Importa PNG y clasifícalos como piezas modulares.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "No se pudo leer la biblioteca.");
+    }
   }, []);
+
+  useEffect(() => { void refreshAssets(); }, [refreshAssets]);
 
   const availableBySlot = useMemo(() => Object.fromEntries(slots.map(slot => [
     slot.category, assets.filter(asset => asset.category === slot.category && viewForAsset(asset, view)),
