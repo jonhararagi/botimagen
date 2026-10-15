@@ -1,39 +1,46 @@
-# Catálogo de referencias externas para BotImagen
+# Catálogo de referencias externas y bases modulares para BotImagen
 
-Estado: **investigación inicial, no paquete de imágenes descargadas**  
-Objetivo: encontrar personajes anime y recursos de modelos/LoRA que sirvan para estudiar siluetas y preparar bases 2D desmontables (cuerpo, cabeza, ojos, cabello, ropa y accesorios).
+Estado: **PASS para la estructura y los SVG originales; PARTIAL para importar archivos externos**. Se verificaron fichas de fuentes y licencias, pero los archivos binarios externos todavía no están replicados en este repositorio. Los enlaces de origen están registrados en `manifest.json`.
 
-## Fuentes revisadas
+## Modelos, LoRA y búsqueda de semejanzas
 
-### Generación y búsqueda de modelos/LoRA
-- **PixAI** — https://pixai.art/en/generator/image  
-  Útil para buscar modelos comunitarios, LoRA y referencias anime. Las imágenes de la galería y los modelos no se copian aquí automáticamente: hay que revisar los permisos de cada recurso antes de incorporarlo al repositorio. La guía pública de PixAI recuerda que la licencia de cada LoRA/modelo y los derechos de terceros siguen importando: https://blog.pixai.art/en/pixai-commercial-use-licensing-guide
-- **Civitai** — https://civitai.com/models  
-  Catálogo de checkpoints y LoRA; cada ficha puede tener una licencia distinta. Términos oficiales: https://civitai.com/content/tos
-- **Hugging Face** — https://huggingface.co/models?pipeline_tag=text-to-image  
-  Las fichas muestran la licencia declarada por el publicador. Ejemplo localizado durante la búsqueda: https://huggingface.co/BackGwa/Character-LoRA-Anima (licencia no comercial declarada; **no** incluir sus pesos en un paquete comercial).
-- **SeaArt** — https://www.seaart.ai/  
-  Otra fuente de búsqueda visual/modelos. Revisar licencia del modelo, términos de la plataforma y permisos de la imagen concreta antes de copiar archivos.
+- **PixAI**: https://pixai.art/en/generator/image  
+  Para buscar modelos comunitarios, LoRA y referencias anime. La guía oficial indica que hay que revisar modelo, LoRA, referencias y propiedad intelectual por separado: https://blog.pixai.art/en/pixai-commercial-use-licensing-guide/
+- **Civitai**: https://civitai.com/models  
+  Cada ficha tiene condiciones propias; registrar licencia exacta antes de descargar pesos.
+- **Hugging Face**: https://huggingface.co/models?pipeline_tag=text-to-image  
+  Las licencias se deben verificar en la ficha del modelo. Candidato localizado: https://huggingface.co/BackGwa/Character-LoRA-Anima, que declara uso no comercial, por lo que no se aprueba para un paquete comercial.
+- **SeaArt**: https://www.seaart.ai/  
+  Fuente de descubrimiento; no implica permiso para redistribuir resultados o modelos.
 
-### Recursos 2D con licencia abierta que merece la pena evaluar primero
-- **OpenGameArt: Visual Novel Character Sprite (CC0 declarado en la ficha)** — https://opengameart.org/content/visual-novel-character-sprite  
-  La ficha menciona PNG, PSD y archivos de Clip Studio; el ZIP es grande. Revisar el paquete y guardar copia de la licencia/ficha antes de incorporarlo.
-- **MakeHuman Community: cartoon01** — https://static.makehumancommunity.org/assets/assetpacks/cartoon01.html  
-  Catálogo de assets cartoon/anime-like con varias entradas etiquetadas CC0, incluidos ejemplos de cabezas y cuerpos. Verificar el archivo individual y su origen antes de copiarlo.
+## Recursos de imagen con licencia comprobada en su ficha
 
-## Política para llenar la carpeta de imágenes
+- **Hordana, “Anime Girl / Michona” (OpenGameArt)**: https://opengameart.org/content/anime-girl  
+  La ficha muestra **CC0** y lista `13jump.png`, `11walk.png` y `blink strip 5.png`. Es una referencia de sprite/animación, no un conjunto de capas de cabeza y ropa. Los enlaces directos y la atribución del autor están registrados en `manifest.json`.
+- **FALLiNG_AiR, “Visual novel Character Sprite” (OpenGameArt)**: https://opengameart.org/content/visual-novel-character-sprite  
+  La ficha muestra **CC0** y ofrece `character.zip` (26,2 MB), descrito como un paquete con PSD, Clip Studio y PNG. Es el candidato prioritario para evaluar capas reales, pero su contenido interno todavía no se ha inspeccionado.
+- **MakeHuman Community, cartoon01**: https://static.makehumancommunity.org/assets/assetpacks/cartoon01.html  
+  Catálogo de assets cartoon; verificar la licencia de cada archivo individual.
 
-1. Priorizar recursos **CC0, dominio público o licencias explícitas compatibles** con la distribución de BotImagen.
-2. No descargar en masa ni volver a publicar arte de usuarios de PixAI/Civitai/SeaArt solo porque la página sea visible.
-3. Por cada archivo incorporado, guardar URL de origen, autor, licencia exacta, fecha de consulta, SHA-256 y cualquier requisito de atribución en manifest.json.
-4. No empaquetar checkpoints/LoRA grandes dentro del repositorio. Registrar enlaces y licencias; el usuario puede descargar modelos directamente de su autor.
-5. Mantener originales intactos. Las marcas de agua «BotImagen · BASE» se aplican solo a copias derivadas preparadas para el editor, no a la referencia fuente.
-6. Para el generador, marcar de forma manual las regiones de cabeza, ojos, cabello, torso, brazos, piernas y ropa. Una imagen plana no se convierte automáticamente en capas semánticas perfectas.
+## Bases originales creadas para este repositorio
 
-## Estructura
+- Base completa editable: [`prepared/botimagen-modular-base-v1.svg`](prepared/botimagen-modular-base-v1.svg)
+- Partes separadas con el mismo lienzo 512×768:
+  - [Cuerpo](prepared/parts/body.svg)
+  - [Ropa](prepared/parts/clothing.svg)
+  - [Cabeza](prepared/parts/head.svg)
+  - [Ojos](prepared/parts/eyes.svg)
+  - [Cabello](prepared/parts/hair.svg)
+  - [Marca de agua](prepared/parts/watermark.svg)
 
-- manifest.json: fuentes revisadas y estado de derechos.
-- incoming/: lugar para assets de licencia confirmada antes de procesarlos.
-- prepared/: copias de trabajo preparadas para el compositor; conservar procedencia en el manifiesto.
+Son piezas vectoriales originales, no arte copiado de PixAI u otro autor. Se pueden abrir y editar por separado; para usarlas como conjunto deben conservar el mismo lienzo y alineación. La base está pensada para iteración y no sustituye la revisión visual de las piezas en el editor.
 
-No se colocaron imágenes de terceros en este commit porque las páginas de búsqueda no conceden por sí solas permiso para redistribuir sus imágenes. Esta carpeta deja las fuentes investigadas y la trazabilidad listas sin introducir material de licencia incierta.
+## Próximo paso para recursos externos
+
+1. Descargar desde la ficha de OpenGameArt los paquetes CC0.
+2. Inspeccionar el ZIP y confirmar que cada archivo interno está cubierto por la licencia declarada.
+3. Guardar el original, aviso de licencia, URL, autor, fecha y SHA-256.
+4. Copiar solo assets verificados a `incoming/`; preparar copias de trabajo en `prepared/`.
+5. No publicar imágenes de galerías de PixAI/Civitai/SeaArt sin permisos explícitos. No incluir checkpoints ni LoRA grandes en el repositorio; registrar enlaces a sus fichas.
+
+Una imagen plana no se convierte mágicamente en capas semánticas. La separación de cabeza, ojos, cabello, cuerpo y ropa requiere archivos por capas o revisión manual.
