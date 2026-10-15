@@ -1778,6 +1778,27 @@ try {
 
 
 
+
+  // Real-browser test for visual/manual role assignment across the 43 extracted PSD layer previews.
+  const roleMapper = page.getByTestId("psd-layer-role-mapper");
+  await roleMapper.waitFor({ state: "visible", timeout: 20000 });
+  await roleMapper.getByText("Clasificador visual de capas PSD CC0").waitFor({ state: "visible" });
+  await roleMapper.getByText("43 capas extraídas").waitFor({ state: "visible" });
+  await roleMapper.getByRole("status").filter({ hasText: "Mostrando 43 de 43 capas" }).waitFor({ state: "visible", timeout: 20000 });
+  assert.equal(await roleMapper.locator(".psd-role-card").count(), 43, "The role mapper should display all 43 extracted PSD layers.");
+  await roleMapper.getByRole("combobox", { name: "Rol para fallingair-layer-001" }).selectOption("hair");
+  await roleMapper.getByRole("status").filter({ hasText: "Asignación guardada: fallingair-layer-001" }).waitFor({ state: "visible" });
+  const savedRole = await page.evaluate(() => {
+    const payload = JSON.parse(localStorage.getItem("botimagen-cc0-psd-layer-roles-v1") || "{}");
+    return payload["fallingair-layer-001"]?.role ?? null;
+  });
+  assert.equal(savedRole, "hair", "A manually assigned semantic role should persist in localStorage.");
+  await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("unassigned");
+  assert.equal(await roleMapper.locator(".psd-role-card").count(), 42, "Unassigned filter should exclude the one manually classified layer.");
+  await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("all");
+  await roleMapper.getByRole("button", { name: "Exportar asignaciones JSON" }).waitFor({ state: "visible" });
+  console.log("PASS_REAL: Chromium displayed all 43 PSD layer previews, saved a manual semantic role, filtered pending layers, and exposed JSON export with provenance.");
+
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
