@@ -21,7 +21,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-1/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-002",
@@ -37,7 +42,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-1/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-003",
@@ -53,7 +63,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-1/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-004",
@@ -69,7 +84,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-1/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.3,
+        "reason": "Recorte pequeño de un PSD principal sin nombre semántico fiable. Puede ser detalle, accesorio u otra región; requiere revisión visual."
+      }
     },
     {
       "id": "fallingair-layer-005",
@@ -85,7 +105,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.35,
+        "reason": "Capa amplia de un PSD de rostro. Puede ser una composición de referencia y no una pieza facial intercambiable; revisar visualmente."
+      }
     },
     {
       "id": "fallingair-layer-006",
@@ -101,7 +126,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "expression",
+        "confidence": 0.93,
+        "reason": "Recorte pequeño procedente de un PSD dedicado al rostro. Probable expresión facial; confirmar la vista antes de usarla en un modelo."
+      }
     },
     {
       "id": "fallingair-layer-007",
@@ -117,7 +147,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-008",
@@ -133,7 +168,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.3,
+        "reason": "Recorte pequeño de un PSD principal sin nombre semántico fiable. Puede ser detalle, accesorio u otra región; requiere revisión visual."
+      }
     },
     {
       "id": "fallingair-layer-009",
@@ -149,7 +189,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.3,
+        "reason": "Recorte pequeño de un PSD principal sin nombre semántico fiable. Puede ser detalle, accesorio u otra región; requiere revisión visual."
+      }
     },
     {
       "id": "fallingair-layer-010",
@@ -165,7 +210,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-011",
@@ -181,7 +231,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.3,
+        "reason": "Recorte pequeño de un PSD principal sin nombre semántico fiable. Puede ser detalle, accesorio u otra región; requiere revisión visual."
+      }
     },
     {
       "id": "fallingair-layer-012",
@@ -197,7 +252,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-013",
@@ -213,7 +273,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-014",
@@ -229,7 +294,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-2/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.3,
+        "reason": "Recorte pequeño de un PSD principal sin nombre semántico fiable. Puede ser detalle, accesorio u otra región; requiere revisión visual."
+      }
     },
     {
       "id": "fallingair-layer-015",
@@ -245,7 +315,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.35,
+        "reason": "Capa amplia de un PSD de rostro. Puede ser una composición de referencia y no una pieza facial intercambiable; revisar visualmente."
+      }
     },
     {
       "id": "fallingair-layer-016",
@@ -261,7 +336,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "expression",
+        "confidence": 0.93,
+        "reason": "Recorte pequeño procedente de un PSD dedicado al rostro. Probable expresión facial; confirmar la vista antes de usarla en un modelo."
+      }
     },
     {
       "id": "fallingair-layer-017",
@@ -277,7 +357,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-018",
@@ -293,7 +378,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-019",
@@ -309,7 +399,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-020",
@@ -325,7 +420,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-021",
@@ -341,7 +441,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-022",
@@ -357,7 +462,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-3/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-023",
@@ -373,7 +483,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-4/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.35,
+        "reason": "Capa amplia de un PSD de rostro. Puede ser una composición de referencia y no una pieza facial intercambiable; revisar visualmente."
+      }
     },
     {
       "id": "fallingair-layer-024",
@@ -389,7 +504,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-4/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "expression",
+        "confidence": 0.93,
+        "reason": "Recorte pequeño procedente de un PSD dedicado al rostro. Probable expresión facial; confirmar la vista antes de usarla en un modelo."
+      }
     },
     {
       "id": "fallingair-layer-025",
@@ -405,7 +525,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-4/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-026",
@@ -421,7 +546,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-4/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-027",
@@ -437,7 +567,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-4/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-028",
@@ -453,7 +588,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-4/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-029",
@@ -469,7 +609,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-5/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.35,
+        "reason": "Capa amplia de un PSD de rostro. Puede ser una composición de referencia y no una pieza facial intercambiable; revisar visualmente."
+      }
     },
     {
       "id": "fallingair-layer-030",
@@ -485,7 +630,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-5/layers/face-master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "expression",
+        "confidence": 0.93,
+        "reason": "Recorte pequeño procedente de un PSD dedicado al rostro. Probable expresión facial; confirmar la vista antes de usarla en un modelo."
+      }
     },
     {
       "id": "fallingair-layer-031",
@@ -501,7 +651,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-5/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-032",
@@ -517,7 +672,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-5/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-033",
@@ -533,7 +693,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-5/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-034",
@@ -549,7 +714,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/characters/character-5/layers/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "unassigned",
+        "confidence": 0,
+        "reason": "El nombre original es genérico o la región es amplia. No se asigna un rol automático sin validación visual."
+      }
     },
     {
       "id": "fallingair-layer-035",
@@ -565,7 +735,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-036",
@@ -581,7 +756,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-037",
@@ -597,7 +777,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-038",
@@ -613,7 +798,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-039",
@@ -629,7 +819,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-040",
@@ -645,7 +840,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-041",
@@ -661,7 +861,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-042",
@@ -677,7 +882,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     },
     {
       "id": "fallingair-layer-043",
@@ -693,7 +903,12 @@
       "source_psd": "assets/reference-research/prepared/fallingair/illustration/master.psd",
       "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
       "license": "CC0 1.0 (as displayed on source page)",
-      "category": "psd-layer"
+      "category": "psd-layer",
+      "role_suggestion": {
+        "role": "other",
+        "confidence": 0.25,
+        "reason": "Parte de una ilustración compuesta. No se ha demostrado que sea una pieza modular aislada."
+      }
     }
   ]
 }
