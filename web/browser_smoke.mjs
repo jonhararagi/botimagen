@@ -1735,6 +1735,47 @@ try {
   assert.equal(cc0Imported.uniqueSources, 65, "Every imported reference should preserve a distinct original archive member");
   assert.ok(cc0Imported.categories.every(kind => kind === "reference"), "External character art must stay a reference until a person classifies its layers");
   console.log("PASS_REAL: Chromium imported 65 CC0 PNG references through the real constructor UI, verified SHA-256 in the browser, and checked that source/license provenance persisted through the local API.");
+  
+  // Import separately extracted, hash-pinned PSD leaf layers. Keep them as references because layer names do not always describe semantic body/clothing roles.
+  const psdCatalogResponse = await page.evaluate(async () => {
+    const response = await fetch("/cc0-character-library/psd-layers-manifest.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error("The extracted CC0 PSD layer catalogue is unavailable");
+    const catalog = await response.json();
+    return { layer_count: catalog.layer_count, assets: catalog.assets };
+  });
+  assert.equal(psdCatalogResponse.layer_count, psdCatalogResponse.assets.length, "The PSD layer manifest must match its asset list");
+  assert.ok(psdCatalogResponse.layer_count > 0, "At least one independently extracted PSD layer should be available");
+  await modelBuilder.getByRole("button", { name: "Importar capas PSD CC0" }).click();
+  const psdStatus = modelBuilder.getByRole("status").filter({ hasText: "Capas PSD CC0 incorporadas:" });
+  const psdError = modelBuilder.getByRole("alert");
+  await Promise.race([
+    psdStatus.waitFor({ state: "visible", timeout: 120000 }),
+    psdError.waitFor({ state: "visible", timeout: 120000 }),
+  ]);
+  if (await psdError.isVisible().catch(() => false)) {
+    throw new Error("CC0 PSD layer import failed: " + (await psdError.textContent()));
+  }
+  const psdStatusText = await psdStatus.textContent();
+  assert.match(psdStatusText || "", new RegExp(psdCatalogResponse.layer_count + " capas verificadas; 0 omitidas\\\\."), "All extracted PSD layer PNGs should import without skips.");
+  const importedPsdLayers = await page.evaluate(async () => {
+    const response = await fetch("/api/modular-assets");
+    if (!response.ok) throw new Error("Could not read the local modular asset catalogue after PSD layer import");
+    const payload = await response.json();
+    const assets = Array.isArray(payload) ? payload : payload.assets;
+    const imported = assets.filter(asset => typeof asset.label === "string" && asset.label.startsWith("CC0 PSD · "));
+    return {
+      count: imported.length,
+      withoutSource: imported.filter(asset => !asset.source_url || !asset.license || !asset.source_filename).length,
+      uniqueSources: new Set(imported.map(asset => asset.source_filename)).size,
+      categories: [...new Set(imported.map(asset => asset.kind))],
+    };
+  });
+  assert.equal(importedPsdLayers.count, psdCatalogResponse.layer_count, "Every extracted PSD layer should be available as a reference in the local library");
+  assert.equal(importedPsdLayers.withoutSource, 0, "Every PSD layer must retain its source URL, license and original PSD/layer path");
+  assert.equal(importedPsdLayers.uniqueSources, psdCatalogResponse.layer_count, "Every imported PSD layer must preserve distinct provenance");
+  assert.ok(importedPsdLayers.categories.every(kind => kind === "reference"), "PSD layer references must not become garment/body parts without user classification");
+  console.log("PASS_REAL: Chromium imported all " + psdCatalogResponse.layer_count + " extracted CC0 PSD layers, verified their hashes and preserved per-layer provenance without auto-classifying semantics.");
+
 
 
   // Smoke the responsive breakpoints used by the local browser UI.
