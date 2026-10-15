@@ -74,6 +74,17 @@ class ModularAssetLibraryTests(unittest.TestCase):
             self.assertEqual(list_user_assets(root)["count"], 1)
             self.assertTrue((root / "catalog.json").is_file())
 
+    def test_cc0_archive_member_provenance_preserves_relative_path(self):
+        with TemporaryDirectory() as directory:
+            source_member = "cha 1/image/pl1 angry.png"
+            record = import_user_asset(payload(
+                source_filename=source_member,
+                source_url="https://opengameart.org/content/visual-novel-character-sprite",
+                license="CC0 1.0",
+            ), Path(directory))
+            self.assertEqual(record["source_filename"], source_member)
+            self.assertEqual(list_user_assets(Path(directory))["assets"][0]["source_filename"], source_member)
+
     def test_duplicate_content_does_not_duplicate_catalog(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -89,6 +100,8 @@ class ModularAssetLibraryTests(unittest.TestCase):
             payload(data_base64="not base64"),
             payload(category="../../outside"),
             payload(filename="../../outside.png"),
+            payload(source_filename="../outside.png"),
+            payload(source_filename="C:/Users/private/source.png"),
             payload(kind="modular_piece", source_url="javascript:alert(1)"),
         ]
         for case in cases:

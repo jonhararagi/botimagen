@@ -108,6 +108,22 @@ def _image_dimensions(data: bytes, mime: str) -> tuple[int, int]:
     raise AssetImportError("Formato no admitido. Usa PNG, JPEG o WebP.")
 
 
+def _safe_source_reference(value: Any) -> str:
+    """Validate provenance paths as metadata without treating them as filesystem paths."""
+    if not isinstance(value, str):
+        raise AssetImportError("La procedencia del archivo debe ser texto.")
+    reference = value.strip()
+    parts = reference.split("/")
+    if (
+        not reference or len(reference) > 500 or chr(92) in reference
+        or reference.startswith("/") or re.match(r"^[A-Za-z]:", reference)
+        or any(part in {"", ".", ".."} for part in parts)
+        or any(ord(char) < 32 for char in reference)
+    ):
+        raise AssetImportError("Referencia de procedencia no válida.")
+    return reference
+
+
 def _safe_display_name(name: Any) -> str:
     if not isinstance(name, str):
         raise AssetImportError("El nombre de archivo debe ser texto.")
@@ -377,7 +393,7 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
     kind = payload.get("kind", "reference")
     if not isinstance(kind, str) or kind not in {"modular_piece", "full_character", "reference", "portrait"}:
         raise AssetImportError("Tipo de recurso no válido.")
-    source_filename = _safe_display_name(payload.get("source_filename", filename))
+    source_filename = _safe_source_reference(payload.get("source_filename", filename))
     source_asset_id = payload.get("source_asset_id")
     if source_asset_id is not None and (
         not isinstance(source_asset_id, str) or not re.fullmatch(r"user\.[0-9a-f]{32}", source_asset_id)
