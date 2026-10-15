@@ -18,6 +18,7 @@ import { CharacterCatalogStudio } from "./visual/CharacterCatalogStudio";
 import { Cc0CharacterStudio } from "./visual/Cc0CharacterStudio";
 import { PixAiAssetFactory } from "./visual/PixAiAssetFactory";
 import { DressUpGame } from "./visual/DressUpGame";
+import { ModularDressUp } from "./visual/ModularDressUp";
 import { ModelLoraFinder } from "./visual/ModelLoraFinder";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
