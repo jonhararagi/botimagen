@@ -1,3 +1,18 @@
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-15 · MINI JUEGO DE CAMBIO DE CABELLO Y ROPA
+
+Trabajo en la rama existente `feature/bimg-anime-png-universal-library`, PR #15. No modificar `main`, no crear ramas duplicadas y no integrar sin autorización.
+
+## Incremento
+- Nuevo componente `web/src/visual/DressUpGame.tsx`, integrado en `web/src/App.tsx` con acceso visible «Juego de vestuario».
+- Mini juego funcional en SVG: 4 peinados (largo, bob, dos coletas, coleta), 9 colores de cabello, 4 estilos de ropa (uniforme, hoodie, vestido, cyberpunk), 8 colores de ropa, 5 colores de ojos y 3 opciones de accesorio.
+- Cambios en vivo, botón aleatorio, reinicio y guardado del look en localStorage. No depende de PixAI, créditos ni API remota; sirve para jugar y validar la interacción inmediatamente.
+- Añadido smoke test Chromium para cambiar peinado y ropa, ajustar color y guardar el look.
+- Limitación honesta: la primera versión usa una ilustración SVG dibujada con capas y formas vectoriales, no las piezas PNG importadas. Es un mini juego funcional de personalización, no todavía un compositor de assets PNG intercambiables. La siguiente fase debe conectar slots compatibles con los PNG importados y guardar metadatos por rasgo.
+- CI #778 para el HEAD `8825f5885703955394d81fa0120d6db69999bea2` está en ejecución; no declarar PASS hasta resultado final.
+- PixAI: una imagen Low Priority de 944×1584 mostró 3.000 créditos y no se generó nada; no gastar créditos hasta identificar un modelo/LoRA barato o recibir autorización para el coste mostrado.
+
+---
+
 # ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-15 · FÁBRICA DE ASSETS PIXAI
 
 La tarea continúa en la rama existente `feature/bimg-anime-png-universal-library` y PR #15, sin modificar `main`, sin abrir ramas duplicadas y sin integrar automáticamente.
