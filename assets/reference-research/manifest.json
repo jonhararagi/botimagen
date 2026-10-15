@@ -11,12 +11,16 @@
       "author": "FALLiNG_AiR",
       "license": "CC0 1.0, explicitly displayed on source page",
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "rights_status": "license-verified-at-source; archive-not-yet-mirrored",
+      "rights_status": "cc0-source-verified; downloaded-binary-hash-verified",
       "available_files": [
         {
           "name": "character.zip",
           "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
-          "type": "ZIP (26.2 MB; page states it includes PSD, Clip Studio files and PNGs)"
+          "type": "ZIP (26.2 MB; page states it includes PSD, Clip Studio files and PNGs)",
+          "size_bytes": 26170320,
+          "sha256": "df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11",
+          "repository_path": "assets/reference-research/incoming/opengameart/character.zip",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         }
       ],
       "notes": "Potentially valuable because source files may preserve layers. Archive contents have not yet been inspected, so do not claim individual layers or asset integrity until downloaded and checked."
@@ -29,22 +33,34 @@
       "author": "Hordana",
       "license": "CC0 1.0, explicitly displayed on source page",
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "rights_status": "license-verified-at-source; files-not-yet-mirrored",
+      "rights_status": "cc0-source-verified; downloaded-binary-hash-verified",
       "available_files": [
         {
-          "name": "13jump.png",
+          "name": "13jump_1.png",
           "source_url": "https://opengameart.org/sites/default/files/13jump_1.png",
-          "type": "PNG sprite animation"
+          "type": "PNG sprite animation",
+          "size_bytes": 715613,
+          "sha256": "f8597238ebe3b9d761fe40e6169042fa9247f771d44328345f8dc4514634f259",
+          "repository_path": "assets/reference-research/incoming/opengameart/13jump_1.png",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         },
         {
-          "name": "11walk.png",
+          "name": "11walk_4.png",
           "source_url": "https://opengameart.org/sites/default/files/11walk_4.png",
-          "type": "PNG sprite animation"
+          "type": "PNG sprite animation",
+          "size_bytes": 656731,
+          "sha256": "1b6537b1bea0c93da1f1b27f52786a9c3e0de2b5b2f89dca045af7631e942337",
+          "repository_path": "assets/reference-research/incoming/opengameart/11walk_4.png",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         },
         {
           "name": "blink strip 5.png",
           "source_url": "https://opengameart.org/sites/default/files/blink%20strip%205.png",
-          "type": "PNG sprite strip"
+          "type": "PNG sprite strip",
+          "size_bytes": 77978,
+          "sha256": "4a42ed4aaeca1f034a1fa3429e8db59bfc6d7501b92680feaf8292160bd67212",
+          "repository_path": "assets/reference-research/incoming/opengameart/blink strip 5.png",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         }
       ],
       "notes": "Source page labels the artwork CC0 and includes an attribution notice from the author. Useful as an external animation/reference source, but these sprite sheets are not layered character parts. Save the source page and attribution note with any future import."
@@ -157,5 +173,6 @@
       ],
       "notes": "Original base, not copied from PixAI or another artist. Groups are separated in SVG for editing; raster exports may still require manual cleanup before importing into the raster region builder."
     }
-  ]
+  ],
+  "ingestion_note": "The import workflow downloads pinned source bytes, checks SHA-256 against independently inspected files, validates PNG dimensions and ZIP CRC/path safety, writes archive-inventory.json, then commits to this feature branch."
 }

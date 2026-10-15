@@ -1,0 +1,146 @@
+name: Import verified CC0 character references
+
+on:
+  push:
+    branches:
+      - feature/bimg-anime-png-universal-library
+    paths:
+      - .github/workflows/import-cc0-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import-verified-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the existing feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/bimg-anime-png-universal-library
+          fetch-depth: 0
+
+      - name: Download pinned CC0 source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/reference-research/incoming/opengameart
+          cd assets/reference-research/incoming/opengameart
+          curl --fail --location --retry 3 --silent --show-error 'https://opengameart.org/sites/default/files/13jump_1.png' --output 13jump_1.png
+          curl --fail --location --retry 3 --silent --show-error 'https://opengameart.org/sites/default/files/11walk_4.png' --output 11walk_4.png
+          curl --fail --location --retry 3 --silent --show-error 'https://opengameart.org/sites/default/files/blink%20strip%205.png' --output 'blink strip 5.png'
+          curl --fail --location --retry 3 --silent --show-error 'https://opengameart.org/sites/default/files/character_5.zip' --output character.zip
+          sha256sum -c <<'SHA'
+          f8597238ebe3b9d761fe40e6169042fa9247f771d44328345f8dc4514634f259  13jump_1.png
+          1b6537b1bea0c93da1f1b27f52786a9c3e0de2b5b2f89dca045af7631e942337  11walk_4.png
+          4a42ed4aaeca1f034a1fa3429e8db59bfc6d7501b92680feaf8292160bd67212  blink strip 5.png
+          df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11  character.zip
+          SHA
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, struct, zipfile
+          root = Path('.')
+          expected = {
+              '13jump_1.png': (715613, (3250, 221)),
+              '11walk_4.png': (656731, (2750, 221)),
+              'blink strip 5.png': (77978, (1105, 221)),
+          }
+          inventory = []
+          for name, (size, dimensions) in expected.items():
+              p = root / name
+              raw = p.read_bytes()
+              if len(raw) != size or raw[:8] != b'\x89PNG\r\n\x1a\n':
+                  raise SystemExit(f'Invalid PNG bytes/size: {name}')
+              width, height = struct.unpack('>II', raw[16:24])
+              if (width, height) != dimensions:
+                  raise SystemExit(f'Unexpected PNG dimensions for {name}: {(width, height)}')
+              inventory.append({'name': name, 'type': 'PNG', 'bytes': len(raw), 'width': width, 'height': height, 'sha256': hashlib.sha256(raw).hexdigest()})
+          archive = root / 'character.zip'
+          with zipfile.ZipFile(archive) as z:
+              bad = z.testzip()
+              if bad:
+                  raise SystemExit(f'ZIP CRC failure: {bad}')
+              members = []
+              for item in z.infolist():
+                  p = Path(item.filename)
+                  if p.is_absolute() or '..' in p.parts:
+                      raise SystemExit(f'Unsafe ZIP member path: {item.filename}')
+                  members.append({'path': item.filename, 'bytes': item.file_size, 'compressed_bytes': item.compress_size, 'directory': item.is_dir()})
+              inventory.append({'name': 'character.zip', 'type': 'ZIP', 'bytes': archive.stat().st_size, 'sha256': hashlib.sha256(archive.read_bytes()).hexdigest(), 'zip_integrity': 'PASS', 'member_count': len(members)})
+              (root / 'archive-inventory.json').write_text(json.dumps({'source_page': 'https://opengameart.org/content/visual-novel-character-sprite', 'license': 'CC0 1.0 as displayed on source page', 'archive_sha256': inventory[-1]['sha256'], 'members': members}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          (root / 'download-inventory.json').write_text(json.dumps({'verified_at_utc': __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(), 'source_pages': ['https://opengameart.org/content/anime-girl', 'https://opengameart.org/content/visual-novel-character-sprite'], 'license': 'CC0 1.0 as displayed on each source page', 'assets': inventory}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('Verified PNG signatures/dimensions, exact SHA-256 values, and ZIP CRC/member paths.')
+          print('Archive members:')
+          for item in members:
+              print(f"{item['bytes']:>10}  {item['path']}")
+          PY
+
+      - name: Record verified source provenance
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('assets/reference-research/manifest.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          hashes = {
+              '13jump.png': ('13jump_1.png', 715613, 'f8597238ebe3b9d761fe40e6169042fa9247f771d44328345f8dc4514634f259'),
+              '11walk.png': ('11walk_4.png', 656731, '1b6537b1bea0c93da1f1b27f52786a9c3e0de2b5b2f89dca045af7631e942337'),
+              'blink strip 5.png': ('blink strip 5.png', 77978, '4a42ed4aaeca1f034a1fa3429e8db59bfc6d7501b92680feaf8292160bd67212'),
+              'character.zip': ('character.zip', 26170320, 'df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11'),
+          }
+          for source in data.get('sources', []):
+              for item in source.get('available_files', []):
+                  if item.get('name') in hashes:
+                      name, size, sha = hashes[item['name']]
+                      item['name'] = name
+                      item['size_bytes'] = size
+                      item['sha256'] = sha
+                      item['repository_path'] = 'assets/reference-research/incoming/opengameart/' + name
+                      item['verification_status'] = 'downloaded; SHA-256 verified; source page declares CC0 1.0'
+                      source['rights_status'] = 'cc0-source-verified; downloaded-binary-hash-verified'
+          data['updated_at'] = '2026-10-15'
+          data['ingestion_note'] = 'The import workflow downloads pinned source bytes, checks SHA-256 against independently inspected files, validates PNG dimensions and ZIP CRC/path safety, writes archive-inventory.json, then commits to this feature branch.'
+          p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          cat > assets/reference-research/incoming/opengameart/README.md <<'EOF'
+          # OpenGameArt CC0 source assets
+
+          Source pages explicitly display CC0 1.0:
+
+          - Hordana, **Anime Girl / Michona the creepy and cute warrior**: https://opengameart.org/content/anime-girl
+          - FALLiNG_AiR, **Visual novel Character Sprite**: https://opengameart.org/content/visual-novel-character-sprite
+
+          These are preserved source downloads, not silently edited derivative art. The three Hordana PNGs are animation sprite strips, not semantically separated clothing/body layers. The FALLiNG_AiR archive is retained intact pending archive inventory review; inspect archive-inventory.json before selecting internal PSD/Clip Studio/PNG assets for generator integration.
+
+          The import workflow pins expected byte hashes, validates PNG signatures and dimensions, runs the ZIP CRC test, rejects unsafe archive paths, records SHA-256 and file sizes, and updates assets/reference-research/manifest.json.
+
+          | File | SHA-256 |
+          |---|---|
+          | 13jump_1.png | f8597238ebe3b9d761fe40e6169042fa9247f771d44328345f8dc4514634f259 |
+          | 11walk_4.png | 1b6537b1bea0c93da1f1b27f52786a9c3e0de2b5b2f89dca045af7631e942337 |
+          | blink strip 5.png | 4a42ed4aaeca1f034a1fa3429e8db59bfc6d7501b92680feaf8292160bd67212 |
+          | character.zip | df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11 |
+
+          Attribution retained for provenance even though the source pages declare CC0:
+          - Hordana's source page includes the notice “By the name of Hordana I command this to be free forever and ever!”
+          - FALLiNG_AiR's source page states “It's free”.
+          EOF
+
+      - name: Commit verified binaries and inventory to this same branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: feature/bimg-anime-png-universal-library
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/reference-research/incoming/opengameart assets/reference-research/manifest.json
+          if git diff --cached --quiet; then
+            echo 'No asset changes to commit.'
+            exit 0
+          fi
+          git commit -m 'assets: import verified OpenGameArt CC0 character sources'
+          git push origin "HEAD:${TARGET_BRANCH}"
