@@ -138,6 +138,45 @@ export function CharacterModelBuilder() {
     finally{setBusy(false);}
   };
 
+  const importCc0PsdLayers=async()=>{
+    setBusy(true);setError("");setNotice("");
+    try{
+      const catalogResponse=await fetch("/cc0-character-library/psd-layers-manifest.json",{cache:"no-cache"});
+      if(!catalogResponse.ok)throw new Error("No se pudo abrir el catálogo de capas PSD CC0. Esperá a que termine la preparación de recursos.");
+      const catalog=await catalogResponse.json() as {assets:Array<{id:string;name:string;label:string;path:string;bytes:number;sha256:string;source_member:string;source_psd:string;source_url:string;license:string;layer_path:string}>};
+      const imported:string[]=[];let skipped=0;
+      for(let index=0;index<catalog.assets.length;index++){
+        const asset=catalog.assets[index];
+        setNotice("Verificando capa PSD "+(index+1)+"/"+catalog.assets.length+"…");
+        const imageResponse=await fetch(asset.path);
+        if(!imageResponse.ok){skipped++;continue;}
+        const blob=await imageResponse.blob();
+        if(!blob.size||blob.size>12*1024*1024){skipped++;continue;}
+        const bytes=new Uint8Array(await blob.arrayBuffer());
+        const digest=new Uint8Array(await crypto.subtle.digest("SHA-256",bytes));
+        const sha256=Array.from(digest,value=>value.toString(16).padStart(2,"0")).join("");
+        const signature=[137,80,78,71,13,10,26,10];
+        if(sha256!==asset.sha256||bytes.length<8||signature.some((value,index)=>bytes[index]!==value)){skipped++;continue;}
+        let binary="";
+        for(let offset=0;offset<bytes.length;offset+=0x8000)binary+=String.fromCharCode(...bytes.subarray(offset,Math.min(offset+0x8000,bytes.length)));
+        const response=await fetch("/api/modular-assets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+          filename:asset.name,mime_type:"image/png",data_base64:btoa(binary),category:"reference",
+          label:("CC0 PSD · "+asset.layer_path).slice(0,100),kind:"reference",view:"unknown",
+          license:asset.license,source_url:asset.source_url,source_filename:asset.source_member+" :: "+asset.layer_path
+        })});
+        const data=await response.json();
+        if(!response.ok)throw new Error(data.error||"No se pudo importar la capa "+asset.layer_path+".");
+        const id=data.asset?.id||data.id;
+        if(typeof id==="string")imported.push(id);
+      }
+      await refreshAssets();
+      setSelectedIds(current=>Array.from(new Set([...current,...imported])).slice(0,32));
+      if(imported.length&&!baseAssetId)setBaseAssetId(imported[0]);
+      setNotice("Capas PSD CC0 incorporadas: "+imported.length+" capas verificadas; "+skipped+" omitidas. Siguen como referencias raster; asigná manualmente su rol semántico antes de usarlas como prendas o partes del cuerpo.");
+    }catch(reason){setError(reason instanceof Error?reason.message:String(reason));}
+    finally{setBusy(false);}
+  };
+
   const drawMaskPreview=()=>{
     const canvas=previewCanvasRef.current,maskCanvas=maskCanvasRef.current,source=sourceImageRef.current;
     if(!canvas||!maskCanvas||!source)return;
@@ -401,6 +440,7 @@ export function CharacterModelBuilder() {
         <label className="model-builder-search">Filtrar recursos<input value={filter} onChange={event=>setFilter(event.target.value)} placeholder="Nombre, archivo o categoría…" /></label>
         <button type="button" className="model-builder-secondary" disabled={busy} onClick={refreshLibrary}>Actualizar biblioteca local</button>
         <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>void importCc0References()}>{busy?"Importando CC0…":"Importar colección CC0 al constructor"}</button>
+        <button type="button" className="model-builder-secondary" disabled={busy} onClick={()=>void importCc0PsdLayers()}>{busy?"Importando capas PSD…":"Importar capas PSD CC0"}</button>
         <div className="model-builder-asset-list">
           {filteredAssets.map(asset=><label className={selectedIds.includes(asset.id)?"model-builder-asset selected":"model-builder-asset"} key={asset.id}>
             <input type="checkbox" checked={selectedIds.includes(asset.id)} onChange={()=>toggleAsset(asset.id)} />
