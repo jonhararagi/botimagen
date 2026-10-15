@@ -13,6 +13,7 @@ import { ModularAssetLibrary } from "./visual/ModularAssetLibrary";
 import { CharacterModelBuilder } from "./visual/CharacterModelBuilder";
 import { ModularCharacterComposer } from "./visual/ModularCharacterComposer";
 import { AnimePngLibrary } from "./visual/AnimePngLibrary";
+import { QuickImageEditor } from "./visual/QuickImageEditor";
 import { PsdLayerRoleMapper } from "./visual/PsdLayerRoleMapper";
 import { CharacterCatalogStudio } from "./visual/CharacterCatalogStudio";
 import { Cc0CharacterStudio } from "./visual/Cc0CharacterStudio";
@@ -338,7 +339,8 @@ export default function App(){
    <div className="brand"><span className="brand-mark">✳</span><span><b>BotImagen</b><small>CHARACTER STUDIO</small></span></div>
    <div className="nav-label">ESPACIO DE TRABAJO</div>
    <button className="nav active" type="button"><span>◈</span> Diseñador <i>01</i></button>
-   <button className="nav" type="button" onClick={() => document.getElementById("anime-png-library")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▦</span> Biblioteca de PNG <small>LOCAL</small></button>
+   <button className="nav" type="button" onClick={() => document.getElementById("quick-image-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>✂</span> Editor de imágenes <small>EDITAR</small></button>
+    <button className="nav" type="button" onClick={() => document.getElementById("anime-png-library")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▦</span> Biblioteca de PNG <small>LOCAL</small></button>
    <button className="nav" type="button" onClick={() => document.getElementById("mini-anime-ai")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>✦</span> Mini IA anime <small>LOCAL</small></button>
    <button className="nav" type="button" disabled title="Función futura"><span>⇄</span> Comparar variantes</button>
    <button className="nav" type="button" onClick={() => document.querySelector('[data-testid="pixai-asset-factory"]')?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▤</span> Fábrica de assets <small>PIXAI</small></button>
@@ -349,6 +351,7 @@ export default function App(){
   </aside>
   <main className="main">
    <header className="topbar"><div className="crumb">WORKSPACE <span>/</span> <b>CHARACTER DESIGN</b></div><div className="top-actions"><span className="local-pill"><i/> {catalog?"LOCAL · CONECTADO":"LOCAL · DESCONECTADO"}</span><span className="avatar">BW</span></div></header>
+   <QuickImageEditor />
    <DressUpGame />
     <ModularDressUp />
    <Cc0CharacterStudio />
