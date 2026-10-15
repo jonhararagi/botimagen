@@ -73,3 +73,13 @@
 - Smoke test Chromium: ahora cierra el editor de máscaras antes de importar, muestra el error real si falla la importación y valida tanto los 65 PNG base como las 43 capas PSD y su procedencia.
 - Evidencia de preparación PSD y publicación de catálogo: [workflow de importación #10 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38698873530). Inventarios: `assets/reference-research/prepared/fallingair/psd-layer-inventory.json` y `web/public/cc0-character-library/psd-layers-manifest.json`.
 - CI de la revisión de código más reciente aún en curso al escribir esta entrada; no declarar PASS hasta confirmar la ejecución del HEAD final.
+
+
+## 2026-10-15 · BIMG-REFERENCE-BASE-006 · Asignación visual por lote para capas PSD
+
+- Rama única: `feature/bimg-anime-png-universal-library`; PR #15 sigue siendo el destino del trabajo. No se creó rama nueva ni se modificó `main`.
+- Evidencia de inspección PSD: 10 archivos maestros, 82 entradas de capa registradas y 43 capas transparentes exportadas con nombre/ruta original, caja, dimensiones, hash SHA-256 y procedencia CC0.
+- Mejora de UI: selección manual por tarjeta, estado visual de selección, selección de todas las capas visibles según filtros, selector de rol semántico y acción para aplicar un rol a múltiples capas. La selección se limpia después de aplicar; notas por capa y exportación JSON existente se conservan.
+- Prueba automatizada ampliada en `web/browser_smoke.mjs`: Chromium verifica 43 tarjetas, asignación individual persistida, filtro de pendientes, selección de dos capas, aplicación masiva del rol `accessory`, persistencia de ambas asignaciones y limpieza de selección.
+- Commit de implementación: `d45dd700f0e3852ba8e465d7cd4ba918940a2107`. CI [run #747](https://github.com/jonhararagi/botimagen/actions/runs/38731519929) estaba en curso al registrar este apunte; no declarar PASS hasta verificar resultado final.
+- Límite: la asignación es manual y local al navegador. No se infieren roles por nombre ni se convierten automáticamente referencias PSD en prendas/cabello semánticamente confirmados.
