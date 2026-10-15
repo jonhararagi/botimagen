@@ -11,7 +11,7 @@
       "author": "FALLiNG_AiR",
       "license": "CC0 1.0, explicitly displayed on source page",
       "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "rights_status": "cc0-source-verified; downloaded-binary-hash-verified",
+      "rights_status": "cc0-source-verified; archive-and-derived-png-hashes-verified",
       "available_files": [
         {
           "name": "character.zip",
@@ -23,7 +23,14 @@
           "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
         }
       ],
-      "notes": "Downloaded archive passed ZIP CRC and safe-path checks. Inventory confirms 96 members: 66 PNGs, 10 PSDs, 10 Clip Studio files, and 10 directories. Selected PNG exports and PSD master files are prepared under assets/reference-research/prepared/fallingair; PSD internal layer semantics have not yet been audited."
+      "notes": "Downloaded archive passed ZIP CRC and safe-path checks. Inventory confirms 96 members: 66 PNGs, 10 PSDs, 10 Clip Studio files, and 10 directories. 65 character/expression PNGs are exposed to the generator; 10 PSDs were inspected with psd-tools and 43 visible non-empty leaf layers were exported as transparent PNG references. Layer names/coordinates are preserved, but generic layer names are not automatically mapped to body/clothing semantics.",
+      "local_files": [
+        "assets/reference-research/incoming/opengameart/character.zip",
+        "assets/reference-research/incoming/opengameart/archive-inventory.json",
+        "assets/reference-research/prepared/fallingair/psd-layer-inventory.json",
+        "web/public/cc0-character-library/manifest.json",
+        "web/public/cc0-character-library/psd-layers-manifest.json"
+      ]
     },
     {
       "id": "opengameart-hordana-michona",
@@ -116,14 +123,14 @@
         "psd",
         "clip-studio"
       ],
-      "rights_status": "cc0-source-verified; archive-and-selected-files-hash-verified",
+      "rights_status": "cc0-source-verified; archive-and-derived-png-hashes-verified",
       "local_files": [
         "assets/reference-research/incoming/opengameart/character.zip",
         "assets/reference-research/incoming/opengameart/archive-inventory.json",
         "assets/reference-research/incoming/opengameart/download-inventory.json",
         "assets/reference-research/prepared/fallingair/asset-inventory.json"
       ],
-      "notes": "Legacy duplicate catalog entry synchronized after CC0 archive download, CRC validation, and extraction of 66 PNG exports plus 10 PSD masters. Clip Studio source files remain preserved in the original ZIP rather than duplicated as separate repository files."
+      "notes": "Legacy duplicate catalog entry synchronized after CC0 archive download and CRC validation. 66 PNGs and 10 PSD masters are prepared; 43 visible, non-empty PSD leaf layers are exported for optional import into the generator. Original Clip Studio files remain in the ZIP."
     },
     {
       "id": "makehuman-cartoon01",
@@ -197,5 +204,5 @@
       "notes": "Prepared PNGs are intended for direct import into the PNG library. PSD files are editable source masters, but their internal layer names/semantics are not yet validated."
     }
   ],
-  "ingestion_note": "The import workflow downloads pinned source bytes, checks SHA-256 against independently inspected files, validates PNG dimensions and ZIP CRC/path safety, writes archive-inventory.json, then commits to this feature branch."
+  "ingestion_note": "The import workflow downloads pinned source bytes, validates PNG dimensions and SHA-256, checks ZIP CRC and safe paths, inventories/extracts PNG/PSD sources, inspects PSD layer trees, exports visible non-empty leaf layers to transparent PNGs, and publishes separate hash-pinned manifests for original PNG references and extracted PSD layers."
 }

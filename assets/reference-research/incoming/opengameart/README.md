@@ -1,13 +1,13 @@
 # OpenGameArt CC0 source assets
 
-Source pages explicitly display CC0 1.0:
+Source pages display CC0 1.0:
 
 - Hordana, **Anime Girl / Michona the creepy and cute warrior**: https://opengameart.org/content/anime-girl
 - FALLiNG_AiR, **Visual novel Character Sprite**: https://opengameart.org/content/visual-novel-character-sprite
 
-These are preserved source downloads, not silently edited derivative art. The three Hordana PNGs are animation sprite strips, not semantically separated clothing/body layers. The FALLiNG_AiR archive is retained intact pending archive inventory review; inspect archive-inventory.json before selecting internal PSD/Clip Studio/PNG assets for generator integration.
+These are preserved source downloads. The three Hordana PNGs are animation sprite strips, not semantically separated clothing/body layers. FALLiNG_AiR's original ZIP is preserved intact; its contents were inspected and selected files are organized under `prepared/fallingair/`.
 
-The import workflow pins expected byte hashes, validates PNG signatures and dimensions, runs the ZIP CRC test, rejects unsafe archive paths, records SHA-256 and file sizes, and updates assets/reference-research/manifest.json.
+The import workflow pins expected source hashes, validates PNG signatures/dimensions and ZIP CRC/path safety, records SHA-256 and file sizes, inventories the PSD layer trees, and exports 43 visible non-empty PSD layers as transparent PNG references. The app exposes 65 character/base/expression PNGs and a separate catalog for the 43 extracted PSD layers. See `archive-inventory.json`, `download-inventory.json`, and `prepared/fallingair/psd-layer-inventory.json`.
 
 | File | SHA-256 |
 |---|---|

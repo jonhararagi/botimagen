@@ -61,3 +61,15 @@
 - Integridad: inventario preparado 76 archivos (66 PNG + 10 PSD), hashes SHA-256 y CRC ZIP validados.
 - CI final para HEAD `efbf9a1b1738f5c1503569fe010dd7a49c74a91b`: [run #734 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38695428134). Incluye contratos, generador, build TypeScript/Vite y smoke test de Chromium.
 - Límite de verificación: el smoke test general de Chromium pasó, pero el clic real que importa las 65 imágenes al backend no se ejercitó como flujo E2E independiente. Debe comprobarse con la app y el API local activos antes de declarar esa operación verificada de punta a punta.
+
+
+## 2026-10-15 · BIMG-REFERENCE-BASE-005 · PSD layers wired into generator
+
+- Rama autorizada: `feature/bimg-anime-png-universal-library`; PR #15 sigue abierta. Sin ramas nuevas, sin cambios en `main`, sin merge.
+- Inspección PSD: 10 maestros (canvas 2000×3000), 82 registros de capa, 43 capas visibles/no vacías exportadas como PNG transparentes con SHA-256 y caja de origen.
+- Nombres reconocibles de expresiones faciales se conservan; capas genéricas como `레이어 1` no se clasifican automáticamente como ropa/cabello/cuerpo. Se mantienen como referencias raster pendientes de revisión humana.
+- Constructor: el botón existente importa 65 PNG de personaje/expresión con hashes y procedencia CC0; nuevo botón **Importar capas PSD CC0** importa por separado los 43 PNG extraídos, conserva URL/licencia/miembro de archivo y ruta de capa y no asigna roles semánticos automáticamente.
+- Causa raíz del E2E fallido: `source_filename` rechazaba rutas relativas de procedencia del ZIP aunque se usan solo como metadatos. `_safe_source_reference` ahora permite referencias relativas seguras con `/`, y rechaza rutas absolutas, drive Windows, `..`, segmentos vacíos, controles y barras invertidas. Añadida prueba unitaria para la procedencia CC0 y casos de traversal.
+- Smoke test Chromium: ahora cierra el editor de máscaras antes de importar, muestra el error real si falla la importación y valida tanto los 65 PNG base como las 43 capas PSD y su procedencia.
+- Evidencia de preparación PSD y publicación de catálogo: [workflow de importación #10 PASS](https://github.com/jonhararagi/botimagen/actions/runs/38698873530). Inventarios: `assets/reference-research/prepared/fallingair/psd-layer-inventory.json` y `web/public/cc0-character-library/psd-layers-manifest.json`.
+- CI de la revisión de código más reciente aún en curso al escribir esta entrada; no declarar PASS hasta confirmar la ejecución del HEAD final.
