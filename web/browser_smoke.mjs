@@ -1485,8 +1485,16 @@ try {
   });
   const sliderEnabled = async label => page.locator('input[type="range"][aria-label="' + label + '"]').isEnabled();
 
+  const canonicalBodyGeometry = await page.locator(".character-body-base path").evaluateAll(paths =>
+    paths.map(path => path.getAttribute("d"))
+  );
   for (const [kind, id, selector] of torsoMatrix) {
     await selectMatrixGarment(kind, id);
+    assert.deepEqual(
+      await page.locator(".character-body-base path").evaluateAll(paths => paths.map(path => path.getAttribute("d"))),
+      canonicalBodyGeometry,
+      id + " garment selection must not mutate canonical body geometry"
+    );
     assert.equal(await sliderEnabled("Largo del torso"), true, id + " must enable torso length");
     assert.equal(await sliderEnabled("Ajuste de cintura"), true, id + " must enable waist fit");
     const torsoBoxes = [];
@@ -1508,6 +1516,11 @@ try {
     }
     assert.ok(waistBoxes[0].width < waistBoxes[1].width && waistBoxes[1].width < waistBoxes[2].width,
       id + " selected garment surface must widen monotonically at waist_fit 0/50/100");
+    assert.deepEqual(
+      await page.locator(".character-body-base path").evaluateAll(paths => paths.map(path => path.getAttribute("d"))),
+      canonicalBodyGeometry,
+      id + " torso/waist adjustments must not mutate canonical body geometry"
+    );
   }
 
   for (const [kind, id, selector] of sleeveMatrix) {
