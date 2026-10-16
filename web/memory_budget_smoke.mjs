@@ -86,6 +86,19 @@ try {
   assert.ok(sample.svgPreviewReady, "The local SVG character preview must be ready before measuring");
   assert.ok(usedMiB <= 300, `Browser JavaScript heap exceeds the 300 MiB startup budget: ${usedMiB.toFixed(1)} MiB`);
   console.log("PASS: BotImagen startup JavaScript heap is within the 300 MiB regression budget.");
+
+  const importInput = page.locator('.modular-dropzone input[type="file"]');
+  await importInput.setInputFiles(Array.from({length: 9}, (_, index) => ({
+    name: `memory-queue-${index + 1}.png`,
+    mimeType: "image/png",
+    buffer: Buffer.from("x"),
+  })));
+  await page.waitForFunction(() => document.querySelectorAll(".modular-preview-card").length === 8, undefined, {timeout: 10000});
+  const queueStatus = await page.locator(".modular-library-status").innerText().catch(() => "");
+  const statusText = await page.locator('[data-testid="modular-library-status"]').innerText().catch(() => queueStatus);
+  assert.match(statusText || queueStatus, /8 imágenes y 48 MiB|Límite: 8 imágenes y 48 MiB/,
+    "The import UI must explain that the pending image queue is capped at 8 images / 48 MiB");
+  console.log("PASS: Import queue refuses a ninth image instead of growing without bounds.");
 } finally {
   if (browser) await browser.close();
   for (const child of children.reverse()) stop(child);
