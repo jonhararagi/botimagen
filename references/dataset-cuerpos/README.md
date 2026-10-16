@@ -1,27 +1,22 @@
 # Dataset de referencia corporal de BotImagen
 
-Esta carpeta está reservada para organizar el conjunto de dibujos de referencia usados para estudiar proporciones, anatomía y poses.
+Este directorio contiene los PNG originales 0.png–15.png utilizados para estudiar proporciones, silueta y poses. El repositorio es público: las imágenes fuente son accesibles y descargables.
 
-## ⚠️ Privacidad antes de subir archivos
+## Referencias examinadas para BIMG-ENGINE-009-R3
 
-El repositorio `jonhararagi/botimagen` es actualmente **público**. Todo archivo que se añada aquí será visible y descargable por cualquiera mientras el repositorio siga siendo público.
+- **12.png (768×1280)**: principal candidata frontal de cuerpo completo. Se utiliza únicamente para orientar proporciones y landmarks aproximados; los brazos están ligeramente separados del torso y un tobillo queda parcialmente oculto.
+- **15.png (768×1280)**: segunda comparación de cuerpo completo; presenta desplazamiento de cadera y tobillos cruzados, por lo que no se trata como pose neutral.
+- **4.png (768×1280)**: cuerpo completo orientado al frente con desplazamiento de cadera y tobillos cruzados.
+- **5.png (768×1280)**: silueta completa en tres cuartos, con manos en la cadera y codos flexionados.
+- **6–11.png y 13–14.png (768×1280)**: las imágenes inspeccionadas sirven principalmente como referencias de pose, por recortes, giros fuertes o extremidades superpuestas.
+- **0–3.png**: su clasificación visual permanece pendiente. No deben usarse para calibrar el cuerpo hasta revisarlas individualmente.
 
-**No subas aquí los dibujos originales todavía** si no quieres publicarlos. Antes, convierte el repositorio en privado o utiliza un repositorio privado separado y confirma que el bot obrero tenga acceso. Esta carpeta contiene únicamente documentación de organización, no el dataset.
+Las medidas empleadas por el motor son adaptaciones esquemáticas de relaciones visuales normalizadas al lienzo 340×490. No son captura de movimiento ni medidas clínicas, y no implican que el resultado reproduzca perfectamente una referencia.
 
-## Flujo previsto de auditoría
+## Auditoría reproducible
 
-1. Conservar los originales sin modificarlos.
-2. Generar un inventario de nombres, formatos, dimensiones y hashes.
-3. Detectar duplicados exactos sin eliminar archivos.
-4. Clasificar candidatos por pose y vista cuando sea posible.
-5. Registrar procedencia y permisos de uso.
-6. No incorporar imágenes al producto ni redistribuirlas hasta verificar sus condiciones de uso.
+El workflow ejecuta tools/assets/audit_body_references.py, que calcula SHA-256 sobre los bytes originales, registra dimensiones y modo, valida que cada PNG pueda decodificarse, cuenta transparencia y calcula márgenes aproximados frente al fondo casi blanco. El inventario JSON se publica dentro del artefacto de QA de CI, sin copiar los originales a recursos del producto.
 
-Los originales, miniaturas personales, cachés e informes con datos privados deben permanecer fuera del repositorio público. No se debe realizar scraping masivo ni asumir que una referencia externa se puede reutilizar.
+## Derechos y uso
 
-## Estado
-
-- [x] Carpeta de organización creada.
-- [ ] Confirmar un destino privado para los originales.
-- [ ] Auditar el inventario en modo de solo lectura.
-- [ ] Evaluar cuerpos base y poses reutilizables.
+La licencia y procedencia de estos dibujos no se han verificado. Hasta confirmar los permisos, deben usarse como referencias internas de proporciones; no se incorporan los píxeles al producto ni se redistribuyen como assets. El inventario no elimina ni modifica archivos originales.

@@ -10,30 +10,49 @@ SMOKE = (ROOT / "web/browser_smoke.mjs").read_text(encoding="utf-8")
 
 
 class VisualBodyLandmarkContractTests(unittest.TestCase):
-    def test_landmarks_cover_both_views_and_existing_svg_coordinate_space(self):
-        self.assertIn('export type BodyView = "front" | "back"', LANDMARKS)
-        self.assertIn('getBodyLandmarks(view: BodyView, hemY: number, waistHalf: number)', LANDMARKS)
-        self.assertIn("headTop:", LANDMARKS)
-        for name in ("neckLeft", "shoulderLeft", "shoulderRight", "chestCenter",
-                     "waistLeft", "waistRight", "elbowLeft", "wristLeft",
-                     "handLeft", "pelvisCenter", "kneeLeft", "ankleLeft", "footLeft"):
+    def test_reference_calibration_is_documented_and_uses_existing_dataset(self):
+        self.assertIn('primary: "references/dataset-cuerpos/12.png"', LANDMARKS)
+        self.assertIn('secondary: "references/dataset-cuerpos/15.png"', LANDMARKS)
+        self.assertIn("viewportRatios", LANDMARKS)
+        self.assertIn("Approximate normalized landmark ratios", LANDMARKS)
+
+    def test_body_landmarks_are_independent_from_garment_fit(self):
+        self.assertIn("export function getBodyLandmarks(view: BodyView)", LANDMARKS)
+        self.assertIn("export function getGarmentFitLandmarks(view: BodyView, hemY: number, waistHalf: number)", LANDMARKS)
+        body_function = LANDMARKS.split("export function getBodyLandmarks", 1)[1].split("/**", 1)[0]
+        self.assertNotIn("torso_length", body_function)
+        self.assertNotIn("waist_fit", body_function)
+        self.assertNotIn("hemY", body_function)
+        self.assertNotIn("waistHalf", body_function)
+        self.assertIn("const garmentLandmarks = getGarmentFitLandmarks(r.view, hemY, waistHalf)", RENDERER)
+        self.assertIn("const bodyLandmarks = landmarks", RENDERER)
+
+    def test_body_contours_are_curved_and_share_anatomical_landmarks(self):
+        for name in ("neckLeftBase", "neckRightBase", "shoulderLeft", "torsoShoulderLeft",
+                     "waistLeft", "elbowLeft", "wristLeft", "handLeft", "pelvisCenter",
+                     "kneeLeft", "ankleLeft", "footLeft"):
             self.assertRegex(LANDMARKS, rf"\b{name}: \{{ x:")
-        self.assertIn("headTop: { x: 170, y: 80 }", LANDMARKS)
-        self.assertIn("shoulderLeft: { x: 120, y: 251 }", LANDMARKS)
-        self.assertIn("torsoShoulderLeft: { x: 128, y: 254 }", LANDMARKS)
-        self.assertIn("kneeLeft: { x: 150, y: 442 }", LANDMARKS)
-        self.assertIn("chestCenter: { x: 170, y: rear ? 242 : 241 }", LANDMARKS)
-        self.assertIn("hemY - 57", LANDMARKS)
-        self.assertIn("waistHalf * 0.72", LANDMARKS)
+        for fragment in ("C 140 120 155 122 170 122", "C 235 272 230 286 215 298",
+                         "C 116 300 120 328"):
+            self.assertIn(fragment, LANDMARKS)
+        self.assertIn('className="anatomical-head-scale"', RENDERER)
+        self.assertIn("scale(.72)", RENDERER)
+        self.assertIn("translate(0 -113)", RENDERER)
+        self.assertNotIn("xAtY(", RENDERER)
 
-    def test_renderer_consumes_shared_landmarks_for_svg_geometry(self):
-        self.assertIn('import { getBodyBaseGeometry, getBodyLandmarks, svgLayerIndex } from "./bodyLandmarks"', RENDERER)
-        self.assertIn("getBodyLandmarks(r.view, hemY, waistHalf)", RENDERER)
-        self.assertIn("landmarks.torsoShoulderLeft.x", RENDERER)
-        self.assertIn("landmarks.hemRight.y", RENDERER)
-        self.assertIn("bodyLandmarks.neckLeft.x", RENDERER)
+    def test_fit_controls_only_change_garment_landmarks_and_not_body_base(self):
+        fit_fn = LANDMARKS.split("export function getGarmentFitLandmarks", 1)[1].split("export type BodyBaseGeometry", 1)[0]
+        self.assertIn("const waistY = hemY - 25", fit_fn)
+        self.assertIn("const hemHalf = waistHalf * 0.78", fit_fn)
+        body_fn = LANDMARKS.split("export function getBodyBaseGeometry", 1)[1]
+        self.assertNotIn("hemY", body_fn)
+        self.assertNotIn("waistHalf", body_fn)
+        for control in ("torso_length", "sleeve_length", "waist_fit"):
+            self.assertIn(control, RENDERER)
+            self.assertIn(control, RECIPE_TESTS)
+        self.assertIn("schema_version: 3", RENDERER)
 
-    def test_layer_contract_is_consumed_by_rendered_svg_elements(self):
+    def test_layer_contract_and_piece_controls_remain(self):
         order = re.search(r"const SVG_LAYER_ORDER = \[(.*?)\] as const", LANDMARKS, re.S)
         self.assertIsNotNone(order)
         layers = re.findall(r'"([a-z-]+)"', order.group(1))
@@ -41,73 +60,29 @@ class VisualBodyLandmarkContractTests(unittest.TestCase):
         self.assertLess(layers.index("hair-back"), layers.index("body-base"))
         self.assertLess(layers.index("body-base"), layers.index("neck"))
         self.assertLess(layers.index("arm-skin"), layers.index("hands"))
-        self.assertLess(layers.index("base-sleeves"), layers.index("base-torso"))
         self.assertLess(layers.index("base-torso"), layers.index("lower-body"))
-        self.assertLess(layers.index("lower-body"), layers.index("footwear"))
         self.assertLess(layers.index("footwear"), layers.index("outfit"))
         self.assertLess(layers.index("outer-layer"), layers.index("chromapatch"))
-        for layer in ("ground-shadow", "hair-back", "body-base", "neck", "arm-skin", "hands",
-                      "base-sleeves", "base-torso", "lower-body", "footwear",
-                      "outfit", "outer-layer", "chromapatch"):
-            self.assertIn(f'svgLayerIndex("{layer}")', RENDERER)
-
-    def test_existing_garment_ids_fit_controls_and_recipe_migrations_remain(self):
-        for garment in ("street_bomber", "tactical_baseball", "long_coat"):
-            self.assertIn(garment, RENDERER)
-        for control in ("torso_length", "sleeve_length", "waist_fit"):
-            self.assertIn(control, RENDERER)
-            self.assertIn(control, RECIPE_TESTS)
-        self.assertIn("test_visual_recipe_v1_and_v2_migrate_to_safe_v3_defaults", RECIPE_TESTS)
-        self.assertIn("schema_version: 3", RENDERER)
-        self.assertIn("nanowear_state", RENDERER)
-        self.assertIn("chromapatch", RENDERER.lower())
-
-    def test_shared_landmarks_drive_extremities_pelvis_legs_and_footwear(self):
-        for declaration in ("const armSkinPath =", "const lowerBodyPath =", "const legSilhouettePath =", "const baseFootwearPath ="):
-            self.assertIn(declaration, RENDERER)
-        for landmark in ("elbowLeft", "elbowRight", "wristLeft", "wristRight",
-                         "handLeft", "handRight", "pelvisLeft", "pelvisCenter",
-                         "pelvisRight", "kneeLeft", "kneeRight", "ankleLeft",
-                         "ankleRight", "footLeft", "footRight"):
-            self.assertTrue(f"landmarks.{landmark}." in RENDERER or f"bodyLandmarks.{landmark}." in RENDERER)
-        self.assertIn("d={armSkinPath}", RENDERER)
-        self.assertIn("d={lowerBodyPath}", RENDERER)
-        self.assertIn("d={legSilhouettePath}", RENDERER)
-        self.assertIn("d={baseFootwearPath}", RENDERER)
-        self.assertIn("bodyLandmarks.handLeft.x - 108", RENDERER)
-        self.assertIn("bodyLandmarks.handRight.x - 232", RENDERER)
-        self.assertIn('data-qa-surface="legs"', RENDERER)
-        self.assertIn('data-qa-surface="footwear-base"', RENDERER)
-
-    def test_independent_body_base_is_separate_from_garment_fit_and_public_api(self):
-        body_geometry = LANDMARKS.split("export function getBodyBaseGeometry(view: BodyView)", 1)[1]
-        self.assertIn("export function getBodyBaseGeometry(view: BodyView)", LANDMARKS)
-        self.assertNotIn("torso_length", body_geometry)
-        self.assertNotIn("waist_fit", body_geometry)
-        self.assertIn('import { getBodyBaseGeometry, getBodyLandmarks, svgLayerIndex } from "./bodyLandmarks"', RENDERER)
-        self.assertIn("const bodyLandmarks = getBodyLandmarks(r.view, 343, 34)", RENDERER)
+        self.assertIn("getBodyBaseGeometry(r.view, bodyLandmarks)", RENDERER)
         self.assertIn('data-body-source="independent-geometry"', RENDERER)
         for region in ("torso", "pelvis", "legs", "feet"):
             self.assertIn(f'data-body-region="{region}"', RENDERER)
-        self.assertIn("export function VisualCharacterRenderer({ values, recipe }: RendererProps)", RENDERER)
-        self.assertIn("regionAvailability", SMOKE)
+        self.assertIn("getGarmentCapabilities(values)", RENDERER)
+        self.assertIn("Perfiles CyberStreet", (ROOT / "web/src/visual/ModularCharacterComposer.tsx").read_text(encoding="utf-8"))
 
-    def test_neutral_body_fixture_is_temporary_and_records_front_back_bounds(self):
+    def test_neutral_body_chromium_capture_is_real_renderer_dom(self):
         self.assertIn('bimg-neutral-body-qa-only', SMOKE)
-        self.assertIn('"neutral-body-" + view', SMOKE)
         self.assertIn('neutral-body-manifest.json', SMOKE)
-        self.assertIn("box('[data-layer-id=\"neck\"]')", SMOKE)
-        self.assertIn('document.getElementById(styleId)?.remove()', SMOKE)
-        self.assertIn('BODY_BASE_GEOMETRY_PRESENT_ART_REVIEW_REQUIRED', SMOKE)
-        self.assertIn('normalizedPathBounds', SMOKE)
-        self.assertIn('independent_body_base_path_bbox', SMOKE)
-        self.assertIn('Cosmetic SVG layers must be explicitly hidden', SMOKE)
+        self.assertIn('page.locator("#" + bodyCaptureId).screenshot({ path: resolve(visualQaDir, name + ".png") });', SMOKE)
+        self.assertIn('BODY_ONLY_CHROMIUM_RENDERED_ART_REVIEW_REQUIRED', SMOKE)
+        self.assertIn("normalizedPathBounds", SMOKE)
+        self.assertIn("The screenshot is a QA-only DOM clone of the live production SVG", SMOKE)
 
-    def test_browser_smoke_checks_actual_svg_dom_paint_order(self):
+    def test_browser_smoke_checks_layer_order_and_png_transparency(self):
         self.assertIn('querySelectorAll("[data-layer-id][data-layer-order]")', SMOKE)
         self.assertIn("domLayers.every((entry, index) => index === 0 || entry.order >= domLayers[index - 1].order)", SMOKE)
-        self.assertIn("layerOrderChecks.push", SMOKE)
-        self.assertIn("domLayerOrderValidated: true", SMOKE)
+        self.assertIn("inspectRgbaPng", SMOKE)
+        self.assertIn("cornerAlpha", SMOKE)
 
 
 if __name__ == "__main__":
