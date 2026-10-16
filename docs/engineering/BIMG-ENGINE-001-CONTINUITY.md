@@ -93,3 +93,16 @@ No añadir recursos de terceros ni dependencias npm. No modificar el catálogo d
 - Se preservan receta v3, migraciones v1/v2, controles de ajuste, NanoWear, Chromapatch y los IDs de las prendas; esta entrega no rediseña todavía la silueta completa.
 - `WINDOWS_MANUAL_QA: NOT_RUN`. TIMER: 4–6 horas estimadas; tiempo real `NOT_MEASURED`.
 - Progreso ponderado conservado en 63%; esta migración parcial no completa por sí sola una fase de beta.
+
+
+## BIMG-ENGINE-009-R5 · 2026-10-16 · ejecución y límites verificados
+
+- Rama autorizada: `feature/bimg-engine-001-cyberstreet-visual-renderer`. HEAD de código antes de esta nota: `8cd7bf7bef322f2a5ea26a0b0ef412158ba54f2a`. No se modifica `main`, no se crea otra rama y no se fusiona el PR.
+- CI #808 (`4de5807511efcc31868fdb93f459e4c11d2d359d`) falló en Chromium: la superficie de `combat_jacket` no crecía de forma monótona con `torso_length`.
+- Corrección funcional: commit `6f49ea6def5ea42e28cc046afd1681b85f03cc2b`, detalles y paneles inferiores de `combat_jacket` ligados al dobladillo dinámico en vez de coordenadas Y fijas. CI #809 terminó SUCCESS en ese SHA: https://github.com/jonhararagi/botimagen/actions/runs/38918832400.
+- Evidencia visual real de CI #809: artefacto `botimagen-visual-garment-qa`, ID `12052909188`, accesible durante su retención de 14 días: https://github.com/jonhararagi/botimagen/actions/runs/38918832400/artifacts/12052909188. Contiene capturas Chromium de variantes de torso y mangas, perfiles, importación y exportación.
+- Inspección de PNG exportado `cyberstreet-export-verified.png`: 512×768, RGBA, alfa mínimo 0/máximo 255, 323507 píxeles totalmente transparentes y contenido no transparente dentro del lienzo. La prueba E2E también confirma perfil guardado, restauración, variante independiente y persistencia tras recarga.
+- Inspección visual manual del artefacto frente a `references/dataset-cuerpos/12.png` (referencia frontal principal), con `15.png` y `4.png` documentadas como controles de pose: **la anatomía SVG actual todavía no satisface la aceptación**. La figura renderizada tiene una cabeza relativamente sobredimensionada, torso y extremidades demasiado rígidos y una pose de brazos más vertical que la referencia. Los landmarks actuales son una adaptación aproximada, no una calibración anatómica verificada. No declarar PASS anatómico.
+- Regresión añadida en `web/browser_smoke.mjs`, commit `8cd7bf7bef322f2a5ea26a0b0ef412158ba54f2a`: la matriz de prendas comprueba que seleccionar ropa y cambiar longitud/ajuste no muta los paths canónicos del cuerpo. CI #810 se ejecuta sobre este SHA: https://github.com/jonhararagi/botimagen/actions/runs/38919648421.
+- Estado honesto de R5: **PARTIAL**. Renderizador, perfiles, exportación alfa y matriz automatizada de prendas verificados; la comparación visual revela que falta una revisión anatómica real del cuerpo completo y sus anclajes. WINDOWS_MANUAL_QA: NOT_RUN. TIMER efectivo: NOT_MEASURED por las herramientas disponibles.
+- Siguiente trabajo autorizado: recalibrar conjuntamente cabeza/cuello/hombros/torso/pelvis/miembros con las referencias visualmente inspeccionadas, y después volver a revisar las variantes de prendas, sin deformar el cuerpo para acomodar una prenda. Mantener la separación cuerpo/prendas y exigir CI sobre el SHA final.
