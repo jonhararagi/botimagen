@@ -261,14 +261,48 @@ export function ModularAssetLibrary() {
     void refreshProfiles().catch(e => setStatus(e instanceof Error ? e.message : "No se pudieron cargar los perfiles."));
   }, []);
 
-  const clearConversions = () => setPreviews(current => current.map(item => ({...item,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined})));
+  const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+  const MAX_PENDING_IMAGES = 8;
+  const MAX_PENDING_BYTES = 48 * 1024 * 1024;
+
+  const clearConversions = () => setPreviews(current => current.map(item => {
+    if (item.convertedUrl) {
+      URL.revokeObjectURL(item.convertedUrl);
+      objectUrls.current.delete(item.convertedUrl);
+    }
+    return {...item,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined};
+  }));
+  const removePreview = (index:number) => {
+    const item=previews[index];
+    if(item){
+      URL.revokeObjectURL(item.url);
+      objectUrls.current.delete(item.url);
+      if(item.convertedUrl){
+        URL.revokeObjectURL(item.convertedUrl);
+        objectUrls.current.delete(item.convertedUrl);
+      }
+    }
+    setPreviews(current=>current.filter((_,i)=>i!==index));
+  };
   const selectFiles = (files: FileList | null) => {
     if (!files) return;
-    const accepted = Array.from(files);
-    const next = accepted.filter(file => ["image/png","image/jpeg","image/webp"].includes(file.type) && file.size > 0 && file.size <= 12 * 1024 * 1024);
-    if (next.length !== accepted.length) setStatus("Se omitieron archivos vacíos, mayores de 12 MiB o con formato no admitido.");
+    const submitted = Array.from(files);
+    const valid = submitted.filter(file => ["image/png","image/jpeg","image/webp"].includes(file.type) && file.size > 0 && file.size <= MAX_IMAGE_BYTES);
+    const queuedBytes = previews.reduce((sum,item)=>sum+item.file.size,0);
+    let availableBytes=Math.max(0,MAX_PENDING_BYTES-queuedBytes);
+    let availableSlots=Math.max(0,MAX_PENDING_IMAGES-previews.length);
+    const next:File[]=[];
+    for(const file of valid){
+      if(availableSlots<=0||file.size>availableBytes)continue;
+      next.push(file);
+      availableSlots-=1;
+      availableBytes-=file.size;
+    }
+    const rejected=submitted.length-next.length;
+    if(rejected>0)setStatus(`Se omitieron ${rejected} archivo(s): formato/tamaño no válido o cola llena. Límite: 8 imágenes y 48 MiB pendientes; 12 MiB por imagen.`);
     setPreviews(current => [...current, ...next.map(file => ({file, url:makeUrl(file), category}))]);
-    if (next.length) setStatus(`${next.length} imagen(es) lista(s). Ajusta las opciones y prepara el PNG normalizado.`);
+    if (next.length) setStatus(`${next.length} imagen(es) lista(s). Cola limitada a 8 imágenes y 48 MiB para contener el uso de memoria.`);
+    else if(!rejected)setStatus("No se seleccionaron imágenes.");
   };
 
   const splitAllTransparentPngs = async () => {
@@ -602,7 +636,7 @@ export function ModularAssetLibrary() {
         <span>{item.file.name}</span><small>Original · {Math.round(item.file.size/1024)} KiB</small>
         {item.convertedUrl&&<>{kind==="modular_piece"&&item.conversion?<div className="modular-converted-preview"><AnchorStageEditor imageUrl={item.convertedUrl} anchors={item.conversion.anchors} label={`Ajustar esqueleto de ${item.file.name}`} onChange={anchors=>setPreviews(current=>current.map((entry,j)=>j===i&&entry.conversion?{...entry,conversion:{...entry.conversion,anchors}}:entry))}/></div>:<img className="modular-converted-preview" src={item.convertedUrl} alt={`PNG normalizado de ${item.file.name} 512 por 768`}/>}<small>{kind==="modular_piece"?"Arrastra los puntos del esqueleto al lugar real de cada articulación; se guardarán con la pieza.":"Material convertido · 512×768"}</small></>}
         {kind==="modular_piece"&&<button type="button" className="btn muted" disabled={busy} onClick={()=>setPreviews(current=>{const source=current[i];if(!source)return current;return [...current.slice(0,i+1),{file:source.file,url:makeUrl(source.file),category:"hair_front"},...current.slice(i+1)];})}>Extraer otra parte de este PNG</button>}
-        <button type="button" disabled={busy} onClick={()=>setPreviews(current=>current.filter((_,j)=>j!==i))}>Quitar</button>
+        <button type="button" disabled={busy} onClick={()=>removePreview(i)}>Quitar</button>
       </div>)}
     </div>}
     <div className="modular-library-actions">
