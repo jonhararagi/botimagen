@@ -265,13 +265,15 @@ export function ModularAssetLibrary() {
   const MAX_PENDING_IMAGES = 8;
   const MAX_PENDING_BYTES = 48 * 1024 * 1024;
 
-  const clearConversions = () => setPreviews(current => current.map(item => {
-    if (item.convertedUrl) {
-      URL.revokeObjectURL(item.convertedUrl);
-      objectUrls.current.delete(item.convertedUrl);
+  const clearConversions = () => {
+    for(const item of previews){
+      if(item.convertedUrl){
+        URL.revokeObjectURL(item.convertedUrl);
+        objectUrls.current.delete(item.convertedUrl);
+      }
     }
-    return {...item,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined};
-  }));
+    setPreviews(current => current.map(item => ({...item,convertedUrl:undefined,convertedBlob:undefined,conversion:undefined})));
+  };
   const removePreview = (index:number) => {
     const item=previews[index];
     if(item){
@@ -299,10 +301,10 @@ export function ModularAssetLibrary() {
       availableBytes-=file.size;
     }
     const rejected=submitted.length-next.length;
-    if(rejected>0)setStatus(`Se omitieron ${rejected} archivo(s): formato/tamaño no válido o cola llena. Límite: 8 imágenes y 48 MiB pendientes; 12 MiB por imagen.`);
     setPreviews(current => [...current, ...next.map(file => ({file, url:makeUrl(file), category}))]);
-    if (next.length) setStatus(`${next.length} imagen(es) lista(s). Cola limitada a 8 imágenes y 48 MiB para contener el uso de memoria.`);
-    else if(!rejected)setStatus("No se seleccionaron imágenes.");
+    if(rejected>0)setStatus(`Se omitieron ${rejected} archivo(s). ${next.length} aceptado(s). Límite: 8 imágenes y 48 MiB pendientes; 12 MiB por imagen.`);
+    else if(next.length)setStatus(`${next.length} imagen(es) lista(s). Cola limitada a 8 imágenes y 48 MiB para contener el uso de memoria.`);
+    else setStatus("No se seleccionaron imágenes.");
   };
 
   const splitAllTransparentPngs = async () => {
