@@ -1257,18 +1257,30 @@ try {
   await writeFile(resolve(visualQaDir, "neutral-body-manifest.json"), JSON.stringify(neutralManifest, null, 2));
   await page.evaluate(styleId => document.getElementById(styleId)?.remove(), neutralStyleId);
   await page.getByRole("button", { name: "Frontal", exact: true }).click();
+  const renderedRangeAttributes = {
+    "Largo del torso": "data-torso-length",
+    "Largo de mangas": "data-sleeve-length",
+    "Ajuste de cintura": "data-waist-fit",
+  };
   const setVisualRange = async (label, value) => {
     const slider = page.locator('input[type="range"][aria-label="' + label + '"]');
+    const renderedAttribute = renderedRangeAttributes[label];
+    assert.ok(renderedAttribute, "The rendered SVG must expose a QA attribute for " + label);
     await slider.evaluate((element, nextValue) => {
       const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
       setter.call(element, String(nextValue));
       element.dispatchEvent(new Event("input", { bubbles: true }));
       element.dispatchEvent(new Event("change", { bubbles: true }));
     }, value);
-    await page.waitForFunction(({ label, value }) => {
+    // Wait for the controlled React state to reach the rendered SVG, not just for
+    // the DOM input value that the test assigned itself. This prevents stale
+    // bounding-box reads from accidentally passing or failing the garment matrix.
+    await page.waitForFunction(({ label, value, renderedAttribute }) => {
       const input = document.querySelector('input[type="range"][aria-label="' + label + '"]');
-      return input && Number(input.value) === value;
-    }, { label, value });
+      const svg = document.querySelector(".visual-character-svg");
+      return input && Number(input.value) === value
+        && svg && Number(svg.getAttribute(renderedAttribute)) === value;
+    }, { label, value, renderedAttribute });
   };
 
   await page.getByRole("tab", { name: /Vestuario/i }).click();
