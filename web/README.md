@@ -36,6 +36,14 @@ La CI instala Playwright y Chromium en un directorio temporal y ejecuta `web/bro
 
 Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botimagen/actions/runs/38004033939. CI #167 también pasó tras ajustar el contrato para no publicar el campo interno `prompt_en`: https://github.com/jonhararagi/botimagen/actions/runs/38003917950. Playwright no se añade a las dependencias de ejecución de la aplicación ni modifica `web/package-lock.json`. Esta prueba corre en Linux; la validación manual en Chrome/Edge y Windows sigue pendiente.
 
+## Presupuesto de memoria para PC
+
+La biblioteca de imágenes limita cada archivo de entrada a 12 MiB y la cola de importación a 8 imágenes / 48 MiB pendientes. Al quitar una vista previa o invalidar una conversión, se revocan sus object URLs para no retener recursos innecesariamente. Esto reduce picos previsibles, pero el tamaño comprimido no equivale al tamaño de la imagen decodificada.
+
+La CI ejecuta además `web/memory_budget_smoke.mjs`, que mide el heap JavaScript de Chromium tras cargar el motor y la vista SVG inicial y falla si supera 300 MiB. Es un detector de regresiones, no una medición de toda la RAM del proceso ni de Windows.
+
+El objetivo del producto es hasta 2 GiB de uso total normal y 3 GiB como techo absoluto en el PC objetivo. **La aceptación de ese límite total sigue pendiente de una medición real en Windows** con importación, separación de sprites, cambio de perfil y exportación. Revisa `cerebro/PRESUPUESTO_RAM_PC.md`.
+
 ## Funciones conectadas
 
 - 47 categorías de identidad, cuerpo, anatomía, cara, cabello, vestuario, combate y detalle servidas desde `character_rules.json`; la UI mantiene solo la estructura de los campos y no duplica sus listas de opciones.
