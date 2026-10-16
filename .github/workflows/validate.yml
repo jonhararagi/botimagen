@@ -85,6 +85,11 @@ jobs:
           BOTIMAGEN_PLAYWRIGHT_MODULE: /tmp/botimagen-playwright/node_modules/playwright/index.mjs
         run: node web/browser_smoke.mjs
 
+      - name: Enforce startup JavaScript heap regression budget
+        env:
+          BOTIMAGEN_PLAYWRIGHT_MODULE: /tmp/botimagen-playwright/node_modules/playwright/index.mjs
+        run: node web/memory_budget_smoke.mjs
+
       - name: Upload visual garment QA captures
         if: always()
         uses: actions/upload-artifact@v4
