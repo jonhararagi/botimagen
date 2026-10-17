@@ -85,6 +85,81 @@ def get_cyberstreet_manifest() -> dict[str, Any]:
     }
 
 
+def get_cyberstreet_layer_png_source(layer_id: str) -> dict[str, Any]:
+    """Return one repository-owned SVG layer for explicit local rasterization into a transparent PNG."""
+    manifest = _load_manifest()
+    if not isinstance(layer_id, str) or not re.fullmatch(r"[a-z0-9-]{1,80}", layer_id):
+        raise CyberStreetError("ID de capa CyberStreet inválido.")
+    layer = next((item for item in manifest["layers"] if item["id"] == layer_id), None)
+    if layer is None:
+        raise CyberStreetError(f"No existe una capa CyberStreet llamada {layer_id!r}.")
+
+    categories = {
+        "base-body": ("body", "body", 20),
+        "face-anime-cyan": ("face", "face", 50),
+        "skirt-tech-pleated": ("clothing_bottom", "bottom", 36),
+        "sneakers-neon": ("footwear", "footwear", 28),
+        "top-neon-jacket": ("clothing_top", "top", 40),
+        "hair-midnight-cyan": ("hair_front", "hair_front", 70),
+    }
+    if layer_id not in categories:
+        raise CyberStreetError(f"La capa {layer_id!r} no tiene categoría modular aprobada para PNG.")
+    category, rig_category, layer_order = categories[layer_id]
+    target = (PACK_ROOT / layer["path"]).resolve()
+    if target.parent != PACK_ROOT.resolve() or not target.is_file():
+        raise CyberStreetError(f"No se puede leer la capa CyberStreet {layer_id!r}.")
+    try:
+        svg_text = target.read_text(encoding="utf-8")
+        svg_root = ET.fromstring(svg_text)
+    except (OSError, ET.ParseError) as exc:
+        raise CyberStreetError(f"SVG inválido en la capa {layer_id!r}.") from exc
+    if svg_root.tag not in {f"{{{SVG_NS}}}svg", "svg"}:
+        raise CyberStreetError(f"La capa {layer_id!r} no tiene raíz SVG.")
+    if svg_root.attrib.get("viewBox") not in {"0 0 512 768", "0,0,512,768"}:
+        raise CyberStreetError(f"La capa {layer_id!r} no comparte el lienzo 512×768.")
+
+    # These anchors describe the common authored canvas. They are estimates until the
+    # user inspects the PNG stage and explicitly confirms the points in the UI.
+    anchors = {
+        "origin": {"x": 0.5, "y": 0.5},
+        "head": {"x": 0.5, "y": 145 / 768},
+        "neck": {"x": 0.5, "y": 184 / 768},
+        "shoulder_l": {"x": 184 / 512, "y": 205 / 768},
+        "shoulder_r": {"x": 328 / 512, "y": 205 / 768},
+        "waist": {"x": 0.5, "y": 347 / 768},
+        "hip": {"x": 0.5, "y": 421 / 768},
+        "ankle_l": {"x": 208 / 512, "y": 678 / 768},
+        "ankle_r": {"x": 312 / 512, "y": 678 / 768},
+    }
+    labels = {
+        "base-body": "Cuerpo base",
+        "face-anime-cyan": "Rostro anime",
+        "skirt-tech-pleated": "Falda tecnológica",
+        "sneakers-neon": "Zapatillas neón",
+        "top-neon-jacket": "Chaqueta neón",
+        "hair-midnight-cyan": "Cabello cyan",
+    }
+    relative_path = f"assets/modular/oc-cyberstreet/{layer['path']}"
+    return {
+        "schema_version": 1,
+        "pack_id": manifest["pack_id"],
+        "id": layer_id,
+        "label": labels[layer_id],
+        "category": category,
+        "rig_category": rig_category,
+        "layer_order": layer_order,
+        "width": 512,
+        "height": 768,
+        "view": "front",
+        "license": manifest["license"],
+        "source_url": manifest["source_url"],
+        "source_filename": relative_path,
+        "author": manifest["author"],
+        "anchors": anchors,
+        "svg": svg_text,
+    }
+
+
 def compose_cyberstreet_svg(enabled: dict[str, bool] | None = None) -> str:
     manifest = _load_manifest()
     requested = enabled or {}
