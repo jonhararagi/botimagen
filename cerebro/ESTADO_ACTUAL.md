@@ -1,3 +1,48 @@
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-17 · PACK ORIGINAL CYBERSTREET COMO PNG MODULARES
+
+**Estado global: PARTIAL.** El flujo nuevo ya convierte seis capas SVG originales del paquete CyberStreet en PNG independientes, las registra en la biblioteca modular con SHA-256/procedencia, permite confirmar sus puntos de encaje y compone/descarga un PNG transparente. No declara terminado el catálogo universal ni la beta final.
+
+**TIMER:** 2–4 horas estimadas para el incremento y su QA; tiempo real no medido.
+
+## Rama, PR y SHA
+
+- Repositorio: `jonhararagi/botimagen`.
+- Rama autorizada: `feature/bimg-anime-png-universal-library`.
+- PR #15: abierto y sin fusionar: https://github.com/jonhararagi/botimagen/pull/15.
+- SHA de código validado: `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`.
+- HEAD de `main` consultado antes de documentar: `f86f9345943389dd4ef42d91bc0ec23b38b371d5`; no fue modificado en este incremento.
+- HEAD documental posterior a las próximas ediciones de esta ficha y de `cerebro/PROGRESO.md` será distinto del SHA de código probado; registrar por separado la referencia final al terminar.
+
+## Incremento entregado
+
+- `cyberstreet_svg_compositor.py`: función de lista blanca `get_cyberstreet_layer_png_source`, que expone las seis capas originales con categoría permitida, orden de capa, lienzo común y metadatos de procedencia.
+- `botimagen_server.py`: ruta local GET `/api/modular-cyberstreet/layers/{id}`; rechaza IDs no permitidos y no ofrece escritura por esta ruta.
+- `web/src/visual/ModularAssetLibrary.tsx`: botón «Instalar pack original CyberStreet (6 PNG)». Rasteriza cada SVG en Canvas a PNG individual de 512×768, preserva alpha, calcula SHA-256 y registra fuente, licencia declarada, categoría, vista y metadatos. Evita crear una segunda copia cuando el catálogo local ya reconoce el contenido.
+- Los seis IDs son `base-body`, `face-anime-cyan`, `skirt-tech-pleated`, `sneakers-neon`, `top-neon-jacket` y `hair-midnight-cyan`.
+- Las piezas se agregan a la biblioteca local del usuario; los PNG resultantes no se insertan automáticamente como archivos binarios en Git. Los SVG originales siguen siendo las fuentes versionadas.
+- Los puntos del esqueleto se registran inicialmente como **estimados, no validados**. El importador no certifica alineación de forma automática; cada pieza requiere la acción explícita «Confirmar puntos del esqueleto» antes de ser seleccionable.
+- No se usaron recursos externos, no se consumieron créditos y no se agregó ninguna dependencia de IA de pago.
+
+## Evidencia de CI sobre el SHA exacto de código
+
+- **PASS · Validate BotImagen**, ejecución #39004226106 sobre `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`: validaciones Python, contrato de biblioteca/compositor, build web, smoke test completo de Chromium y artefacto de QA. https://github.com/jonhararagi/botimagen/actions/runs/39004226106
+- **PASS · BotImagen Windows Local Web**, ejecución #39004226133 sobre el mismo SHA: validación del lanzador, dependencias bloqueadas, pruebas de biblioteca/API, build, endpoints localhost y ZIP de fuente de la beta. https://github.com/jonhararagi/botimagen/actions/runs/39004226133
+- Artefacto de QA visual del run #39004226106, ID `12090207949`, digest del artefacto GitHub `sha256:c0845762cc0e2084f66c800339e6fd354887152f116e445fc13c5f669987ec09`: https://github.com/jonhararagi/botimagen/actions/runs/39004226106/artifacts/12090207949
+- ZIP de beta Windows del run #39004226133, ID `12090366950`, 68,258,468 bytes, digest del artefacto GitHub `sha256:164233097b8e439c454b9f193b6aeb392d9e88eb80cf6f2a12879c994c9f47e5`, expiración 2026-10-31: https://github.com/jonhararagi/botimagen/actions/runs/39004226133/artifacts/12090366950. Este digest identifica el contenedor descargable de GitHub, no debe confundirse con el SHA-256 interno del ZIP fuente.
+- El smoke test comprobó seis PNG, MIME/dimensiones 512×768, esquinas transparentes, píxeles visibles, SHA-256 recalculado desde bytes, procedencia retenida, estado inicial de anclajes no validados, confirmación explícita de puntos, composición local con las seis piezas, salida transparente de 512×768 y descarga con nombre `botimagen-composicion-modular.png`.
+- La validación completa encontró dos defectos temporales en los tests intermedios: una captura intentó usarse antes de inicializar el directorio de QA (corregido en `ca20ab5008f4aa974328955965edb5e7f24f410c`) y la nueva prueba dejó seleccionadas seis piezas para un escenario posterior (corregido en `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`). La ejecución final citada arriba pasó después de ambas correcciones.
+- La CI de Windows prueba un runner limpio de GitHub; **QA físico del PC del usuario: NOT_RUN**.
+
+## Límites y pendientes que se conservan
+
+- Se ha verificado un pack de arranque de seis piezas; todavía no es un catálogo universal amplio de peinados, caras, cuerpos y vestuarios alternativos.
+- Los tests de navegador ejercen el flujo técnico completo y el botón de confirmación, pero no son una aprobación artística independiente de la anatomía o del encaje visual. Realizar revisión humana de cada pieza en la biblioteca.
+- Ampliar los recursos solo con arte original/licenciado verificable y comprobar compatibilidad entre piezas; no duplicar variaciones ni reclasificar automáticamente las 43 regiones PSD de referencia.
+- Confirmar roundtrip de perfiles y exportaciones integrales en la beta empaquetada, y validar instalación/uso en el Windows del usuario.
+- No fusionar el PR mientras permanezcan esos criterios de entrega. La autorización de fusión está registrada, pero la ruta integral sigue abierta.
+
+---
+
 # ESTADO CONSOLIDADO · 2026-10-17 · BETA WEB LOCAL WINDOWS Y ZIP
 
 **Estado global:** PARTIAL. La beta web local tiene un lanzador, un paquete ZIP descargable y verificaciones de CI; no se declara terminado el catálogo universal de arte modular ni el QA en el PC del usuario.
