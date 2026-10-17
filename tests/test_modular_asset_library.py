@@ -229,7 +229,7 @@ class ModularAssetLibraryTests(unittest.TestCase):
                 confirm_user_asset_rights(asset["id"], "CC0 1.0", "", root)
             with self.assertRaisesRegex(AssetImportError, "HTTPS"):
                 confirm_user_asset_rights(asset["id"], "CC0 1.0", "http://example.org/art.png", root)
-            with self.assertRaisesRegex(AssetImportError, "licencia no habilitada"):
+            with self.assertRaisesRegex(AssetImportError, "no habilitada para composición"):
                 confirm_user_asset_rights(asset["id"], "licencia inventada", "https://example.org/art.png", root)
             confirmed = confirm_user_asset_rights(asset["id"], "CC0 1.0", "https://example.org/art.png", root)
             self.assertTrue(confirmed["rights_confirmed"])
