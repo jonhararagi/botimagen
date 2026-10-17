@@ -1,3 +1,21 @@
+## Incremento verificado · 2026-10-17 · Pack original CyberStreet a PNG modulares
+
+- **TIMER:** 2–4 horas estimadas para el incremento vertical, correcciones del smoke test y QA; tiempo real no medido.
+- **Rama:** `feature/bimg-anime-png-universal-library`, PR #15 abierto/no fusionado. Código probado en el SHA exacto `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`.
+- Añadidos un endpoint de lectura con lista blanca para devolver fuentes SVG del pack original y un botón de biblioteca que rasteriza cada capa en un PNG transparente independiente de 512×768.
+- Se importan seis capas originales: cuerpo base, rostro, falda, zapatillas, chaqueta y cabello frontal. El PNG final queda registrado en la biblioteca local con SHA-256, categoría, licencia declarada, ruta fuente, URL del repositorio y vista.
+- La prueba no marca automáticamente los anclajes como válidos: cada pieza debe pasar por la acción de confirmación. El smoke test hace click por pieza para comprobar el contrato técnico, pero eso no equivale a una aprobación artística humana.
+- **PASS · Validate BotImagen #39004226106** para el código SHA exacto: build TypeScript/Vite, Python, API local y smoke test de Chromium completo. El test validó dimensiones/MIME/alpha/hash/procedencia de las seis piezas, confirmación de puntos, composición real de seis capas, salida PNG de 512×768 y descarga. https://github.com/jonhararagi/botimagen/actions/runs/39004226106
+- **PASS · BotImagen Windows Local Web #39004226133** sobre el mismo SHA: pruebas del lanzador y API/biblioteca en runner Windows, build, salud de API/Vite y ZIP de beta. https://github.com/jonhararagi/botimagen/actions/runs/39004226133
+- Artefacto visual de QA (GitHub artifact ID `12090207949`, digest `sha256:c0845762cc0e2084f66c800339e6fd354887152f116e445fc13c5f669987ec09`): https://github.com/jonhararagi/botimagen/actions/runs/39004226106/artifacts/12090207949
+- Paquete de beta Windows (GitHub artifact ID `12090366950`, tamaño 68,258,468 bytes, digest del contenedor `sha256:164233097b8e439c454b9f193b6aeb392d9e88eb80cf6f2a12879c994c9f47e5`, expira 2026-10-31): https://github.com/jonhararagi/botimagen/actions/runs/39004226133/artifacts/12090366950. Es un paquete de código fuente con lanzador, no un instalador autónomo.
+- Corrigidos dos defectos revelados por CI antes de obtener PASS: orden de inicialización del directorio de captura de QA y contaminación de selección entre escenarios. Commit de la corrección final de test: `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`.
+- **Estado de la fase: PARTIAL**, sin elevar el porcentaje global por contar opciones o capas. El pack de seis piezas demuestra el flujo completo, pero no completa el catálogo universal.
+- Pendiente: ampliar variaciones originales/libres, revisión humana de las anclas y la compatibilidad visual, probar la beta físicamente en Windows (`NOT_RUN`) y verificar todas las funciones acordadas antes de fusionar.
+- `main` no fue modificado; no se creó ninguna rama nueva y no se gastaron créditos ni se activó una API paga de generación.
+
+---
+
 ## Estado vigente · 2026-10-17 · Beta local Windows y paquete ZIP
 
 - **TIMER:** 2–4 horas estimadas para lanzador, Windows CI, empaquetado ZIP y docs; tiempo real no medido.
