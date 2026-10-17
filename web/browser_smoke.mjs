@@ -419,7 +419,7 @@ try {
     const response = await fetch("/api/modular-assets");
     if(!response.ok)throw new Error("The modular asset library could not be read after installing CyberStreet");
     const payload=await response.json();
-    const assets=payload.assets.filter(asset=>typeof asset.label==="string"&&asset.label.startsWith("CyberStreet · "));
+    const assets=payload.assets.filter(asset=>typeof asset.label==="string"&&asset.label.startsWith("CyberStreet · ")&&typeof asset.source_filename==="string"&&asset.source_filename.startsWith("assets/modular/oc-cyberstreet/"));
     const results=[];
     for(const asset of assets){
       const imageResponse=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/image");
