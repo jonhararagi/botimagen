@@ -706,7 +706,7 @@ class LocalApiTests(unittest.TestCase):
                 self.assertEqual(composed["mime_type"], "image/png")
                 self.assertEqual((composed["width"], composed["height"]), (512, 768))
                 png_bytes = base64.b64decode(composed["png_base64"], validate=True)
-                self.assertTrue(png_bytes.startswith(b"\\x89PNG\\r\\n\\x1a\\n"))
+                self.assertTrue(png_bytes.startswith(b"\x89PNG\r\n\x1a\n"))
                 with Image.open(io.BytesIO(png_bytes)) as rendered:
                     rgba = rendered.convert("RGBA")
                     self.assertEqual(rgba.size, (512, 768))
