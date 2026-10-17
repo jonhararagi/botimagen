@@ -312,12 +312,24 @@ export function ModularAssetLibrary() {
       });
       const data=await response.json();
       if(!response.ok) throw new Error(data.error||"No se pudo componer la selección.");
+      if(data.mime_type!=="image/png"||typeof data.png_base64!=="string"||!data.png_base64.startsWith("iVBOR")||data.width!==512||data.height!==768) {
+        throw new Error("El compositor no devolvió un PNG válido de 512×768.");
+      }
       setCompositionPreview(`data:image/png;base64,${data.png_base64}`);
       setComposeStatus(`Composición real lista · ${data.width}×${data.height} · ${pieces.length} capa(s).`);
     } catch(error) {
       setCompositionPreview("");
       setComposeStatus(error instanceof Error?error.message:"Falló la composición.");
     } finally { setBusy(false); }
+  };
+
+  const downloadComposition = () => {
+    if(!compositionPreview) return;
+    const link=document.createElement("a");
+    link.href=compositionPreview;
+    link.download="botimagen-composicion-modular.png";
+    link.click();
+    setComposeStatus("Descarga PNG iniciada · 512×768 · la transparencia del lienzo se conserva.");
   };
 
   const supportsCompositionView=(asset:UserAsset,view=compositionView)=>asset.view==="unknown"||asset.view===view;
@@ -424,6 +436,7 @@ export function ModularAssetLibrary() {
     <div className="modular-composition-panel">
       <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Importa y confirma un juego frontal y otro trasero, y cambia la vista aquí para alternarlos.</p><label className="modular-composition-view">Vista de composición<select aria-label="Vista para componer" value={compositionView} onChange={e=>changeCompositionView(e.target.value as "front"|"back")}><option value="front">Frontal</option><option value="back">Trasera</option></select></label></div>
       <button className="btn primary" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void composeSelection()}>{busy?"Componiendo…":`Componer selección (${selectedAssets.length})`}</button>
+      <button className="btn muted" type="button" disabled={!compositionPreview||busy} onClick={downloadComposition}>Descargar composición PNG</button>
       <span role="status" data-testid="modular-compose-status">{composeStatus}</span>
       {compositionPreview&&<img className="modular-composition-preview" src={compositionPreview} alt="Composición PNG de piezas modulares importadas"/>}
     </div>
