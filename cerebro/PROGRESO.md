@@ -1,21 +1,17 @@
-## Actualización · 2026-10-17 · Composición modular y beta local Windows
+## Estado vigente · 2026-10-17 · Beta local Windows y paquete ZIP
 
-- PASS: CI #39000665680 para c15abf474b2aefd7c86db9d02b459295263920ea. Chromium confirma composición local, PNG 512 × 768, alpha transparente en esquinas, píxeles visibles y descarga con firma/dimensiones. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
-- PASS: CI #39001219287 para 6ac70f666ad2002ec3511e8b48c57f9db8c8b078. Compuerta de derechos/procedencia, pruebas Python, build y Chromium terminaron con 28/28 pasos. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
-- El compositor rechaza recursos sin declaración confirmada. "Obra propia declarada" y "licencia abierta y fuente declaradas" son declaraciones del usuario, no una auditoría legal automática.
-- Siguiente incremento: lanzador web Windows, modo -CheckOnly, sincronización npm basada en lockfile y workflow windows-latest para probar API/Vite local. TIMER estimado 2–4 horas; tiempo real no medido.
-- CI Windows del SHA b640e9a9a0bedc6df3b6a215651a620806bbe721 en curso al escribir; todavía PARTIAL. La prueba física en el PC del usuario está NOT_RUN.
-- Sin inflar el porcentaje por cantidad de archivos: faltan más ilustraciones modulares originales/libres, validación visual de semántica/compatibilidad, QA físico y un instalador autónomo.
+- **TIMER:** 2–4 horas estimadas para lanzador, Windows CI, empaquetado ZIP y docs; tiempo real no medido.
+- **PASS · Composición PNG:** CI #39000665680, código SHA c15abf474b2aefd7c86db9d02b459295263920ea; 512×768, transparencia de esquinas, píxeles visibles y descarga validada. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
+- **PASS · Derechos/procedencia:** CI #39001219287, SHA 6ac70f666ad2002ec3511e8b48c57f9db8c8b078; 28/28 pasos. La API bloquea piezas sin declaración. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
+- **PASS · Lanzador Windows:** CI #39002036571, SHA 785387bb143ea48f59625e58eaec2003b00f4a71; 12/12 pasos. Preflight, npm ci, Pillow, tests Python, build y API/Vite local. https://github.com/jonhararagi/botimagen/actions/runs/39002036571
+- **PASS · Linux build/Chromium:** CI #39002040269, SHA 785387bb143ea48f59625e58eaec2003b00f4a71; 28/28 pasos. https://github.com/jonhararagi/botimagen/actions/runs/39002040269
+- **PASS · ZIP beta Windows:** CI #39002182415, rama SHA a1071c57f48f26c02612da00d05e4e5d9165a518; generó y publicó el artefacto con código, checksum y BUILD-INFO. https://github.com/jonhararagi/botimagen/actions/runs/39002182415
+- SHA-256 del ZIP interno verificado: 1782c534af688cf2f80540ec4c9b7044f0e14a63bb3c7a806468b7902759058a. El ZIP necesita Python/Node/npm; no es un .exe autónomo.
+- El artefacto temporal de GitHub expira el 2026-10-31; el ZIP verificado se entregó como archivo separado al usuario.
+- Estado integral: **PARTIAL**, porque no se ha realizado QA físico en el PC del usuario y aún no hay suficientes piezas PNG modulares semánticamente confirmadas.
+- Pendientes: probar en el PC real, crecer el catálogo con art original/licenciado, comprobar visualmente anclas/orden/compatibilidad, mantener los 43 recortes PSD como referencias hasta su validación y cerrar criterios de entrega antes de autorizar la fusión.
+- La declaración de derechos/procedencia registrada en la app no sustituye una verificación legal.
 
-## Incremento posterior · 2026-10-17 · Roundtrip de personaje y exportación JSON
-
-- TIMER estimado: 1–2 horas; tiempo real no medido.
-- En la rama existente `feature/bimg-anime-png-universal-library`, el commit `e1ae04067fe33a20e87e8caf318b906598b00d1f` amplía el smoke test Chromium del creador simple.
-- La prueba nueva verifica la persistencia de los rasgos elegidos, carga de una ficha guardada tras crear una ficha nueva y descarga del archivo JSON exportado. Antes solo se comprobaba que el botón de guardado mostrara el aviso.
-- La CI #819 terminó SUCCESS en el SHA anterior `1c2c5586a70e941f7dc3a1e22b54df4388881b30`, incluyendo build y smoke test Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38986491276. Esta evidencia no cubre el commit de prueba nuevo.
-- Estado al escribir esta entrada: PARTIAL, esperando la CI del SHA `e1ae040...`. No marcar el incremento PASS hasta que la ejecución exacta finalice correctamente.
-- Esto aumenta la verificación de persistencia/exportación, no la cantidad de arte visual ni la madurez del compositor modular.
-- Pendiente integral: comprobar CI exacta, corregir fallos reales, validar piezas PNG con categorías/anclas/capas compatibles, completar assets originales o licenciados, QA físico Windows y empaquetado beta.
 
 # Progreso global de BotImagen
 

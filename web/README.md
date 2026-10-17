@@ -1,6 +1,6 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ofrece 47 categorías en 8 pestañas y ahora incluye el primer motor vectorial CyberStreet, un Style Lab con receta versionada, tres estados NanoWear y un Chromapatch personalizable. La CI ejecuta un smoke test headless de Chromium en Linux; la validación manual de navegador en Windows sigue pendiente.
+La interfaz React + TypeScript consume el motor Python local e incluye el creador de personajes, perfiles, biblioteca modular, importación/normalización PNG, anclajes, composición y exportación. La CI de Linux prueba build/Chromium; la CI Windows comprueba el lanzador y prepara un ZIP fuente con SHA-256. La prueba física en la PC del usuario sigue pendiente.
 
 
 ## Requisitos

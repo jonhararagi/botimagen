@@ -1,25 +1,40 @@
-# ESTADO CONSOLIDADO · 2026-10-17 · LANZADOR WEB LOCAL WINDOWS
+# ESTADO CONSOLIDADO · 2026-10-17 · BETA WEB LOCAL WINDOWS Y ZIP
 
-TIMER: 2–4 horas estimadas para lanzador, comprobación Windows y documentación; tiempo real no medido.
+**Estado global:** PARTIAL. La beta web local tiene un lanzador, un paquete ZIP descargable y verificaciones de CI; no se declara terminado el catálogo universal de arte modular ni el QA en el PC del usuario.
 
-## Evidencia confirmada antes del lanzador
-- Rama feature/bimg-anime-png-universal-library; PR #15 abierto y sin fusionar. main no se modificó.
-- PASS · Composición PNG/exportación: SHA c15abf474b2aefd7c86db9d02b459295263920ea, CI #39000665680. Chromium verificó PNG 512 × 768, esquinas transparentes, píxeles visibles, descarga y firma real. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
-- PASS · Derechos/procedencia: SHA 6ac70f666ad2002ec3511e8b48c57f9db8c8b078, CI #39001219287, 28/28 pasos correctos. El servidor bloquea composición si la declaración sigue pendiente; la prueba incluye confirmación de la declaración. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
-- La declaración de obra propia/licencia/fuente la hace el usuario. BotImagen no certifica legalmente la autoría ni valida automáticamente las páginas enlazadas.
+**TIMER:** 2–4 horas estimadas para lanzador, comprobación de Windows, ZIP y documentación; tiempo real no medido.
 
-## Incremento actual: lanzador y CI Windows
-- Commits de implementación: BAT 0f13c5bc8508593aa861cedca2ff2038b67afd2c, PowerShell b92d9d6a8c2f24e072943056273c8c84c0423905, workflow Windows b640e9a9a0bedc6df3b6a215651a620806bbe721.
-- Iniciar_BotImagen_Web.bat y tools/launch_web.ps1 comprueban Python 3.10+, Node 22+, Pillow y dependencias npm según el hash del lockfile, inician API/Vite solo si hacen falta y ofrecen -CheckOnly.
-- Workflow windows-latest prueba el preflight, tests Python, build y disponibilidad de API/Vite en 127.0.0.1.
-- El resultado de CI para SHA b640e9a9a0bedc6df3b6a215651a620806bbe721 está en curso al momento de esta nota. No marcar PASS hasta ver la conclusión.
-- QA físico en el PC del usuario: NOT_RUN; CI Windows remoto no equivale a prueba física.
+## Estado de rama y PR
+- Rama: feature/bimg-anime-png-universal-library.
+- PR #15: abierto y sin fusionar, base main. main no fue modificado.
+- HEAD de código/paquete: a1071c57f48f26c02612da00d05e4e5d9165a518.
+- Commit de checkout usado por el workflow de PR para producir el ZIP: 8f30486cf9c2cca6efb624e7b8280db9d4b1e787. Es distinto del SHA de la cabeza de la rama; el ZIP contiene el árbol validado del PR.
+- El siguiente paso es aumentar la biblioteca de piezas PNG originales/libres semánticamente intercambiables y después completar QA físico; no fusionar hasta superar los criterios restantes.
+
+## Evidencia verificada
+- **PASS · Composición y descarga PNG:** SHA c15abf474b2aefd7c86db9d02b459295263920ea, CI #39000665680. Chromium comprobó composición local, PNG 512 × 768, píxeles visibles, las cuatro esquinas transparentes y descarga con firma PNG real. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
+- **PASS · Derechos/procedencia:** SHA 6ac70f666ad2002ec3511e8b48c57f9db8c8b078, CI #39001219287, 28/28 pasos. El servidor bloquea la composición cuando falta declaración de derechos/procedencia. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
+- **PASS · Lanzador Windows:** SHA 785387bb143ea48f59625e58eaec2003b00f4a71, CI #39002036571, 12/12 pasos. Comprobó -CheckOnly, sincronización npm, Pillow, tests Python, build y salud de API + Vite sobre 127.0.0.1. https://github.com/jonhararagi/botimagen/actions/runs/39002036571
+- **PASS · Linux build + Chromium con launcher/flujo actual:** SHA 785387bb143ea48f59625e58eaec2003b00f4a71, CI #39002040269, 28/28 pasos. https://github.com/jonhararagi/botimagen/actions/runs/39002040269
+- **PASS · Empaquetado ZIP:** rama SHA a1071c57f48f26c02612da00d05e4e5d9165a518; Windows CI #39002182415, 14/14 pasos. Generó y subió el artefacto BotImagen-Web-Beta-Windows. https://github.com/jonhararagi/botimagen/actions/runs/39002182415
+- SHA-256 interno del ZIP de beta: 1782c534af688cf2f80540ec4c9b7044f0e14a63bb3c7a806468b7902759058a. El contenedor del artefacto de GitHub tiene su propio digest y no debe confundirse con el ZIP interno.
+- El artefacto de GitHub expira el 2026-10-31; la copia descargada y verificada del ZIP se entregó fuera del artefacto temporal.
+
+## Qué entrega el ZIP y qué no
+- Incluye el código fuente rastreado en Git y el lanzador Iniciar_BotImagen_Web.bat, no un .exe autónomo.
+- Requiere Windows 10/11, Python 3.10+, Node.js 22+, npm y conexión a Internet la primera vez para instalar dependencias.
+- El lanzador usa -CheckOnly para preparar/verificar dependencias sin arrancar servicios; los servicios web se limitan a 127.0.0.1.
+- La declaración de “obra propia” o de licencia/fuente abierta es una declaración del usuario, no auditoría legal automática.
+- La CI Windows es un runner remoto, no una prueba física en la computadora del usuario.
 
 ## Pendientes de entrega integral
-- Ampliar los PNG originales/libres verificables por categorías y revisar visualmente cada pieza, anclaje, capa y compatibilidad.
-- Los 43 recortes PSD no se cuentan como piezas semánticas intercambiables hasta verificarlos.
-- El launcher no es un ejecutable/instalador .exe autónomo.
-- No fusionar PR #15 ni cambiar main hasta que catálogo, compositor, biblioteca, pruebas y criterios de paquete final estén verificados.
+- **QA físico Windows:** NOT_RUN. Extraer el ZIP, ejecutar Iniciar_BotImagen_Web.bat -CheckOnly, luego iniciar la beta con doble clic y comprobar el flujo básico en Chrome/Edge.
+- **Catálogo modular visual:** añadir recursos originales/licenciados en cantidades útiles por ranura; confirmar que cada PNG tiene transparencia, tamaño, SHA/procedencia, clasificación, anclas y orden de capa adecuados.
+- Los 43 recortes PSD siguen siendo referencias que requieren revisión semántica; no se cuentan como piezas intercambiables confirmadas.
+- Confirmar composición de combinaciones reales cuerpo/cabeza/rostro/cabello/ropa/calzado/accesorios, y corregir cualquier incompatibilidad visual.
+- El paquete actual es ZIP fuente reproducible, no un instalador autónomo; cualquier empaquetador standalone será otra fase.
+- Mantener el PR abierto y sin fusionar mientras los puntos anteriores sigan pendientes.
+
 
 ---
 
