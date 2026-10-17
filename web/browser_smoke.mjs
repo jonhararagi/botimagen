@@ -1722,7 +1722,52 @@ try {
   await importedComposition.waitFor({ timeout: 15000 });
   const composedDimensions = await importedComposition.evaluate(async image => { await image.decode(); return [image.naturalWidth, image.naturalHeight]; });
   assert.deepEqual(composedDimensions, [512, 768], "The imported modular pieces must compose through the existing Python engine");
-  console.log("PASS_REAL: PNG converter normalized source art to 512×768, removed the connected flat background, preserved the original source, registered estimated rig anchors, and composed a body piece through the real local API.");
+  const compositionPixels = await importedComposition.evaluate(async image => {
+    await image.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("Could not inspect the composed PNG alpha channel");
+    context.drawImage(image, 0, 0);
+    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let visiblePixels = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] > 0) visiblePixels++;
+    return {
+      topLeftAlpha: data[3],
+      topRightAlpha: data[(canvas.width - 1) * 4 + 3],
+      bottomLeftAlpha: data[((canvas.height - 1) * canvas.width) * 4 + 3],
+      bottomRightAlpha: data[(canvas.width * canvas.height - 1) * 4 + 3],
+      visiblePixels,
+    };
+  });
+  assert.deepEqual(
+    [compositionPixels.topLeftAlpha, compositionPixels.topRightAlpha, compositionPixels.bottomLeftAlpha, compositionPixels.bottomRightAlpha],
+    [0, 0, 0, 0],
+    "The composed PNG must preserve transparent corners rather than flatten onto a background",
+  );
+  assert.ok(compositionPixels.visiblePixels > 1000, "The composed PNG must contain visible pixels from the selected parts");
+  const downloadButton = assetLibrary.getByRole("button", { name: "Descargar composición PNG" });
+  assert.equal(await downloadButton.isEnabled(), true, "PNG download should only enable after composition succeeds");
+  const composedDownloadPromise = page.waitForEvent("download", { timeout: 10000 });
+  await downloadButton.click();
+  const composedDownload = await composedDownloadPromise;
+  assert.equal(composedDownload.suggestedFilename(), "botimagen-composicion-modular.png");
+  const composedDownloadPath = await composedDownload.path();
+  assert.ok(composedDownloadPath, "The browser should materialize the generated PNG download");
+  const composedDownloadBytes = await readFile(composedDownloadPath);
+  assert.deepEqual(
+    [...composedDownloadBytes.subarray(0, 8)],
+    [137, 80, 78, 71, 13, 10, 26, 10],
+    "Downloaded composition must carry a real PNG signature",
+  );
+  assert.deepEqual(
+    [composedDownloadBytes.readUInt32BE(16), composedDownloadBytes.readUInt32BE(20)],
+    [512, 768],
+    "Downloaded composition must retain the normalized 512×768 dimensions",
+  );
+  assert.ok(composedDownloadBytes.length > 100, "Downloaded composition must contain actual image data");
+  console.log("PASS_REAL: Imported modular PNGs were composed by the local API; Chromium confirmed 512×768 dimensions, transparent corners, visible pixels, and a downloadable PNG with a valid signature.");
+
 
   // Exercise the real batch character-model builder against the saved PNGs above.
   // This proves model creation, palette extraction, region masks, and exact pixel reconstruction.
