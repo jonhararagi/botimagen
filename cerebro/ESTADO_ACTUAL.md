@@ -1,3 +1,46 @@
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-17 · CATÁLOGO CYBERSTREET DE 15 COMPONENTES
+
+**Estado del incremento: PASS en CI automatizada. Estado global BotImagen: PARTIAL.** El pack original de arranque ahora contiene 15 SVG de 512×768, con alternativas de aspecto para cuerpo, rostro, cabello y prendas superiores e inferiores. La importación genera PNG transparentes separados para la biblioteca local y se valida en Chromium. Esto no equivale aún a un catálogo universal completo ni a QA físico en el PC del usuario.
+
+**TIMER:** 2–4 horas estimadas para ampliar las variantes, incorporar las pruebas/regresiones y ajustar los fallos de Chromium; tiempo real no medido.
+
+## HEAD, rama y PR
+
+- Rama de trabajo: `feature/bimg-anime-png-universal-library`.
+- SHA del código verificado: `03727c0b3d6d0970a9f8ed9e08fed05f13c05253`.
+- PR #15 sigue abierto y sin fusionar: https://github.com/jonhararagi/botimagen/pull/15.
+- HEAD de `main` comprobado al cerrar este incremento: `f86f9345943389dd4ef42d91bc0ec23b38b371d5`. No se modificó.
+- Esta nota actualiza la ficha que antes describía el pack de seis piezas. Los documentos del proyecto volverán a avanzar el HEAD cuando se guarde esta actualización; no confundir ese SHA documental con el SHA de código probado.
+
+## Cambios verificados
+
+- Añadidas nueve ilustraciones SVG originales al pack `assets/modular/oc-cyberstreet/`: cuerpo atlético alternativo, cara con ojos ámbar, expresión guiñando, coletas rosas, bob plateado, chaqueta universitaria, blusa gótica, pantalón cargo y minifalda magenta.
+- El manifiesto de 15 capas declara categoría/ranura y `enabled_by_default`. Quedan seis opciones iniciales activas, una por ranura; nueve alternativas comienzan desactivadas.
+- El compositor SVG permite cambiar una variante por ranura y rechaza dos variantes activas en la misma ranura. El perfil cargado normaliza entradas antiguas según los valores predeterminados del manifiesto.
+- El importador de la biblioteca PNG ya admite un número variable de capas (límite 1–100), rasteriza cada SVG a PNG transparente de 512×768, calcula SHA-256 sobre los bytes PNG y conserva ruta de origen, URL y licencia declarada. Las anclas siguen marcadas no validadas hasta que el usuario las confirma expresamente.
+- La API expone solo los IDs de capas incluidos en una lista blanca. La prueba del navegador filtra las 15 fuentes exactas del manifiesto; no acepta imágenes arbitrarias que tengan un nombre parecido.
+- No se incorporan assets externos ni extraídos de otros juegos, no se consumen créditos y no se añade una dependencia de IA de pago.
+
+## Evidencia de CI para SHA exacto
+
+- **PASS · Validate BotImagen #39005676846**, HEAD probado `03727c0b3d6d0970a9f8ed9e08fed05f13c05253`: validaciones Python, compositor SVG, API, build TypeScript/Vite y smoke completo de Chromium. https://github.com/jonhararagi/botimagen/actions/runs/39005676846
+- **PASS · BotImagen Windows Local Web #39005676817**, mismo SHA: pruebas del lanzador, dependencias bloqueadas, biblioteca/API, build Windows y generación del paquete fuente de la beta. https://github.com/jonhararagi/botimagen/actions/runs/39005676817
+- Artefacto visual de QA, ID `12090718215`, tamaño 80,818,085 bytes, digest del contenedor GitHub `sha256:9b9d5d08244c8ab5d8e582d7d5f242e37d68ac7cecb2d68a99dd3abd28462b3c`, caduca 2026-10-31: https://github.com/jonhararagi/botimagen/actions/runs/39005676846/artifacts/12090718215
+- Paquete de fuente beta Windows, ID `12091435269`, 68,272,283 bytes, digest del contenedor de artefacto `sha256:a55582573dd022d2d03501b9824595835afe86bde76f8283e590bfa866dce5f4`, caduca 2026-10-31: https://github.com/jonhararagi/botimagen/actions/runs/39005676817/artifacts/12091435269. No es un instalador binario autónomo; incluye fuente y lanzador y requiere Python/Node según el documento de empaquetado.
+- La prueba Chromium confirma las 15 capas mediante su ruta fuente exacta, asignación de una ranura, MIME PNG, dimensiones 512×768, transparencia de esquina, píxeles visibles, hash calculado sobre bytes, procedencia, confirmación de anclas y exclusividad por ranura. Luego compone seis piezas con variantes alternativas activas y descarga `botimagen-composicion-modular.png`.
+- Dos fallos de prueba anteriores quedan documentados como corregidos: (1) búsqueda por ID del pack confundía el ID de fuente SVG con el ID `user.*` que genera la biblioteca; (2) la auditoría no devolvía `source_filename` antes de comparar la ruta contra la lista permitida. La corrección final se probó en el SHA citado arriba.
+- QA físico en la PC de usuario: **NOT_RUN**. El runner de GitHub Windows solo prueba un entorno limpio automatizado.
+
+## Pendientes de entrega integral
+
+- El catálogo tiene 15 capas y una sola alternativa de calzado. Faltan varias familias de cuerpos, expresiones, peinados, calzados, accesorios y vistas traseras para considerarlo universal.
+- Confirmar visualmente la anatomía y el encaje real de cada alternativa sobre el cuerpo; la prueba de botón de «Confirmar anclas» valida el flujo, no constituye una certificación artística independiente.
+- Probar en Windows real el lanzamiento, primer inicio/dependencias, importación, composición, guardado/recuperación de perfiles y exportación PNG/JSON.
+- Consolidar y demostrar un flujo de exportación PNG para las distintas superficies del creador, y comprobar roundtrip de personajes del modo modular.
+- No fusionar PR #15 todavía: se autoriza la fusión, pero faltan los criterios de entrega integral descritos arriba.
+
+---
+
 # ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-17 · PACK ORIGINAL CYBERSTREET COMO PNG MODULARES
 
 **Estado global: PARTIAL.** El flujo nuevo ya convierte seis capas SVG originales del paquete CyberStreet en PNG independientes, las registra en la biblioteca modular con SHA-256/procedencia, permite confirmar sus puntos de encaje y compone/descarga un PNG transparente. No declara terminado el catálogo universal ni la beta final.
