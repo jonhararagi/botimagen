@@ -1,8 +1,82 @@
+## Incremento verificado · 2026-10-17 · Ampliación a 15 variantes originales
+
+- **TIMER:** 2–4 horas estimadas para los nuevos assets SVG, contratos de ranura y QA automatizado; tiempo real no medido.
+- **Código probado:** `03727c0b3d6d0970a9f8ed9e08fed05f13c05253` en la rama `feature/bimg-anime-png-universal-library`, PR #15 abierto y sin fusionar.
+- Pack CyberStreet: 15 SVG originales de 512×768. Se añadieron 9 variantes (cuerpo atlético, dos rostros alternativos, dos cabellos, dos prendas superiores y dos prendas inferiores). Calzado sigue con una opción. Manifiesto por ranura; seis defaults activos y alternativas desactivadas inicialmente.
+- Editor SVG: al activar un elemento de una ranura, deshabilita el anterior; el servidor de composición rechaza dos opciones de la misma ranura. Al cargar perfiles anteriores, los campos nuevos se normalizan con los defaults del manifiesto.
+- Biblioteca PNG: instala los componentes del manifiesto convirtiéndolos en PNG de 512×768 con transparencia, SHA-256, ruta fuente y procedencia; anclas inicialmente no validadas. La lista de importación está limitada a IDs y fuentes conocidas.
+- **PASS Validate CI #39005676846**, SHA exacto citado, incluyendo test unitario de compositor y smoke de Chromium con las 15 fuentes, hashes/transparencia/procedencia, confirmación de anclas por pieza, exclusividad de variantes, composición alternada y descarga PNG. https://github.com/jonhararagi/botimagen/actions/runs/39005676846
+- **PASS Windows CI #39005676817**, mismo SHA, build y validaciones del entorno Windows limpio. https://github.com/jonhararagi/botimagen/actions/runs/39005676817
+- Capturas QA, artifact `12090718215`, `80,818,085` bytes, digest contenedor `sha256:9b9d5d08244c8ab5d8e582d7d5f242e37d68ac7cecb2d68a99dd3abd28462b3c`: https://github.com/jonhararagi/botimagen/actions/runs/39005676846/artifacts/12090718215
+- ZIP fuente beta Windows, artifact `12091435269`, `68,272,283` bytes, digest contenedor `sha256:a55582573dd022d2d03501b9824595835afe86bde76f8283e590bfa866dce5f4`: https://github.com/jonhararagi/botimagen/actions/runs/39005676817/artifacts/12091435269 (expira 2026-10-31). ZIP fuente + lanzador, no instalador autónomo.
+- El smoke falló en revisiones previas porque el test confundía el ID de origen SVG con el ID local `user.*` y luego no conservaba `source_filename` al comparar procedencia. Se corrigió la prueba, no se eliminaron las aserciones. La revisión final pasó.
+- Estado de este incremento: **PASS (CI exacta)**. Estado de BotImagen completo: **PARTIAL**, sin recalcular globalmente el porcentaje por cantidad de assets.
+- Pendientes: más variedades originales/licenciadas (actualmente hay una sola pieza de calzado); revisión artística humana de alineación; validación física en PC Windows (**NOT_RUN**); verificar perfil/PNG export en beta empaquetada; ampliar accesorios y vistas adicionales antes de declarar universalidad.
+- `main` permanece en `f86f9345943389dd4ef42d91bc0ec23b38b371d5`, sin cambios. No se creó una rama adicional ni se fusionó PR #15.
+
+---
+
+## Incremento verificado · 2026-10-17 · Pack original CyberStreet a PNG modulares
+
+- **TIMER:** 2–4 horas estimadas para el incremento vertical, correcciones del smoke test y QA; tiempo real no medido.
+- **Rama:** `feature/bimg-anime-png-universal-library`, PR #15 abierto/no fusionado. Código probado en el SHA exacto `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`.
+- Añadidos un endpoint de lectura con lista blanca para devolver fuentes SVG del pack original y un botón de biblioteca que rasteriza cada capa en un PNG transparente independiente de 512×768.
+- Se importan seis capas originales: cuerpo base, rostro, falda, zapatillas, chaqueta y cabello frontal. El PNG final queda registrado en la biblioteca local con SHA-256, categoría, licencia declarada, ruta fuente, URL del repositorio y vista.
+- La prueba no marca automáticamente los anclajes como válidos: cada pieza debe pasar por la acción de confirmación. El smoke test hace click por pieza para comprobar el contrato técnico, pero eso no equivale a una aprobación artística humana.
+- **PASS · Validate BotImagen #39004226106** para el código SHA exacto: build TypeScript/Vite, Python, API local y smoke test de Chromium completo. El test validó dimensiones/MIME/alpha/hash/procedencia de las seis piezas, confirmación de puntos, composición real de seis capas, salida PNG de 512×768 y descarga. https://github.com/jonhararagi/botimagen/actions/runs/39004226106
+- **PASS · BotImagen Windows Local Web #39004226133** sobre el mismo SHA: pruebas del lanzador y API/biblioteca en runner Windows, build, salud de API/Vite y ZIP de beta. https://github.com/jonhararagi/botimagen/actions/runs/39004226133
+- Artefacto visual de QA (GitHub artifact ID `12090207949`, digest `sha256:c0845762cc0e2084f66c800339e6fd354887152f116e445fc13c5f669987ec09`): https://github.com/jonhararagi/botimagen/actions/runs/39004226106/artifacts/12090207949
+- Paquete de beta Windows (GitHub artifact ID `12090366950`, tamaño 68,258,468 bytes, digest del contenedor `sha256:164233097b8e439c454b9f193b6aeb392d9e88eb80cf6f2a12879c994c9f47e5`, expira 2026-10-31): https://github.com/jonhararagi/botimagen/actions/runs/39004226133/artifacts/12090366950. Es un paquete de código fuente con lanzador, no un instalador autónomo.
+- Corrigidos dos defectos revelados por CI antes de obtener PASS: orden de inicialización del directorio de captura de QA y contaminación de selección entre escenarios. Commit de la corrección final de test: `4c9759e46d45f35db9bcfbbe2ca15a26684ddc76`.
+- **Estado de la fase: PARTIAL**, sin elevar el porcentaje global por contar opciones o capas. El pack de seis piezas demuestra el flujo completo, pero no completa el catálogo universal.
+- Pendiente: ampliar variaciones originales/libres, revisión humana de las anclas y la compatibilidad visual, probar la beta físicamente en Windows (`NOT_RUN`) y verificar todas las funciones acordadas antes de fusionar.
+- `main` no fue modificado; no se creó ninguna rama nueva y no se gastaron créditos ni se activó una API paga de generación.
+
+---
+
+## Estado vigente · 2026-10-17 · Beta local Windows y paquete ZIP
+
+- **TIMER:** 2–4 horas estimadas para lanzador, Windows CI, empaquetado ZIP y docs; tiempo real no medido.
+- **PASS · Composición PNG:** CI #39000665680, código SHA c15abf474b2aefd7c86db9d02b459295263920ea; 512×768, transparencia de esquinas, píxeles visibles y descarga validada. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
+- **PASS · Derechos/procedencia:** CI #39001219287, SHA 6ac70f666ad2002ec3511e8b48c57f9db8c8b078; 28/28 pasos. La API bloquea piezas sin declaración. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
+- **PASS · Lanzador Windows:** CI #39002036571, SHA 785387bb143ea48f59625e58eaec2003b00f4a71; 12/12 pasos. Preflight, npm ci, Pillow, tests Python, build y API/Vite local. https://github.com/jonhararagi/botimagen/actions/runs/39002036571
+- **PASS · Linux build/Chromium:** CI #39002040269, SHA 785387bb143ea48f59625e58eaec2003b00f4a71; 28/28 pasos. https://github.com/jonhararagi/botimagen/actions/runs/39002040269
+- **PASS · ZIP beta Windows:** CI #39002182415, rama SHA a1071c57f48f26c02612da00d05e4e5d9165a518; generó y publicó el artefacto con código, checksum y BUILD-INFO. https://github.com/jonhararagi/botimagen/actions/runs/39002182415
+- SHA-256 del ZIP interno verificado: 1782c534af688cf2f80540ec4c9b7044f0e14a63bb3c7a806468b7902759058a. El ZIP necesita Python/Node/npm; no es un .exe autónomo.
+- El artefacto temporal de GitHub expira el 2026-10-31; el ZIP verificado se entregó como archivo separado al usuario.
+- Estado integral: **PARTIAL**, porque no se ha realizado QA físico en el PC del usuario y aún no hay suficientes piezas PNG modulares semánticamente confirmadas.
+- Pendientes: probar en el PC real, crecer el catálogo con art original/licenciado, comprobar visualmente anclas/orden/compatibilidad, mantener los 43 recortes PSD como referencias hasta su validación y cerrar criterios de entrega antes de autorizar la fusión.
+- La declaración de derechos/procedencia registrada en la app no sustituye una verificación legal.
+
+
 # Progreso global de BotImagen
 
-**Último cálculo:** 2026-10-12  
+## Incremento posterior · 2026-10-15 · Fábrica local de assets PixAI
+
+- Nueva sección web integrada: inventario por rasgo del catálogo, estado `HAY` / `AÚN NO`, preparación de prompt individual y apertura manual de PixAI.
+- Importación explícita de PNG con validación de firma/tamaño/dimensiones; almacenamiento local en IndexedDB, descarga y eliminación por usuario.
+- PixAI quedó autenticado y se comprobó el coste sin generar: una imagen, tamaño L disponible (944×1584), cola Low Priority (~21 min) cuesta 3.000 créditos; la LoRA Gen Pibara V1 XL no aparece en el selector. No se gastaron créditos ni se produjo PNG. La generación queda bloqueada hasta hallar la configuración económica correcta o decidir un presupuesto distinto.
+- La interfaz no automatiza clicks de pago, no elige Premium, no lee Descargas a escondidas ni publica automáticamente imágenes en GitHub.
+- BIMG-007 pasa de 0% a 25% estimado: ya hay una biblioteca local indexada por rasgo con importación y exportación, pero faltan miniaturas persistentes optimizadas, búsqueda/filtros completos, evaluación de licencias y prueba visual de ensamblado.
+- CI para el HEAD con la fábrica añadida: pendiente de finalizar. El porcentaje es estimación de fase, no evidencia de pruebas.
+
+## Incremento posterior · 2026-10-15 · Creador con sprites CC0
+
+El porcentaje global de 63% indicado más abajo corresponde al cálculo histórico del 2026-10-12 y no fue recalculado en esta sesión.
+
+- Implementado en la rama existente `feature/bimg-anime-png-universal-library`: panel de creación con cinco sprites CC0 completos y sus expresiones disponibles, selección de personaje/expresión, nombre, opciones de fondo, persistencia local y exportación PNG 512×768 con proporción conservada.
+- Integrado en el workspace principal antes del editor técnico.
+- Se agregó prueba Chromium para contar los cinco personajes y verificar que el selector cambia al archivo real de expresión feliz del personaje 2.
+- El manifiesto de las 43 capas ofrece sugerencias conservadoras y justificadas: cuatro recortes de PSD de rostro se proponen como expresiones con confianza alta; regiones sin evidencia suficiente quedan sin asignar o marcadas para revisión. El clasificador permite aplicar las sugerencias de alta confianza solo mediante acción explícita del usuario.
+- El smoke test de Chromium también comprueba esa confirmación manual. CI para el HEAD actualizado aún debe finalizar.
+- No equivale todavía a un creador modular que permita intercambiar cabello, cuerpo y ropa entre personajes. Las 43 capas PSD están extraídas y visibles en el clasificador, pero su clasificación semántica aún requiere validación visual.
+- CI #761 SUCCESS para el HEAD `fe663dc71695620574fd8a8295fbb238649873c9`: build web y smoke test Chromium pasaron, incluido el flujo real de sprites y confirmación de sugerencias. https://github.com/jonhararagi/botimagen/actions/runs/38746099453. El siguiente cambio documental posterior necesita su propia ejecución de CI.
+- Prueba manual en Windows y prueba real de generación con motor/checkpoint local: no realizadas en esta sesión.
+
+
+**Último cálculo:** 2026-10-15  
 **Objetivo medido:** beta local-first web en Windows, no el producto final con funciones opcionales futuras.  
-**Progreso global actual: 63%**
+**Progreso global actual: 66%**
 
 El porcentaje usa puntos ponderados por fase. No se calcula por cantidad de archivos, líneas de código ni tiempo transcurrido. Cada tarea tiene un peso fijo dentro del alcance de la beta y una estimación de terminación documentada con evidencia. Fórmula:
 
@@ -18,13 +92,13 @@ Los porcentajes parciales son juicio técnico de alcance restante, no resultados
 | BIMG-004 · Servicio local y conexión UI/API | 12% | 95% · PARTIAL | 11,4 |
 | BIMG-005 · Editor completo por categorías | 18% | 87% · PARTIAL | 15,66 |
 | BIMG-006 · Ampliación modular del catálogo | 15% | 70% · PARTIAL | 10,5 |
-| BIMG-007 · Biblioteca visual local | 12% | 0% · NOT_STARTED | 0,0 |
+| BIMG-007 · Biblioteca visual local | 12% | 25% · PARTIAL | 3,0 |
 | BIMG-008 · Intake de assets en la interfaz web | 8% | 10% · PARTIAL | 0,8 |
 | BIMG-009 · QA físico de navegador/Windows y rendimiento | 6% | 20% · PARTIAL | 1,2 |
 | BIMG-010 · Empaquetar y validar beta local | 5% | 0% · NOT_STARTED | 0,0 |
-| **Total ponderado** | **100%** | | **62,96 / 100 → 63%** |
+| **Total ponderado** | **100%** | | **65,96 / 100 → 66%** |
 
-BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **62,96 / 100 (63%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
+BIMG-011, la investigación de generación neuronal local, es opcional y posterior a la beta; no se incluye en este denominador porque la beta no depende de generar píxeles. **65,96 / 100 (66%) es el avance hacia la beta local definida aquí, no un porcentaje inventado del producto final completo**: la biblioteca visual, la importación completa, QA física y empaquetado siguen pendientes.
 
 ## Evidencia más reciente
 
@@ -152,3 +226,31 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - **Estado: EN PROGRESO / NO ACEPTADO.** Aún faltan ejecución CI del HEAD actual, E2E real de cambio de cabello/prendas, perfil modular conectado al sistema persistente de perfiles y revisión de capturas.
 - No se incrementa el porcentaje global del producto con esta entrega parcial. `WINDOWS_MANUAL_QA: NOT_RUN`; `TIME_MEASURED: NOT_MEASURED`.
 - Estimación restante de ingeniería: **8–16 horas activas**, más producción y calibración de recursos artísticos independientes.
+
+
+## BIMG-PIXAI-001 · receta de bajo consumo para Gen Pibara V1 · 2026-10-15
+
+- **PARTIAL; no sumar porcentaje global todavía.** BotImagen incluye ahora un enlace a la ficha oficial de PixAI y botones para copiar un prompt positivo/negative prompt derivados de la ficha de personaje actual.
+- Se documentó el protocolo de bajo consumo y procedencia en `docs/PIXAI-GEN-PIBARA-V1.md`. La LoRA sigue alojada en PixAI; no se distribuye ni se afirma integración automática con el motor local.
+- CI #673 (run `38682122703`) está `IN_PROGRESS`: https://github.com/jonhararagi/botimagen/actions/runs/38682122703.
+- Generación PixAI y validación visual: `NOT_RUN`, pendiente de que el usuario guarde el perfil TinyFish. Créditos gastados por esta tarea: **0**.
+- **TIMER restante:** 1–2 horas activas estimadas para verificar CI y realizar una prueba visual individual, sin lotes.
+
+
+## BIMG-MODULAR-PNG-ROUNDTRIP-FIX · 2026-10-17
+
+- TIMER estimado: 1–2 horas; tiempo real: no medido.
+- Corregida una aserción defectuosa de firma PNG en la prueba de integración API. La CI #799 fallaba después de completar la composición porque el test esperaba texto escapado, no los bytes binarios PNG.
+- Commit de código: `7e5405608e28d6e06026b05177b04cb7a0e24a79`. La prueba mantiene comprobaciones reales de importación de dos piezas fixture, confirmación de anclajes, composición, dimensiones 512×768, colores de cuerpo/cabello y transparencia.
+- CI #814, SHA exacto `7e5405608e28d6e06026b05177b04cb7a0e24a79`, estaba **QUEUED** al documentar: https://github.com/jonhararagi/botimagen/actions/runs/38985890843.
+- **PARTIAL / CI PENDING**. No modificar porcentaje global hasta verificar el resultado; Windows manual QA sigue NOT_RUN y la clasificación semántica de las 43 regiones PSD sigue pendiente.
+
+
+## Incremento · 2026-10-17 · Ampliación del catálogo fijo de rasgos
+
+- TIMER estimado: 2–4 horas; tiempo real no medido.
+- Ampliados los selectores del creador vectorial: piel 8, cabello 10 colores, peinado 8, ojos 8 colores, prendas superiores 8, inferiores 7 y accesorios 8.
+- Añadidos dibujos vectoriales para wolf cut, trenzas, coleta lateral, kimono, armadura ligera, falda larga, orejas felinas, aureola y cuernos. La pose sigue fija y las selecciones son explícitas.
+- Añadido test Chromium para conteo de opciones, cambio de vista previa SVG y guardado de personaje.
+- HEAD del código: `1c2c5586a70e941f7dc3a1e22b54df4388881b30`. CI #819 pendiente al registrar esta nota: https://github.com/jonhararagi/botimagen/actions/runs/38986491276.
+- Estado **PARTIAL / CI PENDING**. No se suma progreso global por cantidad de opciones. Esto no añade nuevos PNG artísticos ni valida semánticamente las 43 regiones PSD; esos trabajos siguen pendientes.

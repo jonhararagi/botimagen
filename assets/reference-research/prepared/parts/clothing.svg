@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+<title id="title">BotImagen modular part: clothing</title><desc id="desc">Original standalone editable SVG part aligned to BotImagen modular base v1 canvas.</desc>
+<defs><linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9bf5ff"/><stop offset="1" stop-color="#d17cff"/></linearGradient><linearGradient id="jacketGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262c4c"/><stop offset="1" stop-color="#12162b"/></linearGradient></defs>
+<g id="clothing" data-part="clothing">
+<path d="M206 309 Q256 294 306 309 L337 395 L306 421 L287 367 L295 488 Q256 505 217 488 L225 367 L206 421 L175 395 Z" fill="url(#jacketGradient)" stroke="#302a43" stroke-width="6" stroke-linejoin="round"/><path d="M232 315 L256 343 L280 315 L269 387 L256 411 L243 387 Z" fill="#fb75c8" stroke="#302a43" stroke-width="4"/><path d="M244 411 L268 411 L278 473 L234 473 Z" fill="#79efff" stroke="#302a43" stroke-width="4"/><path d="M213 489 Q256 504 299 489 L313 541 Q256 558 199 541 Z" fill="#fb75c8" stroke="#302a43" stroke-width="5"/><path d="M205 510 L307 510 M201 528 L311 528" stroke="#302a43" stroke-width="4"/><path d="M185 397 L170 456 Q169 470 184 473 L203 465 L220 413 Z M327 397 L342 456 Q343 470 328 473 L309 465 L292 413 Z" fill="#252943" stroke="#302a43" stroke-width="5"/>
+</g>
+</svg>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+<title id="title">BotImagen modular part: watermark</title><desc id="desc">Original standalone editable SVG part aligned to BotImagen modular base v1 canvas.</desc>
+<defs><linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9bf5ff"/><stop offset="1" stop-color="#d17cff"/></linearGradient><linearGradient id="jacketGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262c4c"/><stop offset="1" stop-color="#12162b"/></linearGradient></defs>
+<g id="watermark" data-part="watermark">
+<path d="M210 733 C198 719 177 725 178 741 C179 754 195 761 210 770 C225 761 241 754 242 741 C243 725 222 719 210 733 Z" fill="#d17cff" stroke="#302a43" stroke-width="3" transform="translate(0 -6) scale(.82) translate(46 150)"/><text x="256" y="744" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="1.2" fill="#302a43">BOTIMAGEN · BASE v1</text>
+</g>
+</svg>

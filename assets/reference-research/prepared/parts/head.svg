@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+<title id="title">BotImagen modular part: head</title><desc id="desc">Original standalone editable SVG part aligned to BotImagen modular base v1 canvas.</desc>
+<defs><linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9bf5ff"/><stop offset="1" stop-color="#d17cff"/></linearGradient><linearGradient id="jacketGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262c4c"/><stop offset="1" stop-color="#12162b"/></linearGradient></defs>
+<g id="head" data-part="head">
+<path d="M194 174 Q194 115 256 112 Q318 115 318 174 L309 237 Q294 282 256 285 Q218 282 203 237 Z" fill="#f5d2c1" stroke="#302a43" stroke-width="6" stroke-linejoin="round"/><path d="M232 269 Q256 284 280 269 L280 315 L232 315 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="4"/><path d="M240 247 Q256 256 272 247" fill="none" stroke="#c66c8e" stroke-width="4" stroke-linecap="round"/>
+</g>
+</svg>

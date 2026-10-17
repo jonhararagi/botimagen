@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-15",
+  "purpose": "Research anime character references and model/LoRA candidates for BotImagen; do not treat a search result as redistribution permission.",
+  "sources": [
+    {
+      "id": "opengameart-fallingair-visual-novel-character-sprite",
+      "platform": "OpenGameArt",
+      "title": "Visual novel Character Sprite",
+      "url": "https://opengameart.org/content/visual-novel-character-sprite",
+      "author": "FALLiNG_AiR",
+      "license": "CC0 1.0, explicitly displayed on source page",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_status": "cc0-source-verified; archive-and-derived-png-hashes-verified",
+      "available_files": [
+        {
+          "name": "character.zip",
+          "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
+          "type": "ZIP (26.2 MB; page states it includes PSD, Clip Studio files and PNGs)",
+          "size_bytes": 26170320,
+          "sha256": "df847f16d5ac45905023bfad0a12dccc71d614423d1505fde0d4d9e756dbfb11",
+          "repository_path": "assets/reference-research/incoming/opengameart/character.zip",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
+        }
+      ],
+      "notes": "Downloaded archive passed ZIP CRC and safe-path checks. Inventory confirms 96 members: 66 PNGs, 10 PSDs, 10 Clip Studio files, and 10 directories. 65 character/expression PNGs are exposed to the generator; 10 PSDs were inspected with psd-tools and 43 visible non-empty leaf layers were exported as transparent PNG references. Layer names/coordinates are preserved, but generic layer names are not automatically mapped to body/clothing semantics.",
+      "local_files": [
+        "assets/reference-research/incoming/opengameart/character.zip",
+        "assets/reference-research/incoming/opengameart/archive-inventory.json",
+        "assets/reference-research/prepared/fallingair/psd-layer-inventory.json",
+        "web/public/cc0-character-library/manifest.json",
+        "web/public/cc0-character-library/psd-layers-manifest.json"
+      ]
+    },
+    {
+      "id": "opengameart-hordana-michona",
+      "platform": "OpenGameArt",
+      "title": "Anime Girl / Michona the creepy and cute warrior",
+      "url": "https://opengameart.org/content/anime-girl",
+      "author": "Hordana",
+      "license": "CC0 1.0, explicitly displayed on source page",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_status": "cc0-source-verified; downloaded-binary-hash-verified",
+      "available_files": [
+        {
+          "name": "13jump_1.png",
+          "source_url": "https://opengameart.org/sites/default/files/13jump_1.png",
+          "type": "PNG sprite animation",
+          "size_bytes": 715613,
+          "sha256": "f8597238ebe3b9d761fe40e6169042fa9247f771d44328345f8dc4514634f259",
+          "repository_path": "assets/reference-research/incoming/opengameart/13jump_1.png",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
+        },
+        {
+          "name": "11walk_4.png",
+          "source_url": "https://opengameart.org/sites/default/files/11walk_4.png",
+          "type": "PNG sprite animation",
+          "size_bytes": 656731,
+          "sha256": "1b6537b1bea0c93da1f1b27f52786a9c3e0de2b5b2f89dca045af7631e942337",
+          "repository_path": "assets/reference-research/incoming/opengameart/11walk_4.png",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
+        },
+        {
+          "name": "blink strip 5.png",
+          "source_url": "https://opengameart.org/sites/default/files/blink%20strip%205.png",
+          "type": "PNG sprite strip",
+          "size_bytes": 77978,
+          "sha256": "4a42ed4aaeca1f034a1fa3429e8db59bfc6d7501b92680feaf8292160bd67212",
+          "repository_path": "assets/reference-research/incoming/opengameart/blink strip 5.png",
+          "verification_status": "downloaded; SHA-256 verified; source page declares CC0 1.0"
+        }
+      ],
+      "notes": "Source page labels the artwork CC0 and includes the author's attribution notice. The three PNG sprite strips are committed as unmodified animation/reference assets; they are not semantically separated body/clothing layers."
+    },
+    {
+      "id": "pixai",
+      "platform": "PixAI",
+      "url": "https://pixai.art/en/generator/image",
+      "search_url": "https://pixai.art/en/generator/image",
+      "type": [
+        "image-generator",
+        "community-models",
+        "lora"
+      ],
+      "rights_status": "external-reference-only",
+      "local_files": [],
+      "notes": "Review the specific model/LoRA license and image rights before use. Do not mirror gallery artwork without permission.",
+      "licensing_reference": "https://blog.pixai.art/en/pixai-commercial-use-licensing-guide"
+    },
+    {
+      "id": "civitai",
+      "platform": "Civitai",
+      "url": "https://civitai.com/models",
+      "type": [
+        "checkpoint",
+        "lora",
+        "community-images"
+      ],
+      "rights_status": "per-resource-review-required",
+      "local_files": [],
+      "notes": "Each model can have bespoke terms. Record model page, base model, author, license, and commercial/derivative permissions.",
+      "licensing_reference": "https://civitai.com/content/tos"
+    },
+    {
+      "id": "huggingface-character-lora-anima",
+      "platform": "Hugging Face",
+      "url": "https://huggingface.co/BackGwa/Character-LoRA-Anima",
+      "type": [
+        "lora"
+      ],
+      "rights_status": "non-commercial-license-declared",
+      "local_files": [],
+      "notes": "Not approved for bundling into a commercial product. Use only if the project use complies with the exact published license.",
+      "licensing_reference": "https://huggingface.co/BackGwa/Character-LoRA-Anima"
+    },
+    {
+      "id": "opengameart-visual-novel-character-sprite",
+      "platform": "OpenGameArt",
+      "url": "https://opengameart.org/content/visual-novel-character-sprite",
+      "type": [
+        "2d-character-base",
+        "png",
+        "psd",
+        "clip-studio"
+      ],
+      "rights_status": "cc0-source-verified; archive-and-derived-png-hashes-verified",
+      "local_files": [
+        "assets/reference-research/incoming/opengameart/character.zip",
+        "assets/reference-research/incoming/opengameart/archive-inventory.json",
+        "assets/reference-research/incoming/opengameart/download-inventory.json",
+        "assets/reference-research/prepared/fallingair/asset-inventory.json"
+      ],
+      "notes": "Legacy duplicate catalog entry synchronized after CC0 archive download and CRC validation. 66 PNGs and 10 PSD masters are prepared; 43 visible, non-empty PSD leaf layers are exported for optional import into the generator. Original Clip Studio files remain in the ZIP."
+    },
+    {
+      "id": "makehuman-cartoon01",
+      "platform": "MakeHuman Community",
+      "url": "https://static.makehumancommunity.org/assets/assetpacks/cartoon01.html",
+      "type": [
+        "cartoon-anime-reference",
+        "head",
+        "body"
+      ],
+      "rights_status": "per-asset-cc0-label-review-required",
+      "local_files": [],
+      "notes": "Catalog lists individual assets with CC0 labels. Verify each chosen asset and record its exact origin before copying."
+    },
+    {
+      "id": "seaart",
+      "platform": "SeaArt",
+      "url": "https://www.seaart.ai/",
+      "type": [
+        "image-generator",
+        "community-models"
+      ],
+      "rights_status": "external-reference-only",
+      "local_files": [],
+      "notes": "Use as a discovery source. Confirm model-specific and image-specific rights before redistribution."
+    }
+  ],
+  "import_policy": {
+    "allow_without_review": false,
+    "require_source_url": true,
+    "require_author_when_available": true,
+    "require_exact_license": true,
+    "require_sha256": true,
+    "keep_original_unmodified": true,
+    "package_model_weights_in_repository": false
+  },
+  "local_assets": [
+    {
+      "id": "botimagen-modular-base-v1",
+      "path": "assets/reference-research/prepared/botimagen-modular-base-v1.svg",
+      "creator": "BotImagen project workflow",
+      "origin": "original vector asset created for this repository",
+      "license_status": "original project asset; repository-wide license file not verified in this task; do not treat this note as a standalone license grant",
+      "format": "SVG",
+      "editable_parts": [
+        "body",
+        "clothing",
+        "head",
+        "eyes",
+        "hair",
+        "watermark"
+      ],
+      "notes": "Original base, not copied from PixAI or another artist. Groups are separated in SVG for editing; raster exports may still require manual cleanup before importing into the raster region builder."
+    },
+    {
+      "id": "fallingair-cc0-character-source",
+      "path": "assets/reference-research/prepared/fallingair/asset-inventory.json",
+      "creator": "FALLiNG_AiR",
+      "origin": "Extracted from the source archive linked on the OpenGameArt submission page",
+      "source_url": "https://opengameart.org/content/visual-novel-character-sprite",
+      "license_status": "CC0 1.0 displayed on source page; original archive preserved under incoming/opengameart/character.zip",
+      "format": [
+        "PNG",
+        "PSD"
+      ],
+      "editable_parts": [
+        "per-character base PNGs",
+        "expression PNGs",
+        "PSD source masters"
+      ],
+      "notes": "Prepared PNGs are intended for direct import into the PNG library. PSD files are editable source masters, but their internal layer names/semantics are not yet validated."
+    }
+  ],
+  "ingestion_note": "The import workflow downloads pinned source bytes, validates PNG dimensions and SHA-256, checks ZIP CRC and safe paths, inventories/extracts PNG/PSD sources, inspects PSD layer trees, exports visible non-empty leaf layers to transparent PNGs, and publishes separate hash-pinned manifests for original PNG references and extracted PSD layers."
+}

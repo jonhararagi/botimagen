@@ -598,5 +598,194 @@ class LocalApiTests(unittest.TestCase):
                 thread.join(timeout=2)
 
 
+    def test_modular_png_import_anchor_confirmation_compose_and_export_round_trip(self):
+        def piece_png(color, bounds):
+            image = Image.new("RGBA", (512, 768), (0, 0, 0, 0))
+            ImageDraw.Draw(image).rectangle(bounds, fill=color)
+            output = io.BytesIO()
+            image.save(output, format="PNG")
+            return output.getvalue()
+
+        def image_payload(filename, data, category):
+            rig_category = category
+            return {
+                "filename": filename,
+                "mime_type": "image/png",
+                "data_base64": base64.b64encode(data).decode("ascii"),
+                "category": category,
+                "label": filename,
+                "kind": "modular_piece",
+                "view": "front",
+                "license": "Original propio",
+                "rights_confirmed": True,
+                "conversion": {
+                    "schema_version": 1,
+                    "algorithm": "botimagen-png-stage-v1",
+                    "normalized": True,
+                    "canvas_width": 512,
+                    "canvas_height": 768,
+                    "source_width": 512,
+                    "source_height": 768,
+                    "source_format": "image/png",
+                    "background_removed": True,
+                    "background_tolerance": 0,
+                    "scale_percent": 100,
+                    "offset_x": 0,
+                    "offset_y": 0,
+                    "pose": "front",
+                    "rig_category": rig_category,
+                    "content_bounds": {"x": 0, "y": 0, "width": 512, "height": 768},
+                    "anchors": {"waist": {"x": 0.5, "y": 0.5}},
+                    "anchor_status": "estimated_not_validated",
+                },
+            }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(self.generator, root / "profiles", root / "modular-assets"),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+
+            def request(method, path, payload=None):
+                connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=5)
+                try:
+                    body = json.dumps(payload).encode("utf-8") if payload is not None else None
+                    headers = {"Content-Type": "application/json"} if payload is not None else {}
+                    connection.request(method, path, body=body, headers=headers)
+                    response = connection.getresponse()
+                    raw = response.read()
+                    content_type = response.getheader("Content-Type", "")
+                    parsed = json.loads(raw.decode("utf-8")) if "application/json" in content_type else raw
+                    return response.status, content_type, parsed
+                finally:
+                    connection.close()
+
+            try:
+                status, _, body = request(
+                    "POST", "/api/modular-assets",
+                    image_payload("body.png", piece_png((20, 60, 220, 255), (20, 20, 200, 200)), "body"),
+                )
+                self.assertEqual(status, 201)
+                status, _, hair = request(
+                    "POST", "/api/modular-assets",
+                    image_payload("hair.png", piece_png((240, 30, 150, 255), (300, 300, 500, 500)), "hair_front"),
+                )
+                self.assertEqual(status, 201)
+
+                for asset in (body, hair):
+                    status, _, confirmed = request(
+                        "POST", f"/api/modular-assets/{asset['id']}/validate-anchors",
+                        {"confirm": True, "anchors": {"waist": {"x": 0.5, "y": 0.5}}},
+                    )
+                    self.assertEqual(status, 200)
+                    self.assertTrue(confirmed["anchors_validated"])
+
+                status, _, catalog = request("GET", "/api/modular-assets")
+                self.assertEqual(status, 200)
+                self.assertEqual(catalog["count"], 2)
+                self.assertTrue(all(asset["anchors_validated"] for asset in catalog["assets"]))
+
+                status, content_type, composed = request("POST", "/api/modular-compose", {
+                    "pieces": [
+                        {"schema_version": 1, "id": body["id"], "category": "body",
+                         "resource": body["id"], "dimensions": {"width": 512, "height": 768},
+                         "anchors": {"waist": {"x": 0.5, "y": 0.5}}, "anchors_validated": True,
+                         "layer_order": 20},
+                        {"schema_version": 1, "id": hair["id"], "category": "hair_front",
+                         "resource": hair["id"], "dimensions": {"width": 512, "height": 768},
+                         "anchors": {"waist": {"x": 0.5, "y": 0.5}}, "anchors_validated": True,
+                         "layer_order": 70},
+                    ],
+                    "canvas_size": [512, 768],
+                })
+                self.assertEqual(status, 200)
+                self.assertEqual(content_type, "application/json; charset=utf-8")
+                self.assertEqual(composed["mime_type"], "image/png")
+                self.assertEqual((composed["width"], composed["height"]), (512, 768))
+                png_bytes = base64.b64decode(composed["png_base64"], validate=True)
+                self.assertTrue(png_bytes.startswith(b"\x89PNG\r\n\x1a\n"))
+                with Image.open(io.BytesIO(png_bytes)) as rendered:
+                    rgba = rendered.convert("RGBA")
+                    self.assertEqual(rgba.size, (512, 768))
+                    self.assertEqual(rgba.getpixel((50, 50)), (20, 60, 220, 255))
+                    self.assertEqual(rgba.getpixel((400, 400)), (240, 30, 150, 255))
+                    self.assertEqual(rgba.getpixel((250, 250))[3], 0)
+
+                pending_payload = image_payload(
+                    "unverified.png", piece_png((80, 90, 100, 255), (50, 60, 100, 110)), "body"
+                )
+                pending_payload["license"] = "UNVERIFIED"
+                pending_payload["rights_confirmed"] = False
+                status, _, pending_asset = request("POST", "/api/modular-assets", pending_payload)
+                self.assertEqual(status, 201)
+                blocked_piece = {
+                    "schema_version": 1, "id": pending_asset["id"], "category": "body",
+                    "resource": pending_asset["id"], "dimensions": {"width": 512, "height": 768},
+                    "anchors": {"waist": {"x": 0.5, "y": 0.5}}, "anchors_validated": True,
+                    "layer_order": 20,
+                }
+                status, _, blocked = request("POST", "/api/modular-compose", {
+                    "pieces": [blocked_piece], "canvas_size": [512, 768],
+                })
+                self.assertEqual(status, 400)
+                self.assertIn("derechos/procedencia", blocked["error"].lower())
+                status, _, declared = request(
+                    "POST", f"/api/modular-assets/{pending_asset['id']}/confirm-rights",
+                    {"confirm": True, "license": "Original propio", "source_url": ""},
+                )
+                self.assertEqual(status, 200)
+                self.assertTrue(declared["rights_confirmed"])
+                self.assertEqual(declared["provenance_status"], "user_declared_original")
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
+
+    def test_cyberstreet_layer_endpoint_whitelists_repository_assets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(self.generator, root / "profiles", root / "assets", root / "models"),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=3)
+            try:
+                connection.request("GET", "/api/modular-cyberstreet/layers/base-body")
+                response = connection.getresponse()
+                payload = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(payload["id"], "base-body")
+                self.assertEqual(payload["category"], "body")
+                self.assertEqual((payload["width"], payload["height"]), (512, 768))
+                self.assertIn("<svg", payload["svg"])
+                self.assertEqual(payload["license"], "LicenseRef-BotImagen-Original-Assets")
+
+                connection.request("GET", "/api/modular-cyberstreet/layers/hair-silver-bob")
+                variant = connection.getresponse()
+                variant_payload = json.loads(variant.read().decode("utf-8"))
+                self.assertEqual(variant.status, 200)
+                self.assertEqual(variant_payload["id"], "hair-silver-bob")
+                self.assertEqual(variant_payload["category"], "hair_front")
+                self.assertEqual(variant_payload["slot"], "hair_front")
+                self.assertEqual((variant_payload["width"], variant_payload["height"]), (512, 768))
+
+                connection.request("GET", "/api/modular-cyberstreet/layers/../../outside")
+                invalid = connection.getresponse()
+                invalid.read()
+                self.assertEqual(invalid.status, 404)
+            finally:
+                connection.close()
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

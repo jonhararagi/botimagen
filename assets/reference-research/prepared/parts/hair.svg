@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+<title id="title">BotImagen modular part: hair</title><desc id="desc">Original standalone editable SVG part aligned to BotImagen modular base v1 canvas.</desc>
+<defs><linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9bf5ff"/><stop offset="1" stop-color="#d17cff"/></linearGradient><linearGradient id="jacketGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262c4c"/><stop offset="1" stop-color="#12162b"/></linearGradient></defs>
+<g id="hair" data-part="hair">
+<path d="M190 201 Q169 160 185 123 Q204 79 256 79 Q309 79 328 123 Q344 160 322 201 L310 165 Q290 143 276 117 Q250 148 211 157 L207 211 L194 242 Z" fill="url(#hairGradient)" stroke="#302a43" stroke-width="6" stroke-linejoin="round"/><path d="M211 158 Q234 148 256 122 Q253 151 238 174 L226 194 L223 167 Z" fill="#8feefc" stroke="#302a43" stroke-width="4"/><path d="M276 117 Q289 148 310 165 L304 206 L291 181 L286 154 Z" fill="#d17cff" stroke="#302a43" stroke-width="4"/><path d="M191 193 Q171 235 190 275 L208 250 L205 210 Z" fill="#9bf5ff" stroke="#302a43" stroke-width="5"/><path d="M320 193 Q342 235 322 275 L304 250 L307 210 Z" fill="#d17cff" stroke="#302a43" stroke-width="5"/><path d="M190 129 Q203 98 235 91 M274 92 Q306 102 320 130" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+</g>
+</svg>

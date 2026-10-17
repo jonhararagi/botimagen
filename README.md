@@ -307,13 +307,14 @@ El esquema contiene 40 categorías en total. Hay 35 categorías visuales con die
 La validación automática comprueba los recuentos, compatibilidad de especie, altura, reproducción por semilla y el caso de prueba del cabello verde esmeralda con puntas doradas y pupilas de estrella.
 
 
-## Interfaz web local (beta en construcción)
+## Interfaz web local · Beta para Windows
 
-La interfaz React + TypeScript vive en `web/`. Para utilizarla durante el desarrollo, abre dos terminales:
+**Descarga de beta empaquetada:** la CI generó el archivo \`BotImagen-Web-Beta-Windows.zip\` y su checksum SHA-256 en Windows CI #39002182415: https://github.com/jonhararagi/botimagen/actions/runs/39002182415. El paquete está disponible como artefacto temporal de GitHub Actions y también se distribuye en la entrega de esta sesión.
 
-1. Ejecuta `py botimagen_server.py` desde la raíz del repositorio.
-2. En otra terminal ejecuta `cd web`, `npm install` y `npm run dev`.
+Para usar el ZIP, extrae todos los archivos a una carpeta local y ejecuta \`Iniciar_BotImagen_Web.bat\`. El lanzador comprueba Python 3.10+, Node.js 22+, Pillow y las dependencias fijadas por \`web/package-lock.json\`; sincroniza dependencias si hace falta, arranca la API/Vite cuando no respondan y abre la interfaz. \`Iniciar_BotImagen_Web.bat -CheckOnly\` revisa/prepara dependencias sin abrir servicios ni navegador.
 
-Abre la URL local indicada por Vite. El servicio Python solo escucha en `127.0.0.1:8765`; Vite redirige las solicitudes `/api` al motor. El catálogo procede de `character_rules.json` y la generación de prompts utiliza `CharacterGenerator`. Los perfiles se guardan en `generated_characters/web_profiles/`, excluida de Git.
+La aplicación web abre normalmente en \`http://127.0.0.1:5173\`; la API usa \`http://127.0.0.1:8765\`. Los servicios quedan limitados a 127.0.0.1. La primera instalación puede requerir Internet.
 
-La figura central todavía es un marcador vectorial, no una imagen generada. La galería de perfiles en la UI, la biblioteca visual, el intake de assets en web y la prueba real completa en Windows siguen pendientes. Revisa [`web/README.md`](web/README.md) para comandos y límites, y [`cerebro/PROGRESO.md`](cerebro/PROGRESO.md) para el porcentaje global ponderado.
+La beta permite importar y normalizar PNG, revisar/confirmar anclajes, componer capas con el motor local, previsualizar y descargar una composición PNG 512×768. El servidor requiere declaración de derechos/procedencia para cada pieza modular. Se registra la declaración del usuario, pero BotImagen no certifica legalmente la autoría o la página fuente.
+
+**Limitaciones pendientes:** este ZIP es código fuente con lanzador, no un instalador .exe autónomo. La prueba física en Chrome/Edge en la computadora del usuario sigue NOT_RUN; el runner Windows de CI no equivale a esa prueba. Faltan más imágenes originales/libres semánticamente intercambiables y validación visual de combinaciones. Los 43 recortes PSD no se consideran piezas de ropa/cabello/cuerpo confirmadas. Consulta \`web/README.md\`, \`cerebro/ESTADO_ACTUAL.md\` y \`cerebro/PROGRESO.md\`.

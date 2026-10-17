@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="512" height="768" viewBox="0 0 512 768" role="img" aria-labelledby="title desc">
+  <title id="title">BotImagen modular anime base v1</title>
+  <desc id="desc">Original editable vector base character with separate named groups for body, clothing, head, eyes, hair and watermark. Created for BotImagen.</desc>
+  <defs>
+    <linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9bf5ff"/><stop offset="1" stop-color="#d17cff"/>
+    </linearGradient>
+    <linearGradient id="jacketGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#262c4c"/><stop offset="1" stop-color="#12162b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="768" fill="#f8f7ff"/>
+  <g id="body" data-part="body" inkscape:label="Body">
+    <path d="M205 310 Q256 294 307 310 L332 415 Q352 467 365 545 L326 554 L294 438 L288 584 L224 584 L218 438 L186 554 L147 545 Q160 467 180 415 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M224 574 L255 574 L251 689 L215 689 Q208 680 215 665 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M257 574 L288 574 L299 665 Q306 681 296 689 L260 689 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M211 682 Q230 673 252 686 L252 704 L195 704 Q190 692 211 682 Z" fill="#252943" stroke="#302a43" stroke-width="5"/>
+    <path d="M263 686 Q282 673 301 682 Q323 691 317 704 L261 704 Z" fill="#252943" stroke="#302a43" stroke-width="5"/>
+  </g>
+  <g id="clothing" data-part="clothing" inkscape:label="Clothing">
+    <path d="M206 309 Q256 294 306 309 L337 395 L306 421 L287 367 L295 488 Q256 505 217 488 L225 367 L206 421 L175 395 Z" fill="url(#jacketGradient)" stroke="#302a43" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M232 315 L256 343 L280 315 L269 387 L256 411 L243 387 Z" fill="#fb75c8" stroke="#302a43" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M244 411 L268 411 L278 473 L234 473 Z" fill="#79efff" stroke="#302a43" stroke-width="4"/>
+    <path d="M213 489 Q256 504 299 489 L313 541 Q256 558 199 541 Z" fill="#fb75c8" stroke="#302a43" stroke-width="5"/>
+    <path d="M205 510 L307 510 M201 528 L311 528" stroke="#302a43" stroke-width="4"/>
+    <path d="M185 397 L170 456 Q169 470 184 473 L203 465 L220 413 Z" fill="#252943" stroke="#302a43" stroke-width="5"/>
+    <path d="M327 397 L342 456 Q343 470 328 473 L309 465 L292 413 Z" fill="#252943" stroke="#302a43" stroke-width="5"/>
+    <path d="M176 458 L199 464 L194 484 Q184 490 175 480 Z M313 464 L336 458 L337 480 Q328 490 318 484 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="4"/>
+  </g>
+  <g id="head" data-part="head" inkscape:label="Head">
+    <path d="M194 174 Q194 115 256 112 Q318 115 318 174 L309 237 Q294 282 256 285 Q218 282 203 237 Z" fill="#f5d2c1" stroke="#302a43" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M232 269 Q256 284 280 269 L280 315 L232 315 Z" fill="#f0c9b8" stroke="#302a43" stroke-width="4"/>
+    <path d="M240 247 Q256 256 272 247" fill="none" stroke="#c66c8e" stroke-width="4" stroke-linecap="round"/>
+    <path d="M226 229 Q232 235 238 229 M274 229 Q280 235 286 229" fill="none" stroke="#e49ab0" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g id="eyes" data-part="eyes" inkscape:label="Eyes">
+    <path d="M211 197 Q230 180 248 197 Q233 222 215 208 Z" fill="#ffffff" stroke="#302a43" stroke-width="4"/>
+    <ellipse cx="231" cy="201" rx="8" ry="13" fill="#35cce7"/>
+    <ellipse cx="233" cy="197" rx="3" ry="5" fill="#ffffff"/>
+    <path d="M264 197 Q282 180 301 197 L297 208 Q279 222 264 197 Z" fill="#ffffff" stroke="#302a43" stroke-width="4"/>
+    <ellipse cx="282" cy="201" rx="8" ry="13" fill="#35cce7"/>
+    <ellipse cx="284" cy="197" rx="3" ry="5" fill="#ffffff"/>
+    <path d="M209 188 Q229 174 249 189 M263 189 Q283 174 303 188" fill="none" stroke="#302a43" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g id="hair" data-part="hair" inkscape:label="Hair">
+    <path d="M190 201 Q169 160 185 123 Q204 79 256 79 Q309 79 328 123 Q344 160 322 201 L310 165 Q290 143 276 117 Q250 148 211 157 L207 211 L194 242 Z" fill="url(#hairGradient)" stroke="#302a43" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M211 158 Q234 148 256 122 Q253 151 238 174 L226 194 L223 167 Z" fill="#8feefc" stroke="#302a43" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M276 117 Q289 148 310 165 L304 206 L291 181 L286 154 Z" fill="#d17cff" stroke="#302a43" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M191 193 Q171 235 190 275 L208 250 L205 210 Z" fill="#9bf5ff" stroke="#302a43" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M320 193 Q342 235 322 275 L304 250 L307 210 Z" fill="#d17cff" stroke="#302a43" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M190 129 Q203 98 235 91 M274 92 Q306 102 320 130" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+  </g>
+  <g id="watermark" data-part="watermark" inkscape:label="BotImagen watermark">
+    <path d="M210 733 C198 719 177 725 178 741 C179 754 195 761 210 770 C225 761 241 754 242 741 C243 725 222 719 210 733 Z" fill="#d17cff" stroke="#302a43" stroke-width="3" transform="translate(0 -6) scale(.82) translate(46 150)"/>
+    <text x="256" y="744" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="1.2" fill="#302a43">BOTIMAGEN · BASE v1</text>
+  </g>
+</svg>

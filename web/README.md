@@ -1,38 +1,38 @@
 # BotImagen Studio Web · Beta en construcción
 
-La interfaz React + TypeScript consume el catálogo y el motor reales mediante el servicio Python local. El editor ofrece 47 categorías en 8 pestañas y ahora incluye el primer motor vectorial CyberStreet, un Style Lab con receta versionada, tres estados NanoWear y un Chromapatch personalizable. La CI ejecuta un smoke test headless de Chromium en Linux; la validación manual de navegador en Windows sigue pendiente.
+La interfaz React + TypeScript consume el motor Python local e incluye el creador de personajes, perfiles, biblioteca modular, importación/normalización PNG, anclajes, composición y exportación. La CI de Linux prueba build/Chromium; la CI Windows comprueba el lanzador y prepara un ZIP fuente con SHA-256. La prueba física en la PC del usuario sigue pendiente.
+
 
 ## Requisitos
 
-- Python 3.10+ (sin dependencias Python extra para el servidor actual).
-- Node.js 22 y npm.
-- `package-lock.json` está versionado: `npm ci` instala el árbol fijado por el proyecto y falla si el manifiesto y el lockfile divergen. La instalación inicial requiere Internet para acceder al registro npm; la app no usa APIs de IA ni servicios remotos durante la generación del perfil.
+- Python 3.10+.
+- Node.js 22+ y npm.
+- Pillow para la composición PNG del motor local.
+- web/package-lock.json fija las dependencias; npm ci instala las versiones declaradas en el lockfile. La primera instalación puede requerir Internet.
 
 ## Ejecutar en Windows
 
-Abre dos terminales desde la carpeta del repositorio.
+**Modo recomendado:** desde la raíz del repositorio, haz doble clic en Iniciar_BotImagen_Web.bat. El lanzador comprueba requisitos, prepara dependencias cuando corresponde, inicia la API y Vite solo si no responden ya en sus direcciones locales y abre http://127.0.0.1:5173. Las ventanas de procesos muestran sus logs; déjalas abiertas mientras uses la beta.
 
-**Terminal 1, iniciar el motor local:**
+Para verificar o preparar requisitos sin abrir servicios ni navegador, ejecuta:
 
-```bat
-py botimagen_server.py
-```
+    Iniciar_BotImagen_Web.bat -CheckOnly
 
-El servicio escucha únicamente en `127.0.0.1:8765`. Deja esa terminal abierta.
+El modo manual sigue disponible en dos terminales. En la primera, desde la raíz:
 
-**Terminal 2, iniciar la interfaz web:**
+    py botimagen_server.py
 
-```bat
-cd web
-npm ci
-npm run dev
-```
+En la segunda:
 
-Abre la dirección local que indique Vite, normalmente `http://127.0.0.1:5173`. La configuración de Vite reenvía las solicitudes `/api` al servicio local Python. Para comprobar el frontend compilado, ejecuta `npm run build` dentro de `web/`. La CI valida ese mismo camino con `npm ci --no-audit --no-fund` y `npm run build`.
+    cd web
+    npm ci
+    npm run dev
+
+La API escucha solamente en 127.0.0.1:8765; Vite escucha en 127.0.0.1:5173 y reenvía llamadas /api. Ejecuta npm run build dentro de web/ para verificar la compilación.
 
 ## Smoke test automatizado del navegador
 
-La CI instala Playwright y Chromium en un directorio temporal y ejecuta `web/browser_smoke.mjs`. El test arranca la API local y Vite, abre Chromium headless y verifica el catálogo, semántica de opciones explícitas «ninguno», fallos HTTP recuperables, bloqueo de acciones con cambios pendientes, compatibilidad de rasgos entre categorías, preservación de elecciones manuales y ciclo de guardar/duplicar/cargar perfiles.
+La CI Linux instala Playwright y Chromium en un directorio temporal y ejecuta `web/browser_smoke.mjs`. Los últimos incrementos validados prueban composición PNG real, descarga de 512 × 768 y compuerta de derechos/procedencia; los resultados se registran con sus SHA exactos en `cerebro/ESTADO_ACTUAL.md`. El test arranca la API local y Vite, abre Chromium headless y verifica el catálogo, semántica de opciones explícitas «ninguno», fallos HTTP recuperables, bloqueo de acciones con cambios pendientes, compatibilidad de rasgos entre categorías, preservación de elecciones manuales y ciclo de guardar/duplicar/cargar perfiles.
 
 Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botimagen/actions/runs/38004033939. CI #167 también pasó tras ajustar el contrato para no publicar el campo interno `prompt_en`: https://github.com/jonhararagi/botimagen/actions/runs/38003917950. Playwright no se añade a las dependencias de ejecución de la aplicación ni modifica `web/package-lock.json`. Esta prueba corre en Linux; la validación manual en Chrome/Edge y Windows sigue pendiente.
 
@@ -48,13 +48,16 @@ Evidencia reciente: CI #168 **PASS_REAL**, https://github.com/jonhararagi/botima
 - Guardado de perfiles mediante `POST /api/profiles` en `generated_characters/web_profiles/`, ignorado por Git por defecto.
 - Panel de perfiles locales: permite actualizar la lista, cargar un perfil guardado y duplicarlo como copia independiente. El guardado genera un UUID nuevo y la prueba HTTP confirma que el original permanece intacto.
 - `GET /api/assets/contracts` expone los diez contratos PNG del manifiesto oficial con prompt, destino relativo y límites esperados. Es una ruta de solo lectura; no importa ni escribe archivos.
+- La biblioteca modular registra hash SHA-256, archivo fuente, licencia declarada, estado de derechos, tamaño, categoría, pose y metadatos de conversión.
+- La API bloquea la composición de una pieza modular si la declaración de derechos/procedencia sigue pendiente, aunque se invoque el endpoint directamente.
+- Para confirmar se admite obra propia declarada o una lista limitada de licencias abiertas con URL HTTPS. BotImagen registra lo declarado; no verifica automáticamente autoría, licencia o contenido de la página.
 - Pruebas HTTP del servicio y validación de selecciones para que una opción inventada no se acepte.
 
 ## Límites actuales
 
-El motor visual es una representación SVG 2D estilizada, no un modelo 3D ni una ilustración anime final. Algunas categorías existentes solo reciben una representación neutral porque todavía no tienen geometría dedicada. No existe generación neuronal de imagen, pipeline real de Pixel Art, biblioteca visual con miniaturas/SQLite, comparación de variantes ni migración completa del intake de assets. La API ya publica los contratos oficiales en modo de solo lectura; selección, vista previa, validación binaria y copia de la imagen siguen pendientes. El servicio debe iniciarse manualmente en una terminal; el lanzador unificado de Windows se desarrollará más adelante.
+El motor visual base sigue siendo un dibujo 2D estilizado, no una ilustración anime final ni un sistema 3D. Las piezas modulares deben importarse y clasificarse explícitamente. Confirmar anclajes no limpia una pieza automáticamente ni recupera zonas ocultas por otra prenda. Los 43 recortes PSD siguen como referencias/candidatos pendientes de revisión semántica, no como cabello/cuerpo/ropa intercambiables verificados.
 
-El smoke test automatizado headless de Chromium en Linux ya pasa en GitHub Actions. Falta probar manualmente en Chrome/Edge en Windows y medir memoria/rendimiento; la prueba de CI no sustituye esa verificación física.
+Se añade una CI Windows para comprobar el preflight del lanzador, las pruebas Python, el build y la disponibilidad de API/Vite sobre loopback. Esa comprobación remota no sustituye QA físico en el ordenador del usuario. El lanzador tampoco es un instalador .exe autónomo; empaquetado independiente y mediciones de memoria/rendimiento siguen pendientes.
 
 
 ## Motor de dibujo anime local

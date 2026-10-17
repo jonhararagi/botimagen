@@ -6,7 +6,10 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from modular_asset_library import AssetImportError, confirm_user_asset_anchors, import_user_asset, list_user_assets
+from modular_asset_library import (
+    AssetImportError, confirm_user_asset_anchors, confirm_user_asset_rights,
+    import_user_asset, list_user_assets,
+)
 
 import struct
 import zlib
@@ -74,6 +77,17 @@ class ModularAssetLibraryTests(unittest.TestCase):
             self.assertEqual(list_user_assets(root)["count"], 1)
             self.assertTrue((root / "catalog.json").is_file())
 
+    def test_cc0_archive_member_provenance_preserves_relative_path(self):
+        with TemporaryDirectory() as directory:
+            source_member = "cha 1/image/pl1 angry.png"
+            record = import_user_asset(payload(
+                source_filename=source_member,
+                source_url="https://opengameart.org/content/visual-novel-character-sprite",
+                license="CC0 1.0",
+            ), Path(directory))
+            self.assertEqual(record["source_filename"], source_member)
+            self.assertEqual(list_user_assets(Path(directory))["assets"][0]["source_filename"], source_member)
+
     def test_duplicate_content_does_not_duplicate_catalog(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -89,6 +103,8 @@ class ModularAssetLibraryTests(unittest.TestCase):
             payload(data_base64="not base64"),
             payload(category="../../outside"),
             payload(filename="../../outside.png"),
+            payload(source_filename="../outside.png"),
+            payload(source_filename="C:/Users/private/source.png"),
             payload(kind="modular_piece", source_url="javascript:alert(1)"),
         ]
         for case in cases:
@@ -189,6 +205,36 @@ class ModularAssetLibraryTests(unittest.TestCase):
             with self.assertRaisesRegex(AssetImportError, "Convierte la imagen"):
                 confirm_user_asset_anchors(candidate["id"], root)
             self.assertEqual(list_user_assets(root)["count"], 2)
+
+    def test_provenance_is_unverified_by_default_and_can_be_declared_as_original(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            pending = import_user_asset(payload(), root)
+            self.assertFalse(pending["rights_confirmed"])
+            self.assertEqual(pending["provenance_status"], "unverified")
+            self.assertIsNone(pending["provenance_reviewed_at"])
+            confirmed = confirm_user_asset_rights(pending["id"], "Original propio", "", root)
+            self.assertTrue(confirmed["rights_confirmed"])
+            self.assertEqual(confirmed["provenance_status"], "user_declared_original")
+            self.assertIn("no verifica de forma independiente", confirmed["provenance_note"].lower())
+            stored = list_user_assets(root)["assets"][0]
+            self.assertTrue(stored["rights_confirmed"])
+            self.assertEqual(stored["provenance_status"], "user_declared_original")
+
+    def test_open_license_requires_known_license_and_https_source(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            asset = import_user_asset(payload(data=PNG_STAGE, filename="licensed.png"), root)
+            with self.assertRaisesRegex(AssetImportError, "HTTPS"):
+                confirm_user_asset_rights(asset["id"], "CC0 1.0", "", root)
+            with self.assertRaisesRegex(AssetImportError, "HTTPS"):
+                confirm_user_asset_rights(asset["id"], "CC0 1.0", "http://example.org/art.png", root)
+            with self.assertRaisesRegex(AssetImportError, "no habilitada para composición"):
+                confirm_user_asset_rights(asset["id"], "licencia inventada", "https://example.org/art.png", root)
+            confirmed = confirm_user_asset_rights(asset["id"], "CC0 1.0", "https://example.org/art.png", root)
+            self.assertTrue(confirmed["rights_confirmed"])
+            self.assertEqual(confirmed["provenance_status"], "user_attested_open_license")
+            self.assertEqual(confirmed["source_url"], "https://example.org/art.png")
 
     def test_corrupt_catalog_is_not_overwritten(self):
         with TemporaryDirectory() as directory:

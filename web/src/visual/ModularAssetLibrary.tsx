@@ -6,6 +6,7 @@ type UserAsset = {
   id: string; label: string; category: string; kind: string; filename: string; source_filename?: string;
   source_asset_id?: string | null; mime_type: string; width: number; height: number; bytes: number; sha256: string;
   view: string; license: string; source_url: string; duplicate?: boolean; available?: boolean;
+  rights_confirmed?: boolean; provenance_status?: string; provenance_reviewed_at?: string | null; provenance_note?: string;
   layer_order?: number | null; anchor_estimate?: Record<string, {x:number;y:number}>;
   anchors_validated?: boolean; anchor_status?: string; conversion?: AssetConversionMetadata | null; note?: string;
 };
@@ -170,6 +171,7 @@ export function ModularAssetLibrary() {
   const [view, setView] = useState<"front"|"back"|"side"|"unknown">("front");
   const [license, setLicense] = useState("UNVERIFIED");
   const [sourceUrl, setSourceUrl] = useState("");
+  const [rightsConfirmed, setRightsConfirmed] = useState(false);
   const [removeBackground, setRemoveBackground] = useState(true);
   const [tolerance, setTolerance] = useState(36);
   const [scalePercent, setScalePercent] = useState(100);
@@ -250,7 +252,7 @@ export function ModularAssetLibrary() {
           const originalBase64=await readDataUrl(item.file);
           sourceRecord=await postAsset({
             filename:item.file.name,source_filename:item.file.name,mime_type:item.file.type,data_base64:originalBase64,
-            category:"reference",kind:"reference",label:`Fuente original · ${stem}`,view,license,source_url:sourceUrl,
+            category:"reference",kind:"reference",label:`Fuente original · ${stem}`,view,license,source_url:sourceUrl,rights_confirmed:rightsConfirmed,
           });
         }
         const suffix=item.conversion?.cutout_applied?"-pieza-recortada":"";
@@ -258,7 +260,7 @@ export function ModularAssetLibrary() {
         const convertedBase64=await readDataUrl(convertedFile);
         await postAsset({
           filename:convertedFile.name,source_filename:item.file.name,mime_type:"image/png",data_base64:convertedBase64,
-          category,kind,label:stem,view,license,source_url:sourceUrl,
+          category,kind,label:stem,view,license,source_url:sourceUrl,rights_confirmed:rightsConfirmed,
           ...(sourceRecord?.id?{source_asset_id:sourceRecord.id}:{}),
           conversion:item.conversion,
         });
@@ -271,6 +273,111 @@ export function ModularAssetLibrary() {
       await refresh().catch(()=>undefined);
       setStatus(`${finished} material(es) guardado(s). ${error instanceof Error?error.message:"Falló la importación."}`);
     } finally { setBusy(false); }
+  };
+
+  const installCyberStreetPngPack = async () => {
+    if (busy) return;
+    setBusy(true);
+    let processed = 0;
+    let added = 0;
+    let duplicates = 0;
+    const failures: string[] = [];
+    try {
+      const manifestResponse = await fetch("/api/modular-cyberstreet");
+      if (!manifestResponse.ok) throw new Error("No se pudo abrir el manifiesto del pack original CyberStreet.");
+      const manifest = await manifestResponse.json() as {
+        pack_id: string; width: number; height: number; layers: Array<{id:string;label:string}>;
+      };
+      if (manifest.width !== 512 || manifest.height !== 768 || !Array.isArray(manifest.layers) || manifest.layers.length < 1 || manifest.layers.length > 100) {
+        throw new Error("El pack no contiene un número admisible de capas 512×768.");
+      }
+      for (const manifestLayer of manifest.layers) {
+        let objectUrl = "";
+        try {
+          const sourceResponse = await fetch("/api/modular-cyberstreet/layers/" + encodeURIComponent(manifestLayer.id));
+          const source = await sourceResponse.json() as {
+            id:string; label:string; category:string; rig_category:string; width:number; height:number;
+            view:string; license:string; source_url:string; source_filename:string;
+            anchors:AssetConversionMetadata["anchors"]; svg:string;
+          };
+          if (!sourceResponse.ok) throw new Error("No se pudo leer el SVG fuente.");
+          if (source.width !== 512 || source.height !== 768 || source.view !== "front" || typeof source.svg !== "string") {
+            throw new Error("La capa fuente no cumple el lienzo frontal de 512×768.");
+          }
+          const image = new Image();
+          objectUrl = URL.createObjectURL(new Blob([source.svg], {type:"image/svg+xml"}));
+          image.src = objectUrl;
+          await image.decode();
+          if (image.naturalWidth !== 512 || image.naturalHeight !== 768) {
+            throw new Error("El navegador no rasterizó la capa al tamaño esperado.");
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = 512;
+          canvas.height = 768;
+          const context = canvas.getContext("2d", {willReadFrequently:true});
+          if (!context) throw new Error("Canvas 2D no está disponible para exportar el PNG.");
+          context.clearRect(0, 0, 512, 768);
+          context.drawImage(image, 0, 0, 512, 768);
+          const pixels = context.getImageData(0, 0, 512, 768).data;
+          let minX = 512, minY = 768, maxX = -1, maxY = -1;
+          for (let pixel = 0; pixel < pixels.length; pixel += 4) {
+            if (pixels[pixel + 3] === 0) continue;
+            const point = pixel / 4;
+            const x = point % 512;
+            const y = Math.floor(point / 512);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+          if (maxX < minX || maxY < minY) throw new Error("La capa se exportó vacía.");
+          const pngBlob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("No se pudo codificar el PNG.")), "image/png");
+          });
+          const digest = await crypto.subtle.digest("SHA-256", await pngBlob.arrayBuffer());
+          const pngSha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+          const conversion: AssetConversionMetadata = {
+            schema_version: 1, algorithm: "botimagen-png-stage-v1", normalized: true,
+            canvas_width: 512, canvas_height: 768, source_width: 512, source_height: 768,
+            source_sha256: pngSha256, source_format: "image/png",
+            background_removed: false, background_tolerance: 0, scale_percent: 100, offset_x: 0, offset_y: 0,
+            pose: "front", rig_category: source.rig_category,
+            content_bounds: {x:minX,y:minY,width:maxX-minX+1,height:maxY-minY+1},
+            anchors: source.anchors, anchor_status: "estimated_not_validated", cutout_applied: false,
+          };
+          const result = await postAsset({
+            filename: "cyberstreet-" + source.id + ".png",
+            source_filename: source.source_filename,
+            mime_type: "image/png",
+            data_base64: await readDataUrl(pngBlob),
+            category: source.category,
+            kind: "modular_piece",
+            label: "CyberStreet · " + source.label,
+            view: "front",
+            license: source.license,
+            source_url: source.source_url,
+            rights_confirmed: true,
+            conversion,
+          });
+          processed++;
+          if (result.duplicate) duplicates++; else added++;
+        } catch (error) {
+          failures.push(manifestLayer.id + ": " + (error instanceof Error ? error.message : "error desconocido"));
+        } finally {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+        }
+      }
+      await refresh();
+      if (failures.length) {
+        setStatus("Pack original CyberStreet importado parcialmente: " + processed + "/" + manifest.layers.length + " capas procesadas (" + added + " nuevas, " + duplicates + " ya existentes). Fallos: " + failures.join(" · ") + ". Puedes reintentar sin duplicar las piezas guardadas.");
+      } else {
+        setStatus("Pack original CyberStreet listo: " + manifest.layers.length + " PNG reales de 512×768, fondo transparente conservado y hashes calculados (" + added + " nuevas, " + duplicates + " ya existentes). Procedencia del repositorio registrada; revisa y confirma los puntos del esqueleto en cada pieza antes de componer.");
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "No se pudo instalar el pack original CyberStreet.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const confirmAnchors = async (asset:UserAsset) => {
@@ -288,6 +395,31 @@ export function ModularAssetLibrary() {
       setStatus(error instanceof Error?error.message:"Falló la confirmación de anclajes.");
     } finally { setBusy(false); }
   };
+
+  const confirmRights = async (asset:UserAsset) => {
+    if (busy) return;
+    if (!rightsConfirmed) {
+      setStatus("Marca primero «Confirmo derechos y procedencia» después de revisar la licencia y su fuente.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/confirm-rights",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({confirm:true,license,source_url:sourceUrl}),
+      });
+      const result=await response.json();
+      if(!response.ok) throw new Error(result.error||"No se pudieron guardar los derechos/procedencia.");
+      await refresh();
+      setStatus("Declaración de derechos guardada para «"+asset.label+"». No implica verificación jurídica automática.");
+    } catch(error) {
+      setStatus(error instanceof Error?error.message:"Falló la confirmación de derechos/procedencia.");
+    } finally { setBusy(false); }
+  };
+
+  const hasEligibleProvenance = (asset:UserAsset) =>
+    asset.rights_confirmed === true
+    && ["user_declared_original","user_attested_open_license"].includes(asset.provenance_status || "");
 
   const composeSelection = async () => {
     if (busy || !selectedAssets.length) return;
@@ -312,12 +444,24 @@ export function ModularAssetLibrary() {
       });
       const data=await response.json();
       if(!response.ok) throw new Error(data.error||"No se pudo componer la selección.");
+      if(data.mime_type!=="image/png"||typeof data.png_base64!=="string"||!data.png_base64.startsWith("iVBOR")||data.width!==512||data.height!==768) {
+        throw new Error("El compositor no devolvió un PNG válido de 512×768.");
+      }
       setCompositionPreview(`data:image/png;base64,${data.png_base64}`);
       setComposeStatus(`Composición real lista · ${data.width}×${data.height} · ${pieces.length} capa(s).`);
     } catch(error) {
       setCompositionPreview("");
       setComposeStatus(error instanceof Error?error.message:"Falló la composición.");
     } finally { setBusy(false); }
+  };
+
+  const downloadComposition = () => {
+    if(!compositionPreview) return;
+    const link=document.createElement("a");
+    link.href=compositionPreview;
+    link.download="botimagen-composicion-modular.png";
+    link.click();
+    setComposeStatus("Descarga PNG iniciada · 512×768 · la transparencia del lienzo se conserva.");
   };
 
   const supportsCompositionView=(asset:UserAsset,view=compositionView)=>asset.view==="unknown"||asset.view===view;
@@ -368,8 +512,12 @@ export function ModularAssetLibrary() {
           <option value="front">Frontal</option><option value="back">Trasera</option><option value="side">Lateral</option><option value="unknown">Sin definir</option>
         </select>
       </label>
-      <label>Licencia / derechos <input aria-label="Licencia de la imagen" value={license} onChange={e=>setLicense(e.target.value)} maxLength={1000} /></label>
-      <label className="modular-source-url">URL de procedencia <input aria-label="URL de procedencia" value={sourceUrl} onChange={e=>setSourceUrl(e.target.value)} placeholder="https://… (opcional)" maxLength={1000} /></label>
+      <label>Licencia / derechos <input aria-label="Licencia de la imagen" value={license} onChange={e=>{setLicense(e.target.value);setRightsConfirmed(false);}} maxLength={1000} /></label>
+      <label className="modular-source-url">URL de procedencia <input aria-label="URL de procedencia" value={sourceUrl} onChange={e=>{setSourceUrl(e.target.value);setRightsConfirmed(false);}} placeholder="https://… (opcional)" maxLength={1000} /></label>
+      <label className="modular-check" style={{gridColumn:"1/-1",lineHeight:1.45}}>
+        <input type="checkbox" aria-label="Confirmo derechos y procedencia" checked={rightsConfirmed} onChange={e=>setRightsConfirmed(e.target.checked)} />
+        Declaro que es obra original propia o que la licencia abierta y la fuente indicadas son correctas. Esta declaración se registra, pero BotImagen no verifica automáticamente autoría, licencia ni el contenido de la página.
+      </label>
     </div>
 
     <div className="modular-converter-options">
@@ -398,6 +546,7 @@ export function ModularAssetLibrary() {
       </div>)}
     </div>}
     <div className="modular-library-actions">
+      <button className="btn muted" type="button" data-testid="install-cyberstreet-png-pack" disabled={busy} onClick={()=>void installCyberStreetPngPack()}>{busy?"Procesando…":"Instalar pack original CyberStreet (6 PNG)"}</button>
       <button className="btn muted" type="button" disabled={!previews.length||busy} onClick={()=>void prepareMaterial()}>{busy?"Procesando…":"Preparar PNG 512 × 768"}</button>
       <button className="btn primary" type="button" disabled={!previews.length||previews.some(item=>!item.convertedBlob)||busy} onClick={()=>void importFiles()}>{busy?"Guardando…":"Guardar material convertido"}</button>
       <button className="btn muted" type="button" disabled={busy} onClick={()=>void refresh()}>Actualizar biblioteca</button>
@@ -407,16 +556,19 @@ export function ModularAssetLibrary() {
     <div className="modular-asset-list">
       {assets.map(asset=>{
         const canCompose=isConvertiblePiece(asset);
-        const selectable=canCompose&&asset.anchors_validated===true&&supportsCompositionView(asset);
+        const hasRights=hasEligibleProvenance(asset);
+        const selectable=canCompose&&hasRights&&asset.anchors_validated===true&&supportsCompositionView(asset);
         return <article key={asset.id} data-asset-id={asset.id} data-asset-kind={asset.kind}>
           {asset.kind==="modular_piece"&&asset.conversion?<div className="modular-saved-preview"><AnchorStageEditor imageUrl={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} anchors={asset.anchor_estimate||asset.conversion.anchors} label={`Ajustar esqueleto de ${asset.label}`} onChange={anchors=>setAssets(current=>current.map(entry=>entry.id===asset.id?{...entry,anchor_estimate:anchors,conversion:entry.conversion?{...entry.conversion,anchors}:entry.conversion}:entry))}/></div>:<img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={`Material guardado ${asset.label}`}/>}
           <b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span>
           <small>{asset.filename} · SHA-256 {asset.sha256.slice(0,16)}… · licencia: {asset.license}</small>
+          <small>Procedencia: {asset.provenance_status==="user_declared_original"?"obra propia declarada":asset.provenance_status==="user_attested_open_license"?"licencia abierta y fuente declaradas":"sin confirmar"} · {asset.provenance_note||"No consta declaración de derechos."}</small>
           {asset.conversion&&<small>{asset.conversion.cutout_applied?"Recorte manual":"Imagen completa"} · {asset.conversion.background_removed?"fondo plano retirado":"fondo conservado"} · vista {asset.view} · anclajes: {asset.anchor_status==="user_confirmed"?"confirmados":"estimados sin validar"}</small>}
           {canCompose&&<div className="modular-asset-actions">
             <label className="modular-check"><input type="checkbox" aria-label={`Seleccionar pieza ${asset.label}`} checked={selectedAssets.includes(asset.id)} disabled={!selectable||busy} onChange={e=>toggleAsset(asset.id,e.target.checked)}/>{asset.category==="body"?"Base del esqueleto":"Incluir en la composición"}</label>
             {!asset.anchors_validated&&canCompose&&<button type="button" className="btn muted" disabled={busy} onClick={()=>void confirmAnchors(asset)}>Confirmar puntos del esqueleto</button>}
-            {!selectable&&canCompose&&<small>{!supportsCompositionView(asset)?`Esta pieza es de vista ${asset.view==="back"?"trasera":"frontal"}. Cambia la vista de composición para usarla.`:"Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático."}</small>}
+            {!hasRights&&canCompose&&<button type="button" className="btn muted" disabled={busy||!rightsConfirmed} onClick={()=>void confirmRights(asset)}>Aplicar declaración de derechos a esta pieza</button>}
+            {!selectable&&canCompose&&<small>{!supportsCompositionView(asset)?`Esta pieza es de vista ${asset.view==="back"?"trasera":"frontal"}. Cambia la vista de composición para usarla.`:!hasRights?"Bloqueada: confirma arriba una licencia admitida y su procedencia antes de componer.":"Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático."}</small>}
           </div>}
         </article>;
       })}
@@ -424,6 +576,7 @@ export function ModularAssetLibrary() {
     <div className="modular-composition-panel">
       <div><b>Compositor de piezas importadas</b><p>El cuerpo base actúa como esqueleto de referencia: las prendas se escalan y trasladan automáticamente usando los puntos compartidos. Importa y confirma un juego frontal y otro trasero, y cambia la vista aquí para alternarlos.</p><label className="modular-composition-view">Vista de composición<select aria-label="Vista para componer" value={compositionView} onChange={e=>changeCompositionView(e.target.value as "front"|"back")}><option value="front">Frontal</option><option value="back">Trasera</option></select></label></div>
       <button className="btn primary" type="button" disabled={!selectedAssets.length||busy} onClick={()=>void composeSelection()}>{busy?"Componiendo…":`Componer selección (${selectedAssets.length})`}</button>
+      <button className="btn muted" type="button" disabled={!compositionPreview||busy} onClick={downloadComposition}>Descargar composición PNG</button>
       <span role="status" data-testid="modular-compose-status">{composeStatus}</span>
       {compositionPreview&&<img className="modular-composition-preview" src={compositionPreview} alt="Composición PNG de piezas modulares importadas"/>}
     </div>

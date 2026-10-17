@@ -12,6 +12,15 @@ import type { VisualRecipe } from "./visual/VisualCharacterRenderer";
 import { ModularAssetLibrary } from "./visual/ModularAssetLibrary";
 import { CharacterModelBuilder } from "./visual/CharacterModelBuilder";
 import { ModularCharacterComposer } from "./visual/ModularCharacterComposer";
+import { AnimePngLibrary } from "./visual/AnimePngLibrary";
+import { QuickImageEditor } from "./visual/QuickImageEditor";
+import { PsdLayerRoleMapper } from "./visual/PsdLayerRoleMapper";
+import { CharacterCatalogStudio } from "./visual/CharacterCatalogStudio";
+import { Cc0CharacterStudio } from "./visual/Cc0CharacterStudio";
+import { PixAiAssetFactory } from "./visual/PixAiAssetFactory";
+import { DressUpGame } from "./visual/DressUpGame";
+import { ModularDressUp } from "./visual/ModularDressUp";
+import { ModelLoraFinder } from "./visual/ModelLoraFinder";
 
 type Group = "identity" | "body" | "anatomy" | "face" | "hair" | "outfit" | "combat" | "detail";
 type FieldId = string;
@@ -330,16 +339,25 @@ export default function App(){
    <div className="brand"><span className="brand-mark">✳</span><span><b>BotImagen</b><small>CHARACTER STUDIO</small></span></div>
    <div className="nav-label">ESPACIO DE TRABAJO</div>
    <button className="nav active" type="button"><span>◈</span> Diseñador <i>01</i></button>
-   <button className="nav" type="button" disabled title="Pendiente de BIMG-007"><span>▦</span> Biblioteca visual <small>PRONTO</small></button>
+   <button className="nav" type="button" onClick={() => document.getElementById("quick-image-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>✂</span> Editor de imágenes <small>EDITAR</small></button>
+    <button className="nav" type="button" onClick={() => document.getElementById("anime-png-library")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▦</span> Biblioteca de PNG <small>LOCAL</small></button>
+   <button className="nav" type="button" onClick={() => document.getElementById("mini-anime-ai")?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>✦</span> Mini IA anime <small>LOCAL</small></button>
    <button className="nav" type="button" disabled title="Función futura"><span>⇄</span> Comparar variantes</button>
-   <button className="nav" type="button" disabled title="Integración futura"><span>▤</span> Assets</button>
+   <button className="nav" type="button" onClick={() => document.querySelector('[data-testid="pixai-asset-factory"]')?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>▤</span> Fábrica de assets <small>PIXAI</small></button>
+   <button className="nav" type="button" onClick={() => document.querySelector('[data-testid="dressup-game"]')?.scrollIntoView({ behavior: "smooth", block: "start" })}><span>✂</span> Juego de vestuario</button>
    <div className="side-spacer"/>
    <div className="local-card"><div className="online"><i/> MOTOR LOCAL</div><b>{catalog?"Motor detectado":"Conectando motor"}</b><p>{catalog?"Catálogo y prompts procesados por Python. Sin API de IA externa.":"Inicia el servicio Python para habilitar el catálogo real."}</p><div className="progress"><i/></div><small>{catalog?catalog.style.id:"API LOCAL · 127.0.0.1"}</small></div>
    <footer className="side-footer"><span>v0.2.0</span><span>OFFLINE-FIRST</span></footer>
   </aside>
   <main className="main">
    <header className="topbar"><div className="crumb">WORKSPACE <span>/</span> <b>CHARACTER DESIGN</b></div><div className="top-actions"><span className="local-pill"><i/> {catalog?"LOCAL · CONECTADO":"LOCAL · DESCONECTADO"}</span><span className="avatar">BW</span></div></header>
-   <section className="heading"><div><div className="eyebrow"><i/> ESTUDIO DE PERSONAJES <span>BIMG-004</span></div><h1>Diseña una nueva <em>waifu.</em></h1><p>Selecciona rasgos del catálogo real y deja que el motor complete los campos AUTO.</p></div><div className="heading-buttons"><button className="btn muted" onClick={reset} type="button" disabled={generating}>Restaurar ejemplo</button><button className="btn primary" onClick={() => void saveProfile()} type="button" disabled={!generated||draftDirty||generating}>＋ {draftDirty?"Genera para guardar":saved?"Perfil guardado":"Guardar perfil local"}</button></div></section>
+   <QuickImageEditor />
+   <DressUpGame />
+    <ModularDressUp />
+   <Cc0CharacterStudio />
+   <PixAiAssetFactory />
+   <CharacterCatalogStudio />
+   <section className="heading"><div><div className="eyebrow"><i/> MODO AVANZADO <span>BIMG-004</span></div><h1>Editor técnico del personaje</h1><p>Para ajustar recetas visuales y controles avanzados. El creador simple está arriba.</p></div><div className="heading-buttons"><button className="btn muted" onClick={reset} type="button" disabled={generating}>Restaurar ejemplo</button><button className="btn primary" onClick={() => void saveProfile()} type="button" disabled={!generated||draftDirty||generating}>＋ {draftDirty?"Genera para guardar":saved?"Perfil guardado":"Guardar perfil local"}</button></div></section>
    <div className="workspace">
     <section className="preview-area">
      <div className="kicker"><span><i>01</i> LIENZO DEL PERSONAJE</span><small>PREVIEW <i/></small></div>
@@ -354,7 +372,7 @@ export default function App(){
       <div className="canvas-footer"><div><i/><b>{labelFor(catalog,"species",values.species).toUpperCase()} STUDY</b><small>{renderState}</small></div><div className="swatches"><i style={{background:colorFor(values.hair)}}/><i style={{background:values.hair_secondary_color==="oro_metalico"?"#d7ae59":"#a6abc0"}}/><i style={{background:values.eyes==="ambar"?"#d6a54d":"#7396df"}}/></div></div>
      </div>
      <div className="summary"><div><small>COMBINACIÓN ACTUAL</small><b>{labelFor(catalog,"species",values.species)} · {labelFor(catalog,"hair",values.hair)} · {labelFor(catalog,"eyes",values.eyes)}</b><span>{generated?"Estilo oficial: "+generated.style_name:"El motor aún no ha devuelto un perfil."}</span></div><div className="counts"><b>{Object.values(fixed).filter(Boolean).length}<small>FIJOS</small></b><b>{Object.values(fixed).filter(v=>!v).length}<small>AUTO</small></b></div></div>
-     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><ModularAssetLibrary/><CharacterModelBuilder/><ModularCharacterComposer/><div className="roadmap"><b><img className="studio-library-mark" src={chromapatchBadge} alt="" /> Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
+     <VisualStyleLab recipe={visualRecipe} values={values} onChange={updateVisualRecipe}/><ModelLoraFinder/><ModularAssetLibrary/><CharacterModelBuilder/><PsdLayerRoleMapper/><ModularCharacterComposer/><AnimePngLibrary/><div className="roadmap"><b><img className="studio-library-mark" src={chromapatchBadge} alt="" /> Motor visual CyberStreet</b><span>Vista vectorial original con estados NanoWear, receta visual versionada y Chromapatch persistente. El motor local compone cuerpo, cabello, rostro y vestuario en capas SVG reales. Las opciones sin geometría dedicada se completan en las siguientes integraciones, no se simulan como ya terminadas.</span></div>
     </section>
     <section className="controls-area">
      <div className="control-panel">

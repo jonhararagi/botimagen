@@ -125,6 +125,133 @@ try {
   page.on("pageerror", error => pageErrors.push(error.message));
 
   await page.goto(appUrl, { waitUntil: "domcontentloaded", timeout: 20000 });
+  // Verify expanded fixed-choice character catalog in a real Chromium session.
+  const characterCatalog = page.getByTestId("character-catalog-studio");
+  await characterCatalog.getByRole("heading", { name: "Creador de personajes" }).waitFor({ state: "visible", timeout: 15000 });
+  const catalogOptionCounts = {};
+  for (const [label, expected] of [["Piel", 8], ["Color del cabello", 10], ["Peinado", 8], ["Ojos", 8], ["Prenda superior", 8], ["Prenda inferior", 7], ["Accesorio", 8]]) {
+    const selector = characterCatalog.getByRole("combobox", { name: label });
+    await selector.waitFor({ state: "visible" });
+    const count = await selector.locator("option").count();
+    assert.equal(count, expected, `Expanded catalog option count for ${label}`);
+    catalogOptionCounts[label] = count;
+  }
+  await characterCatalog.getByRole("combobox", { name: "Peinado" }).selectOption("wolfcut");
+  await characterCatalog.getByRole("combobox", { name: "Prenda superior" }).selectOption("sports");
+  const svgBeforeAccessory = await characterCatalog.locator("svg.cc-figure").innerHTML();
+  await characterCatalog.getByRole("combobox", { name: "Accesorio" }).selectOption("halo");
+  const svgAfterAccessory = await characterCatalog.locator("svg.cc-figure").innerHTML();
+  assert.notEqual(svgAfterAccessory, svgBeforeAccessory, "Selecting a new accessory must change the live SVG preview");
+  await characterCatalog.getByRole("button", { name: "Guardar personaje" }).click();
+  await characterCatalog.getByRole("status").filter({ hasText: /guardado/i }).waitFor({ state: "visible", timeout: 5000 });
+  const savedCatalog = await page.evaluate(() => JSON.parse(localStorage.getItem("botimagen.character-catalog.v1") || "[]"));
+  assert.equal(savedCatalog.length, 1, "Saving a character should persist one catalog entry");
+  assert.equal(savedCatalog[0].hairstyle, "wolfcut", "Saved character should preserve hairstyle");
+  assert.equal(savedCatalog[0].top, "sports", "Saved character should preserve top clothing");
+  assert.equal(savedCatalog[0].accessory, "halo", "Saved character should preserve accessory");
+  await characterCatalog.getByRole("button", { name: "Nuevo personaje" }).click();
+  await characterCatalog.locator(".cc-saved > button").first().click();
+  assert.equal(await characterCatalog.getByRole("combobox", { name: "Peinado" }).inputValue(), "wolfcut",
+    "Loading a saved character should restore its hairstyle");
+  assert.equal(await characterCatalog.getByRole("combobox", { name: "Prenda superior" }).inputValue(), "sports",
+    "Loading a saved character should restore its top clothing");
+  assert.equal(await characterCatalog.getByRole("combobox", { name: "Accesorio" }).inputValue(), "halo",
+    "Loading a saved character should restore its accessory");
+  const characterJsonDownload = page.waitForEvent("download", { timeout: 10000 });
+  await characterCatalog.getByRole("button", { name: "Exportar ficha" }).click();
+  assert.match((await characterJsonDownload).suggestedFilename(), /\.json$/i,
+    "Character data export should download a JSON file");
+  console.log("PASS_REAL: Chromium verified expanded catalog counts, live SVG updates, localStorage save/load roundtrip and JSON ficha download.");
+  // Exercise the new Picsart-style quick editor: import, select, add text and export.
+  const imageEditor = page.locator("#quick-image-editor");
+  await imageEditor.waitFor({ state: "visible", timeout: 10000 });
+  await imageEditor.getByRole("heading", { name: "Editor de imágenes" }).waitFor({ state: "visible" });
+  await imageEditor.locator('input[type="file"]').setInputFiles({
+    name: "qa-editor-image.png", mimeType: "image/png", buffer: makeQaPng(),
+  });
+  const importedLayer = imageEditor.locator(".qie-layer");
+  await importedLayer.waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await importedLayer.count(), 1, "The editor must place an imported image on the canvas");
+  await imageEditor.getByRole("button", { name: "T Texto" }).click();
+  await imageEditor.getByLabel("Texto para el lienzo").fill("AnimeArt QA");
+  await imageEditor.getByText("AnimeArt QA", { exact: true }).waitFor({ state: "visible" });
+  const editorDownload = page.waitForEvent("download", { timeout: 10000 });
+  await imageEditor.getByRole("button", { name: "Exportar PNG" }).click();
+  assert.equal((await editorDownload).suggestedFilename(), "botimagen-edicion.png",
+    "The image editor must export the composed canvas as PNG");
+
+  // Verify the CC0 character studio is connected to the real repository sprites.
+  const cc0Studio = page.locator('[data-testid="cc0-character-studio"]');
+  await cc0Studio.waitFor({ state: "visible", timeout: 10000 });
+  // Verify the PixAI asset factory is visible and missing variants are explicitly marked.
+  const pixaiFactory = page.locator('[data-testid="pixai-asset-factory"]');
+  await pixaiFactory.waitFor({ state: "visible", timeout: 10000 });
+  assert.match(await pixaiFactory.locator('[data-testid="pixai-slot-status"]').textContent(), /AÚN NO/,
+    "An unfilled trait must be marked AÚN NO rather than pretending an image exists");
+  await pixaiFactory.getByLabel("¿Qué pieza querés completar?").selectOption("hairstyle");
+  await pixaiFactory.getByLabel("Variante del catálogo").selectOption({ index: 1 });
+  await page.waitForFunction(() => {
+    const prompt = document.querySelector("#pixai-prompt-preview");
+    return prompt instanceof HTMLTextAreaElement && prompt.value.includes("Trait: ");
+  }, undefined, { timeout: 10000 });
+  assert.ok(await pixaiFactory.getByRole("button", { name: "Abrir PixAI · modo económico" }).isEnabled(),
+    "The low-cost PixAI action must be available only after selecting a real catalog trait");
+  await pixaiFactory.locator('input[type="file"]').setInputFiles({
+    name: "qa-pixai-hair.png", mimeType: "image/png", buffer: makeQaPng(),
+  });
+  await page.waitForFunction(
+    () => document.querySelector('[data-testid="pixai-slot-status"]')?.textContent?.includes("HAY · 1 pieza") ?? false,
+    undefined,
+    { timeout: 15000 },
+  );
+  await page.waitForFunction(
+    () => document.querySelector('[data-testid="pixai-asset-factory"]')?.textContent?.includes("Pieza importada y guardada") ?? false,
+    undefined,
+    { timeout: 10000 },
+  );
+
+  // Exercise the actual dress-up mini game: hair, clothing, colors and save.
+  const dressup = page.locator('[data-testid="dressup-game"]');
+  await dressup.waitFor({ state: "visible", timeout: 10000 });
+  await dressup.getByRole("button", { name: "Dos coletas" }).click();
+  assert.equal(await dressup.getByRole("button", { name: "Dos coletas" }).getAttribute("aria-pressed"), "true");
+  await dressup.getByRole("button", { name: "Cyberpunk" }).click();
+  assert.equal(await dressup.getByRole("button", { name: "Cyberpunk" }).getAttribute("aria-pressed"), "true");
+  await dressup.getByRole("button", { name: "Rosa", exact: true }).last().click().catch(async () => {
+    await dressup.getByRole("button", { name: "Rosa", exact: true }).first().click();
+  });
+  await dressup.getByRole("button", { name: "Guardar look" }).click();
+  await dressup.getByText("¡Look guardado en este navegador!").waitFor({ state: "visible" });
+  assert.deepEqual(pageErrors, [], "Dress-up interactions should not raise JavaScript errors");
+
+  // The PNG-backed mode reports the real local inventory instead of inventing assets.
+  const modularDressup = page.locator("[data-testid=modular-dressup]");
+  await modularDressup.waitFor({ state: "visible", timeout: 10000 });
+  await modularDressup.getByRole("heading", { name: "Vestuario con tus PNG reales" }).waitFor({ state: "visible" });
+  assert.match(await modularDressup.locator("[data-testid=modular-dressup-status]").textContent(), /AÚN NO|biblioteca|pieza/i,
+    "The PNG-backed mode should report the actual local asset inventory");
+  await modularDressup.getByRole("button", { name: "Actualizar biblioteca" }).click();
+  await page.waitForFunction(() => {
+    const status = document.querySelector('[data-testid="modular-dressup-status"]');
+    return status instanceof HTMLElement && /Biblioteca actualizada|Biblioteca leída|No hay piezas|AÚN NO/i.test(status.textContent ?? "");
+  }, undefined, { timeout: 10000 });
+  assert.ok(await modularDressup.getByRole("button", { name: "Componer personaje" }).isDisabled(),
+    "Composing must stay disabled until at least one real modular asset is selected");
+  assert.equal(await cc0Studio.locator("[data-character-id]").count(), 5,
+    "The user-facing CC0 studio must offer all five imported character sprites");
+  await page.waitForFunction(() => {
+    const image = document.querySelector('[data-testid="cc0-character-preview"]');
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
+  }, undefined, { timeout: 10000 });
+  await cc0Studio.getByRole("button", { name: "Elegir Personaje 2" }).click();
+  await cc0Studio.getByRole("combobox", { name: "Expresión del personaje" }).selectOption("happy");
+  await page.waitForFunction(() => {
+    const image = document.querySelector('[data-testid="cc0-character-preview"]');
+    return image instanceof HTMLImageElement && image.src.includes("pl2%20happy.png")
+      && image.complete && image.naturalWidth > 0;
+  }, undefined, { timeout: 10000 });
+  assert.equal(await cc0Studio.locator('[aria-pressed="true"]').getAttribute("data-character-id"), "character-2",
+    "Selecting a character must update the real sprite, not just a decorative label");
   await page.waitForFunction(
     () => document.querySelector(".main-footer")?.textContent?.includes("Motor Python conectado"),
     undefined,
@@ -179,6 +306,9 @@ try {
   await page.locator('.modular-asset-list article[data-asset-kind="reference"]')
     .filter({ hasText: "Fuente original · qa-reference" }).first()
     .waitFor({ state: "visible", timeout: 15000 });
+  const rightsControls = page.locator(".modular-library");
+  await rightsControls.getByLabel("Licencia de la imagen").fill("Original propio");
+  await rightsControls.getByLabel("Confirmo derechos y procedencia").check();
 
 
   // Full PNG-to-rig flow: edit body joints, persist them, fit a garment, and compose.
@@ -260,6 +390,125 @@ try {
     const image = document.querySelector("img.modular-composition-preview");
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
   }, null, { timeout: 15000 });
+
+  // Install the authored CyberStreet pack as distinct PNG variants. One option per rig slot must be enforced.
+  const builtInPackLibrary = page.locator(".modular-library");
+  const installPackButton = builtInPackLibrary.getByTestId("install-cyberstreet-png-pack");
+  await installPackButton.scrollIntoViewIfNeeded();
+  await installPackButton.click();
+  await builtInPackLibrary.getByTestId("modular-library-status")
+    .filter({hasText:"15 PNG reales de 512×768"}).waitFor({state:"visible",timeout:30000});
+  const cyberstreetLayerOptions = [
+    {id:"base-body",label:"Cuerpo base",category:"body"},
+    {id:"base-body-athletic",label:"Cuerpo atlético",category:"body"},
+    {id:"face-anime-cyan",label:"Rostro anime",category:"face"},
+    {id:"face-amber-eyes",label:"Rostro ojos ámbar",category:"face"},
+    {id:"face-wink-rose",label:"Rostro guiño rosa",category:"face"},
+    {id:"skirt-tech-pleated",label:"Falda tecnológica",category:"clothing_bottom"},
+    {id:"bottom-short-skirt",label:"Minifalda magenta",category:"clothing_bottom"},
+    {id:"bottom-cargo-pants",label:"Pantalón cargo",category:"clothing_bottom"},
+    {id:"sneakers-neon",label:"Zapatillas neón",category:"footwear"},
+    {id:"top-neon-jacket",label:"Chaqueta neón",category:"clothing_top"},
+    {id:"top-sport-varsity",label:"Chaqueta universitaria",category:"clothing_top"},
+    {id:"top-goth-blouse",label:"Blusa gótica",category:"clothing_top"},
+    {id:"hair-midnight-cyan",label:"Cabello cyan",category:"hair_front"},
+    {id:"hair-rose-twin",label:"Coletas rosas",category:"hair_front"},
+    {id:"hair-silver-bob",label:"Bob plateado",category:"hair_front"},
+  ];
+  const importedPackAudit = await page.evaluate(async (expectedSources) => {
+    const response = await fetch("/api/modular-assets");
+    if(!response.ok)throw new Error("The modular asset library could not be read after installing CyberStreet");
+    const payload=await response.json();
+    const assets=payload.assets.filter(asset=>typeof asset.label==="string"&&asset.label.startsWith("CyberStreet · ")&&typeof asset.source_filename==="string"&&expectedSources.includes(asset.source_filename));
+    const results=[];
+    for(const asset of assets){
+      const imageResponse=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/image");
+      const blob=await imageResponse.blob();
+      const bitmap=await createImageBitmap(blob);
+      const canvas=document.createElement("canvas");canvas.width=bitmap.width;canvas.height=bitmap.height;
+      const context=canvas.getContext("2d",{willReadFrequently:true});
+      if(!context)throw new Error("Canvas unavailable while validating a packaged PNG layer");
+      context.drawImage(bitmap,0,0);
+      const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
+      let nonTransparent=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0)nonTransparent++;
+      const digest=await crypto.subtle.digest("SHA-256",await blob.arrayBuffer());
+      const sha256=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,"0")).join("");
+      results.push({id:asset.id,label:asset.label,source_filename:asset.source_filename,category:asset.category,width:bitmap.width,height:bitmap.height,mime:blob.type,
+        cornerAlpha:pixels[3],nonTransparent,sha256,shaMatches:sha256===asset.sha256,rightsConfirmed:asset.rights_confirmed===true,
+        initiallyUnvalidated:asset.anchors_validated===false,
+        sourceRecorded:typeof asset.source_filename==="string"&&asset.source_filename.startsWith("assets/modular/oc-cyberstreet/")
+          &&asset.source_url==="https://github.com/jonhararagi/botimagen"});
+      bitmap.close();
+    }
+    return results;
+  }, cyberstreetLayerOptions.map(option=>"assets/modular/oc-cyberstreet/"+option.id+".svg"));
+  assert.equal(importedPackAudit.length,cyberstreetLayerOptions.length,"The pack should register all 15 independent variants once");
+  assert.equal(new Set(importedPackAudit.map(asset=>asset.id)).size,cyberstreetLayerOptions.length,"Every source layer must have a unique library ID");
+  assert.equal(new Set(importedPackAudit.map(asset=>asset.sha256)).size,cyberstreetLayerOptions.length,"Every source layer must have distinct PNG bytes");
+  for(const asset of importedPackAudit){
+    const expected=cyberstreetLayerOptions.find(option=>asset.source_filename==="assets/modular/oc-cyberstreet/"+option.id+".svg");
+    assert.ok(expected,"Unexpected imported CyberStreet source ID: "+asset.id);
+    assert.equal(asset.label,"CyberStreet · "+expected.label,"The UI label must match the original pack component");
+    assert.match(asset.id,/^user\./,"The local library should assign its own safe user asset identifier rather than reuse the source layer ID");
+    assert.equal(asset.category,expected.category,"The alternative must map to the correct modular slot");
+    assert.deepEqual([asset.width,asset.height,asset.mime],[512,768,"image/png"],asset.label+" must be a 512×768 PNG");
+    assert.equal(asset.cornerAlpha,0,asset.label+" must preserve transparent canvas corners");
+    assert.ok(asset.nonTransparent>0,asset.label+" must have visible pixels");
+    assert.equal(asset.shaMatches,true,asset.label+" SHA-256 must match the actual PNG bytes");
+    assert.equal(asset.rightsConfirmed,true,asset.label+" must retain the repository-owned source declaration");
+    assert.equal(asset.initiallyUnvalidated,true,asset.label+" anchors must not be auto-confirmed by the importer");
+    assert.equal(asset.sourceRecorded,true,asset.label+" must retain its source path and repository URL");
+  }
+  for(const option of cyberstreetLayerOptions){
+    const card=builtInPackLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({hasText:"CyberStreet · "+option.label}).first();
+    await card.waitFor({state:"visible",timeout:10000});
+    await card.getByRole("button",{name:"Confirmar puntos del esqueleto"}).click();
+    await builtInPackLibrary.getByTestId("modular-library-status").filter({hasText:"Anclajes confirmados"}).waitFor({state:"visible",timeout:10000});
+  }
+  await builtInPackLibrary.getByLabel("Vista para componer").selectOption("front");
+  const findPiece=label=>builtInPackLibrary.getByRole("checkbox",{name:"Seleccionar pieza CyberStreet · "+label});
+  const alternatives=[
+    {original:"Cuerpo base",variant:"Cuerpo atlético"},
+    {original:"Rostro anime",variant:"Rostro ojos ámbar"},
+    {original:"Falda tecnológica",variant:"Pantalón cargo"},
+    {original:"Chaqueta neón",variant:"Chaqueta universitaria"},
+    {original:"Cabello cyan",variant:"Bob plateado"},
+  ];
+  for(const pair of alternatives){
+    const original=findPiece(pair.original),variant=findPiece(pair.variant);
+    await original.check();await variant.check();
+    assert.equal(await original.isChecked(),false,"Choosing "+pair.variant+" must replace "+pair.original+" in the same slot");
+    assert.equal(await variant.isChecked(),true,"Selected variant must stay active");
+  }
+  await findPiece("Zapatillas neón").check();
+  await builtInPackLibrary.getByRole("button",{name:"Componer selección (6)"}).click();
+  const modularPngOutput=builtInPackLibrary.locator("img.modular-composition-preview");
+  await modularPngOutput.waitFor({state:"visible",timeout:15000});
+  await page.waitForFunction(()=>{
+    const image=document.querySelector(".modular-library img.modular-composition-preview");
+    return image instanceof HTMLImageElement&&image.complete&&image.naturalWidth===512&&image.naturalHeight===768;
+  },null,{timeout:15000});
+  const compositeAudit=await page.evaluate(()=>{
+    const image=document.querySelector(".modular-library img.modular-composition-preview");
+    if(!(image instanceof HTMLImageElement))throw new Error("The modular PNG preview is not an image");
+    const canvas=document.createElement("canvas");canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+    const context=canvas.getContext("2d",{willReadFrequently:true});
+    if(!context)throw new Error("Canvas unavailable for composed PNG inspection");
+    context.drawImage(image,0,0);const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
+    let nonTransparent=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0)nonTransparent++;
+    return {width:canvas.width,height:canvas.height,cornerAlpha:pixels[3],nonTransparent};
+  });
+  assert.deepEqual([compositeAudit.width,compositeAudit.height],[512,768]);
+  assert.equal(compositeAudit.cornerAlpha,0,"The composite must preserve transparent background corners");
+  assert.ok(compositeAudit.nonTransparent>10000,"The selected alternative combination must contain visible character pixels");
+  const cyberstreetPngDownload=page.waitForEvent("download",{timeout:10000});
+  await builtInPackLibrary.getByRole("button",{name:"Descargar composición PNG"}).click();
+  assert.equal((await cyberstreetPngDownload).suggestedFilename(),"botimagen-composicion-modular.png");
+  for(const option of cyberstreetLayerOptions){const checkbox=findPiece(option.label);if(await checkbox.isChecked())await checkbox.uncheck();}
+  const cyberstreetCaptureDir=resolve(root,"artifacts","visual-qa");await mkdir(cyberstreetCaptureDir,{recursive:true});
+  await builtInPackLibrary.screenshot({path:resolve(cyberstreetCaptureDir,"cyberstreet-png-modular-composition.png")});
+  console.log("PASS_REAL: Chromium imported 15 original PNG candidates, verified transparency/hash/provenance and anchor review, enforced mutually exclusive variants, composed a six-piece alternate character and downloaded its transparent PNG.");
+
 
   const assetContracts = await page.evaluate(async () => {
     const response = await fetch("/api/assets/contracts");
@@ -1418,7 +1667,9 @@ try {
   }, null, { timeout: 15000 });
   await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-full.png") });
   const hairToggle = cyberstreet.locator(".modular-layer-toggle").filter({ hasText: "Cabello cyan" }).locator('input[type="checkbox"]');
-  assert.equal(await hairToggle.isChecked(), true, "CyberStreet hair should be enabled initially");
+  const bobHairToggle = cyberstreet.locator(".modular-layer-toggle").filter({ hasText: "Bob plateado" }).locator('input[type="checkbox"]');
+  assert.equal(await hairToggle.isChecked(), true, "CyberStreet default hair should be enabled initially");
+  assert.equal(await bobHairToggle.isChecked(), false, "Alternative hair should be disabled initially");
   const fullLayerImage = await cyberstreetPreview.getAttribute("src");
   await hairToggle.uncheck();
   await page.waitForFunction(previous => {
@@ -1443,6 +1694,16 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
   }, imageBeforeRestore, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
+  const beforeBob=await cyberstreetPreview.getAttribute("src");
+  await bobHairToggle.check();
+  await page.waitForFunction(previous=>{
+    const image=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    return image instanceof HTMLImageElement&&image.complete&&image.naturalWidth===512&&image.src!==previous;
+  },beforeBob,{timeout:15000});
+  assert.equal(await hairToggle.isChecked(),false,"Selecting Bob plateado should disable Cabello cyan in the same slot");
+  assert.equal(await bobHairToggle.isChecked(),true,"Alternative hair must be active after selection");
+  await hairToggle.check();
+  assert.equal(await bobHairToggle.isChecked(),false,"Re-selecting default hair must disable its alternatives");
   await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
   await page.waitForFunction(() => {
     const status = document.querySelector('.modular-composer [role="status"]');
@@ -1595,7 +1856,52 @@ try {
   await importedComposition.waitFor({ timeout: 15000 });
   const composedDimensions = await importedComposition.evaluate(async image => { await image.decode(); return [image.naturalWidth, image.naturalHeight]; });
   assert.deepEqual(composedDimensions, [512, 768], "The imported modular pieces must compose through the existing Python engine");
-  console.log("PASS_REAL: PNG converter normalized source art to 512×768, removed the connected flat background, preserved the original source, registered estimated rig anchors, and composed a body piece through the real local API.");
+  const compositionPixels = await importedComposition.evaluate(async image => {
+    await image.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("Could not inspect the composed PNG alpha channel");
+    context.drawImage(image, 0, 0);
+    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let visiblePixels = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] > 0) visiblePixels++;
+    return {
+      topLeftAlpha: data[3],
+      topRightAlpha: data[(canvas.width - 1) * 4 + 3],
+      bottomLeftAlpha: data[((canvas.height - 1) * canvas.width) * 4 + 3],
+      bottomRightAlpha: data[(canvas.width * canvas.height - 1) * 4 + 3],
+      visiblePixels,
+    };
+  });
+  assert.deepEqual(
+    [compositionPixels.topLeftAlpha, compositionPixels.topRightAlpha, compositionPixels.bottomLeftAlpha, compositionPixels.bottomRightAlpha],
+    [0, 0, 0, 0],
+    "The composed PNG must preserve transparent corners rather than flatten onto a background",
+  );
+  assert.ok(compositionPixels.visiblePixels > 1000, "The composed PNG must contain visible pixels from the selected parts");
+  const downloadButton = assetLibrary.getByRole("button", { name: "Descargar composición PNG" });
+  assert.equal(await downloadButton.isEnabled(), true, "PNG download should only enable after composition succeeds");
+  const composedDownloadPromise = page.waitForEvent("download", { timeout: 10000 });
+  await downloadButton.click();
+  const composedDownload = await composedDownloadPromise;
+  assert.equal(composedDownload.suggestedFilename(), "botimagen-composicion-modular.png");
+  const composedDownloadPath = await composedDownload.path();
+  assert.ok(composedDownloadPath, "The browser should materialize the generated PNG download");
+  const composedDownloadBytes = await readFile(composedDownloadPath);
+  assert.deepEqual(
+    [...composedDownloadBytes.subarray(0, 8)],
+    [137, 80, 78, 71, 13, 10, 26, 10],
+    "Downloaded composition must carry a real PNG signature",
+  );
+  assert.deepEqual(
+    [composedDownloadBytes.readUInt32BE(16), composedDownloadBytes.readUInt32BE(20)],
+    [512, 768],
+    "Downloaded composition must retain the normalized 512×768 dimensions",
+  );
+  assert.ok(composedDownloadBytes.length > 100, "Downloaded composition must contain actual image data");
+  console.log("PASS_REAL: Imported modular PNGs were composed by the local API; Chromium confirmed 512×768 dimensions, transparent corners, visible pixels, and a downloadable PNG with a valid signature.");
+
 
   // Exercise the real batch character-model builder against the saved PNGs above.
   // This proves model creation, palette extraction, region masks, and exact pixel reconstruction.
@@ -1682,7 +1988,14 @@ try {
   const maskCanvas = maskEditor.getByTestId("mask-preview");
   const maskBox = await maskCanvas.boundingBox();
   assert.ok(maskBox, "The mask editor must show the source image with a real canvas overlay");
-  await page.mouse.click(maskBox.x + maskBox.width * 0.5, maskBox.y + maskBox.height * 0.5);
+  // Use Playwright's locator interaction so the canvas is scrolled into view and receives a real pointer sequence.
+  // The old page.mouse click could land against a stale/off-viewport bounding box, leaving maskDirty=false.
+  await maskCanvas.click({ position: { x: Math.round(maskBox.width * 0.5), y: Math.round(maskBox.height * 0.5) } });
+  await maskEditor.getByRole("button", { name: "Guardar máscara corregida" }).waitFor({ state: "visible" });
+  await page.waitForFunction(() => {
+    const button = document.querySelector('[data-testid="mask-editor"] button.model-builder-primary');
+    return button instanceof HTMLButtonElement && !button.disabled;
+  }, null, { timeout: 5000 });
   await maskEditor.getByRole("button", { name: "Guardar máscara corregida" }).click();
   await modelBuilder.getByRole("status").filter({ hasText: "Máscara guardada" }).waitFor({ state: "visible", timeout: 15000 });
   assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 2/);
@@ -1690,6 +2003,126 @@ try {
   await modelBuilder.getByRole("status").filter({ hasText: "Máscara original restaurada" }).waitFor({ state: "visible", timeout: 15000 });
   assert.match(await modelBuilder.locator(".model-builder-output-title").textContent() || "", /REVISIÓN 3/);
   console.log("PASS_REAL: Chromium imported a multi-file-capable reference through the builder, edited a mask with the canvas brush, persisted the new model revision, and restored the original mask through the API.");
+
+  // Close the inline mask editor before testing the next constructor action.
+  await maskEditor.getByRole("button", { name: "Cerrar editor" }).click();
+  await maskEditor.waitFor({ state: "detached", timeout: 5000 });
+
+  // Exercise the actual CC0 catalogue-to-model-builder path, not just its static manifest.
+  const cc0ImportButton = modelBuilder.getByRole("button", { name: "Importar colección CC0 al constructor" });
+  await cc0ImportButton.click();
+  const cc0Status = modelBuilder.getByRole("status").filter({ hasText: "Colección CC0 incorporada al constructor:" });
+  const cc0Error = modelBuilder.getByRole("alert");
+  await Promise.race([
+    cc0Status.waitFor({ state: "visible", timeout: 120000 }),
+    cc0Error.waitFor({ state: "visible", timeout: 120000 }),
+  ]);
+  if (await cc0Error.isVisible().catch(() => false)) {
+    throw new Error("CC0 constructor import failed: " + (await cc0Error.textContent()));
+  }
+  const cc0StatusText = await cc0Status.textContent();
+  assert.match(cc0StatusText || "", /65 referencias verificadas; 0 omitidas\./, "All 65 CC0 character/expression PNGs should import without skips.");
+  const cc0Imported = await page.evaluate(async () => {
+    const response = await fetch("/api/modular-assets");
+    if (!response.ok) throw new Error("Could not read the local modular asset catalogue after CC0 import");
+    const payload = await response.json();
+    const assets = Array.isArray(payload) ? payload : payload.assets;
+    if (!Array.isArray(assets)) throw new Error("The local modular asset catalogue has an unexpected shape");
+    const imported = assets.filter(asset => typeof asset.label === "string" && asset.label.startsWith("CC0 "));
+    return {
+      count: imported.length,
+      withoutSource: imported.filter(asset => !asset.source_url || !asset.license || !asset.source_filename).length,
+      uniqueSources: new Set(imported.map(asset => asset.source_filename)).size,
+      categories: [...new Set(imported.map(asset => asset.kind))],
+    };
+  });
+  assert.equal(cc0Imported.count, 65, "The builder should persist all 65 verified character and expression PNGs, excluding the editorial illustration");
+  assert.equal(cc0Imported.withoutSource, 0, "Every imported CC0 asset must retain source URL, declared license, and original archive member");
+  assert.equal(cc0Imported.uniqueSources, 65, "Every imported reference should preserve a distinct original archive member");
+  assert.ok(cc0Imported.categories.every(kind => kind === "reference"), "External character art must stay a reference until a person classifies its layers");
+  console.log("PASS_REAL: Chromium imported 65 CC0 PNG references through the real constructor UI, verified SHA-256 in the browser, and checked that source/license provenance persisted through the local API.");
+  
+  // Import separately extracted, hash-pinned PSD leaf layers. Keep them as references because layer names do not always describe semantic body/clothing roles.
+  const psdCatalogResponse = await page.evaluate(async () => {
+    const response = await fetch("/cc0-character-library/psd-layers-manifest.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error("The extracted CC0 PSD layer catalogue is unavailable");
+    const catalog = await response.json();
+    return { layer_count: catalog.layer_count, assets: catalog.assets };
+  });
+  assert.equal(psdCatalogResponse.layer_count, psdCatalogResponse.assets.length, "The PSD layer manifest must match its asset list");
+  assert.ok(psdCatalogResponse.layer_count > 0, "At least one independently extracted PSD layer should be available");
+  await modelBuilder.getByRole("button", { name: "Importar capas PSD CC0" }).click();
+  const psdStatus = modelBuilder.getByRole("status").filter({ hasText: "Capas PSD CC0 incorporadas:" });
+  const psdError = modelBuilder.getByRole("alert");
+  await Promise.race([
+    psdStatus.waitFor({ state: "visible", timeout: 120000 }),
+    psdError.waitFor({ state: "visible", timeout: 120000 }),
+  ]);
+  if (await psdError.isVisible().catch(() => false)) {
+    throw new Error("CC0 PSD layer import failed: " + (await psdError.textContent()));
+  }
+  const psdStatusText = await psdStatus.textContent();
+  assert.match(psdStatusText || "", new RegExp(psdCatalogResponse.layer_count + " capas verificadas; 0 omitidas\\."), "All extracted PSD layer PNGs should import without skips.");
+  const importedPsdLayers = await page.evaluate(async () => {
+    const response = await fetch("/api/modular-assets");
+    if (!response.ok) throw new Error("Could not read the local modular asset catalogue after PSD layer import");
+    const payload = await response.json();
+    const assets = Array.isArray(payload) ? payload : payload.assets;
+    const imported = assets.filter(asset => typeof asset.label === "string" && asset.label.startsWith("CC0 PSD · "));
+    return {
+      count: imported.length,
+      withoutSource: imported.filter(asset => !asset.source_url || !asset.license || !asset.source_filename).length,
+      uniqueSources: new Set(imported.map(asset => asset.source_filename)).size,
+      categories: [...new Set(imported.map(asset => asset.kind))],
+    };
+  });
+  assert.equal(importedPsdLayers.count, psdCatalogResponse.layer_count, "Every extracted PSD layer should be available as a reference in the local library");
+  assert.equal(importedPsdLayers.withoutSource, 0, "Every PSD layer must retain its source URL, license and original PSD/layer path");
+  assert.equal(importedPsdLayers.uniqueSources, psdCatalogResponse.layer_count, "Every imported PSD layer must preserve distinct provenance");
+  assert.ok(importedPsdLayers.categories.every(kind => kind === "reference"), "PSD layer references must not become garment/body parts without user classification");
+  console.log("PASS_REAL: Chromium imported all " + psdCatalogResponse.layer_count + " extracted CC0 PSD layers, verified their hashes and preserved per-layer provenance without auto-classifying semantics.");
+
+
+
+
+  // Real-browser test for visual/manual role assignment across the 43 extracted PSD layer previews.
+  const roleMapper = page.getByTestId("psd-layer-role-mapper");
+  await roleMapper.waitFor({ state: "visible", timeout: 20000 });
+  await roleMapper.getByText("Clasificador visual de capas PSD CC0").waitFor({ state: "visible" });
+  await roleMapper.getByText("43 capas extraídas").waitFor({ state: "visible" });
+  await roleMapper.getByRole("status").filter({ hasText: "Mostrando 43 de 43 capas" }).waitFor({ state: "visible", timeout: 20000 });
+  assert.equal(await roleMapper.locator(".psd-role-card").count(), 43, "The role mapper should display all 43 extracted PSD layers.");
+  await roleMapper.getByRole("combobox", { name: "Rol para fallingair-layer-001" }).selectOption("hair");
+  await roleMapper.getByRole("status").filter({ hasText: "Asignación guardada: fallingair-layer-001" }).waitFor({ state: "visible" });
+  const savedRole = await page.evaluate(() => {
+    const payload = JSON.parse(localStorage.getItem("botimagen-cc0-psd-layer-roles-v1") || "{}");
+    return payload["fallingair-layer-001"]?.role ?? null;
+  });
+  assert.equal(savedRole, "hair", "A manually assigned semantic role should persist in localStorage.");
+  await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("unassigned");
+  assert.equal(await roleMapper.locator(".psd-role-card").count(), 42, "Unassigned filter should exclude the one manually classified layer.");
+  await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("all");
+  await roleMapper.getByRole("combobox", { name: "Filtrar capas por asignación" }).selectOption("all");
+  await roleMapper.getByRole("checkbox", { name: "Seleccionar capa fallingair-layer-002" }).check();
+  await roleMapper.getByRole("checkbox", { name: "Seleccionar capa fallingair-layer-003" }).check();
+  await roleMapper.getByRole("combobox", { name: "Rol para selección" }).selectOption("accessory");
+  await roleMapper.getByRole("button", { name: "Aplicar rol a seleccionadas" }).click();
+  const bulkRoles = await page.evaluate(() => {
+    const payload = JSON.parse(localStorage.getItem("botimagen-cc0-psd-layer-roles-v1") || "{}");
+    return [payload["fallingair-layer-002"]?.role ?? null, payload["fallingair-layer-003"]?.role ?? null];
+  });
+  assert.deepEqual(bulkRoles, ["accessory", "accessory"], "Bulk role assignment should persist the selected semantic role for every selected layer.");
+  assert.equal(await roleMapper.locator(".psd-role-card.is-selected").count(), 0, "Bulk assignment should clear the selection after applying the role.");
+  const suggestedExpression = roleMapper.locator('[data-layer-id="fallingair-layer-006"]');
+  await suggestedExpression.locator(".psd-role-suggestion").getByText(/Sugerencia orientativa/).waitFor({ state: "visible" });
+  await suggestedExpression.getByRole("button", { name: "Aplicar sugerencia" }).click();
+  const suggestedRole = await page.evaluate(() => {
+    const payload = JSON.parse(localStorage.getItem("botimagen-cc0-psd-layer-roles-v1") || "{}");
+    return payload["fallingair-layer-006"]?.role ?? null;
+  });
+  assert.equal(suggestedRole, "expression", "A high-confidence suggestion must only apply after the user explicitly confirms it.");
+  await roleMapper.getByRole("button", { name: "Exportar asignaciones JSON" }).waitFor({ state: "visible" });
+  console.log("PASS_REAL: Chromium displayed all 43 PSD layer previews, saved manual and bulk roles, filtered pending layers, applied a high-confidence expression suggestion only after user confirmation, and exposed JSON export with provenance.");
 
   // Smoke the responsive breakpoints used by the local browser UI.
   for (const width of [1024, 768, 390, 320]) {

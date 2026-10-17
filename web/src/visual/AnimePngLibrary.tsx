@@ -1,0 +1,373 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+
+type CharacterPng = {
+  id: string;
+  name: string;
+  addedAt: number;
+  width: number;
+  height: number;
+  bytes: number;
+  category: "universal-character";
+  blob: Blob;
+  sourceUrl?: string;
+  license?: string;
+};
+
+const DB_NAME = "botimagen-anime-png-library";
+const STORE_NAME = "characters";
+const MAX_FILE_BYTES = 25 * 1024 * 1024;
+
+function openLibrary(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
+        store.createIndex("addedAt", "addedAt");
+        store.createIndex("name", "name");
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error ?? new Error("No se pudo abrir la biblioteca local."));
+  });
+}
+
+function requestResult<T>(request: IDBRequest<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error ?? new Error("Falló una operación de biblioteca."));
+  });
+}
+
+async function readAll(): Promise<CharacterPng[]> {
+  const db = await openLibrary();
+  try {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const records = await requestResult(tx.objectStore(STORE_NAME).getAll()) as CharacterPng[];
+    return records.sort((a, b) => b.addedAt - a.addedAt);
+  } finally {
+    db.close();
+  }
+}
+
+async function storeCharacter(record: CharacterPng): Promise<void> {
+  const db = await openLibrary();
+  try {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).put(record);
+    await new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error ?? new Error("No se pudo guardar el PNG."));
+      tx.onabort = () => reject(tx.error ?? new Error("Se canceló el guardado del PNG."));
+    });
+  } finally {
+    db.close();
+  }
+}
+
+async function removeCharacter(id: string): Promise<void> {
+  const db = await openLibrary();
+  try {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).delete(id);
+    await new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error ?? new Error("No se pudo eliminar el PNG."));
+      tx.onabort = () => reject(tx.error ?? new Error("Se canceló la eliminación."));
+    });
+  } finally {
+    db.close();
+  }
+}
+
+function formatBytes(bytes: number): string {
+  return bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+export function AnimePngLibrary() {
+  const [items, setItems] = useState<CharacterPng[]>([]);
+  const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("Importá PNG de personajes anime de cuerpo completo o sprites con fondo transparente.");
+  const [selected, setSelected] = useState<CharacterPng | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const folderInput = useRef<HTMLInputElement>(null);
+  useEffect(() => { folderInput.current?.setAttribute("webkitdirectory", ""); }, []);
+
+  const refresh = async () => {
+    try {
+      setItems(await readAll());
+    } catch {
+      setMessage("El navegador no permitió abrir la biblioteca local. Probá en Chrome o Edge y revisá el almacenamiento del sitio.");
+    }
+  };
+
+  useEffect(() => { void refresh(); }, []);
+
+  const filtered = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase();
+    if (!normalized) return items;
+    return items.filter(item => item.name.toLocaleLowerCase().includes(normalized));
+  }, [items, query]);
+
+  const importFiles = async (fileList: FileList | null) => {
+    if (!fileList?.length) return;
+    setBusy(true);
+    let added = 0;
+    let skipped = 0;
+    const problems: string[] = [];
+    try {
+      for (const file of Array.from(fileList)) {
+        if (file.type !== "image/png" && !file.name.toLowerCase().endsWith(".png")) {
+          skipped++;
+          continue;
+        }
+        const signature = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+        if (signature.length !== 8 || signature.some((value, index) => value !== [137, 80, 78, 71, 13, 10, 26, 10][index])) {
+          skipped++;
+          problems.push(`${file.name}: el contenido no es un PNG válido`);
+          continue;
+        }
+        if (file.size > MAX_FILE_BYTES || file.size === 0) {
+          skipped++;
+          problems.push(`${file.name}: tamaño no válido (máximo 25 MB)`);
+          continue;
+        }
+        try {
+          const bitmap = await createImageBitmap(file);
+          const width = bitmap.width;
+          const height = bitmap.height;
+          bitmap.close();
+          if (width < 128 || height < 128) {
+            skipped++;
+            problems.push(`${file.name}: resolución demasiado pequeña (${width}×${height})`);
+            continue;
+          }
+          const id = `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`;
+          await storeCharacter({
+            id, name: file.name, addedAt: Date.now(), width, height,
+            bytes: file.size, category: "universal-character", blob: file.slice(0, file.size, "image/png"),
+          });
+          added++;
+        } catch {
+          skipped++;
+          problems.push(`${file.name}: PNG ilegible o almacenamiento lleno`);
+        }
+      }
+      await refresh();
+      setMessage(`Importados ${added} PNG de personaje. Omitidos: ${skipped}.${problems.length ? ` ${problems.slice(0, 3).join(" · ")}` : ""}`);
+    } finally {
+      setBusy(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  };
+
+  const download = (item: CharacterPng) => {
+    const url = URL.createObjectURL(item.blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = item.name;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const downloadWatermarkedBase = async (item: CharacterPng) => {
+    let bitmap: ImageBitmap | null = null;
+    try {
+      bitmap = await createImageBitmap(item.blob);
+      const footerHeight = Math.max(44, Math.round(bitmap.width * 0.075));
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height + footerHeight;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("No se pudo preparar el lienzo de exportación.");
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(bitmap, 0, 0);
+      const scale = Math.max(1, bitmap.width / 512);
+      const pad = Math.round(10 * scale);
+      const fontSize = Math.max(11, Math.round(14 * scale));
+      const label = "BotImagen · BASE";
+      context.font = `600 ${fontSize}px Segoe UI, Arial, sans-serif`;
+      const textWidth = context.measureText(label).width;
+      const pillWidth = textWidth + pad * 3 + 25 * scale;
+      const pillHeight = Math.min(footerHeight - 8 * scale, fontSize + pad * 1.5);
+      const x = Math.max(4, canvas.width - pillWidth - 8 * scale);
+      const y = bitmap.height + (footerHeight - pillHeight) / 2;
+      context.fillStyle = "rgba(20, 15, 31, 0.94)";
+      context.beginPath();
+      context.roundRect(x, y, pillWidth, pillHeight, pillHeight / 2);
+      context.fill();
+      context.fillStyle = "#e6c5f0";
+      const pawX = x + pad + 5 * scale;
+      const pawY = y + pillHeight / 2;
+      context.beginPath();
+      context.ellipse(pawX, pawY + 2 * scale, 5 * scale, 4 * scale, 0, 0, Math.PI * 2);
+      context.fill();
+      for (const [dx, dy] of [[-4, -5], [2, -7], [7, -3], [0, -1]] as Array<[number, number]>) {
+        context.beginPath();
+        context.arc(pawX + dx * scale, pawY + dy * scale, 2.1 * scale, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.fillStyle = "#fff7ff";
+      context.textBaseline = "middle";
+      context.fillText(label, pawX + 13 * scale, pawY + 0.5 * scale);
+      const output = await new Promise<Blob>((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("No se pudo exportar el PNG.")), "image/png"));
+      const url = URL.createObjectURL(output);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = item.name.replace(/\\.png$/i, "") + "-botimagen-base.png";
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage("Base marcada descargada. El original de la biblioteca no se modificó; la huella queda en una franja añadida debajo del dibujo.");
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : "No se pudo crear la copia marcada.");
+    } finally {
+      bitmap?.close();
+    }
+  };
+
+  const importCc0Collection = async () => {
+    setBusy(true);
+    setMessage("Descargando y verificando la colección CC0…");
+    try {
+      const response = await fetch("/cc0-character-library/manifest.json", { cache: "no-cache" });
+      if (!response.ok) throw new Error("No se pudo cargar el catálogo CC0 integrado.");
+      const catalog = await response.json() as { assets: Array<{id:string;name:string;path:string;character:string;source_url:string;license:string;sha256:string}> };
+      let added = 0, skipped = 0;
+      for (const asset of catalog.assets) {
+        const fileResponse = await fetch(asset.path);
+        if (!fileResponse.ok) { skipped++; continue; }
+        const blob = await fileResponse.blob();
+        if (!blob.size || blob.size > MAX_FILE_BYTES) { skipped++; continue; }
+        const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await blob.arrayBuffer()));
+        const actualSha256 = Array.from(digest, value => value.toString(16).padStart(2, "0")).join("");
+        if (actualSha256 !== asset.sha256) { skipped++; continue; }
+        const signature = new Uint8Array(await blob.slice(0, 8).arrayBuffer());
+        if (signature.length !== 8 || signature.some((value, index) => value !== [137,80,78,71,13,10,26,10][index])) { skipped++; continue; }
+        const bitmap = await createImageBitmap(blob);
+        const width = bitmap.width, height = bitmap.height;
+        bitmap.close();
+        if (width < 128 || height < 128) { skipped++; continue; }
+        const pathParts = asset.path.split("/").filter(Boolean);
+        const characterLabel = pathParts[1] === "characters" ? pathParts[2] : "illustration";
+        await storeCharacter({
+          id: "cc0-fallingair-" + asset.id, name: "CC0 · " + characterLabel + " · " + asset.name,
+          addedAt: Date.now(), width, height, bytes: blob.size,
+          category: "universal-character", blob: blob.slice(0, blob.size, "image/png"),
+          sourceUrl: asset.source_url, license: asset.license,
+        });
+        added++;
+      }
+      await refresh();
+      setMessage("Colección CC0 incorporada: " + added + " PNG añadidos; " + skipped + " omitidos por formato, tamaño o resolución. Procedencia: FALLiNG_AiR · CC0 1.0.");
+    } catch (reason) {
+      setMessage(reason instanceof Error ? reason.message : "No se pudo importar la colección CC0.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteItem = async (item: CharacterPng) => {
+    if (!window.confirm(`¿Eliminar "${item.name}" de la biblioteca local? El archivo original de tu PC no se toca.`)) return;
+    await removeCharacter(item.id);
+    if (selected?.id === item.id) setSelected(null);
+    await refresh();
+    setMessage(`Eliminado de la biblioteca: ${item.name}`);
+  };
+
+  return (
+    <section className="anime-png-library" aria-labelledby="anime-png-library-title">
+      <style>{`
+        .anime-png-library{margin:24px 0;padding:22px;border:1px solid #34344a;border-radius:18px;background:linear-gradient(145deg,#171725,#101018);color:#f5f3ff}
+        .anime-png-library *{box-sizing:border-box}.anime-png-head{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+        .anime-png-library h2{margin:0 0 7px;font-size:20px}.anime-png-library p{margin:0;color:#b8b6cb;line-height:1.5}
+        .anime-png-actions{display:flex;gap:8px;flex-wrap:wrap}.anime-png-library button,.anime-png-library input{font:inherit}
+        .anime-png-library button{border:1px solid #595078;border-radius:10px;padding:10px 13px;background:#28243b;color:#fff;cursor:pointer}
+        .anime-png-library button:disabled{opacity:.55;cursor:wait}.anime-png-library .anime-png-primary{background:#9b5cff;border-color:#b58aff;color:#130b20;font-weight:700}
+        .anime-png-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:18px 0}
+        .anime-png-search{flex:1;min-width:190px;border:1px solid #45445b;border-radius:10px;padding:11px 12px;background:#0c0c13;color:#fff}
+        .anime-png-count{color:#d3c4ff;font-size:13px}.anime-png-note{font-size:12px;margin-top:8px!important}
+        .anime-png-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+        .anime-png-card{overflow:hidden;border:1px solid #353449;border-radius:12px;background:#11111a;min-width:0}
+        .anime-png-thumb{height:190px;padding:8px;display:flex;align-items:center;justify-content:center;background-color:#1c1c2a;background-image:linear-gradient(45deg,#272738 25%,transparent 25%),linear-gradient(-45deg,#272738 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#272738 75%),linear-gradient(-45deg,transparent 75%,#272738 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+        .anime-png-thumb img{width:100%;height:100%;object-fit:contain}.anime-png-meta{padding:10px}.anime-png-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px;color:#f0eaff}
+        .anime-png-dim{font-size:11px;color:#a7a4bb}.anime-png-card-actions{display:flex;gap:6px;margin-top:9px}.anime-png-card-actions button{flex:1;padding:7px 4px;font-size:11px}
+        .anime-png-empty{padding:30px 16px;border:1px dashed #4a4562;border-radius:12px;text-align:center;color:#c3bddb}
+        .anime-png-modal{position:fixed;inset:0;z-index:1000;background:#05050be8;display:flex;align-items:center;justify-content:center;padding:20px}
+        .anime-png-modal-inner{max-width:720px;width:100%;max-height:90vh;overflow:auto;background:#171725;border:1px solid #4b4566;border-radius:16px;padding:16px}
+        .anime-png-modal img{display:block;max-width:100%;max-height:65vh;margin:12px auto;object-fit:contain}
+      `}</style>
+      <div className="anime-png-head">
+        <div>
+          <h2 id="anime-png-library-title">Biblioteca universal de personajes anime PNG</h2>
+          <p>Galería universal para personajes completos, sprites y referencias de arte real. Importá una carpeta con cientos o miles de PNG, buscá por nombre y revisá cada imagen sobre fondo de transparencia.</p>
+          <p className="anime-png-note">Los archivos quedan en este navegador, no se suben a GitHub ni a ningún servidor. Importá solo arte propio o con permiso/licencia de uso. La copia «base con huella» añade una franja debajo de la imagen para identificarla sin tapar la figura; el original queda intacto. La colección CC0 integrada conserva la procedencia y licencia en su catálogo.</p>
+        </div>
+        <div className="anime-png-actions">
+          <input ref={fileInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
+          <input ref={folderInput} type="file" accept="image/png,.png" multiple hidden onChange={event => void importFiles(event.target.files)} />
+          <button className="anime-png-primary" type="button" disabled={busy} onClick={() => fileInput.current?.click()}>{busy ? "Importando…" : "＋ Importar PNG"}</button>
+          <button type="button" disabled={busy} onClick={() => folderInput.current?.click()}>Importar carpeta completa</button>
+          <button type="button" disabled={busy} onClick={() => void importCc0Collection()}>{busy ? "Importando…" : "＋ Añadir colección CC0"}</button>
+        </div>
+      </div>
+      <div className="anime-png-toolbar">
+        <input className="anime-png-search" aria-label="Buscar PNG de personajes" placeholder="Buscar por nombre de archivo…" value={query} onChange={event => setQuery(event.target.value)} />
+        <span className="anime-png-count">{filtered.length.toLocaleString()} / {items.length.toLocaleString()} personajes</span>
+      </div>
+      <div className="anime-png-sources">
+        <strong>Encontrar arte anime real</strong>
+        <p>Explorá catálogos externos con miles de sprites e ilustraciones. Descargá los PNG que te gusten y después importalos aquí. No todos los resultados son anime ni todos permiten uso comercial: revisá la licencia de cada creador.</p>
+        <div className="anime-png-source-links">
+          <a href="https://itch.io/game-assets/genre-visual-novel/tag-sprites" target="_blank" rel="noreferrer">Sprites de novelas visuales · miles de resultados ↗</a>
+          <a href="https://itch.io/game-assets/free/tag-manga/tag-sprites" target="_blank" rel="noreferrer">Sprites manga gratuitos ↗</a>
+          <a href="https://itch.io/game-assets/tag-characters/tag-manga" target="_blank" rel="noreferrer">Personajes manga dibujados a mano ↗</a>
+        </div>
+      </div>
+      <p role="status" aria-live="polite" className="anime-png-note">{message}</p>
+      {filtered.length ? <div className="anime-png-grid" style={{ marginTop: 14 }}>
+        {filtered.map(item => {
+          return <AnimePngCard key={item.id} item={item} onPreview={() => setSelected(item)} onDownload={() => download(item)} onDelete={() => void deleteItem(item)} />;
+        })}
+      </div> : <div className="anime-png-empty" style={{ marginTop: 14 }}>
+        <strong>{items.length ? "No hay resultados con ese nombre." : "La biblioteca está lista para recibir tu colección."}</strong>
+        <p style={{ marginTop: 8 }}>{items.length ? "Probá con otra búsqueda o borrá el filtro." : "Seleccioná cientos o miles de PNG desde tu PC. Se mostrarán como miniaturas y se conservarán localmente entre sesiones."}</p>
+        {!items.length && <button className="anime-png-primary" style={{ marginTop: 14 }} type="button" onClick={() => fileInput.current?.click()}>Elegir archivos PNG</button>}
+      </div>}
+      {selected && <div className="anime-png-modal" role="dialog" aria-modal="true" aria-label={selected.name} onClick={() => setSelected(null)}>
+        <div className="anime-png-modal-inner" onClick={event => event.stopPropagation()}>
+          <div className="anime-png-head"><div><strong>{selected.name}</strong><p className="anime-png-note">{selected.width} × {selected.height} px · {formatBytes(selected.bytes)} · Clase universal: personaje completo</p><p className="anime-png-note">{selected.license && `Licencia: ${selected.license} · `}{selected.sourceUrl && <a href={selected.sourceUrl} target="_blank" rel="noreferrer">Ver procedencia ↗</a>}</p></div><button type="button" onClick={() => setSelected(null)}>Cerrar ✕</button></div>
+          <AnimePngImage blob={selected.blob} alt={selected.name} />
+          <div className="anime-png-actions"><button className="anime-png-primary" type="button" onClick={() => download(selected)}>Descargar original</button><button type="button" onClick={() => void downloadWatermarkedBase(selected)}>Descargar base con huella 🐾</button><button type="button" onClick={() => void deleteItem(selected)}>Quitar de biblioteca</button></div>
+        </div>
+      </div>}
+    </section>
+  );
+}
+
+function AnimePngCard({ item, onPreview, onDownload, onDelete }: {
+  item: CharacterPng; onPreview: () => void; onDownload: () => void; onDelete: () => void;
+}) {
+  const [failed, setFailed] = useState(false);
+  return <article className="anime-png-card">
+    <button type="button" className="anime-png-thumb" aria-label={`Ver ${item.name}`} onClick={onPreview} style={{ width: "100%", border: 0, borderRadius: 0, padding: 8 }}>
+      {!failed ? <AnimePngImage blob={item.blob} alt={item.name} onError={() => setFailed(true)} /> : <span>PNG no disponible</span>}
+    </button>
+    <div className="anime-png-meta">
+      <div className="anime-png-name" title={item.name}>{item.name}</div>
+      <div className="anime-png-dim">{item.width}×{item.height} · {formatBytes(item.bytes)}</div>
+      <div className="anime-png-card-actions"><button type="button" onClick={onPreview}>Ver</button><button type="button" onClick={onDownload}>Bajar</button><button type="button" onClick={onDelete} aria-label={`Eliminar ${item.name}`}>✕</button></div>
+    </div>
+  </article>;
+}
+
+function AnimePngImage({ blob, alt, onError }: { blob: Blob; alt: string; onError?: () => void }) {
+  const [src, setSrc] = useState("");
+  useEffect(() => {
+    const url = URL.createObjectURL(blob);
+    setSrc(url);
+    return () => URL.revokeObjectURL(url);
+  }, [blob]);
+  return src ? <img src={src} alt={alt} onError={onError} /> : null;
+}
