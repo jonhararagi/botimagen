@@ -1,3 +1,21 @@
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-17 · ROUNDTRIP DEL CATÁLOGO SIMPLE
+
+**TIMER:** 1–2 horas estimadas para añadir la cobertura de persistencia y exportación; tiempo real no medido.
+
+- Rama autorizada: `feature/bimg-anime-png-universal-library`; PR #15 sigue abierto y sin fusionar.
+- HEAD antes de este incremento: `f13470d6abe0d24fc76722b92a458fbdbd877b43`.
+- Incremento de prueba: commit `e1ae04067fe33a20e87e8caf318b906598b00d1f`, que amplía `web/browser_smoke.mjs`.
+- El smoke test ahora verifica que Guardar persista peinado/ropa/accesorio en localStorage, que Nuevo personaje + cargar ficha restaure esas opciones y que Exportar ficha inicie una descarga JSON.
+- CI #819 terminó **SUCCESS** en el SHA de código anterior `1c2c5586a70e941f7dc3a1e22b54df4388881b30`: build web, runtime Chromium aislado, smoke test Chromium y captura visual finalizaron correctamente. Evidencia: https://github.com/jonhararagi/botimagen/actions/runs/38986491276.
+- El commit de pruebas nuevo todavía requiere CI sobre su SHA exacto. No reutilizar el resultado de #819 como si validara `e1ae040...`.
+- No se modificó `main`, no se creó otra rama y no se fusionó PR #15.
+- Pendiente inmediato: comprobar CI para `e1ae040...`; si falla, corregir el selector o el flujo que la prueba reproduzca en la misma rama.
+- Pendientes de entrega integral: composición visual de PNG modulares con piezas semánticamente verificadas; ampliar ilustraciones originales/licenciadas con transparencia y procedencia; probar en Windows y empaquetar beta local. Los 43 recortes PSD continúan sin ser piezas intercambiables validadas.
+
+**Estado del incremento:** PARTIAL / CI exacta pendiente al registrar esta nota.
+
+---
+
 # ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-15 · MINI JUEGO DE CAMBIO DE CABELLO Y ROPA
 
 Trabajo en la rama existente `feature/bimg-anime-png-universal-library`, PR #15. No modificar `main`, no crear ramas duplicadas y no integrar sin autorización.
