@@ -275,6 +275,111 @@ export function ModularAssetLibrary() {
     } finally { setBusy(false); }
   };
 
+  const installCyberStreetPngPack = async () => {
+    if (busy) return;
+    setBusy(true);
+    let processed = 0;
+    let added = 0;
+    let duplicates = 0;
+    const failures: string[] = [];
+    try {
+      const manifestResponse = await fetch("/api/modular-cyberstreet");
+      if (!manifestResponse.ok) throw new Error("No se pudo abrir el manifiesto del pack original CyberStreet.");
+      const manifest = await manifestResponse.json() as {
+        pack_id: string; width: number; height: number; layers: Array<{id:string;label:string}>;
+      };
+      if (manifest.width !== 512 || manifest.height !== 768 || !Array.isArray(manifest.layers) || manifest.layers.length !== 6) {
+        throw new Error("El pack no coincide con el contrato esperado de seis capas 512×768.");
+      }
+      for (const manifestLayer of manifest.layers) {
+        let objectUrl = "";
+        try {
+          const sourceResponse = await fetch("/api/modular-cyberstreet/layers/" + encodeURIComponent(manifestLayer.id));
+          const source = await sourceResponse.json() as {
+            id:string; label:string; category:string; rig_category:string; width:number; height:number;
+            view:string; license:string; source_url:string; source_filename:string;
+            anchors:AssetConversionMetadata["anchors"]; svg:string;
+          };
+          if (!sourceResponse.ok) throw new Error("No se pudo leer el SVG fuente.");
+          if (source.width !== 512 || source.height !== 768 || source.view !== "front" || typeof source.svg !== "string") {
+            throw new Error("La capa fuente no cumple el lienzo frontal de 512×768.");
+          }
+          const image = new Image();
+          objectUrl = URL.createObjectURL(new Blob([source.svg], {type:"image/svg+xml"}));
+          image.src = objectUrl;
+          await image.decode();
+          if (image.naturalWidth !== 512 || image.naturalHeight !== 768) {
+            throw new Error("El navegador no rasterizó la capa al tamaño esperado.");
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = 512;
+          canvas.height = 768;
+          const context = canvas.getContext("2d", {willReadFrequently:true});
+          if (!context) throw new Error("Canvas 2D no está disponible para exportar el PNG.");
+          context.clearRect(0, 0, 512, 768);
+          context.drawImage(image, 0, 0, 512, 768);
+          const pixels = context.getImageData(0, 0, 512, 768).data;
+          let minX = 512, minY = 768, maxX = -1, maxY = -1;
+          for (let pixel = 0; pixel < pixels.length; pixel += 4) {
+            if (pixels[pixel + 3] === 0) continue;
+            const point = pixel / 4;
+            const x = point % 512;
+            const y = Math.floor(point / 512);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+          if (maxX < minX || maxY < minY) throw new Error("La capa se exportó vacía.");
+          const pngBlob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("No se pudo codificar el PNG.")), "image/png");
+          });
+          const digest = await crypto.subtle.digest("SHA-256", await pngBlob.arrayBuffer());
+          const pngSha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+          const conversion: AssetConversionMetadata = {
+            schema_version: 1, algorithm: "botimagen-png-stage-v1", normalized: true,
+            canvas_width: 512, canvas_height: 768, source_width: 512, source_height: 768,
+            source_sha256: pngSha256, source_format: "image/png",
+            background_removed: false, background_tolerance: 0, scale_percent: 100, offset_x: 0, offset_y: 0,
+            pose: "front", rig_category: source.rig_category,
+            content_bounds: {x:minX,y:minY,width:maxX-minX+1,height:maxY-minY+1},
+            anchors: source.anchors, anchor_status: "estimated_not_validated", cutout_applied: false,
+          };
+          const result = await postAsset({
+            filename: "cyberstreet-" + source.id + ".png",
+            source_filename: source.source_filename,
+            mime_type: "image/png",
+            data_base64: await readDataUrl(pngBlob),
+            category: source.category,
+            kind: "modular_piece",
+            label: "CyberStreet · " + source.label,
+            view: "front",
+            license: source.license,
+            source_url: source.source_url,
+            rights_confirmed: true,
+            conversion,
+          });
+          processed++;
+          if (result.duplicate) duplicates++; else added++;
+        } catch (error) {
+          failures.push(manifestLayer.id + ": " + (error instanceof Error ? error.message : "error desconocido"));
+        } finally {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+        }
+      }
+      await refresh();
+      if (failures.length) {
+        setStatus("Pack original CyberStreet importado parcialmente: " + processed + "/6 capas procesadas (" + added + " nuevas, " + duplicates + " ya existentes). Fallos: " + failures.join(" · ") + ". Puedes reintentar sin duplicar las piezas guardadas.");
+      } else {
+        setStatus("Pack original CyberStreet listo: seis PNG reales de 512×768, fondo transparente conservado y hashes calculados (" + added + " nuevas, " + duplicates + " ya existentes). Procedencia del repositorio registrada; revisa y confirma los puntos del esqueleto en cada pieza antes de componer.");
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "No se pudo instalar el pack original CyberStreet.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const confirmAnchors = async (asset:UserAsset) => {
     if (busy) return;
     setBusy(true);
@@ -441,6 +546,7 @@ export function ModularAssetLibrary() {
       </div>)}
     </div>}
     <div className="modular-library-actions">
+      <button className="btn muted" type="button" data-testid="install-cyberstreet-png-pack" disabled={busy} onClick={()=>void installCyberStreetPngPack()}>{busy?"Procesando…":"Instalar pack original CyberStreet (6 PNG)"}</button>
       <button className="btn muted" type="button" disabled={!previews.length||busy} onClick={()=>void prepareMaterial()}>{busy?"Procesando…":"Preparar PNG 512 × 768"}</button>
       <button className="btn primary" type="button" disabled={!previews.length||previews.some(item=>!item.convertedBlob)||busy} onClick={()=>void importFiles()}>{busy?"Guardando…":"Guardar material convertido"}</button>
       <button className="btn muted" type="button" disabled={busy} onClick={()=>void refresh()}>Actualizar biblioteca</button>
