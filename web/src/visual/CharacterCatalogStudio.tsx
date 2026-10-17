@@ -47,11 +47,11 @@ function CharacterFigure({character:c}:{character:Character}) {
     {c.accessory==="headphones"&&<g fill="none" stroke="#7dd9e8" strokeWidth="5"><path d="M84 78 Q82 39 120 39 Q158 39 156 78"/><rect x="80" y="72" width="10" height="23" rx="4" fill="#7dd9e8"/><rect x="150" y="72" width="10" height="23" rx="4" fill="#7dd9e8"/></g>}
     {c.accessory==="cat_ears"&&<path d="M91 51 L86 25 L107 43 Q120 37 133 43 L154 25 L149 51Z" fill={hair} stroke="#30273d" strokeWidth="2.5"/>}
     {c.accessory==="halo"&&<ellipse cx="120" cy="19" rx="23" ry="6" fill="none" stroke="#f2c96d" strokeWidth="4"/>}
-    {c.accessory==="horns"&&<path d="M99 43 Q88 26 96 17 Q107 27 109 40 M141 43 Q152 26 144 17 Q133 27 131 40" fill="#b94c62" stroke="#30273d" strokeWidth="2"/>
+    {c.accessory==="horns"&&<path d="M99 43 Q88 26 96 17 Q107 27 109 40 M141 43 Q152 26 144 17 Q133 27 131 40" fill="#b94c62" stroke="#30273d" strokeWidth="2"/>}
     {c.top==="uniform"&&<path d="M110 137 L120 151 L130 137" fill="none" stroke="#f5edf9" strokeWidth="4"/>}
     {(c.top==="jacket"||c.top==="armor")&&<path d="M120 151 L120 210 M108 143 L120 158 L132 143" fill="none" stroke={c.top==="armor"?"#dbe5f3":"#7ee4ee"} strokeWidth="2.5"/>}
     {c.top==="kimono"&&<path d="M104 145 L120 166 L136 145" fill="none" stroke="#f7dce8" strokeWidth="3"/>}
-    {c.top==="sports"&&<path d="M104 155 L136 155 M104 167 L136 167" fill="none" stroke="#d8f7fa" strokeWidth="3"/>
+    {c.top==="sports"&&<path d="M104 155 L136 155 M104 167 L136 167" fill="none" stroke="#d8f7fa" strokeWidth="3"/>}
     <path d="M104 211 L136 211" stroke="#f5d87b" strokeWidth="3"/>
   </svg>;
 }
