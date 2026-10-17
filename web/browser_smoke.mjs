@@ -144,7 +144,24 @@ try {
   assert.notEqual(svgAfterAccessory, svgBeforeAccessory, "Selecting a new accessory must change the live SVG preview");
   await characterCatalog.getByRole("button", { name: "Guardar personaje" }).click();
   await characterCatalog.getByRole("status").filter({ hasText: /guardado/i }).waitFor({ state: "visible", timeout: 5000 });
-  console.log("PASS_REAL: Chromium verified expanded catalog option counts " + JSON.stringify(catalogOptionCounts) + ", live hairstyle/clothing/accessory preview changes, and character save action.");
+  const savedCatalog = await page.evaluate(() => JSON.parse(localStorage.getItem("botimagen.character-catalog.v1") || "[]"));
+  assert.equal(savedCatalog.length, 1, "Saving a character should persist one catalog entry");
+  assert.equal(savedCatalog[0].hairstyle, "wolfcut", "Saved character should preserve hairstyle");
+  assert.equal(savedCatalog[0].top, "sports", "Saved character should preserve top clothing");
+  assert.equal(savedCatalog[0].accessory, "halo", "Saved character should preserve accessory");
+  await characterCatalog.getByRole("button", { name: "Nuevo personaje" }).click();
+  await characterCatalog.getByRole("button", { name: /Mi personaje/ }).click();
+  assert.equal(await characterCatalog.getByRole("combobox", { name: "Peinado" }).inputValue(), "wolfcut",
+    "Loading a saved character should restore its hairstyle");
+  assert.equal(await characterCatalog.getByRole("combobox", { name: "Prenda superior" }).inputValue(), "sports",
+    "Loading a saved character should restore its top clothing");
+  assert.equal(await characterCatalog.getByRole("combobox", { name: "Accesorio" }).inputValue(), "halo",
+    "Loading a saved character should restore its accessory");
+  const characterJsonDownload = page.waitForEvent("download", { timeout: 10000 });
+  await characterCatalog.getByRole("button", { name: "Exportar ficha" }).click();
+  assert.match((await characterJsonDownload).suggestedFilename(), /\.json$/i,
+    "Character data export should download a JSON file");
+  console.log("PASS_REAL: Chromium verified expanded catalog counts, live SVG updates, localStorage save/load roundtrip and JSON ficha download.");
   // Exercise the new Picsart-style quick editor: import, select, add text and export.
   const imageEditor = page.locator("#quick-image-editor");
   await imageEditor.waitFor({ state: "visible", timeout: 10000 });
