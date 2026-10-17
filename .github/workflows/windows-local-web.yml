@@ -71,8 +71,8 @@ jobs:
         shell: pwsh
         run: |
           $root = (Get-Location).Path
-          $python = (Get-Command python.exe -ErrorAction Stop).Source
-          $npm = (Get-Command npm.cmd -ErrorAction Stop).Source
+          $python = (Get-Command python.exe -ErrorAction Stop | Select-Object -First 1).Source
+          $npm = (Get-Command npm.cmd -ErrorAction Stop | Select-Object -First 1).Source
           $apiLog = Join-Path $env:RUNNER_TEMP "botimagen-api.log"
           $webLog = Join-Path $env:RUNNER_TEMP "botimagen-vite.log"
           $apiError = Join-Path $env:RUNNER_TEMP "botimagen-api-error.log"

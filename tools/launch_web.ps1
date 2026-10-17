@@ -39,7 +39,7 @@ try {
     $pythonCommand = $null
     $pythonVersion = $null
     foreach ($candidateName in @("python.exe", "py.exe")) {
-        $candidate = Get-Command $candidateName -CommandType Application -ErrorAction SilentlyContinue
+        $candidate = Get-Command $candidateName -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
         if (-not $candidate) { continue }
         try {
             $candidateVersion = & $candidate.Source -c "import sys; print('.'.join(map(str, sys.version_info[:3])))" 2>$null
@@ -54,7 +54,7 @@ try {
     }
     if (-not $pythonCommand) { throw "Se necesita Python 3.10 o posterior. Instala Python y vuelve a ejecutar el lanzador." }
 
-    $nodeCommand = Get-Command node.exe -CommandType Application -ErrorAction SilentlyContinue
+    $nodeCommand = Get-Command node.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $nodeCommand) { throw "No se encontro Node.js. Instala Node.js 22 o posterior." }
     $nodeVersion = (& $nodeCommand.Source --version).Trim()
     if ($LASTEXITCODE -ne 0 -or $nodeVersion -notmatch '^v?([0-9]+)\.') {
@@ -62,7 +62,7 @@ try {
     }
     if ([int]$Matches[1] -lt 22) { throw "BotImagen requiere Node.js 22 o posterior; se detecto $nodeVersion." }
 
-    $npmCommand = Get-Command npm.cmd -CommandType Application -ErrorAction SilentlyContinue
+    $npmCommand = Get-Command npm.cmd -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $npmCommand) { throw "No se encontro npm.cmd. Reinstala Node.js 22 o revisa PATH." }
 
     $lockfile = Join-Path $WebRoot "package-lock.json"
