@@ -446,9 +446,10 @@ try {
   assert.equal(new Set(importedPackAudit.map(asset=>asset.id)).size,cyberstreetLayerOptions.length,"Every source layer must have a unique library ID");
   assert.equal(new Set(importedPackAudit.map(asset=>asset.sha256)).size,cyberstreetLayerOptions.length,"Every source layer must have distinct PNG bytes");
   for(const asset of importedPackAudit){
-    const expected=cyberstreetLayerOptions.find(option=>option.id===asset.id);
+    const expected=cyberstreetLayerOptions.find(option=>asset.source_filename==="assets/modular/oc-cyberstreet/"+option.id+".svg");
     assert.ok(expected,"Unexpected imported CyberStreet source ID: "+asset.id);
     assert.equal(asset.label,"CyberStreet · "+expected.label,"The UI label must match the original pack component");
+    assert.match(asset.id,/^user\./,"The local library should assign its own safe user asset identifier rather than reuse the source layer ID");
     assert.equal(asset.category,expected.category,"The alternative must map to the correct modular slot");
     assert.deepEqual([asset.width,asset.height,asset.mime],[512,768,"image/png"],asset.label+" must be a 512×768 PNG");
     assert.equal(asset.cornerAlpha,0,asset.label+" must preserve transparent canvas corners");
