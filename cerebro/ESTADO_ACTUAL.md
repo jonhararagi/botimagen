@@ -1,3 +1,28 @@
+# ESTADO CONSOLIDADO · 2026-10-17 · LANZADOR WEB LOCAL WINDOWS
+
+TIMER: 2–4 horas estimadas para lanzador, comprobación Windows y documentación; tiempo real no medido.
+
+## Evidencia confirmada antes del lanzador
+- Rama feature/bimg-anime-png-universal-library; PR #15 abierto y sin fusionar. main no se modificó.
+- PASS · Composición PNG/exportación: SHA c15abf474b2aefd7c86db9d02b459295263920ea, CI #39000665680. Chromium verificó PNG 512 × 768, esquinas transparentes, píxeles visibles, descarga y firma real. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
+- PASS · Derechos/procedencia: SHA 6ac70f666ad2002ec3511e8b48c57f9db8c8b078, CI #39001219287, 28/28 pasos correctos. El servidor bloquea composición si la declaración sigue pendiente; la prueba incluye confirmación de la declaración. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
+- La declaración de obra propia/licencia/fuente la hace el usuario. BotImagen no certifica legalmente la autoría ni valida automáticamente las páginas enlazadas.
+
+## Incremento actual: lanzador y CI Windows
+- Commits de implementación: BAT 0f13c5bc8508593aa861cedca2ff2038b67afd2c, PowerShell b92d9d6a8c2f24e072943056273c8c84c0423905, workflow Windows b640e9a9a0bedc6df3b6a215651a620806bbe721.
+- Iniciar_BotImagen_Web.bat y tools/launch_web.ps1 comprueban Python 3.10+, Node 22+, Pillow y dependencias npm según el hash del lockfile, inician API/Vite solo si hacen falta y ofrecen -CheckOnly.
+- Workflow windows-latest prueba el preflight, tests Python, build y disponibilidad de API/Vite en 127.0.0.1.
+- El resultado de CI para SHA b640e9a9a0bedc6df3b6a215651a620806bbe721 está en curso al momento de esta nota. No marcar PASS hasta ver la conclusión.
+- QA físico en el PC del usuario: NOT_RUN; CI Windows remoto no equivale a prueba física.
+
+## Pendientes de entrega integral
+- Ampliar los PNG originales/libres verificables por categorías y revisar visualmente cada pieza, anclaje, capa y compatibilidad.
+- Los 43 recortes PSD no se cuentan como piezas semánticas intercambiables hasta verificarlos.
+- El launcher no es un ejecutable/instalador .exe autónomo.
+- No fusionar PR #15 ni cambiar main hasta que catálogo, compositor, biblioteca, pruebas y criterios de paquete final estén verificados.
+
+---
+
 # ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-17 · ROUNDTRIP DEL CATÁLOGO SIMPLE
 
 **TIMER:** 1–2 horas estimadas para añadir la cobertura de persistencia y exportación; tiempo real no medido.

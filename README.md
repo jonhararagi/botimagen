@@ -309,11 +309,10 @@ La validación automática comprueba los recuentos, compatibilidad de especie, a
 
 ## Interfaz web local (beta en construcción)
 
-La interfaz React + TypeScript vive en `web/`. Para utilizarla durante el desarrollo, abre dos terminales:
+**Inicio recomendado en Windows 10/11:** ejecuta Iniciar_BotImagen_Web.bat desde la raíz del repositorio. El lanzador comprueba Python 3.10+, Node.js 22+, Pillow y las dependencias fijadas por web/package-lock.json; inicia la API y Vite solo si sus servicios locales no responden y abre la interfaz. Usa Iniciar_BotImagen_Web.bat -CheckOnly para comprobar o preparar dependencias sin iniciar servicios ni abrir el navegador.
 
-1. Ejecuta `py botimagen_server.py` desde la raíz del repositorio.
-2. En otra terminal ejecuta `cd web`, `npm install` y `npm run dev`.
+La interfaz React + TypeScript vive en web/, normalmente en http://127.0.0.1:5173; el servicio Python escucha en http://127.0.0.1:8765. Ambos quedan limitados a 127.0.0.1, no a la red local. El primer npm ci o la instalación de Pillow puede necesitar conexión a Internet.
 
-Abre la URL local indicada por Vite. El servicio Python solo escucha en `127.0.0.1:8765`; Vite redirige las solicitudes `/api` al motor. El catálogo procede de `character_rules.json` y la generación de prompts utiliza `CharacterGenerator`. Los perfiles se guardan en `generated_characters/web_profiles/`, excluida de Git.
+La beta incluye biblioteca PNG, normalización a 512 × 768, recorte manual, ajuste/confirmación de anclajes, composición local de capas PNG, vista previa, descarga PNG y perfiles del creador. Para componer, la API exige que cada pieza esté registrada como modular y que la declaración de derechos/procedencia y los anclajes requeridos estén confirmados. Es una declaración del usuario, no una verificación legal independiente.
 
-La figura central todavía es un marcador vectorial, no una imagen generada. La galería de perfiles en la UI, la biblioteca visual, el intake de assets en web y la prueba real completa en Windows siguen pendientes. Revisa [`web/README.md`](web/README.md) para comandos y límites, y [`cerebro/PROGRESO.md`](cerebro/PROGRESO.md) para el porcentaje global ponderado.
+**Límites de entrega:** la composición y la compuerta de procedencia pasaron CI Linux en los SHA documentados en cerebro/ESTADO_ACTUAL.md. Se está validando el lanzador en un runner Windows, todavía no el equipo físico del usuario. Faltan más recursos originales/licenciados realmente intercambiables, revisión visual de compatibilidad de piezas y QA físico. Los 43 recortes PSD no se cuentan como piezas intercambiables verificadas. El lanzador no es un instalador .exe autónomo. Consulta web/README.md, cerebro/ESTADO_ACTUAL.md y cerebro/PROGRESO.md.

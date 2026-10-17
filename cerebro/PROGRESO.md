@@ -1,3 +1,12 @@
+## Actualización · 2026-10-17 · Composición modular y beta local Windows
+
+- PASS: CI #39000665680 para c15abf474b2aefd7c86db9d02b459295263920ea. Chromium confirma composición local, PNG 512 × 768, alpha transparente en esquinas, píxeles visibles y descarga con firma/dimensiones. https://github.com/jonhararagi/botimagen/actions/runs/39000665680
+- PASS: CI #39001219287 para 6ac70f666ad2002ec3511e8b48c57f9db8c8b078. Compuerta de derechos/procedencia, pruebas Python, build y Chromium terminaron con 28/28 pasos. https://github.com/jonhararagi/botimagen/actions/runs/39001219287
+- El compositor rechaza recursos sin declaración confirmada. "Obra propia declarada" y "licencia abierta y fuente declaradas" son declaraciones del usuario, no una auditoría legal automática.
+- Siguiente incremento: lanzador web Windows, modo -CheckOnly, sincronización npm basada en lockfile y workflow windows-latest para probar API/Vite local. TIMER estimado 2–4 horas; tiempo real no medido.
+- CI Windows del SHA b640e9a9a0bedc6df3b6a215651a620806bbe721 en curso al escribir; todavía PARTIAL. La prueba física en el PC del usuario está NOT_RUN.
+- Sin inflar el porcentaje por cantidad de archivos: faltan más ilustraciones modulares originales/libres, validación visual de semántica/compatibilidad, QA físico y un instalador autónomo.
+
 ## Incremento posterior · 2026-10-17 · Roundtrip de personaje y exportación JSON
 
 - TIMER estimado: 1–2 horas; tiempo real no medido.
