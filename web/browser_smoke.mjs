@@ -433,7 +433,7 @@ try {
       let nonTransparent=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0)nonTransparent++;
       const digest=await crypto.subtle.digest("SHA-256",await blob.arrayBuffer());
       const sha256=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,"0")).join("");
-      results.push({id:asset.id,label:asset.label,category:asset.category,width:bitmap.width,height:bitmap.height,mime:blob.type,
+      results.push({id:asset.id,label:asset.label,source_filename:asset.source_filename,category:asset.category,width:bitmap.width,height:bitmap.height,mime:blob.type,
         cornerAlpha:pixels[3],nonTransparent,sha256,shaMatches:sha256===asset.sha256,rightsConfirmed:asset.rights_confirmed===true,
         initiallyUnvalidated:asset.anchors_validated===false,
         sourceRecorded:typeof asset.source_filename==="string"&&asset.source_filename.startsWith("assets/modular/oc-cyberstreet/")
