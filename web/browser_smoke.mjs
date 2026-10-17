@@ -150,7 +150,7 @@ try {
   assert.equal(savedCatalog[0].top, "sports", "Saved character should preserve top clothing");
   assert.equal(savedCatalog[0].accessory, "halo", "Saved character should preserve accessory");
   await characterCatalog.getByRole("button", { name: "Nuevo personaje" }).click();
-  await characterCatalog.getByRole("button", { name: /Mi personaje/ }).click();
+  await characterCatalog.locator(".cc-saved > button").first().click();
   assert.equal(await characterCatalog.getByRole("combobox", { name: "Peinado" }).inputValue(), "wolfcut",
     "Loading a saved character should restore its hairstyle");
   assert.equal(await characterCatalog.getByRole("combobox", { name: "Prenda superior" }).inputValue(), "sports",
