@@ -746,5 +746,37 @@ class LocalApiTests(unittest.TestCase):
                 thread.join(timeout=2)
 
 
+    def test_cyberstreet_layer_endpoint_whitelists_repository_assets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0),
+                make_handler(self.generator, root / "profiles", root / "assets", root / "models"),
+            )
+            server.daemon_threads = True
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            connection = HTTPConnection("127.0.0.1", server.server_address[1], timeout=3)
+            try:
+                connection.request("GET", "/api/modular-cyberstreet/layers/base-body")
+                response = connection.getresponse()
+                payload = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(payload["id"], "base-body")
+                self.assertEqual(payload["category"], "body")
+                self.assertEqual((payload["width"], payload["height"]), (512, 768))
+                self.assertIn("<svg", payload["svg"])
+                self.assertEqual(payload["license"], "LicenseRef-BotImagen-Original-Assets")
+
+                connection.request("GET", "/api/modular-cyberstreet/layers/../../outside")
+                invalid = connection.getresponse()
+                invalid.read()
+                self.assertEqual(invalid.status, 404)
+            finally:
+                connection.close()
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=2)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
