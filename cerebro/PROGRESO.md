@@ -1,3 +1,21 @@
+## Incremento verificado · 2026-10-17 · Ampliación a 15 variantes originales
+
+- **TIMER:** 2–4 horas estimadas para los nuevos assets SVG, contratos de ranura y QA automatizado; tiempo real no medido.
+- **Código probado:** `03727c0b3d6d0970a9f8ed9e08fed05f13c05253` en la rama `feature/bimg-anime-png-universal-library`, PR #15 abierto y sin fusionar.
+- Pack CyberStreet: 15 SVG originales de 512×768. Se añadieron 9 variantes (cuerpo atlético, dos rostros alternativos, dos cabellos, dos prendas superiores y dos prendas inferiores). Calzado sigue con una opción. Manifiesto por ranura; seis defaults activos y alternativas desactivadas inicialmente.
+- Editor SVG: al activar un elemento de una ranura, deshabilita el anterior; el servidor de composición rechaza dos opciones de la misma ranura. Al cargar perfiles anteriores, los campos nuevos se normalizan con los defaults del manifiesto.
+- Biblioteca PNG: instala los componentes del manifiesto convirtiéndolos en PNG de 512×768 con transparencia, SHA-256, ruta fuente y procedencia; anclas inicialmente no validadas. La lista de importación está limitada a IDs y fuentes conocidas.
+- **PASS Validate CI #39005676846**, SHA exacto citado, incluyendo test unitario de compositor y smoke de Chromium con las 15 fuentes, hashes/transparencia/procedencia, confirmación de anclas por pieza, exclusividad de variantes, composición alternada y descarga PNG. https://github.com/jonhararagi/botimagen/actions/runs/39005676846
+- **PASS Windows CI #39005676817**, mismo SHA, build y validaciones del entorno Windows limpio. https://github.com/jonhararagi/botimagen/actions/runs/39005676817
+- Capturas QA, artifact `12090718215`, `80,818,085` bytes, digest contenedor `sha256:9b9d5d08244c8ab5d8e582d7d5f242e37d68ac7cecb2d68a99dd3abd28462b3c`: https://github.com/jonhararagi/botimagen/actions/runs/39005676846/artifacts/12090718215
+- ZIP fuente beta Windows, artifact `12091435269`, `68,272,283` bytes, digest contenedor `sha256:a55582573dd022d2d03501b9824595835afe86bde76f8283e590bfa866dce5f4`: https://github.com/jonhararagi/botimagen/actions/runs/39005676817/artifacts/12091435269 (expira 2026-10-31). ZIP fuente + lanzador, no instalador autónomo.
+- El smoke falló en revisiones previas porque el test confundía el ID de origen SVG con el ID local `user.*` y luego no conservaba `source_filename` al comparar procedencia. Se corrigió la prueba, no se eliminaron las aserciones. La revisión final pasó.
+- Estado de este incremento: **PASS (CI exacta)**. Estado de BotImagen completo: **PARTIAL**, sin recalcular globalmente el porcentaje por cantidad de assets.
+- Pendientes: más variedades originales/licenciadas (actualmente hay una sola pieza de calzado); revisión artística humana de alineación; validación física en PC Windows (**NOT_RUN**); verificar perfil/PNG export en beta empaquetada; ampliar accesorios y vistas adicionales antes de declarar universalidad.
+- `main` permanece en `f86f9345943389dd4ef42d91bc0ec23b38b371d5`, sin cambios. No se creó una rama adicional ni se fusionó PR #15.
+
+---
+
 ## Incremento verificado · 2026-10-17 · Pack original CyberStreet a PNG modulares
 
 - **TIMER:** 2–4 horas estimadas para el incremento vertical, correcciones del smoke test y QA; tiempo real no medido.
