@@ -391,109 +391,123 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
   }, null, { timeout: 15000 });
 
-  // Install the repository-owned SVG starter as six real, transparent PNG layers and test the end-to-end rig flow.
+  // Install the authored CyberStreet pack as distinct PNG variants. One option per rig slot must be enforced.
   const builtInPackLibrary = page.locator(".modular-library");
   const installPackButton = builtInPackLibrary.getByTestId("install-cyberstreet-png-pack");
   await installPackButton.scrollIntoViewIfNeeded();
   await installPackButton.click();
   await builtInPackLibrary.getByTestId("modular-library-status")
-    .filter({hasText: "seis PNG reales de 512×768"}).waitFor({state:"visible",timeout:30000});
-  const cyberstreetLayerLabels = [
-    "Cuerpo base", "Rostro anime", "Falda tecnológica",
-    "Zapatillas neón", "Chaqueta neón", "Cabello cyan",
+    .filter({hasText:"15 PNG reales de 512×768"}).waitFor({state:"visible",timeout:30000});
+  const cyberstreetLayerOptions = [
+    {id:"base-body",label:"Cuerpo base",category:"body"},
+    {id:"base-body-athletic",label:"Cuerpo atlético",category:"body"},
+    {id:"face-anime-cyan",label:"Rostro anime",category:"face"},
+    {id:"face-amber-eyes",label:"Rostro ojos ámbar",category:"face"},
+    {id:"face-wink-rose",label:"Rostro guiño rosa",category:"face"},
+    {id:"skirt-tech-pleated",label:"Falda tecnológica",category:"clothing_bottom"},
+    {id:"bottom-short-skirt",label:"Minifalda magenta",category:"clothing_bottom"},
+    {id:"bottom-cargo-pants",label:"Pantalón cargo",category:"clothing_bottom"},
+    {id:"sneakers-neon",label:"Zapatillas neón",category:"footwear"},
+    {id:"top-neon-jacket",label:"Chaqueta neón",category:"clothing_top"},
+    {id:"top-sport-varsity",label:"Chaqueta universitaria",category:"clothing_top"},
+    {id:"top-goth-blouse",label:"Blusa gótica",category:"clothing_top"},
+    {id:"hair-midnight-cyan",label:"Cabello cyan",category:"hair_front"},
+    {id:"hair-rose-twin",label:"Coletas rosas",category:"hair_front"},
+    {id:"hair-silver-bob",label:"Bob plateado",category:"hair_front"},
   ];
   const importedPackAudit = await page.evaluate(async () => {
     const response = await fetch("/api/modular-assets");
-    if (!response.ok) throw new Error("The modular asset library could not be read after installing CyberStreet");
-    const payload = await response.json();
-    const assets = payload.assets.filter(asset => typeof asset.label === "string" && asset.label.startsWith("CyberStreet · "));
-    const results = [];
-    for (const asset of assets) {
-      const imageResponse = await fetch("/api/modular-assets/" + encodeURIComponent(asset.id) + "/image");
-      const blob = await imageResponse.blob();
-      const bitmap = await createImageBitmap(blob);
-      const canvas = document.createElement("canvas");
-      canvas.width = bitmap.width;
-      canvas.height = bitmap.height;
-      const context = canvas.getContext("2d", {willReadFrequently:true});
-      if (!context) throw new Error("Canvas unavailable while validating a packaged PNG layer");
-      context.drawImage(bitmap, 0, 0);
-      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-      let nonTransparent = 0;
-      for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) nonTransparent++;
-      const digest = await crypto.subtle.digest("SHA-256", await blob.arrayBuffer());
-      const sha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
-      results.push({
-        id: asset.id, label: asset.label, category: asset.category,
-        width: bitmap.width, height: bitmap.height, mime: blob.type,
-        cornerAlpha: pixels[3], nonTransparent, shaMatches: sha256 === asset.sha256,
-        rightsConfirmed: asset.rights_confirmed === true,
-        initiallyUnvalidated: asset.anchors_validated === false,
-        sourceRecorded: typeof asset.source_filename === "string"
-          && asset.source_filename.startsWith("assets/modular/oc-cyberstreet/")
-          && asset.source_url === "https://github.com/jonhararagi/botimagen",
-      });
+    if(!response.ok)throw new Error("The modular asset library could not be read after installing CyberStreet");
+    const payload=await response.json();
+    const assets=payload.assets.filter(asset=>typeof asset.label==="string"&&asset.label.startsWith("CyberStreet · "));
+    const results=[];
+    for(const asset of assets){
+      const imageResponse=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/image");
+      const blob=await imageResponse.blob();
+      const bitmap=await createImageBitmap(blob);
+      const canvas=document.createElement("canvas");canvas.width=bitmap.width;canvas.height=bitmap.height;
+      const context=canvas.getContext("2d",{willReadFrequently:true});
+      if(!context)throw new Error("Canvas unavailable while validating a packaged PNG layer");
+      context.drawImage(bitmap,0,0);
+      const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
+      let nonTransparent=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0)nonTransparent++;
+      const digest=await crypto.subtle.digest("SHA-256",await blob.arrayBuffer());
+      const sha256=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,"0")).join("");
+      results.push({id:asset.id,label:asset.label,category:asset.category,width:bitmap.width,height:bitmap.height,mime:blob.type,
+        cornerAlpha:pixels[3],nonTransparent,sha256,shaMatches:sha256===asset.sha256,rightsConfirmed:asset.rights_confirmed===true,
+        initiallyUnvalidated:asset.anchors_validated===false,
+        sourceRecorded:typeof asset.source_filename==="string"&&asset.source_filename.startsWith("assets/modular/oc-cyberstreet/")
+          &&asset.source_url==="https://github.com/jonhararagi/botimagen"});
       bitmap.close();
     }
     return results;
   });
-  assert.equal(importedPackAudit.length, 6, "The starter pack must register all six independent PNG layers exactly once");
-  for (const asset of importedPackAudit) {
-    assert.ok(cyberstreetLayerLabels.some(label => asset.label === "CyberStreet · " + label), "Expected named CyberStreet layer: " + asset.label);
-    assert.deepEqual([asset.width, asset.height, asset.mime], [512, 768, "image/png"], asset.label + " must be a 512×768 PNG");
-    assert.equal(asset.cornerAlpha, 0, asset.label + " must preserve transparent canvas corners");
-    assert.ok(asset.nonTransparent > 0, asset.label + " must contain visible pixels");
-    assert.equal(asset.shaMatches, true, asset.label + " SHA-256 must match its actual PNG bytes");
-    assert.equal(asset.rightsConfirmed, true, asset.label + " must retain the repository-owned source declaration");
-    assert.equal(asset.initiallyUnvalidated, true, asset.label + " anchors must not be auto-confirmed by the importer");
-    assert.equal(asset.sourceRecorded, true, asset.label + " must retain its source path and repository URL");
+  assert.equal(importedPackAudit.length,cyberstreetLayerOptions.length,"The pack should register all 15 independent variants once");
+  assert.equal(new Set(importedPackAudit.map(asset=>asset.id)).size,cyberstreetLayerOptions.length,"Every source layer must have a unique library ID");
+  assert.equal(new Set(importedPackAudit.map(asset=>asset.sha256)).size,cyberstreetLayerOptions.length,"Every source layer must have distinct PNG bytes");
+  for(const asset of importedPackAudit){
+    const expected=cyberstreetLayerOptions.find(option=>option.id===asset.id);
+    assert.ok(expected,"Unexpected imported CyberStreet source ID: "+asset.id);
+    assert.equal(asset.label,"CyberStreet · "+expected.label,"The UI label must match the original pack component");
+    assert.equal(asset.category,expected.category,"The alternative must map to the correct modular slot");
+    assert.deepEqual([asset.width,asset.height,asset.mime],[512,768,"image/png"],asset.label+" must be a 512×768 PNG");
+    assert.equal(asset.cornerAlpha,0,asset.label+" must preserve transparent canvas corners");
+    assert.ok(asset.nonTransparent>0,asset.label+" must have visible pixels");
+    assert.equal(asset.shaMatches,true,asset.label+" SHA-256 must match the actual PNG bytes");
+    assert.equal(asset.rightsConfirmed,true,asset.label+" must retain the repository-owned source declaration");
+    assert.equal(asset.initiallyUnvalidated,true,asset.label+" anchors must not be auto-confirmed by the importer");
+    assert.equal(asset.sourceRecorded,true,asset.label+" must retain its source path and repository URL");
   }
-  // Anchor confirmation remains an explicit action for each imported layer.
-  for (const label of cyberstreetLayerLabels) {
-    const asset = builtInPackLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({hasText:"CyberStreet · " + label}).first();
-    await asset.waitFor({state:"visible",timeout:10000});
-    await asset.getByRole("button",{name:"Confirmar puntos del esqueleto"}).click();
-    await builtInPackLibrary.getByTestId("modular-library-status")
-      .filter({hasText:"Anclajes confirmados"}).waitFor({state:"visible",timeout:10000});
+  for(const option of cyberstreetLayerOptions){
+    const card=builtInPackLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({hasText:"CyberStreet · "+option.label}).first();
+    await card.waitFor({state:"visible",timeout:10000});
+    await card.getByRole("button",{name:"Confirmar puntos del esqueleto"}).click();
+    await builtInPackLibrary.getByTestId("modular-library-status").filter({hasText:"Anclajes confirmados"}).waitFor({state:"visible",timeout:10000});
   }
   await builtInPackLibrary.getByLabel("Vista para componer").selectOption("front");
-  for (const label of cyberstreetLayerLabels) {
-    await builtInPackLibrary.getByRole("checkbox",{name:"Seleccionar pieza CyberStreet · " + label}).check();
+  const findPiece=label=>builtInPackLibrary.getByRole("checkbox",{name:"Seleccionar pieza CyberStreet · "+label});
+  const alternatives=[
+    {original:"Cuerpo base",variant:"Cuerpo atlético"},
+    {original:"Rostro anime",variant:"Rostro ojos ámbar"},
+    {original:"Falda tecnológica",variant:"Pantalón cargo"},
+    {original:"Chaqueta neón",variant:"Chaqueta universitaria"},
+    {original:"Cabello cyan",variant:"Bob plateado"},
+  ];
+  for(const pair of alternatives){
+    const original=findPiece(pair.original),variant=findPiece(pair.variant);
+    await original.check();await variant.check();
+    assert.equal(await original.isChecked(),false,"Choosing "+pair.variant+" must replace "+pair.original+" in the same slot");
+    assert.equal(await variant.isChecked(),true,"Selected variant must stay active");
   }
+  await findPiece("Zapatillas neón").check();
   await builtInPackLibrary.getByRole("button",{name:"Componer selección (6)"}).click();
-  const modularPngOutput = builtInPackLibrary.locator("img.modular-composition-preview");
+  const modularPngOutput=builtInPackLibrary.locator("img.modular-composition-preview");
   await modularPngOutput.waitFor({state:"visible",timeout:15000});
-  await page.waitForFunction(() => {
-    const image = document.querySelector(".modular-library img.modular-composition-preview");
-    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
-  }, null, {timeout:15000});
-  const composedPackAudit = await page.evaluate(() => {
-    const image = document.querySelector(".modular-library img.modular-composition-preview");
-    if (!(image instanceof HTMLImageElement)) throw new Error("The modular PNG preview is not an image");
-    const canvas = document.createElement("canvas");
-    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
-    const context = canvas.getContext("2d", {willReadFrequently:true});
-    if (!context) throw new Error("Canvas unavailable for composed PNG inspection");
-    context.drawImage(image,0,0);
-    const pixels = context.getImageData(0,0,canvas.width,canvas.height).data;
-    let nonTransparent=0;
-    for(let i=3;i<pixels.length;i+=4) if(pixels[i]>0) nonTransparent++;
+  await page.waitForFunction(()=>{
+    const image=document.querySelector(".modular-library img.modular-composition-preview");
+    return image instanceof HTMLImageElement&&image.complete&&image.naturalWidth===512&&image.naturalHeight===768;
+  },null,{timeout:15000});
+  const compositeAudit=await page.evaluate(()=>{
+    const image=document.querySelector(".modular-library img.modular-composition-preview");
+    if(!(image instanceof HTMLImageElement))throw new Error("The modular PNG preview is not an image");
+    const canvas=document.createElement("canvas");canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+    const context=canvas.getContext("2d",{willReadFrequently:true});
+    if(!context)throw new Error("Canvas unavailable for composed PNG inspection");
+    context.drawImage(image,0,0);const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;
+    let nonTransparent=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>0)nonTransparent++;
     return {width:canvas.width,height:canvas.height,cornerAlpha:pixels[3],nonTransparent};
   });
-  assert.deepEqual([composedPackAudit.width,composedPackAudit.height],[512,768]);
-  assert.equal(composedPackAudit.cornerAlpha,0,"The final composed PNG should keep transparency outside the character");
-  assert.ok(composedPackAudit.nonTransparent>10000,"The actual composite should contain a visible character, not an empty canvas");
-  const cyberstreetPngDownload = page.waitForEvent("download",{timeout:10000});
+  assert.deepEqual([compositeAudit.width,compositeAudit.height],[512,768]);
+  assert.equal(compositeAudit.cornerAlpha,0,"The composite must preserve transparent background corners");
+  assert.ok(compositeAudit.nonTransparent>10000,"The selected alternative combination must contain visible character pixels");
+  const cyberstreetPngDownload=page.waitForEvent("download",{timeout:10000});
   await builtInPackLibrary.getByRole("button",{name:"Descargar composición PNG"}).click();
   assert.equal((await cyberstreetPngDownload).suggestedFilename(),"botimagen-composicion-modular.png");
-  // Leave the shared library UI in a neutral selection state for subsequent smoke-test scenarios.
-  for (const label of cyberstreetLayerLabels) {
-    await builtInPackLibrary.getByRole("checkbox",{name:"Seleccionar pieza CyberStreet · " + label}).uncheck();
-  }
-  const cyberstreetCaptureDir = resolve(root,"artifacts","visual-qa");
-  await mkdir(cyberstreetCaptureDir,{recursive:true});
+  for(const option of cyberstreetLayerOptions){const checkbox=findPiece(option.label);if(await checkbox.isChecked())await checkbox.uncheck();}
+  const cyberstreetCaptureDir=resolve(root,"artifacts","visual-qa");await mkdir(cyberstreetCaptureDir,{recursive:true});
   await builtInPackLibrary.screenshot({path:resolve(cyberstreetCaptureDir,"cyberstreet-png-modular-composition.png")});
-  console.log("PASS_REAL: Chromium installed the six repository-owned source layers as independently hashed transparent PNG assets, preserved provenance, required explicit anchor confirmation, composed all six through the local API, and downloaded the resulting 512×768 transparent PNG.");
+  console.log("PASS_REAL: Chromium imported 15 original PNG candidates, verified transparency/hash/provenance and anchor review, enforced mutually exclusive variants, composed a six-piece alternate character and downloaded its transparent PNG.");
+
 
   const assetContracts = await page.evaluate(async () => {
     const response = await fetch("/api/assets/contracts");
@@ -1652,7 +1666,9 @@ try {
   }, null, { timeout: 15000 });
   await cyberstreet.screenshot({ path: resolve(visualQaDir, "cyberstreet-modular-full.png") });
   const hairToggle = cyberstreet.locator(".modular-layer-toggle").filter({ hasText: "Cabello cyan" }).locator('input[type="checkbox"]');
-  assert.equal(await hairToggle.isChecked(), true, "CyberStreet hair should be enabled initially");
+  const bobHairToggle = cyberstreet.locator(".modular-layer-toggle").filter({ hasText: "Bob plateado" }).locator('input[type="checkbox"]');
+  assert.equal(await hairToggle.isChecked(), true, "CyberStreet default hair should be enabled initially");
+  assert.equal(await bobHairToggle.isChecked(), false, "Alternative hair should be disabled initially");
   const fullLayerImage = await cyberstreetPreview.getAttribute("src");
   await hairToggle.uncheck();
   await page.waitForFunction(previous => {
@@ -1677,6 +1693,16 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.src !== previous && hair instanceof HTMLInputElement && !hair.checked;
   }, imageBeforeRestore, { timeout: 15000 });
   assert.equal(await hairToggle.isChecked(), false, "Restoring the saved profile must restore the saved hair selection");
+  const beforeBob=await cyberstreetPreview.getAttribute("src");
+  await bobHairToggle.check();
+  await page.waitForFunction(previous=>{
+    const image=document.querySelector('.modular-composer img[alt="Personaje CyberStreet compuesto con capas SVG reales"]');
+    return image instanceof HTMLImageElement&&image.complete&&image.naturalWidth===512&&image.src!==previous;
+  },beforeBob,{timeout:15000});
+  assert.equal(await hairToggle.isChecked(),false,"Selecting Bob plateado should disable Cabello cyan in the same slot");
+  assert.equal(await bobHairToggle.isChecked(),true,"Alternative hair must be active after selection");
+  await hairToggle.check();
+  assert.equal(await bobHairToggle.isChecked(),false,"Re-selecting default hair must disable its alternatives");
   await cyberstreet.getByRole("button", { name: "Exportar PNG" }).click();
   await page.waitForFunction(() => {
     const status = document.querySelector('.modular-composer [role="status"]');

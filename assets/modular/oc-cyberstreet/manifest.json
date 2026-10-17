@@ -52,7 +52,9 @@
       "path": "base-body.svg",
       "z": 10,
       "role": "body",
-      "editable": false
+      "editable": false,
+      "slot": "body",
+      "enabled_by_default": true
     },
     {
       "id": "face-anime-cyan",
@@ -60,7 +62,9 @@
       "z": 15,
       "role": "facial-features",
       "editable": true,
-      "anchor": "head"
+      "anchor": "head",
+      "slot": "face",
+      "enabled_by_default": true
     },
     {
       "id": "skirt-tech-pleated",
@@ -68,7 +72,9 @@
       "z": 20,
       "role": "lower-garment",
       "editable": true,
-      "anchor": "waist"
+      "anchor": "waist",
+      "slot": "clothing_bottom",
+      "enabled_by_default": true
     },
     {
       "id": "sneakers-neon",
@@ -76,7 +82,9 @@
       "z": 25,
       "role": "footwear",
       "editable": true,
-      "anchor": "ankle_left,ankle_right"
+      "anchor": "ankle_left,ankle_right",
+      "slot": "footwear",
+      "enabled_by_default": true
     },
     {
       "id": "top-neon-jacket",
@@ -84,7 +92,9 @@
       "z": 30,
       "role": "upper-garment",
       "editable": true,
-      "anchor": "shoulder_left,shoulder_right,waist"
+      "anchor": "shoulder_left,shoulder_right,waist",
+      "slot": "clothing_top",
+      "enabled_by_default": true
     },
     {
       "id": "hair-midnight-cyan",
@@ -92,13 +102,104 @@
       "z": 40,
       "role": "hair-front-and-back",
       "editable": true,
+      "anchor": "head",
+      "slot": "hair_front",
+      "enabled_by_default": true
+    },
+    {
+      "id": "base-body-athletic",
+      "path": "base-body-athletic.svg",
+      "z": 10,
+      "role": "body-shape",
+      "editable": true,
+      "slot": "body",
+      "enabled_by_default": false
+    },
+    {
+      "id": "face-amber-eyes",
+      "path": "face-amber-eyes.svg",
+      "z": 15,
+      "role": "facial-features",
+      "editable": true,
+      "slot": "face",
+      "enabled_by_default": false,
+      "anchor": "head"
+    },
+    {
+      "id": "face-wink-rose",
+      "path": "face-wink-rose.svg",
+      "z": 15,
+      "role": "facial-features",
+      "editable": true,
+      "slot": "face",
+      "enabled_by_default": false,
+      "anchor": "head"
+    },
+    {
+      "id": "bottom-cargo-pants",
+      "path": "bottom-cargo-pants.svg",
+      "z": 20,
+      "role": "lower-garment",
+      "editable": true,
+      "slot": "clothing_bottom",
+      "enabled_by_default": false,
+      "anchor": "waist"
+    },
+    {
+      "id": "bottom-short-skirt",
+      "path": "bottom-short-skirt.svg",
+      "z": 20,
+      "role": "lower-garment",
+      "editable": true,
+      "slot": "clothing_bottom",
+      "enabled_by_default": false,
+      "anchor": "waist"
+    },
+    {
+      "id": "top-sport-varsity",
+      "path": "top-sport-varsity.svg",
+      "z": 30,
+      "role": "upper-garment",
+      "editable": true,
+      "slot": "clothing_top",
+      "enabled_by_default": false,
+      "anchor": "shoulder_left,shoulder_right,waist"
+    },
+    {
+      "id": "top-goth-blouse",
+      "path": "top-goth-blouse.svg",
+      "z": 30,
+      "role": "upper-garment",
+      "editable": true,
+      "slot": "clothing_top",
+      "enabled_by_default": false,
+      "anchor": "shoulder_left,shoulder_right,waist"
+    },
+    {
+      "id": "hair-rose-twin",
+      "path": "hair-rose-twin.svg",
+      "z": 40,
+      "role": "hair-front-and-back",
+      "editable": true,
+      "slot": "hair_front",
+      "enabled_by_default": false,
+      "anchor": "head"
+    },
+    {
+      "id": "hair-silver-bob",
+      "path": "hair-silver-bob.svg",
+      "z": 40,
+      "role": "hair-front-and-back",
+      "editable": true,
+      "slot": "hair_front",
+      "enabled_by_default": false,
       "anchor": "head"
     }
   ],
   "limitations": [
-    "Original vector components are a stylized starter pack, not production-grade illustration.",
-    "The face is now an independent layer and the fringe frames rather than fully hides the eyes.",
-    "Layer alignment must still be rechecked in the live React/Python compositor after the asset update.",
-    "No external artwork or game-extracted asset is included."
+    "This repository-owned stylized pack has deliberate per-slot alternatives, but is a starter library rather than a universal production catalogue.",
+    "All source components share the 512×768 front canvas. Their landmark estimates remain candidates until each imported PNG is explicitly reviewed in the local library.",
+    "The PNG importer records source path, licence declaration and SHA-256 on import; it does not commit generated local PNG binaries to Git.",
+    "No external artwork, game-extracted resource or paid generation is included."
   ]
 }

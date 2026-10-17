@@ -768,6 +768,15 @@ class LocalApiTests(unittest.TestCase):
                 self.assertIn("<svg", payload["svg"])
                 self.assertEqual(payload["license"], "LicenseRef-BotImagen-Original-Assets")
 
+                connection.request("GET", "/api/modular-cyberstreet/layers/hair-silver-bob")
+                variant = connection.getresponse()
+                variant_payload = json.loads(variant.read().decode("utf-8"))
+                self.assertEqual(variant.status, 200)
+                self.assertEqual(variant_payload["id"], "hair-silver-bob")
+                self.assertEqual(variant_payload["category"], "hair_front")
+                self.assertEqual(variant_payload["slot"], "hair_front")
+                self.assertEqual((variant_payload["width"], variant_payload["height"]), (512, 768))
+
                 connection.request("GET", "/api/modular-cyberstreet/layers/../../outside")
                 invalid = connection.getresponse()
                 invalid.read()

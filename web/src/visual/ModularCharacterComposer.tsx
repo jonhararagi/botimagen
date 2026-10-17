@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-type Layer = { id:string; label:string; role:string; z:number; editable:boolean; enabled_by_default:boolean };
+type Layer = { id:string; label:string; role:string; slot:string; z:number; editable:boolean; enabled_by_default:boolean };
 type Manifest = { schema_version:number; pack_id:string; title:string; width:number; height:number; layers:Layer[] };
 type Saved = { id:string; name:string; saved_at:string; style_id:string; seed:number|null };
 const defaultEnabled:Record<string,boolean> = {
@@ -24,7 +24,7 @@ export function ModularCharacterComposer() {
   try { const r=await fetch("/api/profiles"); if(!r.ok) throw new Error(); const d=await r.json(); setProfiles(Array.isArray(d.profiles)?d.profiles:[]); }
   catch { setMessage("No se pudieron cargar los perfiles guardados en el motor local."); }
  }
- useEffect(()=>{void (async()=>{try{const r=await fetch("/api/modular-cyberstreet");const d=await r.json();if(!r.ok)throw new Error(d.error||"Paquete no disponible.");setManifest(d);setEnabled(Object.fromEntries(d.layers.map((l:Layer)=>[l.id,true])));setMessage("Paquete SVG real cargado. Activa o desactiva las capas para modificar la composición.");await render(Object.fromEntries(d.layers.map((l:Layer)=>[l.id,true])));}catch(e){setMessage(e instanceof Error?e.message:"No se pudo cargar CyberStreet.");}})();void refreshProfiles();},[]);
+ useEffect(()=>{void (async()=>{try{const r=await fetch("/api/modular-cyberstreet");const d=await r.json();if(!r.ok)throw new Error(d.error||"Paquete no disponible.");setManifest(d);const defaults=Object.fromEntries(d.layers.map((l:Layer)=>[l.id,l.enabled_by_default]));setEnabled(defaults);setMessage("Paquete SVG real cargado. Elige una sola alternativa por ranura.");await render(defaults);}catch(e){setMessage(e instanceof Error?e.message:"No se pudo cargar CyberStreet.");}})();void refreshProfiles();},[]);
 
  async function render(selection=enabled) {
   setBusy(true);
@@ -33,7 +33,12 @@ export function ModularCharacterComposer() {
   finally{setBusy(false);}
  }
  function toggle(id:string,value:boolean) {
-  const next={...enabled,[id]:value};setEnabled(next);void render(next);
+  const next={...enabled};
+  const activeLayer=manifest?.layers.find(layer=>layer.id===id);
+  if(value&&activeLayer?.slot) {
+   for(const sibling of manifest?.layers||[]) if(sibling.slot===activeLayer.slot&&sibling.id!==id) next[sibling.id]=false;
+  }
+  next[id]=value;setEnabled(next);void render(next);
  }
  async function saveProfile() {
   setBusy(true);
@@ -44,7 +49,7 @@ export function ModularCharacterComposer() {
  async function loadProfile() {
   if(!profileId){setMessage("Selecciona un perfil guardado.");return;}
   setBusy(true);
-  try {const r=await fetch("/api/profiles/"+encodeURIComponent(profileId));const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo recuperar el perfil.");const comp=d.profile?.modular_composition;const next=comp?.enabled;if(!next||typeof next!=="object")throw new Error("El perfil no contiene selecciones CyberStreet.");setProfileName(d.name||"Mi personaje CyberStreet");setEnabled(next);await render(next);setMessage("Selecciones recuperadas del perfil local.");}
+  try {const r=await fetch("/api/profiles/"+encodeURIComponent(profileId));const d=await r.json();if(!r.ok)throw new Error(d.error||"No se pudo recuperar el perfil.");const comp=d.profile?.modular_composition;const saved=comp?.enabled;if(!saved||typeof saved!=="object")throw new Error("El perfil no contiene selecciones CyberStreet.");const next=Object.fromEntries((manifest?.layers||[]).map(layer=>[layer.id,typeof saved[layer.id]==="boolean"?saved[layer.id]:layer.enabled_by_default]));if(!(manifest?.layers||[]).some(layer=>layer.slot==="body"&&next[layer.id]===true))next["base-body"]=true;setProfileName(d.name||"Mi personaje CyberStreet");setEnabled(next);await render(next);setMessage("Selecciones recuperadas del perfil local.");}
   catch(e){setMessage(e instanceof Error?e.message:"Error cargando perfil.");}
   finally{setBusy(false);}
  }

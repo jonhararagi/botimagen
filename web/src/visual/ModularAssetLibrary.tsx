@@ -288,8 +288,8 @@ export function ModularAssetLibrary() {
       const manifest = await manifestResponse.json() as {
         pack_id: string; width: number; height: number; layers: Array<{id:string;label:string}>;
       };
-      if (manifest.width !== 512 || manifest.height !== 768 || !Array.isArray(manifest.layers) || manifest.layers.length !== 6) {
-        throw new Error("El pack no coincide con el contrato esperado de seis capas 512×768.");
+      if (manifest.width !== 512 || manifest.height !== 768 || !Array.isArray(manifest.layers) || manifest.layers.length < 1 || manifest.layers.length > 100) {
+        throw new Error("El pack no contiene un número admisible de capas 512×768.");
       }
       for (const manifestLayer of manifest.layers) {
         let objectUrl = "";
@@ -369,9 +369,9 @@ export function ModularAssetLibrary() {
       }
       await refresh();
       if (failures.length) {
-        setStatus("Pack original CyberStreet importado parcialmente: " + processed + "/6 capas procesadas (" + added + " nuevas, " + duplicates + " ya existentes). Fallos: " + failures.join(" · ") + ". Puedes reintentar sin duplicar las piezas guardadas.");
+        setStatus("Pack original CyberStreet importado parcialmente: " + processed + "/" + manifest.layers.length + " capas procesadas (" + added + " nuevas, " + duplicates + " ya existentes). Fallos: " + failures.join(" · ") + ". Puedes reintentar sin duplicar las piezas guardadas.");
       } else {
-        setStatus("Pack original CyberStreet listo: seis PNG reales de 512×768, fondo transparente conservado y hashes calculados (" + added + " nuevas, " + duplicates + " ya existentes). Procedencia del repositorio registrada; revisa y confirma los puntos del esqueleto en cada pieza antes de componer.");
+        setStatus("Pack original CyberStreet listo: " + manifest.layers.length + " PNG reales de 512×768, fondo transparente conservado y hashes calculados (" + added + " nuevas, " + duplicates + " ya existentes). Procedencia del repositorio registrada; revisa y confirma los puntos del esqueleto en cada pieza antes de componer.");
       }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "No se pudo instalar el pack original CyberStreet.");

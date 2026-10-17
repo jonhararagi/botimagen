@@ -53,6 +53,12 @@ def _load_manifest() -> dict[str, Any]:
             raise CyberStreetError(f"El recurso {layer_id} no tiene raíz SVG.")
         if root.attrib.get("viewBox") not in {"0 0 512 768", "0,0,512,768"}:
             raise CyberStreetError(f"El recurso {layer_id} no comparte el lienzo 512×768.")
+        slot = layer.get("slot")
+        if slot is not None and slot not in {"body", "face", "clothing_bottom", "footwear", "clothing_top", "hair_front"}:
+            raise CyberStreetError(f"Ranura modular inválida para la capa {layer_id}.")
+        enabled_by_default = layer.get("enabled_by_default", True)
+        if not isinstance(enabled_by_default, bool):
+            raise CyberStreetError(f"Estado inicial inválido para la capa {layer_id}.")
         ids.add(layer_id)
     if "base-body" not in ids:
         raise CyberStreetError("El paquete requiere la capa base-body.")
@@ -63,11 +69,20 @@ def get_cyberstreet_manifest() -> dict[str, Any]:
     manifest = _load_manifest()
     labels = {
         "base-body": "Cuerpo base",
+        "base-body-athletic": "Cuerpo atlético",
         "face-anime-cyan": "Rostro anime",
-        "sneakers-neon": "Zapatillas neón",
+        "face-amber-eyes": "Rostro ojos ámbar",
+        "face-wink-rose": "Rostro guiño rosa",
         "skirt-tech-pleated": "Falda tecnológica",
+        "bottom-cargo-pants": "Pantalón cargo",
+        "bottom-short-skirt": "Minifalda magenta",
+        "sneakers-neon": "Zapatillas neón",
         "top-neon-jacket": "Chaqueta neón",
+        "top-sport-varsity": "Chaqueta universitaria",
+        "top-goth-blouse": "Blusa gótica",
         "hair-midnight-cyan": "Cabello cyan",
+        "hair-rose-twin": "Coletas rosas",
+        "hair-silver-bob": "Bob plateado",
     }
     return {
         "schema_version": 1,
@@ -78,8 +93,8 @@ def get_cyberstreet_manifest() -> dict[str, Any]:
         "layers": [
             {"id": layer["id"], "label": labels.get(layer["id"], layer["id"].replace("-", " ").title()),
              "role": layer.get("role", "detail"), "z": layer.get("z", 0),
-             "editable": bool(layer.get("editable", False)),
-             "enabled_by_default": True}
+             "slot": layer["slot"], "editable": bool(layer.get("editable", False)),
+             "enabled_by_default": layer.get("enabled_by_default", True)}
             for layer in sorted(manifest["layers"], key=lambda item: (item.get("z", 0), item["id"]))
         ],
     }
@@ -96,11 +111,20 @@ def get_cyberstreet_layer_png_source(layer_id: str) -> dict[str, Any]:
 
     categories = {
         "base-body": ("body", "body", 20),
+        "base-body-athletic": ("body", "body", 20),
         "face-anime-cyan": ("face", "face", 50),
+        "face-amber-eyes": ("face", "face", 50),
+        "face-wink-rose": ("face", "face", 50),
         "skirt-tech-pleated": ("clothing_bottom", "bottom", 36),
+        "bottom-cargo-pants": ("clothing_bottom", "bottom", 36),
+        "bottom-short-skirt": ("clothing_bottom", "bottom", 36),
         "sneakers-neon": ("footwear", "footwear", 28),
         "top-neon-jacket": ("clothing_top", "top", 40),
+        "top-sport-varsity": ("clothing_top", "top", 40),
+        "top-goth-blouse": ("clothing_top", "top", 40),
         "hair-midnight-cyan": ("hair_front", "hair_front", 70),
+        "hair-rose-twin": ("hair_front", "hair_front", 70),
+        "hair-silver-bob": ("hair_front", "hair_front", 70),
     }
     if layer_id not in categories:
         raise CyberStreetError(f"La capa {layer_id!r} no tiene categoría modular aprobada para PNG.")
@@ -133,11 +157,20 @@ def get_cyberstreet_layer_png_source(layer_id: str) -> dict[str, Any]:
     }
     labels = {
         "base-body": "Cuerpo base",
+        "base-body-athletic": "Cuerpo atlético",
         "face-anime-cyan": "Rostro anime",
+        "face-amber-eyes": "Rostro ojos ámbar",
+        "face-wink-rose": "Rostro guiño rosa",
         "skirt-tech-pleated": "Falda tecnológica",
+        "bottom-cargo-pants": "Pantalón cargo",
+        "bottom-short-skirt": "Minifalda magenta",
         "sneakers-neon": "Zapatillas neón",
         "top-neon-jacket": "Chaqueta neón",
+        "top-sport-varsity": "Chaqueta universitaria",
+        "top-goth-blouse": "Blusa gótica",
         "hair-midnight-cyan": "Cabello cyan",
+        "hair-rose-twin": "Coletas rosas",
+        "hair-silver-bob": "Bob plateado",
     }
     relative_path = f"assets/modular/oc-cyberstreet/{layer['path']}"
     return {
@@ -148,6 +181,7 @@ def get_cyberstreet_layer_png_source(layer_id: str) -> dict[str, Any]:
         "category": category,
         "rig_category": rig_category,
         "layer_order": layer_order,
+        "slot": layer["slot"],
         "width": 512,
         "height": 768,
         "view": "front",
@@ -167,8 +201,20 @@ def compose_cyberstreet_svg(enabled: dict[str, bool] | None = None) -> str:
     unknown = set(requested) - valid_ids
     if unknown:
         raise CyberStreetError("IDs de capa desconocidos: " + ", ".join(sorted(unknown)))
-    if requested.get("base-body", True) is not True:
-        raise CyberStreetError("La capa de cuerpo base es obligatoria.")
+    active_slots: dict[str, str] = {}
+    for layer in manifest["layers"]:
+        layer_id = layer["id"]
+        selected = requested.get(layer_id, layer.get("enabled_by_default", True))
+        if selected is not True:
+            continue
+        slot = layer.get("slot")
+        if slot:
+            previous = active_slots.get(slot)
+            if previous and previous != layer_id:
+                raise CyberStreetError(f"Selecciona una sola alternativa para la ranura {slot}: {previous} y {layer_id}.")
+            active_slots[slot] = layer_id
+    if "body" not in active_slots:
+        raise CyberStreetError("Debes seleccionar una única variante de cuerpo base.")
     width, height = manifest["view"]["width"], manifest["view"]["height"]
     canvas = ET.Element(f"{{{SVG_NS}}}svg", {
         "width": str(width), "height": str(height), "viewBox": f"0 0 {width} {height}",
@@ -176,7 +222,7 @@ def compose_cyberstreet_svg(enabled: dict[str, bool] | None = None) -> str:
     })
     for layer in sorted(manifest["layers"], key=lambda item: (item.get("z", 0), item["id"])):
         layer_id = layer["id"]
-        if requested.get(layer_id, True) is False:
+        if requested.get(layer_id, layer.get("enabled_by_default", True)) is not True:
             continue
         relative = Path(layer["path"])
         target = (PACK_ROOT / relative).resolve()
