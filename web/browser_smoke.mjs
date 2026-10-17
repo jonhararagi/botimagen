@@ -486,7 +486,9 @@ try {
   const cyberstreetPngDownload = page.waitForEvent("download",{timeout:10000});
   await builtInPackLibrary.getByRole("button",{name:"Descargar composición PNG"}).click();
   assert.equal((await cyberstreetPngDownload).suggestedFilename(),"botimagen-composicion-modular.png");
-  await builtInPackLibrary.screenshot({path:resolve(visualQaDir,"cyberstreet-png-modular-composition.png")});
+  const cyberstreetCaptureDir = resolve(root,"artifacts","visual-qa");
+  await mkdir(cyberstreetCaptureDir,{recursive:true});
+  await builtInPackLibrary.screenshot({path:resolve(cyberstreetCaptureDir,"cyberstreet-png-modular-composition.png")});
   console.log("PASS_REAL: Chromium installed the six repository-owned source layers as independently hashed transparent PNG assets, preserved provenance, required explicit anchor confirmation, composed all six through the local API, and downloaded the resulting 512×768 transparent PNG.");
 
   const assetContracts = await page.evaluate(async () => {
