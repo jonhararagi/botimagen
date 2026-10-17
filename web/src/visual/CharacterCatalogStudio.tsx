@@ -8,13 +8,13 @@ type Choice = { id: string; label: string; color?: string };
 const STORE_KEY = "botimagen.character-catalog.v1";
 const choices: Record<string, Choice[]> = {
   body: [{id:"slim",label:"Esbelto"},{id:"balanced",label:"Proporcionado"},{id:"athletic",label:"Atlético"}],
-  skin: [{id:"porcelain",label:"Porcelana",color:"#f4d7cb"},{id:"warm",label:"Cálido",color:"#d99d7b"},{id:"tan",label:"Moreno",color:"#986449"},{id:"deep",label:"Oscuro",color:"#633f37"}],
-  hair: [{id:"black",label:"Negro",color:"#252137"},{id:"brown",label:"Castaño",color:"#70462f"},{id:"blonde",label:"Rubio",color:"#e9c56d"},{id:"pink",label:"Rosa",color:"#e77aa9"},{id:"blue",label:"Azul",color:"#557de0"},{id:"white",label:"Blanco",color:"#e6e5ef"}],
-  hairstyle: [{id:"long",label:"Largo"},{id:"bob",label:"Bob"},{id:"ponytail",label:"Coleta"},{id:"short",label:"Corto"},{id:"twin",label:"Coletas dobles"}],
-  eyes: [{id:"violet",label:"Violeta",color:"#8761d7"},{id:"blue",label:"Azul",color:"#4c91df"},{id:"green",label:"Verde",color:"#42a77b"},{id:"amber",label:"Ámbar",color:"#d69a35"},{id:"red",label:"Rojo",color:"#d94d66"}],
-  top: [{id:"uniform",label:"Uniforme"},{id:"hoodie",label:"Sudadera"},{id:"blouse",label:"Blusa"},{id:"jacket",label:"Chaqueta"}],
-  bottom: [{id:"skirt",label:"Falda plisada"},{id:"shorts",label:"Shorts"},{id:"pants",label:"Pantalón"},{id:"dress",label:"Vestido"}],
-  accessory: [{id:"none",label:"Ninguno"},{id:"glasses",label:"Gafas"},{id:"ribbon",label:"Lazo"},{id:"headphones",label:"Auriculares"},{id:"hairclip",label:"Horquilla"}],
+  skin: [{id:"porcelain",label:"Porcelana",color:"#f4d7cb"},{id:"ivory",label:"Marfil",color:"#f7dfd0"},{id:"warm",label:"Cálido",color:"#d99d7b"},{id:"peach",label:"Durazno",color:"#e8b49b"},{id:"olive",label:"Oliva",color:"#c49a72"},{id:"tan",label:"Moreno",color:"#986449"},{id:"deep",label:"Oscuro",color:"#633f37"},{id:"ebony",label:"Ébano",color:"#4b302f"}],
+  hair: [{id:"black",label:"Negro",color:"#252137"},{id:"brown",label:"Castaño",color:"#70462f"},{id:"auburn",label:"Cobrizo",color:"#a94f3f"},{id:"blonde",label:"Rubio",color:"#e9c56d"},{id:"silver",label:"Plateado",color:"#b9c2d8"},{id:"pink",label:"Rosa",color:"#e77aa9"},{id:"red",label:"Carmesí",color:"#bd315b"},{id:"blue",label:"Azul",color:"#557de0"},{id:"teal",label:"Turquesa",color:"#31aeb7"},{id:"white",label:"Blanco",color:"#e6e5ef"}],
+  hairstyle: [{id:"long",label:"Largo"},{id:"bob",label:"Bob"},{id:"ponytail",label:"Coleta"},{id:"sidepony",label:"Coleta lateral"},{id:"short",label:"Corto"},{id:"wolfcut",label:"Wolf cut"},{id:"braids",label:"Trenzas"},{id:"twin",label:"Coletas dobles"}],
+  eyes: [{id:"violet",label:"Violeta",color:"#8761d7"},{id:"blue",label:"Azul",color:"#4c91df"},{id:"sky",label:"Celeste",color:"#5bc7e8"},{id:"green",label:"Verde",color:"#42a77b"},{id:"emerald",label:"Esmeralda",color:"#168b65"},{id:"amber",label:"Ámbar",color:"#d69a35"},{id:"red",label:"Rojo",color:"#d94d66"},{id:"rose",label:"Rosa",color:"#e875a8"}],
+  top: [{id:"uniform",label:"Uniforme"},{id:"hoodie",label:"Sudadera"},{id:"blouse",label:"Blusa"},{id:"jacket",label:"Chaqueta"},{id:"armor",label:"Armadura ligera"},{id:"kimono",label:"Kimono"},{id:"gothic",label:"Gótico"},{id:"sports",label:"Deportivo"}],
+  bottom: [{id:"skirt",label:"Falda plisada"},{id:"shorts",label:"Shorts"},{id:"pants",label:"Pantalón"},{id:"dress",label:"Vestido"},{id:"pleated_long",label:"Falda larga"},{id:"cargo",label:"Pantalón cargo"},{id:"short_skirt",label:"Minifalda"}],
+  accessory: [{id:"none",label:"Ninguno"},{id:"glasses",label:"Gafas"},{id:"ribbon",label:"Lazo"},{id:"headphones",label:"Auriculares"},{id:"hairclip",label:"Horquilla"},{id:"cat_ears",label:"Orejas felinas"},{id:"halo",label:"Aureola"},{id:"horns",label:"Cuernos pequeños"}],
   pose: [{id:"neutral",label:"De pie · frontal (fija)"}],
 };
 const defaults: Character = {id:"",name:"Mi personaje",body:"balanced",skin:"porcelain",hair:"black",hairstyle:"long",eyes:"violet",top:"uniform",bottom:"skirt",accessory:"none",pose:"neutral"};
@@ -26,27 +26,32 @@ function readSaved(): Character[] {
 }
 function CharacterFigure({character:c}:{character:Character}) {
   const hair = color("hair",c.hair,"#252137"), skin = color("skin",c.skin,"#f4d7cb"), eyes = color("eyes",c.eyes,"#8761d7");
-  const topColor = ({uniform:"#5a54a8",hoodie:"#42475e",blouse:"#f2eaf4",jacket:"#29334c"} as Record<string,string>)[c.top] || "#5a54a8";
-  const bottomColor = ({skirt:"#d34f91",shorts:"#425f9a",pants:"#34405d",dress:"#a84d91"} as Record<string,string>)[c.bottom] || "#d34f91";
+  const topColor = ({uniform:"#5a54a8",hoodie:"#42475e",blouse:"#f2eaf4",jacket:"#29334c",armor:"#687a91",kimono:"#b74d75",gothic:"#292438",sports:"#2f8d9b"} as Record<string,string>)[c.top] || "#5a54a8";
+  const bottomColor = ({skirt:"#d34f91",shorts:"#425f9a",pants:"#34405d",dress:"#a84d91",pleated_long:"#8b5fbf",cargo:"#45566c",short_skirt:"#e078a9"} as Record<string,string>)[c.bottom] || "#d34f91";
   const bodyWidth = c.body==="slim"?52:c.body==="athletic"?70:60;
   return <svg className="cc-figure" viewBox="0 0 240 360" role="img" aria-label={c.name + ", personaje anime de cuerpo completo"}>
     <ellipse cx="120" cy="337" rx="55" ry="9" fill="#151222" opacity=".12"/>
-    <path d={c.hairstyle==="long"?"M82 72 Q58 118 77 181 L94 190 L99 104 Z":c.hairstyle==="ponytail"?"M143 63 Q190 63 184 121 L166 139 L158 93 Z":"M82 62 Q66 97 78 119 L94 104 Z"} fill={hair}/>
+    <path d={c.hairstyle==="long"?"M82 72 Q58 118 77 181 L94 190 L99 104 Z":(c.hairstyle==="ponytail"||c.hairstyle==="sidepony")?"M143 63 Q190 63 184 121 L166 139 L158 93 Z":c.hairstyle==="braids"?"M82 72 Q63 111 78 157 L86 186 L96 178 L91 118 Z M145 75 Q164 111 155 157 L154 186 L144 178 L146 118 Z":"M82 62 Q66 97 78 119 L94 104 Z"} fill={hair}/>
     <path d="M99 234 L93 314 Q94 324 107 324 L118 250 Z M141 234 L148 314 Q148 324 135 324 L122 250 Z" fill={skin}/>
     <path d="M91 310 L111 310 L113 329 L83 329 Q82 318 91 310 M132 310 L150 310 Q160 317 157 329 L128 329 Z" fill="#29253d"/>
-    <path d={c.bottom==="skirt"?"M91 204 L149 204 L164 260 Q120 273 76 260 Z":c.bottom==="shorts"?"M91 205 L149 205 L150 245 L122 249 L120 232 L108 249 L89 245 Z":c.bottom==="dress"?"M91 185 L149 185 L167 260 L73 260 Z":"M91 204 L149 204 L150 263 L127 263 L120 225 L111 263 L89 263 Z"} fill={bottomColor} stroke="#2a243d" strokeWidth="2"/>
-    <path d={`M${120-bodyWidth/2} 132 Q120 119 ${120+bodyWidth/2} 132 L150 211 Q120 225 90 211 Z`} fill={topColor} stroke="#2a243d" strokeWidth="2"/>
+    <path d={c.bottom==="skirt"||c.bottom==="short_skirt"?"M91 204 L149 204 L164 260 Q120 273 76 260 Z":c.bottom==="shorts"?"M91 205 L149 205 L150 245 L122 249 L120 232 L108 249 L89 245 Z":c.bottom==="dress"?"M91 185 L149 185 L167 260 L73 260 Z":c.bottom==="pleated_long"?"M91 204 L149 204 L158 282 Q120 294 82 282 Z":"M91 204 L149 204 L150 263 L127 263 L120 225 L111 263 L89 263 Z"} fill={bottomColor} stroke="#2a243d" strokeWidth="2"/>
+    <path d={c.top==="kimono"?"M98 132 L142 132 L156 211 L120 225 L84 211 Z":c.top==="armor"?"M100 132 L140 132 L150 211 L120 225 L90 211 Z":`M${120-bodyWidth/2} 132 Q120 119 ${120+bodyWidth/2} 132 L150 211 Q120 225 90 211 Z`} fill={topColor} stroke="#2a243d" strokeWidth="2"/>
     <path d="M101 139 L83 188 M139 139 L157 188" stroke={skin} strokeWidth="13" strokeLinecap="round"/>
     <path d="M95 58 Q120 35 145 58 L151 100 Q148 130 120 139 Q92 130 89 100 Z" fill={skin} stroke="#30273d" strokeWidth="2"/>
-    <path d={c.hairstyle==="bob"?"M88 82 Q72 34 119 31 Q164 31 152 87 L143 105 L139 65 Q116 80 95 62 L94 106 Z":c.hairstyle==="short"?"M88 73 Q79 34 119 31 Q159 33 151 74 L137 62 L120 69 L98 61 Z":c.hairstyle==="twin"?"M89 69 Q63 30 78 16 Q103 22 101 63 Q119 40 143 48 Q178 28 166 73 L147 93 L143 61 Q119 78 96 61 L94 94 Z":"M88 75 Q72 30 118 28 Q164 28 152 76 L141 96 L140 58 Q119 76 97 57 L95 98 Z"} fill={hair} stroke="#30273d" strokeWidth="2"/>
+    <path d={c.hairstyle==="bob"?"M88 82 Q72 34 119 31 Q164 31 152 87 L143 105 L139 65 Q116 80 95 62 L94 106 Z":c.hairstyle==="short"?"M88 73 Q79 34 119 31 Q159 33 151 74 L137 62 L120 69 L98 61 Z":c.hairstyle==="twin"?"M89 69 Q63 30 78 16 Q103 22 101 63 Q119 40 143 48 Q178 28 166 73 L147 93 L143 61 Q119 78 96 61 L94 94 Z":c.hairstyle==="wolfcut"?"M88 76 Q70 29 118 27 Q166 29 152 76 L145 94 L151 117 L135 108 L130 127 L119 110 L105 128 L101 108 L85 120 L93 93 Z":c.hairstyle==="braids"?"M88 75 Q72 30 118 28 Q164 28 152 76 L141 96 L140 58 Q119 76 97 57 L95 98 Z M88 83 L76 139 L83 184 L96 179 L90 137 L100 111 Z M150 83 L164 139 L157 184 L144 179 L150 137 L140 111 Z":c.hairstyle==="sidepony"?"M88 75 Q72 30 118 28 Q164 28 152 76 L141 96 L140 58 Q119 76 97 57 L95 98 Z M142 39 Q176 28 175 55 L164 74 L152 60 Z":"M88 75 Q72 30 118 28 Q164 28 152 76 L141 96 L140 58 Q119 76 97 57 L95 98 Z"} fill={hair} stroke="#30273d" strokeWidth="2"/>
     <ellipse cx="105" cy="91" rx="5" ry="8" fill={eyes}/><ellipse cx="135" cy="91" rx="5" ry="8" fill={eyes}/><circle cx="106" cy="89" r="1.8" fill="white"/><circle cx="136" cy="89" r="1.8" fill="white"/>
     <path d="M113 113 Q120 118 127 113" fill="none" stroke="#b45f77" strokeWidth="2" strokeLinecap="round"/>
     {c.accessory==="glasses"&&<g fill="none" stroke="#29243b" strokeWidth="2.5"><circle cx="105" cy="91" r="11"/><circle cx="135" cy="91" r="11"/><path d="M116 91 L124 91"/></g>}
     {c.accessory==="ribbon"&&<path d="M116 43 L99 31 L101 51 L116 47 L132 31 L133 51 Z" fill="#e75b98" stroke="#30273d" strokeWidth="1.5"/>}
     {c.accessory==="hairclip"&&<path d="M137 51 L151 45" stroke="#f2c96d" strokeWidth="5" strokeLinecap="round"/>}
     {c.accessory==="headphones"&&<g fill="none" stroke="#7dd9e8" strokeWidth="5"><path d="M84 78 Q82 39 120 39 Q158 39 156 78"/><rect x="80" y="72" width="10" height="23" rx="4" fill="#7dd9e8"/><rect x="150" y="72" width="10" height="23" rx="4" fill="#7dd9e8"/></g>}
+    {c.accessory==="cat_ears"&&<path d="M91 51 L86 25 L107 43 Q120 37 133 43 L154 25 L149 51Z" fill={hair} stroke="#30273d" strokeWidth="2.5"/>}
+    {c.accessory==="halo"&&<ellipse cx="120" cy="19" rx="23" ry="6" fill="none" stroke="#f2c96d" strokeWidth="4"/>}
+    {c.accessory==="horns"&&<path d="M99 43 Q88 26 96 17 Q107 27 109 40 M141 43 Q152 26 144 17 Q133 27 131 40" fill="#b94c62" stroke="#30273d" strokeWidth="2"/>
     {c.top==="uniform"&&<path d="M110 137 L120 151 L130 137" fill="none" stroke="#f5edf9" strokeWidth="4"/>}
-    {c.top==="jacket"&&<path d="M120 151 L120 210 M108 143 L120 158 L132 143" fill="none" stroke="#7ee4ee" strokeWidth="2.5"/>}
+    {(c.top==="jacket"||c.top==="armor")&&<path d="M120 151 L120 210 M108 143 L120 158 L132 143" fill="none" stroke={c.top==="armor"?"#dbe5f3":"#7ee4ee"} strokeWidth="2.5"/>}
+    {c.top==="kimono"&&<path d="M104 145 L120 166 L136 145" fill="none" stroke="#f7dce8" strokeWidth="3"/>}
+    {c.top==="sports"&&<path d="M104 155 L136 155 M104 167 L136 167" fill="none" stroke="#d8f7fa" strokeWidth="3"/>
     <path d="M104 211 L136 211" stroke="#f5d87b" strokeWidth="3"/>
   </svg>;
 }
@@ -83,7 +88,7 @@ export function CharacterCatalogStudio() {
   const remove=(id:string)=>{const next=saved.filter(item=>item.id!==id);setSaved(next);localStorage.setItem(STORE_KEY,JSON.stringify(next));setNotice("Ficha eliminada de la biblioteca local.");};
   const exportJson=()=>{const blob=new Blob([JSON.stringify(character,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=(character.name||"personaje").replace(/[^\p{L}\p{N}_-]+/gu,"-")+".json";a.click();URL.revokeObjectURL(url);};
   const exportSvg=()=>{const svg=document.querySelector(".cc-figure");if(!svg)return;const clone=svg.cloneNode(true) as SVGElement;clone.setAttribute("xmlns","http://www.w3.org/2000/svg");const blob=new Blob([new XMLSerializer().serializeToString(clone)],{type:"image/svg+xml"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=(character.name||"personaje").replace(/[^\p{L}\p{N}_-]+/gu,"-")+".svg";a.click();URL.revokeObjectURL(url);};
-  return <section className="character-catalog-studio" aria-labelledby="cc-title">
+  return <section className="character-catalog-studio" data-testid="character-catalog-studio" aria-labelledby="cc-title">
     <style>{`
       .character-catalog-studio{margin:16px 0 26px;padding:22px;border:1px solid #3c3654;border-radius:18px;background:linear-gradient(145deg,#171522,#111019);color:#f7f4ff}
       .character-catalog-studio *{box-sizing:border-box}.cc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.cc-head h2{margin:0 0 6px;font-size:23px}.cc-head p{margin:0;color:#bdb7d1;line-height:1.45}.cc-label{font-size:10px;letter-spacing:.14em;color:#a99aff;font-weight:800}
