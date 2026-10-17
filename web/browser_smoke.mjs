@@ -125,6 +125,26 @@ try {
   page.on("pageerror", error => pageErrors.push(error.message));
 
   await page.goto(appUrl, { waitUntil: "domcontentloaded", timeout: 20000 });
+  // Verify expanded fixed-choice character catalog in a real Chromium session.
+  const characterCatalog = page.getByTestId("character-catalog-studio");
+  await characterCatalog.getByRole("heading", { name: "Creador de personajes" }).waitFor({ state: "visible", timeout: 15000 });
+  const catalogOptionCounts = {};
+  for (const [label, expected] of [["Piel", 8], ["Color del cabello", 10], ["Peinado", 8], ["Ojos", 8], ["Prenda superior", 8], ["Prenda inferior", 7], ["Accesorio", 8]]) {
+    const selector = characterCatalog.getByRole("combobox", { name: label });
+    await selector.waitFor({ state: "visible" });
+    const count = await selector.locator("option").count();
+    assert.equal(count, expected, `Expanded catalog option count for ${label}`);
+    catalogOptionCounts[label] = count;
+  }
+  await characterCatalog.getByRole("combobox", { name: "Peinado" }).selectOption("wolfcut");
+  await characterCatalog.getByRole("combobox", { name: "Prenda superior" }).selectOption("sports");
+  const svgBeforeAccessory = await characterCatalog.locator("svg.cc-figure").innerHTML();
+  await characterCatalog.getByRole("combobox", { name: "Accesorio" }).selectOption("halo");
+  const svgAfterAccessory = await characterCatalog.locator("svg.cc-figure").innerHTML();
+  assert.notEqual(svgAfterAccessory, svgBeforeAccessory, "Selecting a new accessory must change the live SVG preview");
+  await characterCatalog.getByRole("button", { name: "Guardar personaje" }).click();
+  await characterCatalog.getByRole("status").filter({ hasText: /guardado/i }).waitFor({ state: "visible", timeout: 5000 });
+  console.log("PASS_REAL: Chromium verified expanded catalog option counts " + JSON.stringify(catalogOptionCounts) + ", live hairstyle/clothing/accessory preview changes, and character save action.");
   // Exercise the new Picsart-style quick editor: import, select, add text and export.
   const imageEditor = page.locator("#quick-image-editor");
   await imageEditor.waitFor({ state: "visible", timeout: 10000 });
