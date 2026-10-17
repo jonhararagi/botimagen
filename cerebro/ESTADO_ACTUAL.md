@@ -829,3 +829,15 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - **Siguiente paso:** añadir una prueba real de composición con fixture PNG modular y validar anclas, orden de capas y descarga.
 - **TIMER:** 1–3 horas activas estimadas para cerrar la validación y prueba de composición con recursos compatibles; no es tiempo medido.
 
+
+
+## BIMG-MODULAR-PNG-ROUNDTRIP-FIX · 2026-10-17
+
+- TIMER: 1–2 horas estimadas para corregir el bloqueo y verificar el recorrido; tiempo real no medido.
+- HEAD inicial inspeccionado: `4fc2fad540d183425c45d1269999ade374a09c47`; PR #15 abierto, sin fusionar, rama `feature/bimg-anime-png-universal-library`.
+- CI #799 falló en `tests/test_local_api.py::test_modular_png_import_anchor_confirmation_compose_and_export_round_trip`. La API completaba importación, confirmación de anclajes, composición y respuesta; el test comparaba la firma PNG contra una secuencia de barras invertidas literal en vez de los bytes PNG.
+- Corrección delimitada en commit `7e5405608e28d6e06026b05177b04cb7a0e24a79`: la aserción compara ahora la firma binaria real `b"\\x89PNG\\r\\n\\x1a\\n"`. No se relajaron las verificaciones de dimensiones, colores por orden de capa ni transparencia.
+- La prueba de round-trip cubre dos piezas PNG generadas como fixture, importación por API, confirmación de anclajes, catálogo, composición 512×768, decodificación PNG y píxeles representativos de cuerpo/cabello/transparencia.
+- CI #814 para el SHA exacto `7e5405608e28d6e06026b05177b04cb7a0e24a79`: **QUEUED al registrar esta nota**, todavía no es PASS. https://github.com/jonhararagi/botimagen/actions/runs/38985890843
+- Estado actual del incremento: **PARTIAL / CI PENDING**. No aumenta el progreso global. No se ejecutó QA física Windows; tampoco se afirma que las 43 regiones PSD sean piezas semánticas intercambiables.
+- Próximo paso: esperar CI del SHA exacto; si pasa, ampliar el E2E del panel React con fixture PNG real y comprobar la descarga. Si falla, corregir el primer fallo reproducible antes de ampliar alcance. 
