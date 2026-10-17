@@ -184,3 +184,12 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - CI #673 (run `38682122703`) está `IN_PROGRESS`: https://github.com/jonhararagi/botimagen/actions/runs/38682122703.
 - Generación PixAI y validación visual: `NOT_RUN`, pendiente de que el usuario guarde el perfil TinyFish. Créditos gastados por esta tarea: **0**.
 - **TIMER restante:** 1–2 horas activas estimadas para verificar CI y realizar una prueba visual individual, sin lotes.
+
+
+## BIMG-MODULAR-PNG-ROUNDTRIP-FIX · 2026-10-17
+
+- TIMER estimado: 1–2 horas; tiempo real: no medido.
+- Corregida una aserción defectuosa de firma PNG en la prueba de integración API. La CI #799 fallaba después de completar la composición porque el test esperaba texto escapado, no los bytes binarios PNG.
+- Commit de código: `7e5405608e28d6e06026b05177b04cb7a0e24a79`. La prueba mantiene comprobaciones reales de importación de dos piezas fixture, confirmación de anclajes, composición, dimensiones 512×768, colores de cuerpo/cabello y transparencia.
+- CI #814, SHA exacto `7e5405608e28d6e06026b05177b04cb7a0e24a79`, estaba **QUEUED** al documentar: https://github.com/jonhararagi/botimagen/actions/runs/38985890843.
+- **PARTIAL / CI PENDING**. No modificar porcentaje global hasta verificar el resultado; Windows manual QA sigue NOT_RUN y la clasificación semántica de las 43 regiones PSD sigue pendiente.
