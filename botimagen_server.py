@@ -17,7 +17,7 @@ from character_model_builder import (
     reset_character_model_layer,
 )
 from modular_character_compositor import CompositionError, compose_png, validate_selection
-from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg
+from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg, get_cyberstreet_layer_png_source
 from modular_asset_library import read_user_asset
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
 from mini_ai_generator import MiniAIError, generate_mini_ai, mini_ai_status
@@ -369,6 +369,8 @@ def make_handler(
             allowed = allowed_by_path.get(path)
             if path.startswith("/api/modular-assets/") and path.endswith(("/validate-anchors", "/confirm-rights")):
                 allowed = ("POST",)
+            elif path.startswith("/api/modular-cyberstreet/layers/"):
+                allowed = ("GET",)
             elif path.startswith("/api/character-models/"):
                 allowed = ("POST",) if path.endswith(("/extend", "/publish-layer", "/edit-layer", "/reset-layer")) else ("GET",)
             if allowed is None:
@@ -405,6 +407,19 @@ def make_handler(
                 return
             if path == "/api/assets/contracts":
                 self._send_json(HTTPStatus.OK, asset_contract_catalog)
+                return
+            if path.startswith("/api/modular-cyberstreet/layers/"):
+                layer_id = path.removeprefix("/api/modular-cyberstreet/layers/")
+                if not layer_id or "/" in layer_id:
+                    self._send_json(HTTPStatus.NOT_FOUND, {"error": "Ruta de capa CyberStreet no encontrada."})
+                    return
+                try:
+                    source = get_cyberstreet_layer_png_source(layer_id)
+                except CyberStreetError as exc:
+                    status = HTTPStatus.NOT_FOUND if "No existe una capa CyberStreet" in str(exc) or "ID de capa CyberStreet inválido" in str(exc) else HTTPStatus.INTERNAL_SERVER_ERROR
+                    self._send_json(status, {"error": str(exc)})
+                    return
+                self._send_json(HTTPStatus.OK, source)
                 return
             if path == "/api/modular-cyberstreet":
                 try:
