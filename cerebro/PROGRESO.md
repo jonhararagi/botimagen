@@ -193,3 +193,13 @@ Actualizar este archivo al finalizar cada tarea. Los pesos no deben cambiarse pa
 - Commit de código: `7e5405608e28d6e06026b05177b04cb7a0e24a79`. La prueba mantiene comprobaciones reales de importación de dos piezas fixture, confirmación de anclajes, composición, dimensiones 512×768, colores de cuerpo/cabello y transparencia.
 - CI #814, SHA exacto `7e5405608e28d6e06026b05177b04cb7a0e24a79`, estaba **QUEUED** al documentar: https://github.com/jonhararagi/botimagen/actions/runs/38985890843.
 - **PARTIAL / CI PENDING**. No modificar porcentaje global hasta verificar el resultado; Windows manual QA sigue NOT_RUN y la clasificación semántica de las 43 regiones PSD sigue pendiente.
+
+
+## Incremento · 2026-10-17 · Ampliación del catálogo fijo de rasgos
+
+- TIMER estimado: 2–4 horas; tiempo real no medido.
+- Ampliados los selectores del creador vectorial: piel 8, cabello 10 colores, peinado 8, ojos 8 colores, prendas superiores 8, inferiores 7 y accesorios 8.
+- Añadidos dibujos vectoriales para wolf cut, trenzas, coleta lateral, kimono, armadura ligera, falda larga, orejas felinas, aureola y cuernos. La pose sigue fija y las selecciones son explícitas.
+- Añadido test Chromium para conteo de opciones, cambio de vista previa SVG y guardado de personaje.
+- HEAD del código: `1c2c5586a70e941f7dc3a1e22b54df4388881b30`. CI #819 pendiente al registrar esta nota: https://github.com/jonhararagi/botimagen/actions/runs/38986491276.
+- Estado **PARTIAL / CI PENDING**. No se suma progreso global por cantidad de opciones. Esto no añade nuevos PNG artísticos ni valida semánticamente las 43 regiones PSD; esos trabajos siguen pendientes.
