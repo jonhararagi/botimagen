@@ -108,3 +108,39 @@ jobs:
               }
             }
           }
+
+      - name: Package source beta and calculate SHA-256
+        shell: pwsh
+        run: |
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE "release"
+          New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
+          $archive = Join-Path $releaseDir "BotImagen-Web-Beta-Windows.zip"
+          git archive --format=zip --prefix=BotImagen-Web-Beta-Windows/ HEAD -o $archive
+          if ($LASTEXITCODE -ne 0) { throw "git archive failed; the Windows source package was not created." }
+          $checkoutSha = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0 -or -not $checkoutSha) { throw "Could not determine the commit used for packaging." }
+          $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          $checksum = Join-Path $releaseDir "BotImagen-Web-Beta-Windows.zip.sha256"
+          Set-Content -LiteralPath $checksum -Value "$hash  BotImagen-Web-Beta-Windows.zip" -Encoding Ascii
+          $buildInfo = Join-Path $releaseDir "BUILD-INFO.txt"
+          @(
+            "Product: BotImagen local web beta source package",
+            "Checked-out commit: $checkoutSha",
+            "Package type: source + local launcher, not a self-contained installer",
+            "Requirements: Python 3.10+, Node.js 22+, npm, first-run dependency download"
+          ) | Set-Content -LiteralPath $buildInfo -Encoding UTF8
+          "Package SHA-256: $hash" | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+          "Checked-out commit: $checkoutSha" | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+          Get-Item $archive | Select-Object Name,Length | Format-Table | Out-String | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload Windows local beta package
+        uses: actions/upload-artifact@v4
+        with:
+          name: BotImagen-Web-Beta-Windows
+          path: |
+            release/BotImagen-Web-Beta-Windows.zip
+            release/BotImagen-Web-Beta-Windows.zip.sha256
+            release/BUILD-INFO.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
