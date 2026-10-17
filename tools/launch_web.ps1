@@ -85,13 +85,25 @@ try {
         Set-Content -LiteralPath $dependencyStamp -Value $lockHash -Encoding Ascii -NoNewline
     }
 
+    $oldActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     & $pythonCommand.Source -c "from PIL import Image" 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    $pillowCheckExit = $LASTEXITCODE
+    $ErrorActionPreference = $oldActionPreference
+    if ($pillowCheckExit -ne 0) {
         Write-Host "Instalando dependencia Python de composicion PNG..." -ForegroundColor Yellow
+        $oldActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
         & $pythonCommand.Source -m pip install --disable-pip-version-check -r (Join-Path $RepoRoot "requirements-engine.txt")
-        if ($LASTEXITCODE -ne 0) { throw "No se pudo instalar requirements-engine.txt." }
+        $pipInstallExit = $LASTEXITCODE
+        $ErrorActionPreference = $oldActionPreference
+        if ($pipInstallExit -ne 0) { throw "No se pudo instalar requirements-engine.txt." }
+        $oldActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
         & $pythonCommand.Source -c "from PIL import Image" 2>$null
-        if ($LASTEXITCODE -ne 0) { throw "Pillow sigue sin estar disponible en Python." }
+        $pillowRecheckExit = $LASTEXITCODE
+        $ErrorActionPreference = $oldActionPreference
+        if ($pillowRecheckExit -ne 0) { throw "Pillow sigue sin estar disponible en Python." }
     }
 
     Write-Host "PASS: Python $pythonVersion, Node $nodeVersion y dependencias comprobadas." -ForegroundColor Green
