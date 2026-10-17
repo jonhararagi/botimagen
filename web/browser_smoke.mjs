@@ -391,6 +391,104 @@ try {
     return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
   }, null, { timeout: 15000 });
 
+  // Install the repository-owned SVG starter as six real, transparent PNG layers and test the end-to-end rig flow.
+  const builtInPackLibrary = page.locator(".modular-library");
+  const installPackButton = builtInPackLibrary.getByTestId("install-cyberstreet-png-pack");
+  await installPackButton.scrollIntoViewIfNeeded();
+  await installPackButton.click();
+  await builtInPackLibrary.getByTestId("modular-library-status")
+    .filter({hasText: "seis PNG reales de 512×768"}).waitFor({state:"visible",timeout:30000});
+  const cyberstreetLayerLabels = [
+    "Cuerpo base", "Rostro anime", "Falda tecnológica",
+    "Zapatillas neón", "Chaqueta neón", "Cabello cyan",
+  ];
+  const importedPackAudit = await page.evaluate(async () => {
+    const response = await fetch("/api/modular-assets");
+    if (!response.ok) throw new Error("The modular asset library could not be read after installing CyberStreet");
+    const payload = await response.json();
+    const assets = payload.assets.filter(asset => typeof asset.label === "string" && asset.label.startsWith("CyberStreet · "));
+    const results = [];
+    for (const asset of assets) {
+      const imageResponse = await fetch("/api/modular-assets/" + encodeURIComponent(asset.id) + "/image");
+      const blob = await imageResponse.blob();
+      const bitmap = await createImageBitmap(blob);
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const context = canvas.getContext("2d", {willReadFrequently:true});
+      if (!context) throw new Error("Canvas unavailable while validating a packaged PNG layer");
+      context.drawImage(bitmap, 0, 0);
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let nonTransparent = 0;
+      for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) nonTransparent++;
+      const digest = await crypto.subtle.digest("SHA-256", await blob.arrayBuffer());
+      const sha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+      results.push({
+        id: asset.id, label: asset.label, category: asset.category,
+        width: bitmap.width, height: bitmap.height, mime: blob.type,
+        cornerAlpha: pixels[3], nonTransparent, shaMatches: sha256 === asset.sha256,
+        rightsConfirmed: asset.rights_confirmed === true,
+        initiallyUnvalidated: asset.anchors_validated === false,
+        sourceRecorded: typeof asset.source_filename === "string"
+          && asset.source_filename.startsWith("assets/modular/oc-cyberstreet/")
+          && asset.source_url === "https://github.com/jonhararagi/botimagen",
+      });
+      bitmap.close();
+    }
+    return results;
+  });
+  assert.equal(importedPackAudit.length, 6, "The starter pack must register all six independent PNG layers exactly once");
+  for (const asset of importedPackAudit) {
+    assert.ok(cyberstreetLayerLabels.some(label => asset.label === "CyberStreet · " + label), "Expected named CyberStreet layer: " + asset.label);
+    assert.deepEqual([asset.width, asset.height, asset.mime], [512, 768, "image/png"], asset.label + " must be a 512×768 PNG");
+    assert.equal(asset.cornerAlpha, 0, asset.label + " must preserve transparent canvas corners");
+    assert.ok(asset.nonTransparent > 0, asset.label + " must contain visible pixels");
+    assert.equal(asset.shaMatches, true, asset.label + " SHA-256 must match its actual PNG bytes");
+    assert.equal(asset.rightsConfirmed, true, asset.label + " must retain the repository-owned source declaration");
+    assert.equal(asset.initiallyUnvalidated, true, asset.label + " anchors must not be auto-confirmed by the importer");
+    assert.equal(asset.sourceRecorded, true, asset.label + " must retain its source path and repository URL");
+  }
+  // Anchor confirmation remains an explicit action for each imported layer.
+  for (const label of cyberstreetLayerLabels) {
+    const asset = builtInPackLibrary.locator('.modular-asset-list article[data-asset-kind="modular_piece"]').filter({hasText:"CyberStreet · " + label}).first();
+    await asset.waitFor({state:"visible",timeout:10000});
+    await asset.getByRole("button",{name:"Confirmar puntos del esqueleto"}).click();
+    await builtInPackLibrary.getByTestId("modular-library-status")
+      .filter({hasText:"Anclajes confirmados"}).waitFor({state:"visible",timeout:10000});
+  }
+  await builtInPackLibrary.getByLabel("Vista para componer").selectOption("front");
+  for (const label of cyberstreetLayerLabels) {
+    await builtInPackLibrary.getByRole("checkbox",{name:"Seleccionar pieza CyberStreet · " + label}).check();
+  }
+  await builtInPackLibrary.getByRole("button",{name:"Componer selección (6)"}).click();
+  const modularPngOutput = builtInPackLibrary.locator("img.modular-composition-preview");
+  await modularPngOutput.waitFor({state:"visible",timeout:15000});
+  await page.waitForFunction(() => {
+    const image = document.querySelector(".modular-library img.modular-composition-preview");
+    return image instanceof HTMLImageElement && image.complete && image.naturalWidth === 512 && image.naturalHeight === 768;
+  }, null, {timeout:15000});
+  const composedPackAudit = await page.evaluate(() => {
+    const image = document.querySelector(".modular-library img.modular-composition-preview");
+    if (!(image instanceof HTMLImageElement)) throw new Error("The modular PNG preview is not an image");
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+    const context = canvas.getContext("2d", {willReadFrequently:true});
+    if (!context) throw new Error("Canvas unavailable for composed PNG inspection");
+    context.drawImage(image,0,0);
+    const pixels = context.getImageData(0,0,canvas.width,canvas.height).data;
+    let nonTransparent=0;
+    for(let i=3;i<pixels.length;i+=4) if(pixels[i]>0) nonTransparent++;
+    return {width:canvas.width,height:canvas.height,cornerAlpha:pixels[3],nonTransparent};
+  });
+  assert.deepEqual([composedPackAudit.width,composedPackAudit.height],[512,768]);
+  assert.equal(composedPackAudit.cornerAlpha,0,"The final composed PNG should keep transparency outside the character");
+  assert.ok(composedPackAudit.nonTransparent>10000,"The actual composite should contain a visible character, not an empty canvas");
+  const cyberstreetPngDownload = page.waitForEvent("download",{timeout:10000});
+  await builtInPackLibrary.getByRole("button",{name:"Descargar composición PNG"}).click();
+  assert.equal((await cyberstreetPngDownload).suggestedFilename(),"botimagen-composicion-modular.png");
+  await builtInPackLibrary.screenshot({path:resolve(visualQaDir,"cyberstreet-png-modular-composition.png")});
+  console.log("PASS_REAL: Chromium installed the six repository-owned source layers as independently hashed transparent PNG assets, preserved provenance, required explicit anchor confirmation, composed all six through the local API, and downloaded the resulting 512×768 transparent PNG.");
+
   const assetContracts = await page.evaluate(async () => {
     const response = await fetch("/api/assets/contracts");
     if (!response.ok) throw new Error("The asset contract catalog endpoint is unavailable through the web proxy");
