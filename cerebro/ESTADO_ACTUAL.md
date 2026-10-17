@@ -841,3 +841,15 @@ Ejecutar una sola orden de trabajo para completar la edición de máscaras y el 
 - CI #814 para el SHA exacto `7e5405608e28d6e06026b05177b04cb7a0e24a79`: **QUEUED al registrar esta nota**, todavía no es PASS. https://github.com/jonhararagi/botimagen/actions/runs/38985890843
 - Estado actual del incremento: **PARTIAL / CI PENDING**. No aumenta el progreso global. No se ejecutó QA física Windows; tampoco se afirma que las 43 regiones PSD sean piezas semánticas intercambiables.
 - Próximo paso: esperar CI del SHA exacto; si pasa, ampliar el E2E del panel React con fixture PNG real y comprobar la descarga. Si falla, corregir el primer fallo reproducible antes de ampliar alcance. 
+
+# ACTUALIZACIÓN DE CONTINUIDAD · 2026-10-17 · AMPLIACIÓN DEL CATÁLOGO FIJO DE RASGOS
+
+- TIMER estimado: 2–4 horas para este incremento acotado de opciones, render y prueba Chromium; tiempo real no medido.
+- Rama activa: `feature/bimg-anime-png-universal-library`; PR #15 sigue abierto y sin fusionar. HEAD de código de este incremento: `1c2c5586a70e941f7dc3a1e22b54df4388881b30`.
+- Se amplió `web/src/visual/CharacterCatalogStudio.tsx` con un catálogo fijo más amplio: 8 tonos de piel, 10 colores de cabello, 8 peinados, 8 colores de ojos, 8 prendas superiores, 7 prendas inferiores y 8 accesorios. Se añadieron variaciones vectoriales para wolf cut, trenzas y coleta lateral; siluetas de kimono/armadura y falda larga; y orejas felinas, aureola y cuernos pequeños.
+- La pose continúa bloqueada en frontal; no se introdujo azar para elegir rasgos. El usuario sigue controlando cada selector y el prompt manual PixAI recibe las etiquetas elegidas.
+- Se amplió `web/browser_smoke.mjs` para verificar en Chromium la cantidad exacta de opciones por selector, cambios en la vista SVG en vivo y guardado del personaje.
+- **Límite importante:** esto amplía opciones y el boceto vectorial del creador; no equivale a tener PNG ilustrados independientes para cada rasgo ni a que los 43 recortes PSD sean piezas intercambiables validadas. Los assets CC0 existentes (66 entradas de sprites/expresiones y 43 regiones PSD) conservan sus manifiestos y procedencia; no se afirma que se hayan añadido nuevos archivos de arte CC0.
+- La ejecución #819 corresponde al SHA de código `1c2c5586a70e941f7dc3a1e22b54df4388881b30`: pendiente al momento de esta anotación. https://github.com/jonhararagi/botimagen/actions/runs/38986491276
+- Estado de este incremento: **PARTIAL / CI PENDING** hasta que pase build y smoke test. QA manual en Windows no ejecutado. No se recalcula el porcentaje global a partir del número de opciones.
+- Siguiente paso tras CI: arreglar cualquier fallo real; si pasa, el siguiente trabajo de catálogo debe priorizar nuevas piezas ilustradas originales/licenciadas con PNG de transparencia y procedencia comprobable, no inflar conteos con duplicados o variantes que no existen.
