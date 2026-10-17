@@ -1,3 +1,13 @@
+## Incremento posterior · 2026-10-17 · Roundtrip de personaje y exportación JSON
+
+- TIMER estimado: 1–2 horas; tiempo real no medido.
+- En la rama existente `feature/bimg-anime-png-universal-library`, el commit `e1ae04067fe33a20e87e8caf318b906598b00d1f` amplía el smoke test Chromium del creador simple.
+- La prueba nueva verifica la persistencia de los rasgos elegidos, carga de una ficha guardada tras crear una ficha nueva y descarga del archivo JSON exportado. Antes solo se comprobaba que el botón de guardado mostrara el aviso.
+- La CI #819 terminó SUCCESS en el SHA anterior `1c2c5586a70e941f7dc3a1e22b54df4388881b30`, incluyendo build y smoke test Chromium: https://github.com/jonhararagi/botimagen/actions/runs/38986491276. Esta evidencia no cubre el commit de prueba nuevo.
+- Estado al escribir esta entrada: PARTIAL, esperando la CI del SHA `e1ae040...`. No marcar el incremento PASS hasta que la ejecución exacta finalice correctamente.
+- Esto aumenta la verificación de persistencia/exportación, no la cantidad de arte visual ni la madurez del compositor modular.
+- Pendiente integral: comprobar CI exacta, corregir fallos reales, validar piezas PNG con categorías/anclas/capas compatibles, completar assets originales o licenciados, QA físico Windows y empaquetado beta.
+
 # Progreso global de BotImagen
 
 ## Incremento posterior · 2026-10-15 · Fábrica local de assets PixAI
