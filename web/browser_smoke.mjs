@@ -415,11 +415,11 @@ try {
     {id:"hair-rose-twin",label:"Coletas rosas",category:"hair_front"},
     {id:"hair-silver-bob",label:"Bob plateado",category:"hair_front"},
   ];
-  const importedPackAudit = await page.evaluate(async () => {
+  const importedPackAudit = await page.evaluate(async (expectedSources) => {
     const response = await fetch("/api/modular-assets");
     if(!response.ok)throw new Error("The modular asset library could not be read after installing CyberStreet");
     const payload=await response.json();
-    const assets=payload.assets.filter(asset=>typeof asset.label==="string"&&asset.label.startsWith("CyberStreet · ")&&typeof asset.source_filename==="string"&&asset.source_filename.startsWith("assets/modular/oc-cyberstreet/"));
+    const assets=payload.assets.filter(asset=>typeof asset.label==="string"&&asset.label.startsWith("CyberStreet · ")&&typeof asset.source_filename==="string"&&expectedSources.includes(asset.source_filename));
     const results=[];
     for(const asset of assets){
       const imageResponse=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/image");
@@ -441,7 +441,7 @@ try {
       bitmap.close();
     }
     return results;
-  });
+  }, cyberstreetLayerOptions.map(option=>"assets/modular/oc-cyberstreet/"+option.id+".svg"));
   assert.equal(importedPackAudit.length,cyberstreetLayerOptions.length,"The pack should register all 15 independent variants once");
   assert.equal(new Set(importedPackAudit.map(asset=>asset.id)).size,cyberstreetLayerOptions.length,"Every source layer must have a unique library ID");
   assert.equal(new Set(importedPackAudit.map(asset=>asset.sha256)).size,cyberstreetLayerOptions.length,"Every source layer must have distinct PNG bytes");
