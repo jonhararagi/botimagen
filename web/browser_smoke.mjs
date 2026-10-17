@@ -486,6 +486,10 @@ try {
   const cyberstreetPngDownload = page.waitForEvent("download",{timeout:10000});
   await builtInPackLibrary.getByRole("button",{name:"Descargar composición PNG"}).click();
   assert.equal((await cyberstreetPngDownload).suggestedFilename(),"botimagen-composicion-modular.png");
+  // Leave the shared library UI in a neutral selection state for subsequent smoke-test scenarios.
+  for (const label of cyberstreetLayerLabels) {
+    await builtInPackLibrary.getByRole("checkbox",{name:"Seleccionar pieza CyberStreet · " + label}).uncheck();
+  }
   const cyberstreetCaptureDir = resolve(root,"artifacts","visual-qa");
   await mkdir(cyberstreetCaptureDir,{recursive:true});
   await builtInPackLibrary.screenshot({path:resolve(cyberstreetCaptureDir,"cyberstreet-png-modular-composition.png")});
