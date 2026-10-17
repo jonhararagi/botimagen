@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg, get_cyberstreet_manifest
+from cyberstreet_svg_compositor import CyberStreetError, compose_cyberstreet_svg, get_cyberstreet_manifest, get_cyberstreet_layer_png_source
 import xml.etree.ElementTree as ET
 
 class CyberStreetSvgTests(unittest.TestCase):
@@ -32,6 +32,32 @@ class CyberStreetSvgTests(unittest.TestCase):
         self.assertIn("layer-face-anime-cyan", no_hair)
         self.assertIn('id="face-features"', no_hair)
         self.assertNotIn("layer-hair-midnight-cyan", no_hair)
+
+    def test_png_source_endpoint_contract_has_six_safe_original_independent_layers(self):
+        manifest = get_cyberstreet_manifest()
+        expected = {
+            "base-body": ("body", "body", 20),
+            "face-anime-cyan": ("face", "face", 50),
+            "skirt-tech-pleated": ("clothing_bottom", "bottom", 36),
+            "sneakers-neon": ("footwear", "footwear", 28),
+            "top-neon-jacket": ("clothing_top", "top", 40),
+            "hair-midnight-cyan": ("hair_front", "hair_front", 70),
+        }
+        self.assertEqual({item["id"] for item in manifest["layers"]}, set(expected))
+        for layer_id, (category, rig_category, layer_order) in expected.items():
+            with self.subTest(layer_id=layer_id):
+                source = get_cyberstreet_layer_png_source(layer_id)
+                self.assertEqual((source["width"], source["height"]), (512, 768))
+                self.assertEqual((source["category"], source["rig_category"], source["layer_order"]),
+                                 (category, rig_category, layer_order))
+                self.assertIn('viewBox="0 0 512 768"', source["svg"])
+                self.assertTrue(source["source_filename"].startswith("assets/modular/oc-cyberstreet/"))
+                self.assertEqual(source["license"], "LicenseRef-BotImagen-Original-Assets")
+                self.assertTrue(source["source_url"].startswith("https://"))
+                self.assertIn("shoulder_l", source["anchors"])
+                self.assertIn("ankle_r", source["anchors"])
+        with self.assertRaises(CyberStreetError):
+            get_cyberstreet_layer_png_source("../../outside")
 
     def test_rejects_unknown_layer_and_missing_base(self):
         with self.assertRaises(CyberStreetError): compose_cyberstreet_svg({"../../oops":True})
