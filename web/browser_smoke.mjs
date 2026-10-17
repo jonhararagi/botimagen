@@ -306,6 +306,9 @@ try {
   await page.locator('.modular-asset-list article[data-asset-kind="reference"]')
     .filter({ hasText: "Fuente original · qa-reference" }).first()
     .waitFor({ state: "visible", timeout: 15000 });
+  const rightsControls = page.locator(".modular-library");
+  await rightsControls.getByLabel("Licencia de la imagen").fill("Original propio");
+  await rightsControls.getByLabel("Confirmo derechos y procedencia").check();
 
 
   // Full PNG-to-rig flow: edit body joints, persist them, fit a garment, and compose.

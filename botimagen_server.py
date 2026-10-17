@@ -22,7 +22,8 @@ from modular_asset_library import read_user_asset
 from character_render_engine import DEFAULT_RENDER_RECIPE, RENDERER_ID, render_profile_svg
 from mini_ai_generator import MiniAIError, generate_mini_ai, mini_ai_status
 from modular_asset_library import (
-    AssetImportError, confirm_user_asset_anchors, import_user_asset, list_user_assets, read_user_asset,
+    AssetImportError, confirm_user_asset_anchors, confirm_user_asset_rights,
+    import_user_asset, list_user_assets, read_user_asset,
 )
 
 ROOT = Path(__file__).resolve().parent
@@ -366,7 +367,7 @@ def make_handler(
                 "/api/generate": ("POST",),
             }
             allowed = allowed_by_path.get(path)
-            if path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors"):
+            if path.startswith("/api/modular-assets/") and path.endswith(("/validate-anchors", "/confirm-rights")):
                 allowed = ("POST",)
             elif path.startswith("/api/character-models/"):
                 allowed = ("POST",) if path.endswith(("/extend", "/publish-layer", "/edit-layer", "/reset-layer")) else ("GET",)
@@ -518,11 +519,12 @@ def make_handler(
                 self._method_not_allowed()
                 return
             validate_anchor_route = path.startswith("/api/modular-assets/") and path.endswith("/validate-anchors")
+            confirm_rights_route = path.startswith("/api/modular-assets/") and path.endswith("/confirm-rights")
             model_extend_route = path.startswith("/api/character-models/") and path.endswith("/extend")
             model_publish_route = path.startswith("/api/character-models/") and path.endswith("/publish-layer")
             model_edit_route = path.startswith("/api/character-models/") and path.endswith("/edit-layer")
             model_reset_route = path.startswith("/api/character-models/") and path.endswith("/reset-layer")
-            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render", "/api/mini-ai/generate"} and not validate_anchor_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route:
+            if path not in {"/api/generate", "/api/profiles", "/api/render/character", "/api/modular-assets", "/api/character-models", "/api/modular-compose", "/api/modular-cyberstreet/render", "/api/mini-ai/generate"} and not validate_anchor_route and not confirm_rights_route and not model_extend_route and not model_publish_route and not model_edit_route and not model_reset_route:
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "Endpoint no encontrado."})
                 return
             try:
@@ -537,6 +539,27 @@ def make_handler(
                     asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/validate-anchors").strip("/")
                     try:
                         result = confirm_user_asset_anchors(asset_id, library_root=asset_library_root, anchors=payload.get("anchors"))
+                    except FileNotFoundError:
+                        self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
+                        return
+                    except AssetImportError as exc:
+                        raise ApiInputError(str(exc)) from exc
+                    self._send_json(HTTPStatus.OK, result)
+                    return
+                if confirm_rights_route:
+                    if (
+                        not isinstance(payload, dict)
+                        or payload.get("confirm") is not True
+                        or set(payload) - {"confirm", "license", "source_url"}
+                        or not isinstance(payload.get("license"), str)
+                    ):
+                        raise ApiInputError("Confirma explícitamente derechos/procedencia y envía license; source_url es opcional solo para obra propia.")
+                    asset_id = path.removeprefix("/api/modular-assets/").removesuffix("/confirm-rights").strip("/")
+                    try:
+                        result = confirm_user_asset_rights(
+                            asset_id, payload["license"], payload.get("source_url", ""),
+                            library_root=asset_library_root,
+                        )
                     except FileNotFoundError:
                         self._send_json(HTTPStatus.NOT_FOUND, {"error": "Asset no encontrado."})
                         return
@@ -567,6 +590,22 @@ def make_handler(
                     if not isinstance(pieces, list) or not isinstance(size, list) or len(size) != 2:
                         raise ApiInputError("Se requieren pieces (lista) y canvas_size [ancho, alto].")
                     try:
+                        by_id = {asset["id"]: asset for asset in list_user_assets(asset_library_root)["assets"]}
+                        for piece in pieces:
+                            if not isinstance(piece, dict):
+                                raise ApiInputError("Cada pieza de composición debe ser un objeto.")
+                            resource_id = piece.get("resource")
+                            asset = by_id.get(resource_id)
+                            if asset is None or asset.get("kind") != "modular_piece":
+                                raise ApiInputError("La composición solo admite piezas modulares PNG registradas en la biblioteca.")
+                            if (
+                                asset.get("rights_confirmed") is not True
+                                or asset.get("provenance_status") not in {"user_declared_original", "user_attested_open_license"}
+                            ):
+                                raise ApiInputError(
+                                    f"La pieza «{asset.get('label', resource_id)}» tiene derechos/procedencia sin confirmar. "
+                                    "Declara «Original propio» o una licencia abierta admitida con URL HTTPS."
+                                )
                         selected = validate_selection(pieces)
                         image = compose_png(selected, lambda asset_id: read_user_asset(asset_id, asset_library_root)[0], tuple(size))
                     except (CompositionError, AssetImportError, FileNotFoundError, TypeError, ValueError) as exc:

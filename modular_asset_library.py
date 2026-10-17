@@ -10,6 +10,7 @@ import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_LIBRARY_ROOT = ROOT / "user_data" / "modular_assets"
@@ -21,6 +22,22 @@ CATEGORIES = {
     "body", "head", "face", "hair_back", "hair_front", "eyes", "brows", "mouth",
     "clothing_top", "clothing_bottom", "footwear", "accessory_back", "accessory_front",
     "reference", "portrait",
+}
+
+_ORIGINAL_LICENSE_ALIASES = {
+    "original propio",
+    "original del usuario",
+    "licenseref-botimagen-original-assets",
+}
+_OPEN_LICENSE_ALIASES = {
+    "cc0 1.0",
+    "cc0 1.0 universal",
+    "cc by 4.0",
+    "cc by-sa 4.0",
+    "cc by 3.0",
+    "cc by-sa 3.0",
+    "public domain",
+    "dominio público",
 }
 
 
@@ -149,6 +166,56 @@ def _read_catalog(root: Path) -> dict[str, Any]:
     return value
 
 
+def _provenance_fields(license_name: str, source_url: str, confirmed: bool) -> dict[str, Any]:
+    """Record a user's provenance declaration without claiming independent legal verification."""
+    if not confirmed:
+        return {
+            "rights_confirmed": False,
+            "provenance_status": "unverified",
+            "provenance_reviewed_at": None,
+            "provenance_note": "Pendiente: derechos, licencia y procedencia aún no declarados.",
+        }
+    normalized = " ".join(license_name.strip().casefold().split())
+    if normalized in _ORIGINAL_LICENSE_ALIASES:
+        return {
+            "rights_confirmed": True,
+            "provenance_status": "user_declared_original",
+            "provenance_reviewed_at": datetime.now(timezone.utc).isoformat(),
+            "provenance_note": "Original declarado por el usuario. BotImagen no verifica de forma independiente la autoría.",
+        }
+    if normalized in _OPEN_LICENSE_ALIASES:
+        parsed = urlsplit(source_url.strip())
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+            raise AssetImportError(
+                "Para confirmar una licencia abierta admitida, añade una URL de procedencia HTTPS válida."
+            )
+        return {
+            "rights_confirmed": True,
+            "provenance_status": "user_attested_open_license",
+            "provenance_reviewed_at": datetime.now(timezone.utc).isoformat(),
+            "provenance_note": "Licencia y fuente declaradas por el usuario; BotImagen no verifica automáticamente la página ni sus derechos.",
+        }
+    raise AssetImportError(
+        "Licencia no habilitada para composición. Usa «Original propio» o una licencia admitida "
+        "(CC0 1.0, CC BY 4.0, CC BY-SA 4.0, CC BY 3.0, CC BY-SA 3.0 o dominio público). "
+        "Para una licencia abierta se requiere una URL HTTPS de procedencia."
+    )
+
+
+def _write_catalog_atomic(root: Path, catalog: dict[str, Any]) -> None:
+    temporary = root / ("catalog.json." + uuid.uuid4().hex + ".tmp")
+    try:
+        with temporary.open("x", encoding="utf-8") as handle:
+            json.dump(catalog, handle, ensure_ascii=False, indent=2)
+            handle.write("\n")
+        temporary.replace(root / "catalog.json")
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+
+
 def list_user_assets(library_root: Path | None = None) -> dict[str, Any]:
     root = Path(library_root) if library_root else DEFAULT_LIBRARY_ROOT
     catalog = _read_catalog(root)
@@ -158,8 +225,45 @@ def list_user_assets(library_root: Path | None = None) -> dict[str, Any]:
             continue
         path = root / str(item.get("stored_name", ""))
         if path.is_file() and path.parent.resolve() == root.resolve():
-            visible.append({k: v for k, v in item.items() if k != "stored_name"} | {"available": True})
+            public_item = {k: v for k, v in item.items() if k != "stored_name"} | {"available": True}
+            public_item.setdefault("rights_confirmed", False)
+            public_item.setdefault("provenance_status", "unverified")
+            public_item.setdefault("provenance_reviewed_at", None)
+            public_item.setdefault("provenance_note", "Sin confirmación de derechos/procedencia.")
+            visible.append(public_item)
     return {"schema_version": 1, "count": len(visible), "assets": visible}
+
+
+def confirm_user_asset_rights(
+    asset_id: str,
+    license_name: Any,
+    source_url: Any = "",
+    library_root: Path | None = None,
+) -> dict[str, Any]:
+    """Persist an explicit user declaration for a previously imported resource."""
+    if not isinstance(asset_id, str) or not re.fullmatch(r"user\.[0-9a-f]{32}", asset_id):
+        raise AssetImportError("Identificador de asset inválido.")
+    if not isinstance(license_name, str) or len(license_name) > 1000:
+        raise AssetImportError("El campo de licencia debe ser texto de hasta 1000 caracteres.")
+    if not isinstance(source_url, str) or len(source_url) > 1000:
+        raise AssetImportError("El campo de procedencia debe ser texto de hasta 1000 caracteres.")
+    license_name = license_name.strip()
+    source_url = source_url.strip()
+    if source_url and not source_url.startswith(("https://", "http://")):
+        raise AssetImportError("source_url debe ser una URL HTTP(S) o estar vacío.")
+    provenance = _provenance_fields(license_name, source_url, True)
+    root = Path(library_root) if library_root else DEFAULT_LIBRARY_ROOT
+    if root.is_symlink():
+        raise AssetImportError("El directorio de biblioteca no puede ser un enlace simbólico.")
+    catalog = _read_catalog(root)
+    item = next((entry for entry in catalog["assets"] if isinstance(entry, dict) and entry.get("id") == asset_id), None)
+    if item is None:
+        raise FileNotFoundError(asset_id)
+    item["license"] = license_name
+    item["source_url"] = source_url
+    item.update(provenance)
+    _write_catalog_atomic(root, catalog)
+    return {key: value for key, value in item.items() if key != "stored_name"}
 
 
 def confirm_user_asset_anchors(
@@ -194,17 +298,7 @@ def confirm_user_asset_anchors(
     item["anchors_validated"] = True
     item["anchor_status"] = "user_confirmed"
     item["note"] = "El usuario ajustó/revisó los puntos del esqueleto en la vista previa y confirmó el encaje."
-    temporary = root / ("catalog.json." + uuid.uuid4().hex + ".tmp")
-    try:
-        with temporary.open("x", encoding="utf-8") as handle:
-            json.dump(catalog, handle, ensure_ascii=False, indent=2)
-            handle.write("\n")
-        temporary.replace(root / "catalog.json")
-    finally:
-        try:
-            temporary.unlink()
-        except FileNotFoundError:
-            pass
+    _write_catalog_atomic(root, catalog)
     return {key: value for key, value in item.items() if key != "stored_name"}
 
 
@@ -353,7 +447,7 @@ def _validate_conversion_metadata(value: Any, image_width: int, image_height: in
 def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise AssetImportError("El cuerpo debe ser un objeto JSON.")
-    allowed = {"filename", "mime_type", "data_base64", "category", "label", "view", "license", "source_url", "kind", "conversion", "source_asset_id", "source_filename"}
+    allowed = {"filename", "mime_type", "data_base64", "category", "label", "view", "license", "source_url", "kind", "conversion", "source_asset_id", "source_filename", "rights_confirmed"}
     if set(payload) - allowed:
         raise AssetImportError("Hay campos de importación no reconocidos.")
     filename = _safe_display_name(payload.get("filename"))
@@ -385,11 +479,17 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
         raise AssetImportError("La imagen supera el límite de 20 megapíxeles.")
     source_url = payload.get("source_url", "")
     license_name = payload.get("license", "UNVERIFIED")
+    rights_confirmed = payload.get("rights_confirmed", False)
+    if not isinstance(rights_confirmed, bool):
+        raise AssetImportError("rights_confirmed debe ser booleano.")
     for field, value in (("source_url", source_url), ("license", license_name)):
         if not isinstance(value, str) or len(value) > 1000:
             raise AssetImportError(f"Metadato {field} no válido.")
+    source_url = source_url.strip()
+    license_name = license_name.strip()
     if source_url and not source_url.startswith(("https://", "http://")):
         raise AssetImportError("source_url debe ser una URL HTTP(S) o estar vacío.")
+    provenance = _provenance_fields(license_name, source_url, rights_confirmed)
     kind = payload.get("kind", "reference")
     if not isinstance(kind, str) or kind not in {"modular_piece", "full_character", "reference", "portrait"}:
         raise AssetImportError("Tipo de recurso no válido.")
@@ -427,6 +527,9 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
             and existing.get("license") == license_name and existing.get("source_url") == source_url
             and existing.get("conversion") == conversion
         ):
+            if provenance["rights_confirmed"] and existing.get("rights_confirmed") is not True:
+                existing.update(provenance)
+                _write_catalog_atomic(root, catalog)
             return {k: v for k, v in existing.items() if k != "stored_name"} | {"duplicate": True}
     asset_id = "user." + uuid.uuid4().hex
     suffix = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}[mime]
@@ -448,6 +551,7 @@ def import_user_asset(payload: Any, library_root: Path | None = None) -> dict[st
         "anchor_status": "estimated_not_validated" if conversion else "not_applicable",
         "conversion": conversion,
         "source_url": source_url, "license": license_name,
+        **provenance,
         "imported_at": datetime.now(timezone.utc).isoformat(),
         "compatibility": [], "color_options": [],
         "note": (

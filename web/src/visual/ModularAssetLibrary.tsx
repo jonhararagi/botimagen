@@ -6,6 +6,7 @@ type UserAsset = {
   id: string; label: string; category: string; kind: string; filename: string; source_filename?: string;
   source_asset_id?: string | null; mime_type: string; width: number; height: number; bytes: number; sha256: string;
   view: string; license: string; source_url: string; duplicate?: boolean; available?: boolean;
+  rights_confirmed?: boolean; provenance_status?: string; provenance_reviewed_at?: string | null; provenance_note?: string;
   layer_order?: number | null; anchor_estimate?: Record<string, {x:number;y:number}>;
   anchors_validated?: boolean; anchor_status?: string; conversion?: AssetConversionMetadata | null; note?: string;
 };
@@ -170,6 +171,7 @@ export function ModularAssetLibrary() {
   const [view, setView] = useState<"front"|"back"|"side"|"unknown">("front");
   const [license, setLicense] = useState("UNVERIFIED");
   const [sourceUrl, setSourceUrl] = useState("");
+  const [rightsConfirmed, setRightsConfirmed] = useState(false);
   const [removeBackground, setRemoveBackground] = useState(true);
   const [tolerance, setTolerance] = useState(36);
   const [scalePercent, setScalePercent] = useState(100);
@@ -250,7 +252,7 @@ export function ModularAssetLibrary() {
           const originalBase64=await readDataUrl(item.file);
           sourceRecord=await postAsset({
             filename:item.file.name,source_filename:item.file.name,mime_type:item.file.type,data_base64:originalBase64,
-            category:"reference",kind:"reference",label:`Fuente original · ${stem}`,view,license,source_url:sourceUrl,
+            category:"reference",kind:"reference",label:`Fuente original · ${stem}`,view,license,source_url:sourceUrl,rights_confirmed:rightsConfirmed,
           });
         }
         const suffix=item.conversion?.cutout_applied?"-pieza-recortada":"";
@@ -258,7 +260,7 @@ export function ModularAssetLibrary() {
         const convertedBase64=await readDataUrl(convertedFile);
         await postAsset({
           filename:convertedFile.name,source_filename:item.file.name,mime_type:"image/png",data_base64:convertedBase64,
-          category,kind,label:stem,view,license,source_url:sourceUrl,
+          category,kind,label:stem,view,license,source_url:sourceUrl,rights_confirmed:rightsConfirmed,
           ...(sourceRecord?.id?{source_asset_id:sourceRecord.id}:{}),
           conversion:item.conversion,
         });
@@ -288,6 +290,31 @@ export function ModularAssetLibrary() {
       setStatus(error instanceof Error?error.message:"Falló la confirmación de anclajes.");
     } finally { setBusy(false); }
   };
+
+  const confirmRights = async (asset:UserAsset) => {
+    if (busy) return;
+    if (!rightsConfirmed) {
+      setStatus("Marca primero «Confirmo derechos y procedencia» después de revisar la licencia y su fuente.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response=await fetch("/api/modular-assets/"+encodeURIComponent(asset.id)+"/confirm-rights",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({confirm:true,license,source_url:sourceUrl}),
+      });
+      const result=await response.json();
+      if(!response.ok) throw new Error(result.error||"No se pudieron guardar los derechos/procedencia.");
+      await refresh();
+      setStatus("Declaración de derechos guardada para «"+asset.label+"». No implica verificación jurídica automática.");
+    } catch(error) {
+      setStatus(error instanceof Error?error.message:"Falló la confirmación de derechos/procedencia.");
+    } finally { setBusy(false); }
+  };
+
+  const hasEligibleProvenance = (asset:UserAsset) =>
+    asset.rights_confirmed === true
+    && ["user_declared_original","user_attested_open_license"].includes(asset.provenance_status || "");
 
   const composeSelection = async () => {
     if (busy || !selectedAssets.length) return;
@@ -380,8 +407,12 @@ export function ModularAssetLibrary() {
           <option value="front">Frontal</option><option value="back">Trasera</option><option value="side">Lateral</option><option value="unknown">Sin definir</option>
         </select>
       </label>
-      <label>Licencia / derechos <input aria-label="Licencia de la imagen" value={license} onChange={e=>setLicense(e.target.value)} maxLength={1000} /></label>
-      <label className="modular-source-url">URL de procedencia <input aria-label="URL de procedencia" value={sourceUrl} onChange={e=>setSourceUrl(e.target.value)} placeholder="https://… (opcional)" maxLength={1000} /></label>
+      <label>Licencia / derechos <input aria-label="Licencia de la imagen" value={license} onChange={e=>{setLicense(e.target.value);setRightsConfirmed(false);}} maxLength={1000} /></label>
+      <label className="modular-source-url">URL de procedencia <input aria-label="URL de procedencia" value={sourceUrl} onChange={e=>{setSourceUrl(e.target.value);setRightsConfirmed(false);}} placeholder="https://… (opcional)" maxLength={1000} /></label>
+      <label className="modular-check" style={{gridColumn:"1/-1",lineHeight:1.45}}>
+        <input type="checkbox" aria-label="Confirmo derechos y procedencia" checked={rightsConfirmed} onChange={e=>setRightsConfirmed(e.target.checked)} />
+        Declaro que es obra original propia o que la licencia abierta y la fuente indicadas son correctas. Esta declaración se registra, pero BotImagen no verifica automáticamente autoría, licencia ni el contenido de la página.
+      </label>
     </div>
 
     <div className="modular-converter-options">
@@ -419,16 +450,19 @@ export function ModularAssetLibrary() {
     <div className="modular-asset-list">
       {assets.map(asset=>{
         const canCompose=isConvertiblePiece(asset);
-        const selectable=canCompose&&asset.anchors_validated===true&&supportsCompositionView(asset);
+        const hasRights=hasEligibleProvenance(asset);
+        const selectable=canCompose&&hasRights&&asset.anchors_validated===true&&supportsCompositionView(asset);
         return <article key={asset.id} data-asset-id={asset.id} data-asset-kind={asset.kind}>
           {asset.kind==="modular_piece"&&asset.conversion?<div className="modular-saved-preview"><AnchorStageEditor imageUrl={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} anchors={asset.anchor_estimate||asset.conversion.anchors} label={`Ajustar esqueleto de ${asset.label}`} onChange={anchors=>setAssets(current=>current.map(entry=>entry.id===asset.id?{...entry,anchor_estimate:anchors,conversion:entry.conversion?{...entry.conversion,anchors}:entry.conversion}:entry))}/></div>:<img className="modular-saved-preview" src={"/api/modular-assets/"+encodeURIComponent(asset.id)+"/image"} alt={`Material guardado ${asset.label}`}/>}
           <b>{asset.label}</b><span>{asset.category} · {asset.kind} · {asset.width}×{asset.height}</span>
           <small>{asset.filename} · SHA-256 {asset.sha256.slice(0,16)}… · licencia: {asset.license}</small>
+          <small>Procedencia: {asset.provenance_status==="user_declared_original"?"obra propia declarada":asset.provenance_status==="user_attested_open_license"?"licencia abierta y fuente declaradas":"sin confirmar"} · {asset.provenance_note||"No consta declaración de derechos."}</small>
           {asset.conversion&&<small>{asset.conversion.cutout_applied?"Recorte manual":"Imagen completa"} · {asset.conversion.background_removed?"fondo plano retirado":"fondo conservado"} · vista {asset.view} · anclajes: {asset.anchor_status==="user_confirmed"?"confirmados":"estimados sin validar"}</small>}
           {canCompose&&<div className="modular-asset-actions">
             <label className="modular-check"><input type="checkbox" aria-label={`Seleccionar pieza ${asset.label}`} checked={selectedAssets.includes(asset.id)} disabled={!selectable||busy} onChange={e=>toggleAsset(asset.id,e.target.checked)}/>{asset.category==="body"?"Base del esqueleto":"Incluir en la composición"}</label>
             {!asset.anchors_validated&&canCompose&&<button type="button" className="btn muted" disabled={busy} onClick={()=>void confirmAnchors(asset)}>Confirmar puntos del esqueleto</button>}
-            {!selectable&&canCompose&&<small>{!supportsCompositionView(asset)?`Esta pieza es de vista ${asset.view==="back"?"trasera":"frontal"}. Cambia la vista de composición para usarla.`:"Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático."}</small>}
+            {!hasRights&&canCompose&&<button type="button" className="btn muted" disabled={busy||!rightsConfirmed} onClick={()=>void confirmRights(asset)}>Aplicar declaración de derechos a esta pieza</button>}
+            {!selectable&&canCompose&&<small>{!supportsCompositionView(asset)?`Esta pieza es de vista ${asset.view==="back"?"trasera":"frontal"}. Cambia la vista de composición para usarla.`:!hasRights?"Bloqueada: confirma arriba una licencia admitida y su procedencia antes de componer.":"Arrastra los puntos del esqueleto y confírmalos antes de usar el encaje automático."}</small>}
           </div>}
         </article>;
       })}

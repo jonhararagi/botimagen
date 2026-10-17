@@ -616,7 +616,8 @@ class LocalApiTests(unittest.TestCase):
                 "label": filename,
                 "kind": "modular_piece",
                 "view": "front",
-                "license": "USER_PROVIDED_REFERENCE",
+                "license": "Original propio",
+                "rights_confirmed": True,
                 "conversion": {
                     "schema_version": 1,
                     "algorithm": "botimagen-png-stage-v1",
@@ -713,6 +714,32 @@ class LocalApiTests(unittest.TestCase):
                     self.assertEqual(rgba.getpixel((50, 50)), (20, 60, 220, 255))
                     self.assertEqual(rgba.getpixel((400, 400)), (240, 30, 150, 255))
                     self.assertEqual(rgba.getpixel((250, 250))[3], 0)
+
+                pending_payload = image_payload(
+                    "unverified.png", piece_png((80, 90, 100, 255), (50, 60, 100, 110)), "body"
+                )
+                pending_payload["license"] = "UNVERIFIED"
+                pending_payload["rights_confirmed"] = False
+                status, _, pending_asset = request("POST", "/api/modular-assets", pending_payload)
+                self.assertEqual(status, 201)
+                blocked_piece = {
+                    "schema_version": 1, "id": pending_asset["id"], "category": "body",
+                    "resource": pending_asset["id"], "dimensions": {"width": 512, "height": 768},
+                    "anchors": {"waist": {"x": 0.5, "y": 0.5}}, "anchors_validated": True,
+                    "layer_order": 20,
+                }
+                status, _, blocked = request("POST", "/api/modular-compose", {
+                    "pieces": [blocked_piece], "canvas_size": [512, 768],
+                })
+                self.assertEqual(status, 400)
+                self.assertIn("derechos/procedencia", blocked["error"].lower())
+                status, _, declared = request(
+                    "POST", f"/api/modular-assets/{pending_asset['id']}/confirm-rights",
+                    {"confirm": True, "license": "Original propio", "source_url": ""},
+                )
+                self.assertEqual(status, 200)
+                self.assertTrue(declared["rights_confirmed"])
+                self.assertEqual(declared["provenance_status"], "user_declared_original")
             finally:
                 server.shutdown()
                 server.server_close()
